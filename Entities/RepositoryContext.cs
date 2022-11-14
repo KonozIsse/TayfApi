@@ -1,0 +1,231 @@
+﻿using Entities.Models;
+using Entities.Models.Configuration;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class RepositoryContext : IdentityDbContext <User,Role,int>
+    {
+        public RepositoryContext(DbContextOptions options) : base(options)
+        {
+
+        }
+
+        public RepositoryContext()
+        {
+        }
+
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<ProductAttribut> AttributesProducts { get; set; }
+        public DbSet<Banner> Banners { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartProduct> CartsProducts { get; set; } 
+        public DbSet<CartAttributeProduct> CartAttributeProducts { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<CategoriesStore> CategoriesStores { get; set; }
+        public DbSet<CommentNews> CommentNews { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<CustomerStore> CustomerStores { get; set; }
+        public DbSet<CustomerProduct> CustomerProducts { get; set; }
+        public DbSet<CustomerAttributesProduct> CustomerAttributesProducts { get; set; }
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<DeliveryTime> DeliveryTimes { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<ImageSetting> ImageSettings { get; set; }
+        public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<Link> Links { get; set; }
+        public DbSet<MessageTemplate> MessageTemplate { get; set; }
+        public DbSet<MailList> MailLists { get; set; }
+        public DbSet<News> News { get; set; }
+        public DbSet<NewsCategory> NewsCategories { get; set; }
+        public DbSet<Notification> Notification { get; set; }
+        public DbSet<NotificationAction> NotificationAction { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderProduct> OrdersProducts { get; set; }
+        public DbSet<OrderAttributProduct> OrderAttributesProducts { get; set; }
+        public DbSet<OrderStatus> OrdersStatus { get; set; }
+        public DbSet<PaymentMethods> PaymentMethods { get; set; }
+        public DbSet<PaymentMethodDetail> PaymentMethodDetail { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<ProductSales> ProductSales { get; set; }
+        public DbSet<ProductsStore> ProductsStores { get; set; } 
+        public DbSet<ProductType> ProductTypes { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<Setting> Settings { get; set; }
+        public DbSet<ShippingMethods> ShippingMethods { get; set; }
+        public DbSet<Sliders> Sliders { get; set; }
+        public DbSet<StaticPages> StaticPages { get; set; }
+        public DbSet<SpecialProducts> SpecialProducts { get; set; }
+        public DbSet<TaxClass> TaxClasses { get; set; }
+        public DbSet<TaxRate> TaxRates { get; set; }
+        public DbSet<UserCoupon> UserCoupons { get; set; } 
+        public DbSet<Unit> Units { get; set; } 
+        public DbSet<WishList> WishLists { get; set; }
+        public DbSet<Zone> Zones { get; set; }
+        public override int SaveChanges()
+        {
+            UpdateSoftDeleteStatuses();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            UpdateSoftDeleteStatuses();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void UpdateSoftDeleteStatuses()
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        break;
+                    case EntityState.Deleted:
+                        bool IsDeleted;
+                        if (entry.OriginalValues.TryGetValue("IsDeleted", out IsDeleted))
+                        {
+                            entry.State = EntityState.Modified;
+                            entry.CurrentValues["IsDeleted"] = true;
+                            entry.CurrentValues["DeletedAt"] = DateTime.Now;
+
+                            //foreach (var navigationEntry in entry.Navigations.Where(n => !n.Metadata.IsDependentToPrincipal()))
+                            //{
+                            //    if (navigationEntry is CollectionEntry collectionEntry)
+                            //    {
+                            //        foreach (var dependentEntry in collectionEntry.CurrentValue)
+                            //        {
+                            //            HandleDependent(Entry(dependentEntry));
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        var dependentEntry = navigationEntry.CurrentValue;
+                            //        if (dependentEntry != null)
+                            //        {
+                            //            HandleDependent(Entry(dependentEntry));
+                            //        }
+                            //    }
+                            //}
+                        }
+                        break;
+                    case EntityState.Modified:
+                        DateTime? UpdatedAt;
+                        if (entry.OriginalValues.TryGetValue("UpdatedAt", out UpdatedAt))
+                        {
+                            entry.CurrentValues["UpdatedAt"] = DateTime.Now;
+                        }
+                        break;
+
+                }
+            }
+        }
+
+        private void HandleDependent(EntityEntry entry)
+        {
+            entry.CurrentValues["IsDeleted"] = true;
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            ConfigureConfiguration(modelBuilder);
+
+            ConfigureSoftDelete(modelBuilder);
+
+            ConfigureAutoMapToTables(modelBuilder);
+
+            modelBuilder.Entity<User>().HasMany(address => address.Addresses)
+                          .WithOne(user => user.User).HasForeignKey(con => con.UserId);
+
+            modelBuilder.Entity<User>().HasMany(customer => customer.Customers)
+                         .WithOne(user => user.Customer).HasForeignKey(con => con.CustomerId);
+
+            modelBuilder.Entity<User>().HasMany(store => store.Stores)
+                           .WithOne(user => user.Store).HasForeignKey(con => con.StoreId);
+
+            modelBuilder.Entity<User>().HasMany(store => store.StoreOrders)
+                         .WithOne(order => order.Store).HasForeignKey(con => con.StoreId);
+            modelBuilder.Entity<User>().HasMany(customer => customer.CustomerOrders)
+                         .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId);
+
+            ConfigureDeleteBehavior(modelBuilder);
+
+        }
+
+        private static void ConfigureDeleteBehavior(ModelBuilder modelBuilder)
+        {
+            var cascadeFKs = modelBuilder.Model.GetEntityTypes()
+                            .SelectMany(t => t.GetForeignKeys())
+                            .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);
+
+            foreach (var fk in cascadeFKs)
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
+        }
+
+        private static void ConfigureConfiguration(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+        }
+
+        private static void ConfigureSoftDelete(ModelBuilder modelBuilder)
+        {
+            Expression<Func<BaseEntity, bool>> filterExpr = bm => !bm.IsDeleted;
+            foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
+            {
+                // check if current entity type is child of BaseModel
+                if (mutableEntityType.ClrType.IsAssignableTo(typeof(BaseEntity)))
+                {
+                    // modify expression to handle correct child type
+                    var parameter = Expression.Parameter(mutableEntityType.ClrType);
+                    var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
+                    var lambdaExpression = Expression.Lambda(body, parameter);
+
+                    // set filter
+                    mutableEntityType.SetQueryFilter(lambdaExpression);
+                }
+            }
+        }
+
+        private static void ConfigureAutoMapToTables(ModelBuilder modelBuilder)
+        {
+            var allDbSets = typeof(RepositoryContext).GetProperties()
+                         .Where(p => p.PropertyType.Name.Contains("DbSet") && p.Module.Name.Contains(nameof(RepositoryContext)))
+                         .Select(p => new
+                         {
+                             Type = p.PropertyType.GetGenericArguments()[0],
+                             p.Name
+                         });
+            string schema = null;
+            foreach (var property in allDbSets)
+            {
+                var type = property.Type;
+                modelBuilder.Entity(type, b =>
+                {
+                    b.ToTable(property.Name, schema);
+                });
+            }
+        }
+    }
+
+}

@@ -1,0 +1,36 @@
+﻿using Entities.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Contracts
+{
+    public interface ISettingRepository
+    {
+        Task<IEnumerable<Setting>> GetAllSettings(bool trackChanges);
+        Setting GetSettingByValue(string key);
+        Task<IEnumerable<Setting>> GetMediaSetting();
+         string GetPeriod();
+    } 
+    public interface IMessageTemplateRepository
+    {
+        Task<MessageTemplate> GetVerificationEmail();
+        Task<MessageTemplate> GetDefaultEmailTemplate();
+        Task<IEnumerable<MessageTemplate>> GetEmailTemplatesList(bool trackChanges);
+        Task<MessageTemplate> GetTemplateById(int id, bool trackChanges);
+    }
+    public interface IMailListRepository
+    {
+        Task<MailList> GetMailListById(int id, bool trackChanges);
+        Task<MailList> GetMailListEmail(string email);
+        void SendUserEmail(MailList sendEmail);
+        void RemoveMailList(MailList email);
+    }
+    public interface IDeliveryTimeRepository
+    {
+        Task<List<DeliveryTime>> GetAllDeliveryTimes();
+        Task<DeliveryTime> GetDeliveryTimeById(int id, bool trackChanges);
+    }
+}

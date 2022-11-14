@@ -1,0 +1,471 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="addAdmin" xml:space="preserve">
+    <value>إضافة مستخدم</value>
+  </data>
+  <data name="addArticle" xml:space="preserve">
+    <value>اضافة مقال</value>
+  </data>
+  <data name="addArticleCategory" xml:space="preserve">
+    <value>اضافة تصنيف</value>
+  </data>
+  <data name="addCity" xml:space="preserve">
+    <value>اضافة مدينة</value>
+  </data>
+  <data name="addClasses" xml:space="preserve">
+    <value>إضافة شعبة</value>
+  </data>
+  <data name="addCollege" xml:space="preserve">
+    <value>اضافة كليه</value>
+  </data>
+  <data name="addCountry" xml:space="preserve">
+    <value>اضافة دولة جديدة</value>
+  </data>
+  <data name="addCourse" xml:space="preserve">
+    <value>اضافة دورة تدريبية</value>
+  </data>
+  <data name="addCourseCategory" xml:space="preserve">
+    <value>اضافة تصنيف</value>
+  </data>
+  <data name="addCriteria" xml:space="preserve">
+    <value>اضافة مهارة/معيار</value>
+  </data>
+  <data name="addDegree" xml:space="preserve">
+    <value>اضافة درجة علمية</value>
+  </data>
+  <data name="addMainMenu" xml:space="preserve">
+    <value>اضافة قائمة جديدة</value>
+  </data>
+  <data name="addQuestion" xml:space="preserve">
+    <value>اضافة سؤال</value>
+  </data>
+  <data name="addScholarship" xml:space="preserve">
+    <value>اضافة منحة دراسية</value>
+  </data>
+  <data name="addServices" xml:space="preserve">
+    <value>إضافة خدمة</value>
+  </data>
+  <data name="addSlider" xml:space="preserve">
+    <value>اضافة شريحة جديدة</value>
+  </data>
+  <data name="addSpecialization" xml:space="preserve">
+    <value>اضافة تخصص</value>
+  </data>
+  <data name="addSport" xml:space="preserve">
+    <value>اضافة رياضة</value>
+  </data>
+  <data name="addTrainer" xml:space="preserve">
+    <value>اضافة مدرب</value>
+  </data>
+  <data name="addUniversity" xml:space="preserve">
+    <value>اضافة جامعة</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>المستخدمين</value>
+  </data>
+  <data name="Article" xml:space="preserve">
+    <value>من نحن</value>
+  </data>
+  <data name="ArticleCategory" xml:space="preserve">
+    <value>تصنيفات المقالات</value>
+  </data>
+  <data name="Cities" xml:space="preserve">
+    <value>المدن</value>
+  </data>
+  <data name="Classes" xml:space="preserve">
+    <value>الشعب</value>
+  </data>
+  <data name="Colleges" xml:space="preserve">
+    <value>الكليات</value>
+  </data>
+  <data name="contactUs" xml:space="preserve">
+    <value>تواصل معنا</value>
+  </data>
+  <data name="ControlPanel" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>الدول</value>
+  </data>
+  <data name="Course" xml:space="preserve">
+    <value>الدورات التدريبية</value>
+  </data>
+  <data name="CourseCategory" xml:space="preserve">
+    <value>تصنيفات الدورات التدريبية</value>
+  </data>
+  <data name="courseFeature" xml:space="preserve">
+    <value>ميزات الدورة</value>
+  </data>
+  <data name="Criteria" xml:space="preserve">
+    <value>المهارات والمعايير</value>
+  </data>
+  <data name="CriteriaTitle" xml:space="preserve">
+    <value>عنوان المهارة/المعيار</value>
+  </data>
+  <data name="Degrees" xml:space="preserve">
+    <value>الدرجات العلمية</value>
+  </data>
+  <data name="editAdmin" xml:space="preserve">
+    <value>تعديل مستخدم</value>
+  </data>
+  <data name="editArticle" xml:space="preserve">
+    <value>تعديل مقال</value>
+  </data>
+  <data name="editArticleCategory" xml:space="preserve">
+    <value>تعديل تصنيف مقالة</value>
+  </data>
+  <data name="editClasses" xml:space="preserve">
+    <value>تعديل شعبة</value>
+  </data>
+  <data name="editCollege" xml:space="preserve">
+    <value>تعديل كلية</value>
+  </data>
+  <data name="editCountry" xml:space="preserve">
+    <value>تعديل دولة</value>
+  </data>
+  <data name="editCourse" xml:space="preserve">
+    <value>تعديل دورة تدريبية</value>
+  </data>
+  <data name="editCourseCategory" xml:space="preserve">
+    <value>تعديل تصنيف</value>
+  </data>
+  <data name="editCriteria" xml:space="preserve">
+    <value>تعديل مهارة/ معيار</value>
+  </data>
+  <data name="editMainMenu" xml:space="preserve">
+    <value>تعديل قائمة</value>
+  </data>
+  <data name="editQuestion" xml:space="preserve">
+    <value>تعديل سؤال</value>
+  </data>
+  <data name="editServices" xml:space="preserve">
+    <value>تعديل الخدمات</value>
+  </data>
+  <data name="EditSetting" xml:space="preserve">
+    <value>تعديل الإعدادات</value>
+  </data>
+  <data name="editSlider" xml:space="preserve">
+    <value>تعديل شريحة</value>
+  </data>
+  <data name="editSport" xml:space="preserve">
+    <value>تعديل رياضة</value>
+  </data>
+  <data name="editTrainer" xml:space="preserve">
+    <value>تعديل بيانات المدرب</value>
+  </data>
+  <data name="MainMenu" xml:space="preserve">
+    <value>القوائم الرئيسية</value>
+  </data>
+  <data name="NewsLetter" xml:space="preserve">
+    <value>إرسال الايميل</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>تص السؤال</value>
+  </data>
+  <data name="Questions" xml:space="preserve">
+    <value>الاسئلة</value>
+  </data>
+  <data name="QuestionTitle" xml:space="preserve">
+    <value>عنوان السؤال</value>
+  </data>
+  <data name="Scholarships" xml:space="preserve">
+    <value>المنح الدراسية</value>
+  </data>
+  <data name="SendLetter" xml:space="preserve">
+    <value>ارسال رسالة</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>الخدمات</value>
+  </data>
+  <data name="Setting" xml:space="preserve">
+    <value>الإعدادات</value>
+  </data>
+  <data name="share" xml:space="preserve">
+    <value>شارك هذه القصة ، اختر الموقع الخاص بك</value>
+  </data>
+  <data name="slider" xml:space="preserve">
+    <value>الشرائح الرئيسية</value>
+  </data>
+  <data name="Specialization" xml:space="preserve">
+    <value>التخصص</value>
+  </data>
+  <data name="Specializations" xml:space="preserve">
+    <value>التخصصات العلمية</value>
+  </data>
+  <data name="Sports" xml:space="preserve">
+    <value>أنواع الرياضة</value>
+  </data>
+  <data name="Trainee" xml:space="preserve">
+    <value>المتدربين</value>
+  </data>
+  <data name="Trainer" xml:space="preserve">
+    <value>المدربين</value>
+  </data>
+  <data name="University" xml:space="preserve">
+    <value>الجامعات</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>المستخدمين</value>
+  </data>
+  <data name="ViewArticle" xml:space="preserve">
+    <value>عرض المقالات</value>
+  </data>
+  <data name="ViewArticleCategory" xml:space="preserve">
+    <value>عرض تصنيفات المقالات</value>
+  </data>
+  <data name="ViewClasses" xml:space="preserve">
+    <value>عرض الصفوف</value>
+  </data>
+  <data name="ViewCountry" xml:space="preserve">
+    <value>عرض الدول</value>
+  </data>
+  <data name="ViewCourse" xml:space="preserve">
+    <value>عرض الدورات التدريبية</value>
+  </data>
+  <data name="ViewCourseCategory" xml:space="preserve">
+    <value>عرض تصنيفات الدورات</value>
+  </data>
+  <data name="ViewMainMenu" xml:space="preserve">
+    <value>عرض القوائم الرئيسية</value>
+  </data>
+  <data name="ViewServices" xml:space="preserve">
+    <value>عرض الخدمات</value>
+  </data>
+  <data name="ViewSlider" xml:space="preserve">
+    <value>عرض الشرائح</value>
+  </data>
+  <data name="ViewSubscriber" xml:space="preserve">
+    <value>عرض المشتركين</value>
+  </data>
+  <data name="ViewTrainer" xml:space="preserve">
+    <value>عرض المدربين</value>
+  </data>
+  <data name="editCity" xml:space="preserve">
+    <value>تعديل مدينة</value>
+  </data>
+  <data name="PropertyTypes" xml:space="preserve">
+    <value>تصنيفات العقارات</value>
+  </data>
+  <data name="PropertyTypesAdd" xml:space="preserve">
+    <value>اضافة تصنيف عقار</value>
+  </data>
+  <data name="PropertyTypesEdit" xml:space="preserve">
+    <value>تعديل تصنيف عقار</value>
+  </data>
+  <data name="Regions" xml:space="preserve">
+    <value>المناطق</value>
+  </data>
+  <data name="RegionsAdd" xml:space="preserve">
+    <value>اضافة منطقة</value>
+  </data>
+  <data name="RegionsEdit" xml:space="preserve">
+    <value>تعديل منطقة</value>
+  </data>
+  <data name="ServiceTypes" xml:space="preserve">
+    <value>تصنيفات الخدمات</value>
+  </data>
+  <data name="ServiceTypesAdd" xml:space="preserve">
+    <value>اضافة تصنيف خدمة</value>
+  </data>
+  <data name="ServiceTypesEdit" xml:space="preserve">
+    <value>تعديل تصنيف خدمة</value>
+  </data>
+  <data name="StaticList" xml:space="preserve">
+    <value>قائمة الثوابت</value>
+  </data>
+  <data name="CustomrQueries" xml:space="preserve">
+    <value>استفسارات الزبائن</value>
+  </data>
+  <data name="CustomrServices" xml:space="preserve">
+    <value>خدمات الزبائن</value>
+  </data>
+  <data name="AddNickNames" xml:space="preserve">
+    <value>اضافة مستخدم افتراضي</value>
+  </data>
+  <data name="editNickNames" xml:space="preserve">
+    <value>تعديل مستخدم افتراضي</value>
+  </data>
+  <data name="NickNames" xml:space="preserve">
+    <value>أسماء وصور المستخدمين الافتراضية</value>
+  </data>
+  <data name="state" xml:space="preserve">
+    <value>حالة المستخدم</value>
+  </data>
+  <data name="addProperty" xml:space="preserve">
+    <value>اضافة عقار</value>
+  </data>
+  <data name="AdminProperty" xml:space="preserve">
+    <value>عروض الادارة</value>
+  </data>
+  <data name="editProperty" xml:space="preserve">
+    <value>تعديل عقار</value>
+  </data>
+  <data name="editStaticList" xml:space="preserve">
+    <value>تعديل ثوابت</value>
+  </data>
+  <data name="maintit" xml:space="preserve">
+    <value>عقاراتي - احصائيات</value>
+  </data>
+  <data name="Regions1" xml:space="preserve">
+    <value>مدن المنطقة</value>
+  </data>
+  <data name="replies" xml:space="preserve">
+    <value>اضافة رد</value>
+  </data>
+  <data name="Regions2" xml:space="preserve">
+    <value>أقسام المناطق</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="edit" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>إرسال</value>
+  </data>
+  <data name="addcategory" xml:space="preserve">
+    <value>إضافة تصنيف</value>
+  </data>
+  <data name="addManufacturers" xml:space="preserve">
+    <value>إضافة شركة</value>
+  </data>
+  <data name="editManufacturers" xml:space="preserve">
+    <value>تعديل شركة</value>
+  </data>
+  <data name="manufacure" xml:space="preserve">
+    <value>الشركات المصنعه</value>
+  </data>
+  <data name="editCategory" xml:space="preserve">
+    <value>تعديل تصنيف</value>
+  </data>
+  <data name="AddOptions" xml:space="preserve">
+    <value>إضافة خَيار </value>
+  </data>
+  <data name="SaveContinue" xml:space="preserve">
+    <value>حفظ و استمرار</value>
+  </data>
+  <data name="addnews" xml:space="preserve">
+    <value>إضافة خبر</value>
+  </data>
+  <data name="editnews" xml:space="preserve">
+    <value>تعديل خبر/مقال</value>
+  </data>
+</root>

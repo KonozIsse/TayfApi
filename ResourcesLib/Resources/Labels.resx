@@ -1,0 +1,1530 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>About Us</value>
+  </data>
+  <data name="activate" xml:space="preserve">
+    <value>Activated Successfully</value>
+  </data>
+  <data name="add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddFiles" xml:space="preserve">
+    <value>Add files</value>
+  </data>
+  <data name="all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="AllDurations" xml:space="preserve">
+    <value>All Durations</value>
+  </data>
+  <data name="AllMonths" xml:space="preserve">
+    <value>All Months</value>
+  </data>
+  <data name="AllPermission" xml:space="preserve">
+    <value>All Permissions</value>
+  </data>
+  <data name="April" xml:space="preserve">
+    <value>April</value>
+  </data>
+  <data name="August" xml:space="preserve">
+    <value>August</value>
+  </data>
+  <data name="back" xml:space="preserve">
+    <value>back</value>
+  </data>
+  <data name="cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="categories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="CF" xml:space="preserve">
+    <value>Please Confirm Your Password</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ConfirmMsg" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="ConfirmPass" xml:space="preserve">
+    <value>Please Confirm Your Password</value>
+  </data>
+  <data name="contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="contactUs" xml:space="preserve">
+    <value>Contact Us</value>
+  </data>
+  <data name="ControlPanel" xml:space="preserve">
+    <value>Control Panel</value>
+  </data>
+  <data name="correctImage" xml:space="preserve">
+    <value>You must select a correct image</value>
+  </data>
+  <data name="correctLink" xml:space="preserve">
+    <value>Please make sure the link is correct</value>
+  </data>
+  <data name="December" xml:space="preserve">
+    <value>December</value>
+  </data>
+  <data name="DeleteCategoryMsg" xml:space="preserve">
+    <value>The delete process can not be completed, there are courses in this category</value>
+  </data>
+  <data name="desc" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="editProfile" xml:space="preserve">
+    <value>Edit Profile</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="EmailAddress" xml:space="preserve">
+    <value>Invalid Email Address</value>
+  </data>
+  <data name="EmailMessage" xml:space="preserve">
+    <value>An email will be sent to inform you of the successful registration</value>
+  </data>
+  <data name="EmailVal" xml:space="preserve">
+    <value>Make sure your email and password</value>
+  </data>
+  <data name="enrollNow" xml:space="preserve">
+    <value>Enroll Now</value>
+  </data>
+  <data name="EnterEmail" xml:space="preserve">
+    <value>Enter Your Email</value>
+  </data>
+  <data name="EnterField" xml:space="preserve">
+    <value>Please enter all the required fields and properly</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="excel" xml:space="preserve">
+    <value>Export To Excel</value>
+  </data>
+  <data name="February" xml:space="preserve">
+    <value>February</value>
+  </data>
+  <data name="For" xml:space="preserve">
+    <value>for</value>
+  </data>
+  <data name="forcontactUs" xml:space="preserve">
+    <value>for Contact Us</value>
+  </data>
+  <data name="forSubscribe" xml:space="preserve">
+    <value>for Subscribe</value>
+  </data>
+  <data name="from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="goBack" xml:space="preserve">
+    <value>Go Back To</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="HomePage" xml:space="preserve">
+    <value>Home Page</value>
+  </data>
+  <data name="HomeTitle" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="img" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="InvalidLogin" xml:space="preserve">
+    <value>Invalid login attempt</value>
+  </data>
+  <data name="January" xml:space="preserve">
+    <value>January</value>
+  </data>
+  <data name="July" xml:space="preserve">
+    <value>July</value>
+  </data>
+  <data name="June" xml:space="preserve">
+    <value>June</value>
+  </data>
+  <data name="lang" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LastAqars" xml:space="preserve">
+    <value>Last Properties</value>
+  </data>
+  <data name="LastContact" xml:space="preserve">
+    <value>Last Contact</value>
+  </data>
+  <data name="LastRegistration" xml:space="preserve">
+    <value>Last Registration</value>
+  </data>
+  <data name="LastSubscription" xml:space="preserve">
+    <value>Last Subscription</value>
+  </data>
+  <data name="LearnMore" xml:space="preserve">
+    <value>Learn More</value>
+  </data>
+  <data name="LifeInTurkey" xml:space="preserve">
+    <value>Life In Turkey</value>
+  </data>
+  <data name="link" xml:space="preserve">
+    <value>Quick Link</value>
+  </data>
+  <data name="LinkPermission" xml:space="preserve">
+    <value>Link Permission</value>
+  </data>
+  <data name="login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="logout" xml:space="preserve">
+    <value>Log Out</value>
+  </data>
+  <data name="mainTitle" xml:space="preserve">
+    <value>Main Title</value>
+  </data>
+  <data name="MakePriority" xml:space="preserve">
+    <value>MAKE YOUR SUCCESS A PRIORITY.</value>
+  </data>
+  <data name="March" xml:space="preserve">
+    <value>March</value>
+  </data>
+  <data name="May" xml:space="preserve">
+    <value>May</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="MobileVal" xml:space="preserve">
+    <value>Invalid Mobile Number</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>More</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="News" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="NoClasses" xml:space="preserve">
+    <value>No Classes for this Course</value>
+  </data>
+  <data name="NoCourses" xml:space="preserve">
+    <value>No Courses</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>No Data</value>
+  </data>
+  <data name="NoResult" xml:space="preserve">
+    <value>There are no results to display</value>
+  </data>
+  <data name="NotActiveUser" xml:space="preserve">
+    <value>This user is not active</value>
+  </data>
+  <data name="November" xml:space="preserve">
+    <value>November</value>
+  </data>
+  <data name="October" xml:space="preserve">
+    <value>October</value>
+  </data>
+  <data name="OneWeek" xml:space="preserve">
+    <value>One Week</value>
+  </data>
+  <data name="OtherCourse" xml:space="preserve">
+    <value>Other Course</value>
+  </data>
+  <data name="OtherServices" xml:space="preserve">
+    <value>Other Services</value>
+  </data>
+  <data name="PermissionError" xml:space="preserve">
+    <value>Sorry!! You do not have permission on the requested link</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="Properties" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="QuiqContact" xml:space="preserve">
+    <value>QUICK CONTACT</value>
+  </data>
+  <data name="QuiqLinks" xml:space="preserve">
+    <value>QUICK LINKS</value>
+  </data>
+  <data name="readMore" xml:space="preserve">
+    <value>Read More</value>
+  </data>
+  <data name="RecentNews" xml:space="preserve">
+    <value>Recent News</value>
+  </data>
+  <data name="records" xml:space="preserve">
+    <value>records</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="RegisterCourse" xml:space="preserve">
+    <value>Register in Course</value>
+  </data>
+  <data name="RegisterIn" xml:space="preserve">
+    <value>Register In</value>
+  </data>
+  <data name="RegisterNow" xml:space="preserve">
+    <value>Register Now ! Training Programmes In </value>
+  </data>
+  <data name="Registration" xml:space="preserve">
+    <value>for Registration</value>
+  </data>
+  <data name="repeat" xml:space="preserve">
+    <value>City Name Already Exists</value>
+  </data>
+  <data name="repeat1" xml:space="preserve">
+    <value>Name Already Exists</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>This field is required.</value>
+  </data>
+  <data name="save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="searchAbout" xml:space="preserve">
+    <value>Search For</value>
+  </data>
+  <data name="searchResult" xml:space="preserve">
+    <value>Search Result</value>
+  </data>
+  <data name="searchTxt1" xml:space="preserve">
+    <value>Or, If you’re looking for more specific Training Courses, please call us at</value>
+  </data>
+  <data name="searchTxt2" xml:space="preserve">
+    <value>or contact us at</value>
+  </data>
+  <data name="See" xml:space="preserve">
+    <value>See All</value>
+  </data>
+  <data name="SeeAllCources" xml:space="preserve">
+    <value>See All Cources</value>
+  </data>
+  <data name="seeAllCourse" xml:space="preserve">
+    <value>See All Cources IN </value>
+  </data>
+  <data name="seeMore" xml:space="preserve">
+    <value>See More</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="sendMessage" xml:space="preserve">
+    <value>Send Message</value>
+  </data>
+  <data name="September" xml:space="preserve">
+    <value>September</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="showCities" xml:space="preserve">
+    <value>Show Cities</value>
+  </data>
+  <data name="showClasses" xml:space="preserve">
+    <value>View Classes</value>
+  </data>
+  <data name="showColleges" xml:space="preserve">
+    <value>Show Colleges</value>
+  </data>
+  <data name="showScolerships" xml:space="preserve">
+    <value>Show Scolerships</value>
+  </data>
+  <data name="showSpecalizations" xml:space="preserve">
+    <value>Show Specalizations</value>
+  </data>
+  <data name="showSubMenu" xml:space="preserve">
+    <value>View Sub Menu</value>
+  </data>
+  <data name="showTrainee" xml:space="preserve">
+    <value>View Trainee</value>
+  </data>
+  <data name="sliderlink" xml:space="preserve">
+    <value>Slider Link</value>
+  </data>
+  <data name="soon" xml:space="preserve">
+    <value>Coming Soon</value>
+  </data>
+  <data name="subjcet" xml:space="preserve">
+    <value>Subject</value>
+  </data>
+  <data name="subscribe" xml:space="preserve">
+    <value>Subscribe</value>
+  </data>
+  <data name="subscribeletter" xml:space="preserve">
+    <value>subscribe our newsletter</value>
+  </data>
+  <data name="subscriberCount" xml:space="preserve">
+    <value>Subscriber Count</value>
+  </data>
+  <data name="subTitle" xml:space="preserve">
+    <value> Sub Title</value>
+  </data>
+  <data name="successAdd" xml:space="preserve">
+    <value>Added successfully</value>
+  </data>
+  <data name="successDelete" xml:space="preserve">
+    <value>Deleted successfully</value>
+  </data>
+  <data name="successSave" xml:space="preserve">
+    <value>Saved successfully</value>
+  </data>
+  <data name="successSend" xml:space="preserve">
+    <value>Send successfully</value>
+  </data>
+  <data name="sure" xml:space="preserve">
+    <value>Sure</value>
+  </data>
+  <data name="sureLink" xml:space="preserve">
+    <value>Please make sure the link</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="ThankMessage" xml:space="preserve">
+    <value>Thank you for Registration in Our Courses</value>
+  </data>
+  <data name="Thanks" xml:space="preserve">
+    <value>Thanks</value>
+  </data>
+  <data name="ThankSub" xml:space="preserve">
+    <value>Istanbulitc</value>
+  </data>
+  <data name="ThreeWeek" xml:space="preserve">
+    <value>Three Week</value>
+  </data>
+  <data name="traineeCount" xml:space="preserve">
+    <value>Trainee Count</value>
+  </data>
+  <data name="TrainingCourse" xml:space="preserve">
+    <value>TRAINING COURSES</value>
+  </data>
+  <data name="TwoWeek" xml:space="preserve">
+    <value>Two Week</value>
+  </data>
+  <data name="uniqUser" xml:space="preserve">
+    <value>Email already exists</value>
+  </data>
+  <data name="Universities" xml:space="preserve">
+    <value>Universities</value>
+  </data>
+  <data name="UserPermission" xml:space="preserve">
+    <value>User Permission</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Customers</value>
+  </data>
+  <data name="warn" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="week" xml:space="preserve">
+    <value>week</value>
+  </data>
+  <data name="word" xml:space="preserve">
+    <value>Export To Word</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>years</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="AccountAlreadyExists" xml:space="preserve">
+    <value>This Account Already Exists</value>
+  </data>
+  <data name="admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="AddAdmins" xml:space="preserve">
+    <value>Add Admins</value>
+  </data>
+  <data name="AddAdminType" xml:space="preserve">
+    <value>Add Admin Type</value>
+  </data>
+  <data name="AddedDate" xml:space="preserve">
+    <value>Added Date</value>
+  </data>
+  <data name="AddressInfo" xml:space="preserve">
+    <value>Address Info</value>
+  </data>
+  <data name="admins" xml:space="preserve">
+    <value>Admins</value>
+  </data>
+  <data name="chooseStatus" xml:space="preserve">
+    <value>Please choose Status</value>
+  </data>
+  <data name="ConfirmMsgDelete" xml:space="preserve">
+    <value>Are you sure you want to delete this ... ?</value>
+  </data>
+  <data name="ConfirmPassAtLeast" xml:space="preserve">
+    <value>Password must be small and big  characters and digits</value>
+  </data>
+  <data name="enterCity" xml:space="preserve">
+    <value>Please enter your city.</value>
+  </data>
+  <data name="enterCountry" xml:space="preserve">
+    <value>Please enter your country.</value>
+  </data>
+  <data name="enterPassword" xml:space="preserve">
+    <value>Please enter Password</value>
+  </data>
+  <data name="enterState" xml:space="preserve">
+    <value>Please enter your state.</value>
+  </data>
+  <data name="enterZip" xml:space="preserve">
+    <value>Please enter Zip/Postal Code.</value>
+  </data>
+  <data name="LoginInfo" xml:space="preserve">
+    <value>Login Info</value>
+  </data>
+  <data name="ManageRoles" xml:space="preserve">
+    <value>Manage Roles</value>
+  </data>
+  <data name="NoRecordfound" xml:space="preserve">
+    <value>No Products Found</value>
+  </data>
+  <data name="PersonalInfo" xml:space="preserve">
+    <value>Personal Info</value>
+  </data>
+  <data name="plzchooseType" xml:space="preserve">
+    <value>Please choose admin type.</value>
+  </data>
+  <data name="plzenterfirstName" xml:space="preserve">
+    <value>Please enter first name.</value>
+  </data>
+  <data name="plzenterlastName" xml:space="preserve">
+    <value>Please enter last name.</value>
+  </data>
+  <data name="plzenterTel" xml:space="preserve">
+    <value>Please enter telephone</value>
+  </data>
+  <data name="streetAddress" xml:space="preserve">
+    <value>Street</value>
+  </data>
+  <data name="updateDate" xml:space="preserve">
+    <value>Modified Date</value>
+  </data>
+  <data name="AddRoles" xml:space="preserve">
+    <value>Add Roles</value>
+  </data>
+  <data name="EditRole" xml:space="preserve">
+    <value>Edit Role</value>
+  </data>
+  <data name="ExistItem" xml:space="preserve">
+    <value>Item Already Exists</value>
+  </data>
+  <data name="Addlang" xml:space="preserve">
+    <value>Add New Language</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="ConfirmMsgDeleteLang" xml:space="preserve">
+    <value>Are you sure you want to delete this language? If you will delete this language then all record belongs to this will also be deleted. Infuture, you add this language again you have to add all repective content again.</value>
+  </data>
+  <data name="EditType" xml:space="preserve">
+    <value>Edit Admin Type</value>
+  </data>
+  <data name="FilterBy" xml:space="preserve">
+    <value>Filter By</value>
+  </data>
+  <data name="icon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="sort" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="direction" xml:space="preserve">
+    <value>Direction</value>
+  </data>
+  <data name="EditLang" xml:space="preserve">
+    <value>Edit Language</value>
+  </data>
+  <data name="langCodeSuchAs" xml:space="preserve">
+    <value>Language code such as "en" for english.</value>
+  </data>
+  <data name="langNameSuchAs" xml:space="preserve">
+    <value>Language name such as "English"</value>
+  </data>
+  <data name="LeftToRight" xml:space="preserve">
+    <value>Left To Right</value>
+  </data>
+  <data name="RightToLeft" xml:space="preserve">
+    <value>Right To Left</value>
+  </data>
+  <data name="addCurrency" xml:space="preserve">
+    <value>Add Currencies</value>
+  </data>
+  <data name="currency" xml:space="preserve">
+    <value>Currencies</value>
+  </data>
+  <data name="EditCurrency" xml:space="preserve">
+    <value>Edit Currency</value>
+  </data>
+  <data name="entercode" xml:space="preserve">
+    <value>Please enter currency symbol.</value>
+  </data>
+  <data name="addImg" xml:space="preserve">
+    <value>Add New Image</value>
+  </data>
+  <data name="ImageDetail" xml:space="preserve">
+    <value>Image Detail</value>
+  </data>
+  <data name="imgs" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="LargeHeight" xml:space="preserve">
+    <value>Large Height</value>
+  </data>
+  <data name="LargeSetting" xml:space="preserve">
+    <value>Large Setting</value>
+  </data>
+  <data name="LargeWidth" xml:space="preserve">
+    <value>Large Width</value>
+  </data>
+  <data name="media" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="MediaSetting" xml:space="preserve">
+    <value>Media Setting</value>
+  </data>
+  <data name="MediumHeight" xml:space="preserve">
+    <value>Medium Height</value>
+  </data>
+  <data name="MediumSetting" xml:space="preserve">
+    <value>Medium Setting</value>
+  </data>
+  <data name="MediumWidth" xml:space="preserve">
+    <value>Medium Width</value>
+  </data>
+  <data name="ThumbnailHeight" xml:space="preserve">
+    <value>Thumbnail Height</value>
+  </data>
+  <data name="ThumbnailSetting" xml:space="preserve">
+    <value>Thumbnail Setting</value>
+  </data>
+  <data name="ThumbnailWidth" xml:space="preserve">
+    <value>Thumbnail Width</value>
+  </data>
+  <data name="chooseCat" xml:space="preserve">
+    <value>Choose Category</value>
+  </data>
+  <data name="LeaveAsParent" xml:space="preserve">
+    <value>Leave As Parent</value>
+  </data>
+  <data name="Addproducts" xml:space="preserve">
+    <value>Add Products</value>
+  </data>
+  <data name="AddUnits" xml:space="preserve">
+    <value>Add Units</value>
+  </data>
+  <data name="category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Editproducts" xml:space="preserve">
+    <value>Edit Products</value>
+  </data>
+  <data name="EditUnits" xml:space="preserve">
+    <value>Edit Units</value>
+  </data>
+  <data name="FlashSale" xml:space="preserve">
+    <value>Flash Sale</value>
+  </data>
+  <data name="FlashSaleExpireDate" xml:space="preserve">
+    <value>Flash Sale Expire Date</value>
+  </data>
+  <data name="FlashSalePrice" xml:space="preserve">
+    <value>Flash Sale Price</value>
+  </data>
+  <data name="FlashSaleStartDate" xml:space="preserve">
+    <value>Flash Sale Start Date</value>
+  </data>
+  <data name="IsFeature" xml:space="preserve">
+    <value>Is Feature</value>
+  </data>
+  <data name="MaxOrderLimit" xml:space="preserve">
+    <value>Max Order Limit</value>
+  </data>
+  <data name="MinOrderLimit" xml:space="preserve">
+    <value>Min Order Limit</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="products" xml:space="preserve">
+    <value>Products</value>
+  </data>
+  <data name="ProductsModel" xml:space="preserve">
+    <value>Products Model</value>
+  </data>
+  <data name="ProductsPrice" xml:space="preserve">
+    <value>Products Price</value>
+  </data>
+  <data name="ProductsWeight" xml:space="preserve">
+    <value>Products Weight</value>
+  </data>
+  <data name="ProductType" xml:space="preserve">
+    <value>Product Type</value>
+  </data>
+  <data name="taxclass" xml:space="preserve">
+    <value>Tax Class</value>
+  </data>
+  <data name="UnitName" xml:space="preserve">
+    <value>Unit Name</value>
+  </data>
+  <data name="Units" xml:space="preserve">
+    <value>Units</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Products Options</value>
+  </data>
+  <data name="Special" xml:space="preserve">
+    <value>Special</value>
+  </data>
+  <data name="ManageOptions" xml:space="preserve">
+    <value>Manage Options</value>
+  </data>
+  <data name="AddOptionValue" xml:space="preserve">
+    <value>Add Option Value</value>
+  </data>
+  <data name="editOption" xml:space="preserve">
+    <value>Edit Option</value>
+  </data>
+  <data name="ManageValuesOptions" xml:space="preserve">
+    <value>Manage Values Options</value>
+  </data>
+  <data name="OptionsValues" xml:space="preserve">
+    <value>Options Values</value>
+  </data>
+  <data name="NewsCat" xml:space="preserve">
+    <value>News Categories</value>
+  </data>
+  <data name="DeleteProduct" xml:space="preserve">
+    <value>Delete Product</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="ProductAttributes" xml:space="preserve">
+    <value>Product Attributes</value>
+  </data>
+  <data name="ProductImages" xml:space="preserve">
+    <value>Product Images</value>
+  </data>
+  <data name="ETAYF" xml:space="preserve">
+    <value>ETAYF</value>
+  </data>
+  <data name="compare" xml:space="preserve">
+    <value>compare</value>
+  </data>
+  <data name="allcategory" xml:space="preserve">
+    <value>All Categories</value>
+  </data>
+  <data name="curr" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="latestBlog" xml:space="preserve">
+    <value>Latest Blog</value>
+  </data>
+  <data name="MyAccount" xml:space="preserve">
+    <value>My Account</value>
+  </data>
+  <data name="mycart" xml:space="preserve">
+    <value>my cart</value>
+  </data>
+  <data name="WishList" xml:space="preserve">
+    <value>Wish List</value>
+  </data>
+  <data name="Arrivel" xml:space="preserve">
+    <value>Arrivel</value>
+  </data>
+  <data name="banners" xml:space="preserve">
+    <value>Banners</value>
+  </data>
+  <data name="bestseller" xml:space="preserve">
+    <value>bestseller</value>
+  </data>
+  <data name="editbanners" xml:space="preserve">
+    <value>Edit Banners</value>
+  </data>
+  <data name="editServices" xml:space="preserve">
+    <value>Edit Services</value>
+  </data>
+  <data name="Featured" xml:space="preserve">
+    <value>Featured</value>
+  </data>
+  <data name="latest" xml:space="preserve">
+    <value>latest</value>
+  </data>
+  <data name="OnSale" xml:space="preserve">
+    <value>On Sale</value>
+  </data>
+  <data name="popularproducts" xml:space="preserve">
+    <value>Popular Products</value>
+  </data>
+  <data name="AddtoCart" xml:space="preserve">
+    <value>Add to Cart</value>
+  </data>
+  <data name="AddtoWishList" xml:space="preserve">
+    <value>Add to Wish List</value>
+  </data>
+  <data name="Ourcategory" xml:space="preserve">
+    <value>Our Category</value>
+  </data>
+  <data name="QuickView" xml:space="preserve">
+    <value>Quick View</value>
+  </data>
+  <data name="Specials" xml:space="preserve">
+    <value>Specials</value>
+  </data>
+  <data name="TopRated" xml:space="preserve">
+    <value>Top Rated</value>
+  </data>
+  <data name="addclient" xml:space="preserve">
+    <value>Add Client</value>
+  </data>
+  <data name="addtestim" xml:space="preserve">
+    <value>Add Testemonials</value>
+  </data>
+  <data name="cart" xml:space="preserve">
+    <value>Cart</value>
+  </data>
+  <data name="clients" xml:space="preserve">
+    <value>Clients</value>
+  </data>
+  <data name="edittestim" xml:space="preserve">
+    <value>Edit Testemonials</value>
+  </data>
+  <data name="testemonials" xml:space="preserve">
+    <value>Testemonials</value>
+  </data>
+  <data name="AddComment" xml:space="preserve">
+    <value>Add Comment</value>
+  </data>
+  <data name="blog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="LeaveComments" xml:space="preserve">
+    <value>Leave Comments</value>
+  </data>
+  <data name="Checkout" xml:space="preserve">
+    <value>Checkout</value>
+  </data>
+  <data name="ContinueShopping" xml:space="preserve">
+    <value>Continue Shopping</value>
+  </data>
+  <data name="dailydeal" xml:space="preserve">
+    <value>Daily Deal</value>
+  </data>
+  <data name="loginPage" xml:space="preserve">
+    <value>Login Page</value>
+  </data>
+  <data name="plzlog" xml:space="preserve">
+    <value>If you already have an account with us, please login at the </value>
+  </data>
+  <data name="RefineSearch" xml:space="preserve">
+    <value>Refine Search</value>
+  </data>
+  <data name="sortby" xml:space="preserve">
+    <value>Sort By</value>
+  </data>
+  <data name="YourPersonalDetails" xml:space="preserve">
+    <value>Your Personal Details</value>
+  </data>
+  <data name="AccountLogout" xml:space="preserve">
+    <value>Account Logout</value>
+  </data>
+  <data name="agreepolicy" xml:space="preserve">
+    <value>I have read and agree to the</value>
+  </data>
+  <data name="continu" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="hintlogout" xml:space="preserve">
+    <value>You have been logged off your account. It is now safe to leave the computer. Your shopping cart has been saved, the items inside it will be restored whenever you log back into your account.</value>
+  </data>
+  <data name="MyWishList" xml:space="preserve">
+    <value>My Wish List</value>
+  </data>
+  <data name="OrderHistory" xml:space="preserve">
+    <value>Order History</value>
+  </data>
+  <data name="plzAgree" xml:space="preserve">
+    <value>Please check approval Privacy Policy </value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="Transactions" xml:space="preserve">
+    <value>Transactions</value>
+  </data>
+  <data name="ForgottenPassword" xml:space="preserve">
+    <value>Forgotten Password</value>
+  </data>
+  <data name="Hintlogin" xml:space="preserve">
+    <value>By creating an account you will be able to shop faster, be up to date on an order's status, and keep track of the orders you have previously made.</value>
+  </data>
+  <data name="ImCustomer" xml:space="preserve">
+    <value>I am a returning customer</value>
+  </data>
+  <data name="NewCustomer" xml:space="preserve">
+    <value>New Customer</value>
+  </data>
+  <data name="RegisterAccount" xml:space="preserve">
+    <value>Register Account</value>
+  </data>
+  <data name="ReturningCustomer" xml:space="preserve">
+    <value>Returning Customer</value>
+  </data>
+  <data name="addedWishlist" xml:space="preserve">
+    <value>Success: You have added Product to your wish list !</value>
+  </data>
+  <data name="goLogin" xml:space="preserve">
+    <value>You must login or create an account </value>
+  </data>
+  <data name="AddedToCart" xml:space="preserve">
+    <value>Success: You have added Product to your shopping cart</value>
+  </data>
+  <data name="EcoTax" xml:space="preserve">
+    <value>Eco Tax</value>
+  </data>
+  <data name="NoProducts" xml:space="preserve">
+    <value>No Products in Cart .</value>
+  </data>
+  <data name="ShoppingCart" xml:space="preserve">
+    <value>Shopping Cart</value>
+  </data>
+  <data name="SubTotal" xml:space="preserve">
+    <value>Sub-Total</value>
+  </data>
+  <data name="total" xml:space="preserve">
+    <value>TOTAL</value>
+  </data>
+  <data name="VAT" xml:space="preserve">
+    <value>VAT</value>
+  </data>
+  <data name="ViewCart" xml:space="preserve">
+    <value>View Cart</value>
+  </data>
+  <data name="AddproductImgs" xml:space="preserve">
+    <value>Add Product Images</value>
+  </data>
+  <data name="Availability" xml:space="preserve">
+    <value>Availability</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="Keywords" xml:space="preserve">
+    <value>Keywords</value>
+  </data>
+  <data name="SearchCriteria" xml:space="preserve">
+    <value>Search Criteria</value>
+  </data>
+  <data name="AdddefOptionValue" xml:space="preserve">
+    <value>Add Default Options</value>
+  </data>
+  <data name="AddInventory" xml:space="preserve">
+    <value>Add Inventory</value>
+  </data>
+  <data name="AddStock" xml:space="preserve">
+    <value>Add Stock</value>
+  </data>
+  <data name="DefaultOptions" xml:space="preserve">
+    <value>Default Options</value>
+  </data>
+  <data name="editattr" xml:space="preserve">
+    <value>Edit Attribute</value>
+  </data>
+  <data name="editImg" xml:space="preserve">
+    <value>Edit Image</value>
+  </data>
+  <data name="inventory" xml:space="preserve">
+    <value>Inventory</value>
+  </data>
+  <data name="noOption" xml:space="preserve">
+    <value>No record found! Please click on "Add Default Options" to add Options.</value>
+  </data>
+  <data name="OptionName" xml:space="preserve">
+    <value>Option Name</value>
+  </data>
+  <data name="OptionValue" xml:space="preserve">
+    <value>Option Value</value>
+  </data>
+  <data name="addedtoCompare" xml:space="preserve">
+    <value>Success: You have added Product to Compare !</value>
+  </data>
+  <data name="AvailableOptions" xml:space="preserve">
+    <value>Available Options</value>
+  </data>
+  <data name="ProductComparison" xml:space="preserve">
+    <value>Product Comparison</value>
+  </data>
+  <data name="ProductDetails" xml:space="preserve">
+    <value>Product Details</value>
+  </data>
+  <data name="qty" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+  <data name="views" xml:space="preserve">
+    <value>Views</value>
+  </data>
+  <data name="Weight" xml:space="preserve">
+    <value>Weight</value>
+  </data>
+  <data name="sale" xml:space="preserve">
+    <value>sale</value>
+  </data>
+  <data name="SpecialOffers" xml:space="preserve">
+    <value>Special Offers</value>
+  </data>
+  <data name="plzchooseoption" xml:space="preserve">
+    <value>Please Choose Product Option</value>
+  </data>
+  <data name="BrandIndex" xml:space="preserve">
+    <value>Brand Index</value>
+  </data>
+  <data name="ContactForm" xml:space="preserve">
+    <value>Contact Form</value>
+  </data>
+  <data name="DeliveryInformation" xml:space="preserve">
+    <value>Delivery Information</value>
+  </data>
+  <data name="findbrand" xml:space="preserve">
+    <value>Find Your Favorite Brand</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Ourcompany" xml:space="preserve">
+    <value>Our Company</value>
+  </data>
+  <data name="OurLocation" xml:space="preserve">
+    <value>Our Location</value>
+  </data>
+  <data name="TermsConditions" xml:space="preserve">
+    <value>Terms &amp; Conditions</value>
+  </data>
+  <data name="Deactivate" xml:space="preserve">
+    <value>Deactivate</value>
+  </data>
+  <data name="passwnotequal" xml:space="preserve">
+    <value>Password confirmation does not match password!</value>
+  </data>
+  <data name="reviews" xml:space="preserve">
+    <value>reviews</value>
+  </data>
+  <data name="Reviews1" xml:space="preserve">
+    <value>Reviews</value>
+  </data>
+  <data name="vendor" xml:space="preserve">
+    <value>Vendor</value>
+  </data>
+  <data name="Writeareview" xml:space="preserve">
+    <value>Write a review</value>
+  </data>
+  <data name="YourReview" xml:space="preserve">
+    <value>Your Review</value>
+  </data>
+  <data name="YourReviewUpdatedSuccessfully" xml:space="preserve">
+    <value>Your Review for This Product  Updated Successfully</value>
+  </data>
+  <data name="Customers" xml:space="preserve">
+    <value>Customers</value>
+  </data>
+  <data name="EditAddress" xml:space="preserve">
+    <value>Edit Address</value>
+  </data>
+  <data name="addtaxes" xml:space="preserve">
+    <value>Add Tax Class</value>
+  </data>
+  <data name="addtaxrate" xml:space="preserve">
+    <value>Add Tax Rate</value>
+  </data>
+  <data name="edittaxes" xml:space="preserve">
+    <value>Edit Tax Class</value>
+  </data>
+  <data name="edittaxrate" xml:space="preserve">
+    <value>Edit Tax Rate</value>
+  </data>
+  <data name="taxrate" xml:space="preserve">
+    <value>Tax Rates</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="zone" xml:space="preserve">
+    <value>zone</value>
+  </data>
+  <data name="AddCustomer" xml:space="preserve">
+    <value>Add Customer</value>
+  </data>
+  <data name="EditCustomer" xml:space="preserve">
+    <value>Edit Customer</value>
+  </data>
+  <data name="Female" xml:space="preserve">
+    <value>Female</value>
+  </data>
+  <data name="gender" xml:space="preserve">
+    <value>Gender</value>
+  </data>
+  <data name="Male" xml:space="preserve">
+    <value>Male</value>
+  </data>
+  <data name="Vendors" xml:space="preserve">
+    <value>Vendors</value>
+  </data>
+  <data name="accountNotVerify" xml:space="preserve">
+    <value>This Account is not Verified</value>
+  </data>
+  <data name="AddAddress" xml:space="preserve">
+    <value>Add Address</value>
+  </data>
+  <data name="AddressBookEntries" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="enterCodeVerify" xml:space="preserve">
+    <value>Please Enter Code Verification </value>
+  </data>
+  <data name="errorCode" xml:space="preserve">
+    <value>Error Code</value>
+  </data>
+  <data name="MyAccountInformation" xml:space="preserve">
+    <value>My Account Information</value>
+  </data>
+  <data name="NewAddress" xml:space="preserve">
+    <value>New Address</value>
+  </data>
+  <data name="PasswordChangedSuccessfully" xml:space="preserve">
+    <value>password changed successfully please login again!</value>
+  </data>
+  <data name="verify" xml:space="preserve">
+    <value>Account Verification</value>
+  </data>
+  <data name="verifyCode" xml:space="preserve">
+    <value>Verification Code</value>
+  </data>
+  <data name="address1" xml:space="preserve">
+    <value>Address 1</value>
+  </data>
+  <data name="address2" xml:space="preserve">
+    <value>Address 2</value>
+  </data>
+  <data name="company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="EmailExist" xml:space="preserve">
+    <value>This Email Already Exists for another account</value>
+  </data>
+  <data name="postCode" xml:space="preserve">
+    <value>Post Code</value>
+  </data>
+  <data name="subcategories" xml:space="preserve">
+    <value>Sub Categories</value>
+  </data>
+  <data name="forgot" xml:space="preserve">
+    <value>Forgot Your Password?</value>
+  </data>
+  <data name="forgotMsg" xml:space="preserve">
+    <value>Enter the e-mail address associated with your account. Click submit to have a password reset link e-mailed to you.</value>
+  </data>
+  <data name="ResetPassword" xml:space="preserve">
+    <value>Reset Password</value>
+  </data>
+  <data name="ResetPasswordConfirmation" xml:space="preserve">
+    <value>Reset Password Confirmation</value>
+  </data>
+  <data name="address_title" xml:space="preserve">
+    <value>Address Title</value>
+  </data>
+  <data name="copMsg" xml:space="preserve">
+    <value>Choose if you have a discount code you want to use or would like to estimate your delivery cost.</value>
+  </data>
+  <data name="Enteryourcouponhere" xml:space="preserve">
+    <value>Enter your coupon here</value>
+  </data>
+  <data name="UsCouponCode" xml:space="preserve">
+    <value>Use Coupon Code</value>
+  </data>
+  <data name="notAv" xml:space="preserve">
+    <value>This Product not available in stock now</value>
+  </data>
+  <data name="notAvOp" xml:space="preserve">
+    <value>This Product Option not available in stock now</value>
+  </data>
+  <data name="AllProducts" xml:space="preserve">
+    <value>All Products</value>
+  </data>
+  <data name="purchasenow" xml:space="preserve">
+    <value>Purchase Now</value>
+  </data>
+  <data name="stores" xml:space="preserve">
+    <value>Stores</value>
+  </data>
+  <data name="store" xml:space="preserve">
+    <value>Store</value>
+  </data>
+  <data name="StoreProducts" xml:space="preserve">
+    <value>Store Products</value>
+  </data>
+  <data name="DefaultAddress" xml:space="preserve">
+    <value>Default Address</value>
+  </data>
+  <data name="Discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="OrderSummary" xml:space="preserve">
+    <value>Order Summary</value>
+  </data>
+  <data name="Tax" xml:space="preserve">
+    <value>Tax</value>
+  </data>
+  <data name="ChooseTime" xml:space="preserve">
+    <value>Choose Time</value>
+  </data>
+  <data name="OrderTime" xml:space="preserve">
+    <value>Delivery Time</value>
+  </data>
+  <data name="websiteLink" xml:space="preserve">
+    <value>Website Link</value>
+  </data>
+  <data name="popular" xml:space="preserve">
+    <value>Popular</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="NoofProducts" xml:space="preserve">
+    <value>No. of Products</value>
+  </data>
+  <data name="OrderId" xml:space="preserve">
+    <value>Order ID</value>
+  </data>
+  <data name="filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="storesyouwilllove" xml:space="preserve">
+    <value>Stores You'll Love</value>
+  </data>
+  <data name="AddressUpdatedSuccessfully" xml:space="preserve">
+    <value>Address Updated Successfully</value>
+  </data>
+  <data name="allstore" xml:space="preserve">
+    <value>All Stores</value>
+  </data>
+  <data name="addressdetails" xml:space="preserve">
+    <value>Address Details</value>
+  </data>
+  <data name="BillingInfo" xml:space="preserve">
+    <value>Billing Info</value>
+  </data>
+  <data name="cartIsEmpty" xml:space="preserve">
+    <value>Please Add Products to Cart, Your Cart is Empty</value>
+  </data>
+  <data name="CodeGrater" xml:space="preserve">
+    <value>Coupon amount is greater than total price</value>
+  </data>
+  <data name="invoice" xml:space="preserve">
+    <value>Order Invoice</value>
+  </data>
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>Payment Method</value>
+  </data>
+  <data name="PendOrdMsg" xml:space="preserve">
+    <value>The order has been successfully added, awaiting approval</value>
+  </data>
+  <data name="ShippingCost" xml:space="preserve">
+    <value>Shipping Cost</value>
+  </data>
+  <data name="ShippingInfo" xml:space="preserve">
+    <value>Shipping Info</value>
+  </data>
+  <data name="shippingMethods" xml:space="preserve">
+    <value>shipping Method</value>
+  </data>
+  <data name="flatNo" xml:space="preserve">
+    <value>flat Number</value>
+  </data>
+  <data name="downloadApp" xml:space="preserve">
+    <value>Download App</value>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="PoweredBy" xml:space="preserve">
+    <value>Powered By</value>
+  </data>
+  <data name="searchInProductDesc" xml:space="preserve">
+    <value>Search in product descriptions</value>
+  </data>
+  <data name="SearchInSubcategories" xml:space="preserve">
+    <value>Search in subcategories</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="social" xml:space="preserve">
+    <value>Social Media</value>
+  </data>
+  <data name="ApplyCoupon" xml:space="preserve">
+    <value>Apply Coupon</value>
+  </data>
+  <data name="EditYourAccountInformation" xml:space="preserve">
+    <value>Edit your account information</value>
+  </data>
+  <data name="ModifyYourAddress" xml:space="preserve">
+    <value>Modify your address</value>
+  </data>
+  <data name="MyOrders" xml:space="preserve">
+    <value>My Orders</value>
+  </data>
+  <data name="NewsletterSubscription" xml:space="preserve">
+    <value>News letter Subscription</value>
+  </data>
+  <data name="SeeYourOrderHistory" xml:space="preserve">
+    <value>See Your Order History</value>
+  </data>
+  <data name="SubscribeForNewsletter" xml:space="preserve">
+    <value>Subscribe For Newsletter</value>
+  </data>
+  <data name="SubscribeUnsubscribeToNewsletter" xml:space="preserve">
+    <value>Subscribe / unsubscribe to newsletter</value>
+  </data>
+  <data name="ViewYourOrderHistory" xml:space="preserve">
+    <value>View Your Order History</value>
+  </data>
+  <data name="WhatNext" xml:space="preserve">
+    <value>What would you like to do next?</value>
+  </data>
+  <data name="comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="ConfirmOrder" xml:space="preserve">
+    <value>Confirm Order</value>
+  </data>
+  <data name="notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="cartUpdate" xml:space="preserve">
+    <value>Cart Updated successfully</value>
+  </data>
+  <data name="CommentAdded" xml:space="preserve">
+    <value>Your Comment has been added Successfully</value>
+  </data>
+  <data name="pay" xml:space="preserve">
+    <value>Pay</value>
+  </data>
+  <data name="selectTime" xml:space="preserve">
+    <value>Select Time For Delivey</value>
+  </data>
+  <data name="SharingLink" xml:space="preserve">
+    <value>Sharing Link</value>
+  </data>
+  <data name="Specification" xml:space="preserve">
+    <value>Specification</value>
+  </data>
+  <data name="Specifications" xml:space="preserve">
+    <value>Specifications</value>
+  </data>
+  <data name="rangAsc" xml:space="preserve">
+    <value>Ascending Order</value>
+  </data>
+  <data name="rangDec" xml:space="preserve">
+    <value>Descending Order</value>
+  </data>
+  <data name="CartDetails" xml:space="preserve">
+    <value>Cart Details</value>
+  </data>
+  <data name="checkEmail" xml:space="preserve">
+    <value>Please check your email to reset your password.</value>
+  </data>
+  <data name="BecomeVendor" xml:space="preserve">
+    <value>Become a Vendor</value>
+  </data>
+  <data name="chooseAddress" xml:space="preserve">
+    <value>Choose Address</value>
+  </data>
+  <data name="purchase" xml:space="preserve">
+    <value>Purchase</value>
+  </data>
+  <data name="OldPassword" xml:space="preserve">
+    <value>Old Password</value>
+  </data>
+  <data name="PasswordDigit" xml:space="preserve">
+    <value>Password must have at least one digit</value>
+  </data>
+  <data name="passwordLength" xml:space="preserve">
+    <value>Minimum Password Length Required is: 12</value>
+  </data>
+  <data name="PasswordLowerCase" xml:space="preserve">
+    <value>Password must have at least one lower case letter</value>
+  </data>
+  <data name="PasswordSpecial" xml:space="preserve">
+    <value>Password must have at least one special character</value>
+  </data>
+  <data name="PasswordUpperCase" xml:space="preserve">
+    <value>Password must have at least one upper case letter</value>
+  </data>
+  <data name="OrUsing" xml:space="preserve">
+    <value>OR using</value>
+  </data>
+  <data name="SocialAccountCanNotResetPassword" xml:space="preserve">
+    <value>Social accounts can not reset or change password!</value>
+  </data>
+  <data name="ReSendCode" xml:space="preserve">
+    <value>ReSendCode</value>
+  </data>
+</root>
