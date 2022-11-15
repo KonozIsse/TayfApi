@@ -11,7 +11,6 @@ namespace Contracts
     {
         Task<List<News>> SearchNews(int vendorId, string search);
         Task<List<News>> GetWithComments();
-        Task<List<News>> GetBlogs();
         Task<News> GetBlogById(int id, bool trackChanges);
         void CreateBlog(News blog);
         void DeleteBlog(News blog);
@@ -20,10 +19,11 @@ namespace Contracts
     {
         void DeleteCommentNews(CommentNews commentNews);
         Task<List<CommentNews>> GetCommentsByNewsId(int id);
-        Task<CommentNews> GetCommentIdNewsId(int id, int blog );
+        Task<CommentNews> GetCommentIdNewsId(int id, int blog, bool trackChanges);
         void CreateCommentNews(int newsId, CommentNews commentNews);
         Task<List<CommentNews>> SearchCommets(int newId, string search);
         Task<CommentNews> GetCommentId(int id);
         int GetCountComments(int blog);
+        Task DeleteListCommentNews(List<int> Ids);
     }
 }

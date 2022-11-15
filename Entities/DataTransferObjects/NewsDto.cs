@@ -42,8 +42,6 @@ namespace Entities.DataTransferObjects
     public class CreateCommentsDto
     {
         public string Text { get; set; }
-        public int UserId { get; set; }
-        public int NewsId { get; set; }
     }
     public class CommentsDto
     {

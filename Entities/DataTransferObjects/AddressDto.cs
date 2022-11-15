@@ -35,9 +35,9 @@ namespace Entities.DataTransferObjects
         public string Post_Code { get; set; }
         public string CityName { get; set; }
         public string Flat { get; set; }
+        public bool IsDefault { get; set; }
         public int ZoneId { get; set; }
         public int CountryId { get; set; }
-        public int UserId { get; set; }
     }
     public class UpdateAddressDto: CreateAddressDto
     {

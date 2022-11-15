@@ -32,6 +32,9 @@ namespace Entities.DataTransferObjects
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Telephone { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public Status IsStatus { get; set; }
         public string Url { get; set; }
         public int? ImageId { get; set; }
         public int? CountryId { get; set; }
@@ -59,6 +62,10 @@ namespace Entities.DataTransferObjects
         public int? DefaultAddressId { get; set; }
         public int? CountryId { get; set; }
     }
+    public class UpdateUserDto : CreateCustomerDto
+    {
+        public int? VerifiedCode { get; set; }
+    }
 
     public class UserDto
     {
@@ -84,10 +91,7 @@ namespace Entities.DataTransferObjects
         public int? DefaultAddressId { get; set; }
     }
     
-    public class UpdateUserDto : CreateCustomerDto
-    {
-        public int? VerifiedCode { get; set; }
-    }
+   
 
     public class ResetPasswordDto
     {

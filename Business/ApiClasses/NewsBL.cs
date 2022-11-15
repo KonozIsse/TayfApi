@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BusinessLogic.ApiClasses
-{
+{//BusinessException
     public class NewsBL
     {
         protected readonly IRepositoryManager _repositoryManager;
@@ -30,25 +30,24 @@ namespace BusinessLogic.ApiClasses
             news.ForEach(x => list.Add(new NewsDto
             {
                 Id = x.Id,
+                IsStatus = x.IsStatus,
                 Title = x.Title == null ? "" : x.Title,
-                 // ImageId = Convert.ToInt32((x.ImgId == 0 || x.Image == null ) ? "" :
+                // ImageId = Convert.ToInt32((x.ImgId == 0 || x.Image == null ) ? "" :
                 //(x.Image.ImageSettings.Count() > 0 ? urlImg + x.Image.ImageSettings
-                //    .FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path : "")),
+                //  .FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path : "")),
                 Decription = String.IsNullOrEmpty(x.Decription) ? "" : x.Decription,
                 Url = x.Url,
-                CountComment = x.Comments.Count()
-            }));
+                CountComment = x.Comments.Count() 
+            })); 
             return list;
         }
-
         public async Task<List<NewsDto>> GetListNews()
         {
-            var blogs = await _repositoryManager.News.GetBlogs();  
+            var blogs = await _repositoryManager.News.GetWithComments();  
             var newsDto = _mapper.Map<List<NewsDto>>(blogs);
             foreach (var blog in blogs)
             {
                var blogDto =  newsDto.FirstOrDefault();
-                var count = _repositoryManager.CommentNews.GetCountComments(blog.Id);
                 blogDto.CountComment = blog.Comments.Count();
                // blogDto.ImageId = Convert.ToInt32(_imageApi.GetImageMedium( blog.ImgId.ToString()));
                // blog.VendorId = GetCurrentUserId();
@@ -58,7 +57,7 @@ namespace BusinessLogic.ApiClasses
         public async Task AddNews(CreateNewsDto createNewsDto)
         {
             var blog = _mapper.Map<News>(createNewsDto);
-          //  blog.VendorId = GetCurrentUserId();
+            //blog.VendorId = GetCurrentUserId();
             _repositoryManager.News.CreateBlog(blog);
             await _repositoryManager.SaveAsync();
         }
@@ -70,18 +69,20 @@ namespace BusinessLogic.ApiClasses
                 var commentNews = await _repositoryManager.CommentNews.GetCommentsByNewsId(newsId);
                 if (commentNews != null)
                 {
-                    foreach (var comment in commentNews)
+                    foreach(var commentNew in commentNews)
                     {
-                        _repositoryManager.CommentNews.DeleteCommentNews(comment);
+                        _repositoryManager.CommentNews.DeleteCommentNews(commentNew);
                     }
                 }
                 _repositoryManager.News.DeleteBlog(blog);
             }
             await _repositoryManager.SaveAsync();
         }
+       
         public async Task<List<NewsDto>> SearchBlog(int vendorId, string search)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(vendorId, search);
+           searchBlog.Where(c=>c.VendorId == vendorId );
             var newsDto = _mapper.Map<List<NewsDto>>(searchBlog);
             return newsDto;
         }
@@ -92,14 +93,19 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task DeleteNewsComments(int id , int newsId)
         {
-            var commentNews = await _repositoryManager.CommentNews.GetCommentIdNewsId(id, newsId);
+            var blog = await _repositoryManager.News.GetBlogById(newsId, true);
+            blog.CountComment--;
+            var commentNews = await _repositoryManager.CommentNews.GetCommentIdNewsId(id, newsId , true);
             _repositoryManager.CommentNews.DeleteCommentNews(commentNews);
             await _repositoryManager.SaveAsync();
         }
-        public async Task AddNewsComments(CreateCommentsDto createCommentsDto)
+        public async Task AddNewsComments(int newsId ,CreateCommentsDto createCommentsDto)
         {
+            var blog = await _repositoryManager.News.GetBlogById(newsId, true);
+            blog.CountComment++;
             var commentNews = _mapper.Map<CommentNews>(createCommentsDto);
-            _repositoryManager.CommentNews.CreateCommentNews(commentNews.NewsId, commentNews);
+           // commentNews.UserId = userId;
+            _repositoryManager.CommentNews.CreateCommentNews(newsId, commentNews);
             await _repositoryManager.SaveAsync();
         }
         public async Task<List<CommentsDto>> SearchCommetsNews(int newId, string search)
@@ -108,7 +114,5 @@ namespace BusinessLogic.ApiClasses
             var commentsDtos = _mapper.Map<List<CommentsDto>>(searchComments);
             return commentsDtos;
         }
-
-       
     }
 }

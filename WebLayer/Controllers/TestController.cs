@@ -16,34 +16,38 @@ namespace WebLayer.Controllers
     {
         private readonly HomeBL _homeBL; 
         private readonly NewsBL _newsBL;
-        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news) : base(serviceProvider)
+        private readonly UserBL _userBL;
+        private readonly LocationTaxBL _locationTaxBL;
+        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL , LocationTaxBL locationTaxBL) : base(serviceProvider)
         {
             _homeBL = home;
             _newsBL = news;
+            _userBL = userBL;
+            _locationTaxBL = locationTaxBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add(CreateCommentsDto create)
+        public async Task<IActionResult> add(int id ,CreateAddressDto create)
         {
-            await _newsBL.AddNewsComments(create);
+            await _locationTaxBL.CreateAddress(id , create);
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update(int id , UpdateCurrencyDto update)
+        public async Task<IActionResult> update(int id , UpdateAddressDto update , int ids)
         {
-            await _homeBL.UpdatCurrency(id , update);
+            await _locationTaxBL.EditAddres(id , update , ids);
             return NoContent();
         } 
         [HttpDelete("delete")]
-        public async Task<IActionResult> delete(int id , int cid )
+        public async Task<IActionResult> delete(int id  )
         {
-            await _newsBL.DeleteNewsComments(id , cid);
+            await _locationTaxBL.DeleteTaxRate(id );
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id , string search )
+        public async Task<IActionResult> get(int id )
         {
-            var langs =  await _newsBL.SearchCommetsNews(id , search );
+            var langs =  await _locationTaxBL.DefaultAddress(id);
             return Ok(langs);
         }
     }

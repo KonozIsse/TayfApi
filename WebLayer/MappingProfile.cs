@@ -50,9 +50,12 @@ namespace WebLayer
             CreateMap<UpdateCategoryDto, Category>().ReverseMap();
             //MapCountry
             CreateMap<CountryDto, Country>().ReverseMap();
+            CreateMap<CreateCountryDto, Country>().ReverseMap(); 
+            CreateMap<UpdateCountryDto, Country>().ReverseMap();
             //MapZone
             CreateMap<ZoneDto, Zone>().ReverseMap();
             CreateMap<CreateZoneDto, Zone>().ReverseMap();
+            CreateMap<UpdateZoneDto, Zone>().ReverseMap();
             //MapNews
             CreateMap<NewsDto, News>().ReverseMap();
             CreateMap<CreateNewsDto, News>().ReverseMap();

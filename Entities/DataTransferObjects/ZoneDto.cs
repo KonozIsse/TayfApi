@@ -23,4 +23,7 @@ namespace Entities.DataTransferObjects
         public string ZoneCode { get; set; }
         public int CountryId { get; set; }
     }
+    public class UpdateZoneDto : CreateZoneDto
+    {
+    }
 }

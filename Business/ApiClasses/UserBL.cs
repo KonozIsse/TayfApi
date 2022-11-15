@@ -54,6 +54,7 @@ namespace BusinessLogic.ApiClasses
         {
             var store = _mapper.Map<User>(createStoreDto);
             store.RoleId = 3;
+            store.Lang = " ";
             _repositoryManager.User.AddUser(store);
             await _repositoryManager.SaveAsync();
         }
@@ -139,10 +140,10 @@ namespace BusinessLogic.ApiClasses
             user.IsMobileVerified = true;
             await _repositoryManager.SaveAsync();
         }
-        public async Task EditeUserSubscribe(string newsletter, int userId)
+        public async Task EditeUserSubscribe(bool newsletter, int userId)
         {
             var user = await _repositoryManager.User.GetCustomerId(userId, true);
-            user.IsSubscribe = Convert.ToBoolean(newsletter);
+            user.IsSubscribe = newsletter;
             await _repositoryManager.SaveAsync();
         }
         public async Task UpdateUser(int userId, UpdateUserDto updateUserDto)

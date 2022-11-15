@@ -58,11 +58,11 @@ namespace Repository
          => await FindByCondition(c => c.Email == email && c.RoleId != 2 && c.Status == Status.Active, false).SingleOrDefaultAsync();
         // Store 3--------------------------------------------------
         public async Task<IEnumerable<User>> GetStores(bool trackChanges)
-        => await FindByCondition(c => c.RoleId == 3, trackChanges).ToListAsync();
+        => await FindByCondition(c => c.RoleId == 3, trackChanges).Include(c => c.ProductsStores).Include(c => c.Addresses).ToListAsync();
         public async Task<IEnumerable<User>> GetAllStores (bool trackChanges)
         => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, trackChanges).ToListAsync();
         public async Task<User> GetStoreId (int id)
-       => await FindByCondition(c =>c.Id == id && c.RoleId == 3 && c.Status == Status.Active, false).FirstOrDefaultAsync();
+       => await FindByCondition(c =>c.Id == id && c.RoleId == 3 && c.Status == Status.Active, false).Include(c=>c.ProductsStores).Include(c=>c.Addresses).FirstOrDefaultAsync();
         public async Task<IEnumerable<User>> Get10Stores()
         => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, false).OrderBy(r => r.Id).Take(10).ToListAsync();
         public int GetStoreCount() => FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, false).Count();

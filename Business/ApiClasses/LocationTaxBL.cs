@@ -60,8 +60,10 @@ namespace BusinessLogic.ApiClasses
         {
             var address = _mapper.Map<Address>(createAddressDto);
             address.UserId = userId;
+           
             _repositoryManager.Address.AddAddress(address);
-            if (address.User.DefaultAddressId == address.Id)
+            await _repositoryManager.SaveAsync();
+            if (address.IsDefault == true)
             {
                 await AddDefultAddress(address.Id, userId);
             }
@@ -75,22 +77,22 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task AddDefultAddress(int defaultAddressId, int userId)
         {
-            var user = await _repositoryManager.User.GetUserId(userId, false);
+            var user = await _repositoryManager.User.GetUserId(userId, true);
             if (user != null)
             {
                 user.DefaultAddressId = defaultAddressId;
                 await _repositoryManager.SaveAsync();
             }
         }
-        public async Task EditAddres(UpdateAddressDto updateAddressDto, int id, bool isDefault)
+        public async Task EditAddres(int userId ,UpdateAddressDto updateAddressDto, int id)
         {
-            var address = await _repositoryManager.Address.GetAddressIdByCustomerId(id, updateAddressDto.UserId, true);
-            address.UserId = updateAddressDto.UserId;
+            var address = await _repositoryManager.Address.GetAddressIdByCustomerId(id, userId, true);
+            address.UserId = userId;
             _mapper.Map(updateAddressDto, address);
 
-            if (isDefault == true)
+            if (updateAddressDto.IsDefault == true)
             {
-                await AddDefultAddress(id, updateAddressDto.UserId);
+                await AddDefultAddress(id, userId);
             }
             await _repositoryManager.SaveAsync();
         }
@@ -102,9 +104,9 @@ namespace BusinessLogic.ApiClasses
             {
                 addressDto = _mapper.Map<AddressDto>(address);
                 addressDto.UserId = customerId;
-                addressDto.CityName = (address.Country == null ? "" :
-                        (address.Country.Zones.Where(r => r.Id == address.ZoneId).FirstOrDefault() == null ? "" :
-                        address.Country.Zones.Where(r => r.Id == address.ZoneId).FirstOrDefault().ZoneName));
+                //addressDto.CityName = (address.Country == null ? "" :
+                //        (address.Country.Zones.Where(r => r.Id == address.ZoneId).FirstOrDefault() == null ? "" :
+                //        address.Country.Zones.Where(r => r.Id == address.ZoneId).FirstOrDefault().ZoneName));
                 addressDto.IsDefault = await _repositoryManager.User.GetUserDefaultAddress(customerId, address.Id) != null;
             }
             else
@@ -114,17 +116,34 @@ namespace BusinessLogic.ApiClasses
             return addressDto;
         }
         //Country------------------------------------------------
-        public async Task<List<CountryDto>> GetCountries()
+       
+        public async Task AddCountry(CreateCountryDto createCountryDto)
         {
-            var countries = await _repositoryManager.Country.GetCountries();
-            // var iso = _imgCatRepo.getImgOrg(x1.image.ToString());
-            var countryDto = _mapper.Map<List<CountryDto>>(countries);
-            return countryDto;
+            var country = _mapper.Map<Country>(createCountryDto);
+            _repositoryManager.Country.AddCountry(country);
+            await _repositoryManager.SaveAsync();
         }
         public async Task DeleteCountry(int id)
         {
             var country = await _repositoryManager.Country.GetcountryById(id, false);
-            _repositoryManager.Country.DeleteCountry(country);
+            if(country != null)
+            {
+                var zones = await _repositoryManager.Zone.GetZonesByCountryId(id);
+                if(zones != null)
+                {
+                    foreach (var zone in zones)
+                    {
+                        _repositoryManager.Zone.DeleteZone(zone);
+                    }
+                }
+                _repositoryManager.Country.DeleteCountry(country);
+            }
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task EditCountry(int id, UpdateCountryDto updateDto)
+        {
+            var country = await _repositoryManager.Country.GetcountryById(id, true);
+            _mapper.Map(updateDto, country);
             await _repositoryManager.SaveAsync();
         }
         public bool CheckCountryExist(string countryName, int countryCode)
@@ -138,10 +157,10 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<CountryDto>> GetCountriesForWeb()
         {
             var countries = await _repositoryManager.Country.GetCountries();
-            var country = countries.First();
             var countriesDto = _mapper.Map<List<CountryDto>>(countries);
-            var countryDto = countriesDto.First();
-            countryDto.ImageId = Convert.ToInt32(await _imageBL.GetImageOriginal(country.ImgId.ToString()));
+            //var country = countries.First();
+            //var countryDto = countriesDto.First();
+            //countryDto.ImageId = Convert.ToInt32(await _imageBL.GetImageOriginal(country.ImgId.ToString()));
             return countriesDto;
         }
         //Zone------------------------------------------------
@@ -155,16 +174,41 @@ namespace BusinessLogic.ApiClasses
             var zonesDto = _mapper.Map<List<ZoneDto>>(zones);
             return zonesDto;
         }
-        public async Task AddZone(int countryId, CreateZoneDto createZoneDto)
+        public async Task AddZone(CreateZoneDto createZoneDto)
         {
             var zone = _mapper.Map<Zone>(createZoneDto);
-            _repositoryManager.Zone.AddZone(countryId, zone);
+            _repositoryManager.Zone.AddZone(createZoneDto.CountryId, zone);
             await _repositoryManager.SaveAsync();
         }
         public async Task DeleteZone(int id, int countryId)
         {
             var zone = await _repositoryManager.Zone.GetZoneIdCountryId(id, countryId, false);
             _repositoryManager.Zone.DeleteZone(zone);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task EditZone (int id, UpdateZoneDto updateDto)
+        {
+            var zone = await _repositoryManager.Zone.GetZoneId(id, true);
+            _mapper.Map(updateDto, zone);
+            await _repositoryManager.SaveAsync();
+        }
+        //TaxClass------------------------------------------------
+        public async Task AddTaxClass(CreateTaxClassDto createTaxClassDto)
+        {
+            var taxClass = _mapper.Map<TaxClass>(createTaxClassDto);
+            _repositoryManager.TaxClass.AddTaxClass(taxClass);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task EditTaxClass(int id, UpdateTaxClassDto updateTaxClassDto)
+        {
+            var taxClass = await _repositoryManager.TaxClass.GetTaxClassId(id, true);
+            _mapper.Map(updateTaxClassDto, taxClass);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task DeleteTaxClass(int id)
+        {
+            var taxClass = await _repositoryManager.TaxClass.GetTaxClassId(id, false);
+            _repositoryManager.TaxClass.DeleteTaxClass(taxClass);
             await _repositoryManager.SaveAsync();
         }
         //TaxRate------------------------------------------------
@@ -209,26 +253,6 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             return tax;
-        }
-       
-        //TaxClass------------------------------------------------
-        public async Task AddTaxClass (CreateTaxClassDto createTaxClassDto)
-        {
-            var taxClass = _mapper.Map<TaxClass>(createTaxClassDto);
-            _repositoryManager.TaxClass.AddTaxClass(taxClass);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task EditTaxClass( int id , UpdateTaxClassDto updateTaxClassDto)
-        {
-            var taxClass = await _repositoryManager.TaxClass.GetTaxClassId(id , true);
-            _mapper.Map(updateTaxClassDto , taxClass);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task DeleteTaxClass(int id)
-        {
-            var taxClass = await _repositoryManager.TaxClass.GetTaxClassId(id, false);
-            _repositoryManager.TaxClass.DeleteTaxClass(taxClass);
-            await _repositoryManager.SaveAsync();
         }
         //settings------------------------------------------------
         public async Task<List<SettingDto>> Settings(string lang)
