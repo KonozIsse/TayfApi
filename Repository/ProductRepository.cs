@@ -25,8 +25,10 @@ namespace Repository
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false).FirstOrDefaultAsync();
         public List<Product> GetAllProducts()
         =>  FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToList();
-        public async Task<List<int>> GetAllProductsToCategoryId(int categoryId)
+        public async Task<List<int>> GetProductsCategoryId(int categoryId)
         => await FindByCondition(c => c.CategoryId == categoryId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).Select(c=>c.Id).ToListAsync();
+        public async Task<List<Product>> GetProductsCatId(int categoryId)
+       => await FindByCondition(c => c.CategoryId == categoryId , false).ToListAsync();
 
         public async Task<List<Product>> GetProductsTOStoreId(int storeId)
         => await FindByCondition(c => c.ProductsStores.Any(x => x.VendorId == storeId) && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
@@ -91,6 +93,11 @@ namespace Repository
             Create(product);
         }
         public void DeleteProduct(Product product) => Delete(product);
+        public async Task DeleteListProduct(List<int> Ids)
+        {
+            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
+            DeleteRange(result);
+        }
     }
 
     public class ProductTypeRepository : RepositoryBase<ProductType>, IProductTypeRepository

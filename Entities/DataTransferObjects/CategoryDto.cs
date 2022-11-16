@@ -24,14 +24,14 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public string CategoryName { get; set; }
-        public int? MainCategoryId { get; set; }
+        public int ImageId { get; set; }
+        public Status IsStatus { get; set; }
     }
     public class CreateCategoryDto
     {
         public string CategoryName { get; set; }
         public int? ImgId { get; set; }
         public Status IsStatus { get; set; }
-        public int? MainCategoryId { get; set; }
     }
     public class UpdateCategoryDto : CreateCategoryDto
     {

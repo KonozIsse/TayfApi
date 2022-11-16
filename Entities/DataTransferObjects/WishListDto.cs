@@ -13,12 +13,12 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public Status IsStatus { get; set; }
-        public int? ProductId { get; set; }
+        public int ProductId { get; set; }
         public int CustomerId { get; set; }
     } 
     public class CreateLikeDto
     {
-        public int? ProductId { get; set; }
+        public int ProductId { get; set; }
         public int CustomerId { get; set; }
     }
 }

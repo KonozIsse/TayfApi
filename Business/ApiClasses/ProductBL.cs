@@ -36,20 +36,27 @@ namespace BusinessLogic.ApiClasses
         //Category------------------------------------------------
         public async Task<List<CategoryDto>> GetAllCategories()
         {
-            var categories = await _repositoryManager.Categories.GetCategoriesWithMainCategories(false);
+            var categories = await _repositoryManager.Categories.GetAllCategories(false);
             var categoryDto = _mapper.Map<List<CategoryDto>>(categories);
             return categoryDto;
         }
       
         public async Task<List<MainCategoryDto>> GetMainCategories()
         {
-            var categories = await _repositoryManager.Categories.GetAllCategories(false);
+            var categories = await _repositoryManager.Categories.GetMainCategories(false);
             var mainCategoryDto = _mapper.Map<List<MainCategoryDto>>(categories);
+            return mainCategoryDto;
+        }
+        public async Task<List<CategoryDto>> GetSubCategories()
+        {
+            var categories = await _repositoryManager.Categories.GetSubCategories(false);
+            var mainCategoryDto = _mapper.Map<List<CategoryDto>>(categories);
             return mainCategoryDto;
         }
         public async Task CreateMainCategory(CreateCategoryDto createCategoryDto)
         {
             var category = _mapper.Map<Category>(createCategoryDto);
+            category.MainCategoryId = 0;
             _repositoryManager.Categories.CreateMainCategory(category);
             await _repositoryManager.SaveAsync();
         }
@@ -62,28 +69,105 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task DeleteCategory(int id)
         {
-            var category = await _repositoryManager.Categories.GetCategoryById(id, false);
-            _repositoryManager.Categories.DeleteCategory(category);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task DeleteMainCategory(int id)
-        {
             var subCategoryList = await _repositoryManager.Categories.GetSubCategoriesByMainId(id, false);
             if (subCategoryList != null)
             {
                 foreach (var item in subCategoryList)
                 {
+                    var products = await _repositoryManager.Product.GetProductsCatId(item.Id);
+                    if (products != null)
+                    {
+                        foreach (var product in products)
+                        {
+                             _repositoryManager.Product.DeleteProduct(product);
+                            //await RemoveProduct(product.Id);
+                        }
+                    }
                     _repositoryManager.Categories.DeleteCategory(item);
                 }
-                await _repositoryManager.SaveAsync();
             }
             var MainCategory = await _repositoryManager.Categories.GetCategoryById(id, false);
             _repositoryManager.Categories.DeleteCategory(MainCategory);
             await _repositoryManager.SaveAsync();
         }
+        public async Task EditMainCategory (int id, UpdateCategoryDto updateDto)
+        {
+            var category = await _repositoryManager.Categories.GetCategoryById(id, true);
+            category.MainCategoryId = 0;
+            _mapper.Map(updateDto, category);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task EditSubCategory (int id,int mainId , UpdateCategoryDto updateDto)
+        {
+            var category = await _repositoryManager.Categories.GetCategoryIdMainId(id, mainId, true);
+            _mapper.Map(updateDto, category);
+            await _repositoryManager.SaveAsync();
+        }
 
         //Product------------------------------------------------
+        public async Task AddProduct(int catId, CreateProductDto createProductDto)
+        {
+            var product = _mapper.Map<Product>(createProductDto);
+            product.CategoryId = catId;
+            _repositoryManager.Product.AddProductOnCategory(catId, product);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task EditProduct(int productId, UpdateProductDto updateProductDto)
+        {
+            var product = await _repositoryManager.Product.GetProductById(productId, true);
+            _mapper.Map(updateProductDto, product);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task ApproveProduct(int productId)
+        {
+            var product = await _repositoryManager.Product.GetProductById(productId, true);
+            product.IsAcceptAdmin = true;
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task RemoveProduct(int productId)
+        {
+            var customerProducts = await _repositoryManager.CustomerProduct.GetCustomersProductId(productId);
+            foreach (var customerProduct in customerProducts)
+            {
+                _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
+            }
+            var stores = await _repositoryManager.ProductStore.GetAllProductsStoreProductId(productId);
+            foreach (var store in stores)
+            {
+                _repositoryManager.ProductStore.DeleteProductsStore(store);
+            }
+            var carts = await _repositoryManager.CartProduct.GetAllCartProductProductId(productId);
+            foreach (var cart in carts)
+            {
+                _repositoryManager.CartProduct.DeleteCartProduct(cart);
+            }
 
+            var specials = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(productId);
+            foreach (var special in specials)
+            {
+                _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
+            }
+
+            var sales = await _repositoryManager.Sales.GetAllSalesProductId(productId);
+            foreach (var sale in sales)
+            {
+                _repositoryManager.Sales.DeleteFlashSale(sale);
+            }
+            var likes = await _repositoryManager.WishList.GetLikesProductId(productId);
+            foreach (var like in likes)
+            {
+                _repositoryManager.WishList.DeleteLike(like);
+            }
+            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
+            foreach (var attribut in attributs)
+            {
+                _repositoryManager.Attribute.DeleteAttributesProduct(attribut);
+            }
+
+            var product = await _repositoryManager.Product.GetProductById(productId, false);
+            _repositoryManager.Product.DeleteProduct(product);
+            await _repositoryManager.SaveAsync();
+        }
         public async Task<List<ProductVM>> GetProductByModel(List<int> prodList, int CustomerId, Currency curr)
         {
             if (prodList.Count() > 0)
@@ -168,7 +252,7 @@ namespace BusinessLogic.ApiClasses
             var products = _repositoryManager.Product.GetAllProducts().Where(c => c.IsAcceptAdmin == true).Select(c => c.Id);
             if (catId != 0)
             {
-               products = await _repositoryManager.Product.GetAllProductsToCategoryId(catId);
+               products = await _repositoryManager.Product.GetProductsCategoryId(catId);
             }
              ids = products.ToList();
             return await GetProductByModel(ids, CustomerId, curr);
@@ -202,69 +286,7 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Product.GetProductsTOStoreId(vendorId);
         }
-        public async Task AddProduct(int catId, CreateProductDto createProductDto)
-        {
-            var product = _mapper.Map<Product>(createProductDto);
-            _repositoryManager.Product.AddProductOnCategory(catId, product);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task EditProduct(int productId, UpdateProductDto updateProductDto)
-        {
-            var product = await _repositoryManager.Product.GetProductById(productId, true);
-            _mapper.Map(updateProductDto, product);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task ApproveProduct(int productId)
-        {
-            var product = await _repositoryManager.Product.GetProductById(productId, true);
-            product.IsAcceptAdmin = true;
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task RemoveProduct(int productId)
-        {
-            var customerProducts = await _repositoryManager.CustomerProduct.GetCustomersProductId(productId);
-            foreach (var customerProduct in customerProducts)
-            {
-                _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
-                await _repositoryManager.SaveAsync();
-            }
-            var stores = await _repositoryManager.ProductStore.GetAllProductsStoreProductId(productId);
-            foreach (var store in stores)
-            {
-                _repositoryManager.ProductStore.DeleteProductsStore(store);
-                await _repositoryManager.SaveAsync();
-            }
-            var carts = await _repositoryManager.CartProduct.GetAllCartProductProductId(productId);
-            foreach (var cart in carts)
-            {
-                _repositoryManager.CartProduct.DeleteCartProduct(cart);
-                await _repositoryManager.SaveAsync();
-            }
-
-            var specials = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(productId);
-            foreach (var special in specials)
-            {
-                _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
-                await _repositoryManager.SaveAsync();
-            }
-
-            var sales = await _repositoryManager.Sales.GetAllSalesProductId(productId);
-            foreach (var sale in sales)
-            {
-                _repositoryManager.Sales.DeleteFlashSale(sale);
-                await _repositoryManager.SaveAsync();
-            }
-            var likes = await _repositoryManager.WishList.GetLikesProductId(productId);
-            foreach (var like in likes)
-            {
-                _repositoryManager.WishList.DeleteLike(like);
-                await _repositoryManager.SaveAsync();
-            }
-
-            var product = await _repositoryManager.Product.GetProductById(productId, false);
-            _repositoryManager.Product.DeleteProduct(product);
-            await _repositoryManager.SaveAsync();
-        }
+       
         public async Task<List<ProductPageDto>> PopularsPage(int pageSize = 10)
         {
             var popular = await _repositoryManager.Product.GetPopularProducts(pageSize);
@@ -289,7 +311,6 @@ namespace BusinessLogic.ApiClasses
             var popularDto = _mapper.Map<List<ProductPageDto>>(popular);
             return popularDto;
         }
-
         public async Task<List<ProductPageDto>> TopRatedPage(int pageSize = 6)
         {
             var populars = await _repositoryManager.Product.TopRatedPage(pageSize);
@@ -340,13 +361,20 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Attribute.GetAttributesProductId(productId);
         }
-        public async Task DeleteAttributesProduct(int id, int productId)
+        public async Task AddAttribute (int productId ,CreateAttributeDto createDto)
+        {
+            var attribute = _mapper.Map<ProductAttribut>(createDto);
+            attribute.ProductId = productId;
+            _repositoryManager.Attribute.AddAttributesProduct(productId , attribute);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task DeleteAttribute(int id, int productId)
         {
             var attributId = await _repositoryManager.Attribute.GetAttributeIdProductId(id, productId);
             _repositoryManager.Attribute.DeleteAttributesProduct(attributId);
             await _repositoryManager.SaveAsync();
         }
-        public async Task UpdateAttributells(int attributId, UpdateAttributeDto updateOptionDto)
+        public async Task UpdateAttribute(int attributId, UpdateAttributeDto updateOptionDto)
         {
             var attribut = await _repositoryManager.Attribute.GetAttributeId(attributId, true);
             _mapper.Map(updateOptionDto, attribut);
@@ -361,8 +389,24 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task DeleteOptionProduct(int id)
         {
-            var attributId = await _repositoryManager.Option.GetOptionId(id, false);
-            _repositoryManager.Option.DeleteOption(attributId);
+            var values = await _repositoryManager.Value.GetValuesOPtionId(id);
+            if (values != null)
+            {
+                foreach (var value in values)
+                {
+                    _repositoryManager.Value.DeleteValue(value);
+                }
+            }
+            var attributs = await _repositoryManager.Attribute.GetAttributesOptionId(id);
+            if (attributs != null)
+            {
+                foreach (var attribut in attributs)
+                {
+                    _repositoryManager.Attribute.DeleteAttributesProduct(attribut);
+                }
+            }
+            var option = await _repositoryManager.Option.GetOptionId(id, false);
+            _repositoryManager.Option.DeleteOption(option);
             await _repositoryManager.SaveAsync();
         }
         public async Task<string> GetPriceForOption(int id, string option = "")
@@ -405,7 +449,7 @@ namespace BusinessLogic.ApiClasses
             }
             return productPrice + "_" + stock;
         }
-        //OptionValue------------------------------------------------
+        //Value------------------------------------------------
         public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
         {
             return await _repositoryManager.Value.GetValuesOPtionId(optionId);
@@ -434,9 +478,10 @@ namespace BusinessLogic.ApiClasses
                 return valueDto;
             }
         }
-        public async Task AddValue(CreateValueDto createValueDto)
+        public async Task AddValue(int optionId ,CreateValueDto createValueDto)
         {
             var value = _mapper.Map<ProductOptionValue>(createValueDto);
+            value.OptionId = optionId;
             _repositoryManager.Value.CreateValue(value);
             await _repositoryManager.SaveAsync();
         }
@@ -885,23 +930,14 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task AddReviews(int productId, CreateReviewDto createReviewDto)
         {
+            var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
+            product.Rate = await Rate(productId);
+            product.CountReviews++;
             var review = _mapper.Map<Review>(createReviewDto);
             //review.CustomerId = GetCurrentUserId();
             review.ProductId = productId;
+            review.IsStatus = Status.NotActive;
             _repositoryManager.Review.AddReview(review);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateReviews(int reviewId, UpdateReviewDto updateReviewDto)
-        {
-            var review = await _repositoryManager.Review.GetReviewId(reviewId, true);
-            _mapper.Map(updateReviewDto, review);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task DeleteReviews(int productId, int reviewId)
-        {
-            var review = await _repositoryManager.Review.GetReviewId(reviewId, false);
-            review.ProductId = productId;
-            _repositoryManager.Review.DeleteReview(review);
             await _repositoryManager.SaveAsync();
         }
         public async Task ActiveReview(int id)
@@ -933,36 +969,33 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<ReviewDto>> GetLast3Reviews(int productId)
         {
             var reviews = await _repositoryManager.Review.Last3Reviews(productId);
-            var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
-            return reviewsDto;
-        }
-        //public async Task<List<ReviewDto>> GetPaginationReviews(int productId, PostsParameters postsParameters)
-        //{
-        //    var reviews = await _repositoryManager.Review.GetReviewsByProductId(productId, postsParameters);
-        //    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(reviews.MetaData));
-        //    var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
-        //    return reviewsDto;
-        //}
-        public async Task<List<ReviewDto>> GetReviews(int productId)
-        {
             var reviewsDto = new List<ReviewDto>();
-            var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
             if (reviews.Count() > 0)
             {
                 foreach (var review in reviews)
                 {
                     reviewsDto.Add(new ReviewDto
                     {
-                        CustomerId = review.CustomerId,
-                        CustomerName = review.Customer.FirstName + " "+ review.Customer.LastName,
-                        CustomerImage = review.Customer.Avater ?? null ,
-                        ProductId = review.ProductId,
                         Id = review.Id,
                         Rating = Convert.ToDouble(review.Rating),
-                        Text = review.Text
+                        Text = review.Text,
+                        CustomerId = review.CustomerId,
+                        CustomerName = review.Customer.FirstName + " " + review.Customer.LastName,
+                        CustomerImage = review.Customer.Avater ?? null,
+                        ProductId = productId
                     });
                 }
             }
+            else
+            {
+                return null;
+            }
+            return reviewsDto;
+        }
+        public async Task<List<ReviewDto>> GetReviews(int productId)
+        {
+            var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
+            var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
             return reviewsDto;
         }
         public async Task<decimal> Rate(int productId)
@@ -973,32 +1006,19 @@ namespace BusinessLogic.ApiClasses
             return rate;
         }
         //WishList------------------------------------------------
-        public async Task<WishList> GetLikeUserToProduct(int user, int productId)
+        public async Task AddWishList( CreateLikeDto createLikeDto)
         {
-            return await _repositoryManager.WishList.GetWishListProductIdCustomerId(user, productId);
-        }
-
-        public int GetLikeCountToUser(int user)
-        {
-            return _repositoryManager.WishList.GetCountLikesByCustomersId(user);
-        }
-        public async Task AddWishList(int productId, int userId, CreateLikeDto createLikeDto)
-        {
+            var product = await _repositoryManager.Product.GetActiveProductById(createLikeDto.ProductId , true);
+            product.Like++;
             var wishList = _mapper.Map<WishList>(createLikeDto);
-            wishList.CustomerId = userId;
-            wishList.ProductId = productId;
-            _repositoryManager.WishList.Addlike(productId, wishList);
+            _repositoryManager.WishList.Addlike(createLikeDto.ProductId, wishList);
             await _repositoryManager.SaveAsync();
         }
-        public async Task DeleteLikeCustomerProduct(int customerId, int productId)
+        public async Task DeleteLike(int customerId, int productId)
         {
-            var wishList = await GetLikeUserToProduct(customerId, productId);
-            _repositoryManager.WishList.DeleteLike(wishList);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task DeleteLikeCustomer(int id, int customerId)
-        {
-            var wishList = await _repositoryManager.WishList.GetLikeCustomerId(id, customerId);
+            var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
+            product.Like--;
+            var wishList = await _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId , productId);
             if (wishList != null)
             {
                 _repositoryManager.WishList.DeleteLike(wishList);
@@ -1015,7 +1035,6 @@ namespace BusinessLogic.ApiClasses
             }
             return favorit;
         }
-
         public async Task<int> GetFavourite(int customerId, int productId)
         {
             int favId = 0;

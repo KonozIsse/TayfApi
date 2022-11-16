@@ -12,6 +12,7 @@ namespace Contracts
         Task<ProductAttribut> GetAttributeId(int id, bool trackChanges);
         Task<ProductAttribut> GetAttributeIdProductId(int id, int productId);
         Task<List<ProductAttribut>> GetAttributesProductId(int productId);
+        Task<List<ProductAttribut>> GetAttributesOptionId(int optionId);
         Task<IEnumerable<ProductAttribut>> GetAllAttributesProducts(bool trackChanges);
         Task<ProductAttribut> GetProductOptionValue(int productId, int optionId, int valueId);
         int GetDistinctProdCart(int productId);

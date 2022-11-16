@@ -7,15 +7,15 @@ namespace Entities.Models
     {
         public string ProductName { get; set; }
         public string ProductModel { get; set; }
-        public string Url { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
         public string Description { get; set; }
-        public int? Tax { get; set; }
+        public decimal Rate { get; set; }
+        public int CountReviews { get; set; }
+        public int Like { get; set; }
         public bool IsSpecial { get; set; }
         public bool IsSale { get; set; }
         public bool? IsFavorite { get; set; }
-        public decimal Rate { get; set; }
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }

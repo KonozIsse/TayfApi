@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities.DataTransferObjects
+{
+    public class AttributeDto
+    {
+        public string PricePrefix { get; set; }
+        public decimal AttributePrice { get; set; }
+        public short IsDefault { get; set; }
+        public int ProductId { get; set; }
+        public int OptionId { get; set; }
+        public int ValueId { get; set; }
+    }
+    public class CreateAttributeDto
+    {
+        public string PricePrefix { get; set; }
+        public decimal AttributePrice { get; set; }
+        public short IsDefault { get; set; }
+        public int OptionId { get; set; }
+        public int ValueId { get; set; }
+    }
+    public class UpdateAttributeDto : CreateAttributeDto
+    {
+    }
+  
+    public class OptionDto
+    {
+        public int Id { get; set; }
+        public string OptionName { get; set; }
+        public string OptionType { get; set; }
+        public List<valus> Values { get; set; }
+    }
+
+    public class CreateOptionDto
+    {
+        public string OptionName { get; set; }
+        public string OptionType { get; set; }
+    }
+    public class ValueDto
+    {
+        public int Id { get; set; }
+        public string ValueHexModel { get; set; }
+        public string OptionValueName { get; set; }
+        public int OptionId { get; set; }
+    }
+    public class CreateValueDto
+    {
+        public string ValueHexModel { get; set; }
+        public string OptionValueName { get; set; }
+    }
+    public class UpdateValueDto : CreateValueDto
+    {
+    }
+
+    public class valus
+    {
+        public Nullable<int> option_attribute_id { get; set; }
+        public int ValueId { get; set; }
+        public string ValueHexModel { get; set; }
+        public string OptionValueName { get; set; }
+        public int OptionId { get; set; }
+        public string OptionName { get; set; }
+        public decimal AttributePrice { get; set; }
+        public short IsDefault { get; set; }
+
+    }
+}

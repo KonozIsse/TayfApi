@@ -7,8 +7,6 @@ namespace Entities.Models
     using System.ComponentModel.DataAnnotations;
     public class Role : IdentityRole<int>
     { 
-        [StringLength(191)]
-        public string Name { get; set; }
         public bool? IsVendorLink { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }

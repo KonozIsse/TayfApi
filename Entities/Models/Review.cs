@@ -5,12 +5,12 @@ namespace Entities.Models
     public class Review :  BaseEntity
     {
         public string Text { get; set; }
-        public double? Rating { get; set; }
+        public double Rating { get; set; }
         [ForeignKey(nameof(Product))]
-        public int? ProductId { get; set; }
+        public int ProductId { get; set; }
         public Product Product { get; set; }
         [ForeignKey(nameof(Customer))]
-        public int? CustomerId { get; set; }
+        public int CustomerId { get; set; }
         public User Customer { get; set; }
     }
 }

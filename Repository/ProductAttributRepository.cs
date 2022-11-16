@@ -22,6 +22,8 @@ namespace Repository
           => await FindByCondition(c => c.Id == id && c.ProductId == productId, false).FirstOrDefaultAsync();
         public async Task<List<ProductAttribut>> GetAttributesProductId (int productId)
          =>await FindByCondition(c => c.ProductId == productId, false).ToListAsync();
+        public async Task<List<ProductAttribut>> GetAttributesOptionId(int optionId)
+         => await FindByCondition(c => c.OptionId == optionId, false).ToListAsync();
         public async Task<IEnumerable<ProductAttribut>> GetAllAttributesProducts(bool trackChanges)
         => await FindAll(trackChanges).ToListAsync();
         public async Task<ProductAttribut> GetProductOptionValue(int productId, int optionId, int valueId)

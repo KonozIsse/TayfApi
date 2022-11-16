@@ -54,13 +54,15 @@ namespace BusinessLogic.ApiClasses
         {
             var store = _mapper.Map<User>(createStoreDto);
             store.RoleId = 3;
-            store.Lang = " ";
+            store.Lang = "en";
             _repositoryManager.User.AddUser(store);
             await _repositoryManager.SaveAsync();
         }
         public async Task UpdateStore(int id, UpdateStoreDto updateStoreDto)
         {
             var store = await _repositoryManager.User.GetUserId(id, true);
+            store.RoleId = 3;
+            store.Lang = "en";
             _mapper.Map(updateStoreDto, store);
             await _repositoryManager.SaveAsync();
         }

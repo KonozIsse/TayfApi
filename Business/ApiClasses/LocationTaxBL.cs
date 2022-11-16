@@ -37,25 +37,6 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Address.GetAddressIdByCustomerId(id, user, false);
         }
-        public async Task<List<AddressDto>> GetAddresses(int userId)
-        {
-            var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(userId);
-            var addressesDto = _mapper.Map<List<AddressDto>>(addresses);
-            var addressDto = addressesDto.First();
-            foreach (var address in addresses)
-            {
-                var defaultAddress = await _repositoryManager.User.GetUserDefaultAddress(userId, address.Id);
-                if (defaultAddress != null)
-                {
-                    addressDto.IsDefault = true;
-                }
-                else
-                {
-                    addressDto.IsDefault = false;
-                }
-            }
-            return addressesDto;
-        }
         public async Task CreateAddress(int userId, CreateAddressDto createAddressDto)
         {
             var address = _mapper.Map<Address>(createAddressDto);
@@ -69,10 +50,15 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
         }
-        public async Task DeleteAddressById(int id, int customerId)
+        public async Task DeleteAddress(int id, int customerId)
         {
             var address = await _repositoryManager.Address.GetAddressIdByCustomerId(id, customerId, false);
             _repositoryManager.Address.DeleteAddress(address);
+            var user = await _repositoryManager.User.GetUserId(customerId, true);
+            if (user != null && address.IsDefault == true)
+            {
+                user.DefaultAddressId = null;
+            }
             await _repositoryManager.SaveAsync();
         }
         public async Task AddDefultAddress(int defaultAddressId, int userId)
@@ -99,24 +85,25 @@ namespace BusinessLogic.ApiClasses
         public async Task<AddressDto> DefaultAddress(int customerId)
         {
             var address = await _repositoryManager.Address.GetAddressCustomer(customerId);
-            var addressDto = new AddressDto();
-            if (address != null)
+            if(address == null)
             {
-                addressDto = _mapper.Map<AddressDto>(address);
-                addressDto.UserId = customerId;
-                //addressDto.CityName = (address.Country == null ? "" :
-                //        (address.Country.Zones.Where(r => r.Id == address.ZoneId).FirstOrDefault() == null ? "" :
-                //        address.Country.Zones.Where(r => r.Id == address.ZoneId).FirstOrDefault().ZoneName));
-                addressDto.IsDefault = await _repositoryManager.User.GetUserDefaultAddress(customerId, address.Id) != null;
+                return null;
             }
-            else
+            var addressDto = _mapper.Map<AddressDto>(address);
+            return addressDto;
+        }
+        public async Task<List<AddressDto>> GetAddressesCustomerId (int customerId)
+        {
+            var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(customerId);
+            if (addresses == null)
             {
-                addressDto = null;
+                return null;
             }
+            var addressDto = _mapper.Map<List<AddressDto>>(addresses);
             return addressDto;
         }
         //Country------------------------------------------------
-       
+
         public async Task AddCountry(CreateCountryDto createCountryDto)
         {
             var country = _mapper.Map<Country>(createCountryDto);

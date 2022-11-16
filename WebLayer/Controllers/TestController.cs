@@ -18,36 +18,38 @@ namespace WebLayer.Controllers
         private readonly NewsBL _newsBL;
         private readonly UserBL _userBL;
         private readonly LocationTaxBL _locationTaxBL;
-        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL , LocationTaxBL locationTaxBL) : base(serviceProvider)
+        private readonly ProductBL _productBL;
+        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL , LocationTaxBL locationTaxBL , ProductBL productBL) : base(serviceProvider)
         {
             _homeBL = home;
             _newsBL = news;
             _userBL = userBL;
             _locationTaxBL = locationTaxBL;
+            _productBL = productBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add(int id ,CreateAddressDto create)
+        public async Task<IActionResult> add(int id ,CreateReviewDto create)
         {
-            await _locationTaxBL.CreateAddress(id , create);
+            await _productBL.AddReviews(id ,create);
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update(int id , UpdateAddressDto update , int ids)
+        public async Task<IActionResult> update(int id  )
         {
-            await _locationTaxBL.EditAddres(id , update , ids);
+            await _productBL.ActiveReview(id);
             return NoContent();
         } 
         [HttpDelete("delete")]
-        public async Task<IActionResult> delete(int id  )
+        public async Task<IActionResult> delete(int id , int gid )
         {
-            await _locationTaxBL.DeleteTaxRate(id );
+            await _productBL.DeleteLike(id  , gid);
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id )
+        public async Task<IActionResult> get(int id , int pid)
         {
-            var langs =  await _locationTaxBL.DefaultAddress(id);
+            var langs =  await _productBL.GetFavourite(id , pid);
             return Ok(langs);
         }
     }

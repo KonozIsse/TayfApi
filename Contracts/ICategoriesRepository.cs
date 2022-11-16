@@ -9,9 +9,10 @@ namespace Contracts
 {
     public interface ICategoriesRepository
     {
-        Task<Category> GetCategoryById(int id, bool trackChanges);
+        Task<Category> GetCategoryById(int id, bool trackChanges); 
+        Task<Category> GetCategoryIdMainId(int id,int mainId , bool trackChanges);
         Task<IEnumerable<Category>> GetAllCategories(bool trackChanges);
-        Task<IEnumerable<Category>> GetCategoriesWithMainCategories(bool trackChanges);
+        Task<IEnumerable<Category>> GetSubCategories(bool trackChanges);
         Task<IEnumerable<Category>> GetSubCategoriesByMainId(int id, bool trackChanges);
         Task<IEnumerable<Category>> GetMainCategories(bool trackChanges);
         Task<IEnumerable<Category>> SearchMainCategoriesStoreId(int storeId, int categoryId, string search);

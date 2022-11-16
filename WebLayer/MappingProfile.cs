@@ -75,7 +75,9 @@ namespace WebLayer
             CreateMap<SpecialProductsDto, SpecialProducts>().ReverseMap();
             CreateMap<CreateSpecialProductsDto, SpecialProducts>().ReverseMap();
             CreateMap<UpdateSpecialProductDto, SpecialProducts>().ReverseMap();
-            //MapAttributesProduct
+            //MapAttribute
+            CreateMap<AttributeDto, ProductAttribut>().ReverseMap();
+            CreateMap<CreateAttributeDto, ProductAttribut>().ReverseMap();
             CreateMap<UpdateAttributeDto, ProductAttribut>().ReverseMap();
             //MapOption
             CreateMap<OptionDto, ProductOption>().ReverseMap();

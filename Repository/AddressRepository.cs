@@ -18,12 +18,12 @@ namespace Repository
         }
         public async Task<Address> GetAddress (int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
-        public async Task<IEnumerable<Address>> GetAllAddressesByCustomerId(int customerId)
+        public async Task<List<Address>> GetAllAddressesByCustomerId(int customerId)
          => await FindByCondition(c => c.UserId == customerId, false).OrderByDescending(x => x.Id).ToListAsync();
         public async Task<Address> GetAddressIdByCustomerId(int id ,int customerId , bool trackChanges)
-          => await FindByCondition(c => c.Id == id && c.UserId == customerId, trackChanges).SingleOrDefaultAsync();
+          => await FindByCondition(c => c.Id == id && c.UserId == customerId&& c.IsDefault == true, trackChanges).SingleOrDefaultAsync();
         public async Task<Address> GetAddressCustomer( int customerId)
-        => await FindByCondition(c => c.UserId == customerId, false).SingleOrDefaultAsync();
+        => await FindByCondition(c => c.UserId == customerId && c.IsDefault == true, false).SingleOrDefaultAsync();
         public void AddAddress(Address address) => Create(address);
         public void DeleteAddress(Address address) => Delete(address);
     }

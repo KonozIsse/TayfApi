@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace WebLayer.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20221115221757_deket")]
+    partial class deket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1735,9 +1737,6 @@ namespace WebLayer.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CountReviews")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1772,9 +1771,6 @@ namespace WebLayer.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Like")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -2062,7 +2058,7 @@ namespace WebLayer.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -2074,10 +2070,10 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Rating")
+                    b.Property<double?>("Rating")
                         .HasColumnType("float");
 
                     b.Property<string>("Text")
@@ -2146,8 +2142,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "8ad32a4d-5b3b-475d-b654-07f0d453fb53",
-                            CreatedAt = new DateTime(2022, 11, 15, 16, 5, 26, 598, DateTimeKind.Local).AddTicks(8833),
+                            ConcurrencyStamp = "eca8ef41-bc68-47c7-9888-026c20340b8f",
+                            CreatedAt = new DateTime(2022, 11, 15, 12, 17, 55, 714, DateTimeKind.Local).AddTicks(2451),
                             IsDeleted = false,
                             IsStatus = 2,
                             Name = "Admin",
@@ -2156,8 +2152,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "744e750b-24f0-47ab-ad51-116a94e0481a",
-                            CreatedAt = new DateTime(2022, 11, 15, 16, 5, 26, 598, DateTimeKind.Local).AddTicks(8961),
+                            ConcurrencyStamp = "beb87c5b-862f-4cd4-bc87-a71283b674f9",
+                            CreatedAt = new DateTime(2022, 11, 15, 12, 17, 55, 714, DateTimeKind.Local).AddTicks(2515),
                             IsDeleted = false,
                             IsStatus = 2,
                             Name = "Customer",
@@ -2166,8 +2162,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "eb8eb86d-6e20-404c-955d-fd968ce88a27",
-                            CreatedAt = new DateTime(2022, 11, 15, 16, 5, 26, 598, DateTimeKind.Local).AddTicks(8966),
+                            ConcurrencyStamp = "f10862ac-8781-4bdc-9aa4-0c134997a569",
+                            CreatedAt = new DateTime(2022, 11, 15, 12, 17, 55, 714, DateTimeKind.Local).AddTicks(2520),
                             IsDeleted = false,
                             IsStatus = 2,
                             Name = "Store",
@@ -2759,7 +2755,7 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -3513,15 +3509,11 @@ namespace WebLayer.Migrations
                 {
                     b.HasOne("Entities.Models.User", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.HasOne("Entities.Models.Product", "Product")
                         .WithMany("Reviews")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Customer");
 
@@ -3666,9 +3658,7 @@ namespace WebLayer.Migrations
 
                     b.HasOne("Entities.Models.Product", "Product")
                         .WithMany("WishLists")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Customer");
 

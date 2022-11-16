@@ -15,16 +15,12 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public Status IsStatus { get; set; }
-        public Dictionary<string, string> ProductNames { get; set; }
-        public Dictionary<string, string> ProductDescriptions { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
         public string ProductModel { get; set; }
-        public string Url { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
         public ProductType ProductType { get; set; }
-        public int? Tax { get; set; }
         public bool IsSpecial { get; set; }
         public bool IsSale { get; set; }
         public short IsFeature { get; set; }
@@ -74,16 +70,12 @@ namespace Entities.DataTransferObjects
     {
         public string ProductName { get; set; }
         public string ProductModel { get; set; }
-        public string Url { get; set; }
         public decimal Price { get; set; }
-        public int Availability { get; set; }
         public string Description { get; set; }
-        public ProductType ProductType { get; set; }
-        public int? Tax { get; set; }
+        public int TypeId { get; set; }
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public bool? IsAcceptAdmin { get; set; }
         public int? TopRateProductId { get; set; }
         public int? ImgId { get; set; }
     }
@@ -115,64 +107,6 @@ namespace Entities.DataTransferObjects
     public class UpdateSpecialProductDto  : CreateSpecialProductsDto
     {
     } 
-    public class UpdateAttributeDto
-    {
-        public string PricePrefix { get; set; }
-        public decimal AttributePrice { get; set; }
-        public short IsDefault { get; set; }
-        public int ProductId { get; set; }
-        public int OptionId { get; set; }
-        public int ValueId { get; set; }
-    } 
-    public class AttributeDto
-    {
-        public string PricePrefix { get; set; }
-        public decimal AttributePrice { get; set; }
-        public short IsDefault { get; set; }
-        public int ProductId { get; set; }
-        public int OptionId { get; set; }
-        public int ValueId { get; set; }
-    }
-    public class OptionDto
-    {
-        public int Id { get; set; }
-        public string OptionName { get; set; }
-        public string OptionType { get; set; }
-        public List<valus> Values { get; set; }
-    }
 
-    public class CreateOptionDto
-    {
-        public string OptionName { get; set; }
-        public string OptionType { get; set; }
-    }
-    public class ValueDto
-    {
-        public int Id { get; set; }
-        public string ValueHexModel { get; set; }
-        public string OptionValueName { get; set; }
-        public int OptionId { get; set; }
-    }
-    public class CreateValueDto
-    {
-        public string ValueHexModel { get; set; }
-        public string OptionValueName { get; set; }
-        public int OptionId { get; set; }
-    }
-    public class UpdateValueDto : CreateValueDto
-    {
-    }
-
-    public class valus
-    {
-        public Nullable<int> option_attribute_id { get; set; }
-        public int ValueId { get; set; }
-        public string ValueHexModel { get; set; }
-        public string OptionValueName { get; set; }
-        public int OptionId { get; set; }
-        public string OptionName { get; set; }
-        public decimal AttributePrice { get; set; }
-        public short IsDefault { get; set; }
-
-    }
+   
 }
