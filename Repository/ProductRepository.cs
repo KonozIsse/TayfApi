@@ -17,12 +17,18 @@ namespace Repository
         {
 
         }
+        public async Task<List<Product>> GetAllAcceptedProducts()
+        => await FindByCondition(c => c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false).OrderByDescending(c => c.CreatedAt)
+            .Include(c => c.Category).Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(c => c.Reviews)
+            .Include(e => e.WishLists).Include(c => c.AttributesProducts).Include(i=>i.Images).ToListAsync();
         public async Task<Product> GetProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Product> GetActiveProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();  
         public async Task<Product> GetAcceptAdminActiveProduct(int id)
-        => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false).FirstOrDefaultAsync();
+        => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
+            .Include(c=>c.Category).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
+            .Include(c=>c.Reviews).Include(e=>e.WishLists).Include(c=>c.AttributesProducts).FirstOrDefaultAsync();
         public List<Product> GetAllProducts()
         =>  FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToList();
         public async Task<List<int>> GetProductsCategoryId(int categoryId)
@@ -31,7 +37,7 @@ namespace Repository
        => await FindByCondition(c => c.CategoryId == categoryId , false).ToListAsync();
 
         public async Task<List<Product>> GetProductsTOStoreId(int storeId)
-        => await FindByCondition(c => c.ProductsStores.Any(x => x.VendorId == storeId) && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        => await FindByCondition(c => c.VendorId == storeId&& c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<List<Product>> GetAllProductLikeCustomersId(int customerId)
         => await FindByCondition(c => c.WishLists.Any(c => c.CustomerId == customerId), false).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)
@@ -59,27 +65,13 @@ namespace Repository
 
         public async Task<List<Product>> DailyDeals()
         => await FindByCondition(c => c.Reviews.Any(), false).Include(p => p.Images).Include(p => p.Reviews).ToListAsync();
-        //.ToList() .Select(p => ProductCard(p))
 
         public async Task<List<Product>> SearshProductByCategoryAndStore(int storeId, string search, int categoryId)
         {
             var list = FindByCondition(c => categoryId == 0 || c.Category.MainCategoryId == categoryId
             || (c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 1)
 
-            && storeId == 0 || c.ProductsStores.Any(s => s.VendorId == storeId && s.Vendor.Status == Status.Active)
-            && c.IsAcceptAdmin == true && c.IsStatus == Status.Active
-
-            && ((!String.IsNullOrEmpty(c.Category.CategoryName) && c.Category.CategoryName.Contains(search)) || String.IsNullOrEmpty(search))
-
-            || ((!String.IsNullOrEmpty(c.ProductName) && c.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
-            return await list.ToListAsync();
-        }
-        public async Task<List<Product>> SearshProductByCategoryAndSore(int storeId, string search, int categoryId)
-        {
-            var list = FindByCondition(c => categoryId == 0 || c.Category.MainCategoryId == categoryId
-            || (c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 1)
-
-            && storeId == 0 || c.ProductsStores.Any(s => s.VendorId == storeId && s.Vendor.Status == Status.Active)
+            && storeId == 0 || c.VendorId == storeId && c.Vendor.Status == Status.Active
             && c.IsAcceptAdmin == true && c.IsStatus == Status.Active
 
             && ((!String.IsNullOrEmpty(c.Category.CategoryName) && c.Category.CategoryName.Contains(search)) || String.IsNullOrEmpty(search))

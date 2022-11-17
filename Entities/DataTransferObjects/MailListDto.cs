@@ -9,9 +9,9 @@ namespace Entities.DataTransferObjects
 {
     public class MailListDto
     {
-        public string Email { get; set; }
         public int Id { get; set; }
         public Status IsStatus { get; set; }
+        public string Email { get; set; }
     }
     public class SendMailListDto
     {

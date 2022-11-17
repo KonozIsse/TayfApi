@@ -341,7 +341,7 @@ namespace BusinessLogic.ApiClasses
             return await _repositoryManager.Unit.GetUnitsByVendor(vendorId);
         }
         //-----------------------------------------------
-        protected DateTime EasternTime
+        public DateTime EasternTime
         {
             get
             {

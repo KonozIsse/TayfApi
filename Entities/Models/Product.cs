@@ -19,7 +19,9 @@ namespace Entities.Models
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public int? TopRateProductId { get; set; }
+        [ForeignKey(nameof(Vendor))]
+        public int VendorId { get; set; }
+        public User Vendor { get; set; }
         public bool? IsAcceptAdmin { get; set; }
         [ForeignKey(nameof(ProductType))]
         public int TypeId { get; set; }
@@ -28,7 +30,6 @@ namespace Entities.Models
         [ForeignKey(nameof(Category))]
         public int CategoryId { get; set; }
         public Category Category { get; set; }
-        public List<ProductsStore> ProductsStores { get; set; }
         public List<WishList> WishLists { get; set; }
         public List<Review> Reviews { get; set; }
         public List<SpecialProducts> SpecialProducts { get; set; } 

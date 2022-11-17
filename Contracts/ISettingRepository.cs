@@ -23,6 +23,7 @@ namespace Contracts
     }
     public interface IMailListRepository
     {
+        Task<List<MailList>> GetMailLists();
         Task<MailList> GetMailListById(int id, bool trackChanges);
         Task<MailList> GetMailListEmail(string email);
         void SendUserEmail(MailList sendEmail);

@@ -33,30 +33,28 @@ namespace Entities.DataTransferObjects
         public int CategoryId { get; set; }
         public List<WishListDto> WishLists { get; set; }
         public List<ReviewDto> Reviews { get; set; }
-        public List<SpecialProductsDto> SpecialProducts { get; set; }
-        public List<ProductSalesDto> ProductSales { get; set; }
+        public List<SpecialDto> SpecialProducts { get; set; }
+        public List<SaleDto> ProductSales { get; set; }
         public List<AttributeDto> AttributesProducts { get; set; }
         public List<ProductsStoreDto> ProductsStores { get; set; }
         public List<ImageDto> Images { get; set; }
     }
-    public class SpecialProductsDto
+    public class CreateProductDto
     {
-        public int Id { get; set; }
-        public decimal SpecialPrice { get; set; }
-        public DateTime? DateAdded { get; set; }
-        public DateTime? LastModified { get; set; }
-        public DateTime? EndDate { get; set; }
-        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductModel { get; set; }
+        public decimal Price { get; set; }
+        public string Description { get; set; }
+        public int TypeId { get; set; } 
+        public int Vendor { get; set; }
+        public short IsFeature { get; set; }
+        public short IsBest { get; set; }
+        public short IsPopular { get; set; }
+        public int? TopRateProductId { get; set; }
+        public int? ImgId { get; set; }
     }
-    public class ProductSalesDto
+    public class UpdateProductDto : CreateProductDto
     {
-        public int Id { get; set; }
-        public decimal DiscountPrice { get; set; }
-        public DateTime? AddDate { get; set; }
-        public DateTime? LastUpdate { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public int ProductId { get; set; }
     }
     public class ProductPageDto
     {
@@ -66,45 +64,48 @@ namespace Entities.DataTransferObjects
         public decimal Price { get; set; }
         public decimal Rate { get; set; }
     }
-    public class CreateProductDto
+    //Sales----------------------------------
+    public class SaleDto
     {
-        public string ProductName { get; set; }
-        public string ProductModel { get; set; }
-        public decimal Price { get; set; }
-        public string Description { get; set; }
-        public int TypeId { get; set; }
-        public short IsFeature { get; set; }
-        public short IsBest { get; set; }
-        public short IsPopular { get; set; }
-        public int? TopRateProductId { get; set; }
-        public int? ImgId { get; set; }
+        public int Id { get; set; }
+        public decimal DiscountPrice { get; set; }
+        public DateTime? AddDate { get; set; }
+        public DateTime? LastUpdate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int ProductId { get; set; }
     }
-    public class UpdateProductDto : CreateProductDto
+    public class CreateSaleDto 
     {
-    }  
-    public class UpdateSalesProductDto 
+        public int ProductId { get; set; }
+        public decimal DiscountPrice { get; set; }
+        public Status IsStatus { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+    }
+    public class UpdateSaleDto
     {
         public decimal DiscountPrice { get; set; }
         public DateTime? LastUpdate { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-
     }
-    public class CreateProductSalesDto 
+    //Special----------------------------------
+    public class SpecialDto
+    {
+        public int Id { get; set; }
+        public decimal SpecialPrice { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int ProductId { get; set; }
+    }
+    public class CreateSpecialDto
     {
         public int ProductId { get; set; }
         public decimal SpecialPrice { get; set; }
-        public DateTime? AddDate { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-    }  
-    public class CreateSpecialProductsDto
-    {
-        public decimal SpecialPrice { get; set; }
-        public DateTime? LastModified { get; set; }
+        public Status IsStatus { get; set; }
         public DateTime? EndDate { get; set; }
     } 
-    public class UpdateSpecialProductDto  : CreateSpecialProductsDto
+    public class UpdateSpecialDto  : CreateSpecialDto
     {
     } 
 

@@ -32,7 +32,7 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
         public string OptionName { get; set; }
         public string OptionType { get; set; }
-        public List<valus> Values { get; set; }
+        public List<ValueVM> Values { get; set; }
     }
 
     public class CreateOptionDto
@@ -56,9 +56,9 @@ namespace Entities.DataTransferObjects
     {
     }
 
-    public class valus
+    public class ValueVM
     {
-        public Nullable<int> option_attribute_id { get; set; }
+        public Nullable<int> AttributeId { get; set; }
         public int ValueId { get; set; }
         public string ValueHexModel { get; set; }
         public string OptionValueName { get; set; }

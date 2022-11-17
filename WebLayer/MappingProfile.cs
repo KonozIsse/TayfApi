@@ -20,6 +20,7 @@ namespace WebLayer
         {
             _httpContextAccessor = httpContextAccessor;
             //MapContact
+            CreateMap<ContactDto, Contact>().ReverseMap();
             CreateMap<CreateContactDto, Contact>().ReverseMap();
             //MapLanguage
             CreateMap<LanguageDto, Language>().ReverseMap();
@@ -67,14 +68,15 @@ namespace WebLayer
             CreateMap<ProductDto, Product>().ReverseMap();
             CreateMap<CreateProductDto, Product>().ReverseMap();
             CreateMap<UpdateProductDto, Product>().ReverseMap();
+            CreateMap<ProductPageDto, Product>().ReverseMap();
             //MapProductSales
-            CreateMap<ProductSalesDto, ProductSales>().ReverseMap();
-            CreateMap<CreateProductSalesDto, ProductSales>().ReverseMap();
-            CreateMap<UpdateSalesProductDto, ProductSales>().ReverseMap();
+            CreateMap<SaleDto, ProductSales>().ReverseMap();
+            CreateMap<CreateSaleDto, ProductSales>().ReverseMap();
+            CreateMap<UpdateSaleDto, ProductSales>().ReverseMap();
             //MapSpecialProducts
-            CreateMap<SpecialProductsDto, SpecialProducts>().ReverseMap();
-            CreateMap<CreateSpecialProductsDto, SpecialProducts>().ReverseMap();
-            CreateMap<UpdateSpecialProductDto, SpecialProducts>().ReverseMap();
+            CreateMap<SpecialDto, SpecialProducts>().ReverseMap();
+            CreateMap<CreateSpecialDto, SpecialProducts>().ReverseMap();
+            CreateMap<UpdateSpecialDto, SpecialProducts>().ReverseMap();
             //MapAttribute
             CreateMap<AttributeDto, ProductAttribut>().ReverseMap();
             CreateMap<CreateAttributeDto, ProductAttribut>().ReverseMap();
@@ -150,6 +152,9 @@ namespace WebLayer
             //MapMessageTemplate
             CreateMap<MessageTemplateDto, MessageTemplate>().ReverseMap();
             CreateMap<UpdateTemplateDto, MessageTemplate>().ReverseMap();
+            //MapInventory
+            CreateMap<InventoryDto, Inventory>().ReverseMap();
+            CreateMap<CreateInventoryDto, Inventory>().ReverseMap();
 
             ForAllMaps((typeMap, m) =>
             {

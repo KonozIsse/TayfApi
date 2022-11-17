@@ -65,7 +65,6 @@ namespace Entities
         public DbSet<Product> Products { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<ProductSales> ProductSales { get; set; }
-        public DbSet<ProductsStore> ProductsStores { get; set; } 
         public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Service> Services { get; set; }

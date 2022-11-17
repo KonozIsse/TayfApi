@@ -19,7 +19,8 @@ namespace WebLayer.Controllers
         private readonly UserBL _userBL;
         private readonly LocationTaxBL _locationTaxBL;
         private readonly ProductBL _productBL;
-        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL , LocationTaxBL locationTaxBL , ProductBL productBL) : base(serviceProvider)
+        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL, 
+            LocationTaxBL locationTaxBL , ProductBL productBL) : base(serviceProvider)
         {
             _homeBL = home;
             _newsBL = news;
@@ -28,9 +29,9 @@ namespace WebLayer.Controllers
             _productBL = productBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add(int id ,CreateReviewDto create)
+        public async Task<IActionResult> add( CreateSaleDto create)
         {
-            await _productBL.AddReviews(id ,create);
+            await _productBL.AddFlashSale(create);
             return StatusCode(201);
         }
 
@@ -41,15 +42,15 @@ namespace WebLayer.Controllers
             return NoContent();
         } 
         [HttpDelete("delete")]
-        public async Task<IActionResult> delete(int id , int gid )
+        public async Task<IActionResult> delete(int id)
         {
-            await _productBL.DeleteLike(id  , gid);
+            await _productBL.DeleteFlashSale(id);
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id , int pid)
+        public async Task<IActionResult> get()
         {
-            var langs =  await _productBL.GetFavourite(id , pid);
+            var langs =  await _productBL.GetProducts();
             return Ok(langs);
         }
     }

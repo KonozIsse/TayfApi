@@ -10,6 +10,7 @@ namespace Contracts
 {
     public interface IProductRepository
     {
+        Task<List<Product>> GetAllAcceptedProducts();
         Task<Product> GetProductById(int id, bool trackChanges);
         Task<Product> GetActiveProductById(int id, bool trackChanges);
         Task<Product> GetAcceptAdminActiveProduct(int id);

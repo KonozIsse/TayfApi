@@ -41,6 +41,16 @@ namespace BusinessLogic.ApiClasses
             _imageBL = imageBL;
             _userBL = userBL;
         }
+        public async Task<NavbarVM> GetNavbar()
+        {
+            var navbarDto = new NavbarVM
+            {
+                DefaultLanguage = await GetLanguage(),
+                Languages = await GetAllLanguages(),
+                Currencies = await GetCurrencies()
+            };
+            return navbarDto;
+        }
         public async Task<HomeVM> GetHome(int customerId, Currency cod)
         {
             var language = await _repositoryManager.Language.GetCodeLanguage(lang, false);
@@ -57,9 +67,9 @@ namespace BusinessLogic.ApiClasses
                 ProductsSpecial = await _productBL.SpecialsPage(),
                 ProductsTopRated = await _productBL.TopRatedPage(),
                 ProductsDailyDeal = await _productBL.DailyDeals(),
-                products = await _productBL.GetProductsCatId(0, customerId, cod),
-                flash = await _productBL.GetFlashProds(customerId, cod),
-                specialProducts = await _productBL.GetSpecialsProd(customerId, cod),
+                products = await _productBL.GetProductsCatId(0, customerId),
+                flash = await _productBL.GetFlashProds(customerId),
+                specialProducts = await _productBL.GetSpecialsProd(customerId),
                 stores = await _userBL.GetStores()
             };
             return model;
@@ -67,26 +77,6 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> GetLogo()
         {
             return await _imageBL.GetImageOriginal(_repositoryManager.Setting.GetSettingByValue("website_logo").Value);
-        }
-        //Contact------------------------------------------------
-        public async Task<Contact> GetContact(int id)
-        {
-            return await _repositoryManager.Contact.GetContactById(id, false);
-        }
-        public async Task AddContact(CreateContactDto createContactDto)
-        {
-            var contact = _mapper.Map<Contact>(createContactDto);
-            contact.IsRead = false;
-            contact.IsStatus = Status.NotActive;
-            _repositoryManager.Contact.CreateContact(contact);
-            await _repositoryManager.SaveAsync();
-        }
-
-        public async Task DeleteContact(int id)
-        {
-            var contact = await _repositoryManager.Contact.GetContactById(id, false);
-            _repositoryManager.Contact.DeleteContact(contact);
-            await _repositoryManager.SaveAsync();
         }
         //Banner------------------------------------------------
         public async Task<BannerDto> GetBanner(int langId)
@@ -105,7 +95,6 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
         }
         //Sliders------------------------------------------------
-
         public List<SliderDto> GetSliderMobile(string lange)
         {
             var sliders = _repositoryManager.Slider.GetSlidersForMobile()
@@ -165,11 +154,41 @@ namespace BusinessLogic.ApiClasses
             _mapper.Map(updateServiceDto , service);
             await _repositoryManager.SaveAsync();
         }
-
+        //Contact------------------------------------------------
+        public async Task<Contact> GetContact(int id)
+        {
+            return await _repositoryManager.Contact.GetContactById(id, false);
+        }
+        public async Task<List<ContactDto>> GetAllContacts()
+        {
+            var contacts = await _repositoryManager.Contact.GetContacts(false);
+            var contactsDto = _mapper.Map<List<ContactDto>>(contacts);
+            return contactsDto;
+        }
+        public async Task AddContact(CreateContactDto createContactDto)
+        {
+            var contact = _mapper.Map<Contact>(createContactDto);
+            contact.IsRead = false;
+            contact.IsStatus = Status.NotActive;
+            _repositoryManager.Contact.CreateContact(contact);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task DeleteContact(int id)
+        {
+            var contact = await _repositoryManager.Contact.GetContactById(id, false);
+            _repositoryManager.Contact.DeleteContact(contact);
+            await _repositoryManager.SaveAsync();
+        }
         //template------------------------------------------------
         public async Task<MessageTemplate> GetEmailMessage(int id)
         {
             return await _repositoryManager.MessageTemplate.GetTemplateById(id, false);
+        }
+        public async Task<List<MessageTemplateDto>> GetAllMessageTemplates()
+        {
+            var templets = await _repositoryManager.MessageTemplate.GetEmailTemplatesList(false);
+            var templetsDto = _mapper.Map<List<MessageTemplateDto>>(templets);
+            return templetsDto;
         }
         public async Task UpdateTemplate(int id, UpdateTemplateDto updateDto)
         {
@@ -178,6 +197,12 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
         }
         //Email------------------------------------------------
+        public async Task<List<MailListDto>> GetAllMailLists()
+        {
+            var emails = await _repositoryManager.MailList.GetMailLists();
+            var emailsDto = _mapper.Map<List<MailListDto>>(emails);
+            return emailsDto;
+        }
         public async Task SendUserEmail(SendMailListDto sendMailListDto)
         {
             var mailList = _mapper.Map<MailList>(sendMailListDto);
@@ -270,18 +295,6 @@ namespace BusinessLogic.ApiClasses
             var currency = await _repositoryManager.Currency.GetCurrency(id, false);
             _repositoryManager.Currency.DeleteCurrency(currency);
             await _repositoryManager.SaveAsync();
-        }
-
-        //Navbar------------------------------------------------
-        public async Task<NavbarVM> GetNavbar()
-        {
-            var navbarDto = new NavbarVM
-            {
-                DefaultLanguage = await GetLanguage(),
-                Languages = await GetAllLanguages(),
-                Currencies = await GetCurrencies()
-            };
-            return navbarDto;
         }
         //Notification------------------------------------------------
         public int GetCountNotify(int userId)

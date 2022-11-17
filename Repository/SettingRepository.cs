@@ -43,6 +43,8 @@ namespace Repository
         {
 
         }
+        public async Task<List<MailList>> GetMailLists()
+         => await FindAll(false).ToListAsync();
         public async Task<MailList> GetMailListById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<MailList> GetMailListEmail(string email)

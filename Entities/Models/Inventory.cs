@@ -1,5 +1,6 @@
 namespace Entities.Models
 {
+    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     public class Inventory : BaseEntity
@@ -11,13 +12,12 @@ namespace Entities.Models
         public decimal TotalPurchasedPrice { get; set; }
         [StringLength(191)]
         public string PurchaseCode { get; set; }
-        public int AddedDate { get; set; }
+        public int AddedDate { get; set; } 
         [ForeignKey(nameof(Product))]
         public int ProductId { get; set; }
         public Product Product { get; set; }
 
         [ForeignKey(nameof(AttributesProduct))]
-        //[Required(AllowEmptyStrings = true)]
         public int? AttributesProductId { get; set; }
         public ProductAttribut AttributesProduct { get; set; }
 

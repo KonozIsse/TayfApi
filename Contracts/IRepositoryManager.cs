@@ -48,7 +48,6 @@ namespace Contracts
         ITaxClassRepository TaxClass { get; }
         ITaxRateRepository TaxRate { get; }
         IProductRepository Product { get; }
-        IProductStoreRepository ProductStore { get; }
         IProductTypeRepository ProductType { get; }
         IProductAttributRepository Attribute { get; }
         IProductOptionRepository Option { get; }

@@ -23,8 +23,9 @@ namespace BusinessLogic.ApiClasses
         private readonly ImageBL _imageBL;
         private readonly LocService _locService;
         private readonly Util _util;
+        private readonly OrderBL _orderBL;
 
-        public ProductBL(IRepositoryManager repositoryManager, IMapper mapper, UserBL userBL, LocService locService, ImageBL imageBL, Util util)
+        public ProductBL(IRepositoryManager repositoryManager, IMapper mapper, UserBL userBL, LocService locService, ImageBL imageBL, Util util , OrderBL orderBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
@@ -32,6 +33,7 @@ namespace BusinessLogic.ApiClasses
             _locService = locService;
             _imageBL = imageBL;
             _util = util;
+            _orderBL = orderBL;
         }
         //Category------------------------------------------------
         public async Task<List<CategoryDto>> GetAllCategories()
@@ -40,7 +42,6 @@ namespace BusinessLogic.ApiClasses
             var categoryDto = _mapper.Map<List<CategoryDto>>(categories);
             return categoryDto;
         }
-      
         public async Task<List<MainCategoryDto>> GetMainCategories()
         {
             var categories = await _repositoryManager.Categories.GetMainCategories(false);
@@ -79,8 +80,8 @@ namespace BusinessLogic.ApiClasses
                     {
                         foreach (var product in products)
                         {
-                             _repositoryManager.Product.DeleteProduct(product);
-                            //await RemoveProduct(product.Id);
+                             //_repositoryManager.Product.DeleteProduct(product);
+                            await RemoveProduct(product.Id);
                         }
                     }
                     _repositoryManager.Categories.DeleteCategory(item);
@@ -109,12 +110,14 @@ namespace BusinessLogic.ApiClasses
         {
             var product = _mapper.Map<Product>(createProductDto);
             product.CategoryId = catId;
+           // product.Vendor = createProductDto.Vendor;
             _repositoryManager.Product.AddProductOnCategory(catId, product);
             await _repositoryManager.SaveAsync();
         }
         public async Task EditProduct(int productId, UpdateProductDto updateProductDto)
         {
             var product = await _repositoryManager.Product.GetProductById(productId, true);
+           // product.Vendor = updateProductDto.Vendor;
             _mapper.Map(updateProductDto, product);
             await _repositoryManager.SaveAsync();
         }
@@ -131,11 +134,7 @@ namespace BusinessLogic.ApiClasses
             {
                 _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
             }
-            var stores = await _repositoryManager.ProductStore.GetAllProductsStoreProductId(productId);
-            foreach (var store in stores)
-            {
-                _repositoryManager.ProductStore.DeleteProductsStore(store);
-            }
+           
             var carts = await _repositoryManager.CartProduct.GetAllCartProductProductId(productId);
             foreach (var cart in carts)
             {
@@ -158,6 +157,11 @@ namespace BusinessLogic.ApiClasses
             {
                 _repositoryManager.WishList.DeleteLike(like);
             }
+            var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
+            foreach (var review in reviews)
+            {
+                _repositoryManager.Review.DeleteReview(review);
+            }
             var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
             foreach (var attribut in attributs)
             {
@@ -168,7 +172,13 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Product.DeleteProduct(product);
             await _repositoryManager.SaveAsync();
         }
-        public async Task<List<ProductVM>> GetProductByModel(List<int> prodList, int CustomerId, Currency curr)
+        public async Task<List<ProductDto>> GetProducts()
+        {
+            var products = await _repositoryManager.Product.GetAllAcceptedProducts();
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
+            return productsDto;
+        }
+        public async Task<List<ProductVM>> GetProductByModel(List<int> prodList , int CustomerId)
         {
             if (prodList.Count() > 0)
             {
@@ -178,11 +188,11 @@ namespace BusinessLogic.ApiClasses
                     var product = await _repositoryManager.Product.GetAcceptAdminActiveProduct(id);
                     if (product != null)
                     {
-                        var store = await _userBL.GetStore(product.ProductsStores.First().VendorId);
+                        //var store = await _userBL.GetStore(product.Vendor);
                         var category = await _repositoryManager.Categories.GetCategoryToPrductId(id);
                         var special = await IsOffer(id);
                         var flash = await _repositoryManager.Sales.GetFlashProductId(id);
-                        var specialPrice = special.Id == 0 ? 0 : special.SpecialPrice;
+                        decimal specialPrice = product.IsSpecial == false ? 0 : special.SpecialPrice;
                         productModel.Add(new ProductVM
                         {
                             MainCategoryId = (category != null ? category.MainCategoryId : 0),
@@ -200,7 +210,7 @@ namespace BusinessLogic.ApiClasses
                             ProductImage = await _imageBL.GetImageThumbnail(product.Images.First().Id.ToString()),
                             images = _imageBL.GetListImagesProductId(id),
                             AvailabilityProduct = await AvailabilityProducts(id),
-                            ShareLink = _util.url1 + "/share.html?id=" + id,
+                           // ShareLink = _util.url1 + "/share.html?id=" + id,
                             Options = await GetOptions(id),
 
                             is_special = (special.Id == 0 ? false : true),
@@ -219,9 +229,9 @@ namespace BusinessLogic.ApiClasses
                             Reviews = await GetReviews(id),
                             Rate = await Rate(id),
 
-                            StoreId = product.ProductsStores.First().VendorId,
-                            StoreName = store.FirstName + " " + store.LastName,
-                            StoreImage = store.ImageId.ToString()
+                            //StoreId = product.Vendor,
+                            //StoreName = store.FirstName + " " + store.LastName,
+                            //StoreImage = store.ImageId.ToString()
                         });
                     }
                 }
@@ -246,7 +256,7 @@ namespace BusinessLogic.ApiClasses
                 return new List<ProductVM>();
             }
         }
-        public async Task<List<ProductVM>> GetProductsCatId(int catId, int CustomerId, Currency curr)
+        public async Task<List<ProductVM>> GetProductsCatId(int catId, int CustomerId)
         {
             List<int> ids = new List<int>();
             var products = _repositoryManager.Product.GetAllProducts().Where(c => c.IsAcceptAdmin == true).Select(c => c.Id);
@@ -255,38 +265,8 @@ namespace BusinessLogic.ApiClasses
                products = await _repositoryManager.Product.GetProductsCategoryId(catId);
             }
              ids = products.ToList();
-            return await GetProductByModel(ids, CustomerId, curr);
+            return await GetProductByModel(ids, CustomerId);
         }
-       
-        public List<Product> GetProducts()
-        {
-            return  _repositoryManager.Product.GetAllProducts();
-        }
-        public async Task<List<ProductDto>> GetProductEasys(int storeId, string search, int catId, int CustomerId, string lange)
-        {
-            var products = await _repositoryManager.Product.SearshProductByCategoryAndStore(storeId, search, catId);
-            var productsDto = _mapper.Map<List<ProductDto>>(products);
-            var product = products.FirstOrDefault();
-            var imageId = product.Images.First().Id;
-            foreach (var productDto in productsDto)
-            {
-                productDto.ProductName = (product.ProductName != null ? product.ProductName = _locService.GetLocalizedStringValue(lange) : "");
-                productDto.Description = (product.Description != null ? product.Description = _locService.GetLocalizedStringValue(lange) : "");
-                productDto.Availability = await AvailabilityProducts(product.Id);
-              //  productDto.Images.Select(c => c.Id = Convert.ToInt32(url + "/" + filesRootPath + _imageBL.GetImageOriginal(imageId.ToString())));
-                productDto.Rate = await Rate(product.Id);
-                productDto.IsFavorite = await IsFavourite(CustomerId, product.Id);
-                productDto.Reviews = await GetLast3Reviews(product.Id);
-                productDto.IsSpecial = IsOffer(product.Id).Id != 0;
-                //productDto.ProductSales. = await _repositoryManager.Sales.GetFlashProductId(product.Id);
-            }
-            return productsDto;
-        }
-        public async Task<List<Product>> GetProductsByVendor(int vendorId)
-        {
-            return await _repositoryManager.Product.GetProductsTOStoreId(vendorId);
-        }
-       
         public async Task<List<ProductPageDto>> PopularsPage(int pageSize = 10)
         {
             var popular = await _repositoryManager.Product.GetPopularProducts(pageSize);
@@ -301,32 +281,26 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<List<ProductPageDto>> LatestPage(int pageSize = 10)
         {
-            var popular = await _repositoryManager.Product.GetLatestPage(pageSize);
-            var popularDto = _mapper.Map<List<ProductPageDto>>(popular);
-            return popularDto;
+            var populars = await _repositoryManager.Product.GetLatestPage(pageSize);
+            var popularsDto = _mapper.Map<List<ProductPageDto>>(populars);
+            return popularsDto;
         }
         public async Task<List<ProductPageDto>> SpecialsPage(int pageSize = 5)
         {
-            var popular = await _repositoryManager.Product.SpecialsPage(pageSize);
-            var popularDto = _mapper.Map<List<ProductPageDto>>(popular);
-            return popularDto;
+            var populars = await _repositoryManager.Product.SpecialsPage(pageSize);
+            var popularsDto = _mapper.Map<List<ProductPageDto>>(populars);
+            return popularsDto;
         }
         public async Task<List<ProductPageDto>> TopRatedPage(int pageSize = 6)
         {
             var populars = await _repositoryManager.Product.TopRatedPage(pageSize);
-            var popular = populars.First();
             var popularsDto = _mapper.Map<List<ProductPageDto>>(populars);
-            var popularDto = popularsDto.First();
-            popularDto.Rate = await Rate(popular.Id);
             return popularsDto;
         }
         public async Task<List<ProductPageDto>> DailyDeals()
         {
             var populars = await _repositoryManager.Product.DailyDeals();
-            var popular = populars.First();
             var popularsDto = _mapper.Map<List<ProductPageDto>>(populars);
-            var popularDto = popularsDto.First();
-            popularDto.Rate = await Rate(popular.Id);
             return popularsDto;
         }
         //ProductType------------------------------------------------
@@ -380,6 +354,46 @@ namespace BusinessLogic.ApiClasses
             _mapper.Map(updateOptionDto, attribut);
             await _repositoryManager.SaveAsync();
         }
+        public async Task<string> GetPriceForAttribute(int id)
+        {
+            decimal productPrice = 0;
+            int stock = 0;
+            var attrProduct = await _repositoryManager.Attribute.GetAttributeId(id, false);
+            if (attrProduct != null)
+            {
+                int prodId = attrProduct.ProductId;
+                var product = await _repositoryManager.Product.GetProductById(prodId, false);
+                if (product != null)
+                {
+                    productPrice = product.Price;
+                }
+                var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(prodId);
+                if (special != null)
+                {
+                    productPrice = special.SpecialPrice;
+                }
+                var flashSale = await _repositoryManager.Sales.GetFlashProductId(prodId);
+                if (flashSale != null)
+                {
+                    productPrice = flashSale.DiscountPrice;
+                }
+                if (attrProduct.PricePrefix == "+")
+                {
+                    productPrice += attrProduct.AttributePrice;
+                }
+                else
+                {
+                    if (productPrice != 0)
+                    {
+                        productPrice -= attrProduct.AttributePrice;
+                    }
+                }
+                var inStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(prodId, attrProduct.OptionId);
+                var OutStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(prodId, attrProduct.OptionId);
+                stock = inStockList.Sum(r => r.Stock) - OutStockList.Sum(r => r.Stock);
+            }
+            return productPrice + "  _  " + stock;
+        }
         //Option------------------------------------------------
         public async Task AddOption(CreateOptionDto createOptionDto)
         {
@@ -409,136 +423,51 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Option.DeleteOption(option);
             await _repositoryManager.SaveAsync();
         }
-        public async Task<string> GetPriceForOption(int id, string option = "")
+        public async Task<List<OptionDto>> GetOptions(int productId , int langId = 3)
         {
-            decimal productPrice = 0;
-            int stock = 0;
-            var attrProduct = await _repositoryManager.Attribute.GetAttributeId(id , false);
-            if (attrProduct != null)
+            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
+            var attrs = attributs.GroupBy(x => x.OptionId).Select(x => x.First()).ToList();
+            var optionDto = new List<OptionDto>();
+
+            if (attrs.Count() > 0)
             {
-                int prodId = attrProduct.ProductId;
-                var product = await _repositoryManager.Product.GetProductById(prodId , false);
-                if (product != null)
+                foreach (var t in attrs)
                 {
-                    productPrice = product.Price;
-                }
-                var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(prodId);
-                if (special != null)
-                {
-                    productPrice = special.SpecialPrice;
-                }
-                var flashSale = await _repositoryManager.Sales.GetFlashProductId(prodId);
-                if (flashSale != null)
-                {
-                    productPrice = flashSale.DiscountPrice;
-                }
-                if (attrProduct.PricePrefix == "+")
-                {
-                    productPrice += attrProduct.AttributePrice;
-                }
-                else
-                {
-                    if (productPrice != 0)
+                    var valuesVM = new List<ValueVM>();
+                    var option = await _repositoryManager.Option.GetOptionId(t.OptionId, false);
+                    var values = attributs.Where(r => r.OptionId == option.Id).ToList();
+                    if (values.Count() > 0)
                     {
-                        productPrice -= attrProduct.AttributePrice;
+                        foreach (var v in values)
+                        {
+                            var val = await _repositoryManager.Value.GetValueId(t.ValueId, false);
+                            valuesVM.Add(new ValueVM
+                            {
+                                OptionId = val.OptionId,
+                                OptionValueName = option.OptionName,
+
+                                ValueId = val.Id,
+                                OptionName = val.OptionValueName,
+                                ValueHexModel = val.ValueHexModel,
+                                IsDefault = v.IsDefault,
+
+                                AttributeId = v.Id,
+                                AttributePrice = (v.PricePrefix == "+" ? v.AttributePrice : -v.AttributePrice)
+                            });
+                        }
                     }
+                    optionDto.Add(new OptionDto
+                    {
+                        Id = option.Id,
+                        OptionName = option.OptionName,
+                        OptionType = option.OptionType,
+                        Values = valuesVM,
+                    });
                 }
-                var inStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(prodId,Convert.ToInt32(option));
-                var OutStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(prodId, Convert.ToInt32(option));
-                stock = inStockList.Sum(r => r.Stock) - OutStockList.Sum(r => r.Stock);
             }
-            return productPrice + "_" + stock;
+            return optionDto;
         }
-        //Value------------------------------------------------
-        public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
-        {
-            return await _repositoryManager.Value.GetValuesOPtionId(optionId);
-        }
-        public async Task<ProductOptionValue> FindOptionValue(int valueId)
-        {
-            return await _repositoryManager.Value.GetValueId(valueId, false);
-        }
-        public async Task<ValueDto> GetValue(int valueId)
-        {
-            var value = await _repositoryManager.Value.GetValueId(valueId, false);
-            if (value == null) { return null; }
-            else
-            {
-                var valueDto = _mapper.Map<ValueDto>(value);
-                return valueDto;
-            }
-        }
-        public async Task<List<ValueDto>> GetListValues(int optionId)
-        {
-            var value = await _repositoryManager.Value.GetValuesOPtionId(optionId);
-            if (value == null) { return null; }
-            else
-            {
-                var valueDto = _mapper.Map<List<ValueDto>>(value);
-                return valueDto;
-            }
-        }
-        public async Task AddValue(int optionId ,CreateValueDto createValueDto)
-        {
-            var value = _mapper.Map<ProductOptionValue>(createValueDto);
-            value.OptionId = optionId;
-            _repositoryManager.Value.CreateValue(value);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task DeleteValueProduct(int valueId)
-        {
-            var value = await _repositoryManager.Value.GetValueId(valueId, false);
-            _repositoryManager.Value.DeleteValue(value);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateValue(int valueId, UpdateValueDto updateOptionDto)
-        {
-            var value = await _repositoryManager.Value.GetValueId(valueId, true);
-            _mapper.Map(updateOptionDto, value);
-            await _repositoryManager.SaveAsync();
-        }
-        //SpecialProducts------------------------------------------------
-        public async Task<List<ProductVM>> GetSpecialsProd(int CustomerId, Currency curr)
-        {
-            var items = _repositoryManager.SpecialProducts.GetSpecialProducts().Select(r => r.Id);
-            List<int> ids = items.ToList();
-            return await GetProductByModel(ids, CustomerId, curr);
-        }
-        public async Task AddSpecialProducts(CreateSpecialProductsDto createSpecialProductsDto)
-        {
-            var specialProducts = _mapper.Map<SpecialProducts>(createSpecialProductsDto);
-            _repositoryManager.SpecialProducts.AddSpecialProduct(specialProducts);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task<SpecialProducts> IsOffer(int productId)
-        {
-            var special = new SpecialProducts();
-            var specialProducts = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
-            if (specialProducts != null)
-            {
-                special.Id = specialProducts.Id;
-                special.ProductId = productId;
-                special.EndDate = specialProducts.EndDate;
-                special.IsStatus = specialProducts.IsStatus;
-                special.SpecialPrice = specialProducts.SpecialPrice;
-            }
-            return special;
-        }
-        public async Task DeleteSpecialProduct(int productId)
-        {
-            var specialProducts = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
-            if (specialProducts != null)
-            {
-                _repositoryManager.SpecialProducts.DeleteSpecialProduct(specialProducts);
-            }
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task EditSpecialProduct(int productId, UpdateSpecialProductDto updateProductDto)
-        {
-            var specialProducts = await _repositoryManager.SpecialProducts.CheckSpecialExists(productId, true);
-            _mapper.Map(updateProductDto, specialProducts);
-            await _repositoryManager.SaveAsync();
-        }
+        // test not finish
         public async Task<decimal> getOptionsOrdersTotalPrice(int productId, int orderId)
         {
             decimal tot = 0;
@@ -551,18 +480,18 @@ namespace BusinessLogic.ApiClasses
                 {
                     tot = special.SpecialPrice;
                 }
-                var orderAttributProducts = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(orderId ,productId);
+                var orderAttributProducts = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(orderId, productId);
                 if (orderAttributProducts.Count() > 0)
                 {
                     foreach (var item in orderAttributProducts)
                     {
-                        var option = await _repositoryManager.Option.GetOptionId(item.ProductAttribut.OptionId , false);
+                        var option = await _repositoryManager.Option.GetOptionId(item.ProductAttribut.OptionId, false);
                         var values = orderAttributProducts.Where(r => r.ProductAttribut.OptionId == option.Id).ToList();
                         if (values.Count() > 0)
                         {
                             foreach (var itemValue in values)
                             {
-                                var value = await _repositoryManager.Value.GetValueId(itemValue.ProductAttribut.ValueId , false);
+                                var value = await _repositoryManager.Value.GetValueId(itemValue.ProductAttribut.ValueId, false);
                                 if (value != null)
                                 {
                                     var valueDto = _mapper.Map<ValueDto>(value);
@@ -615,7 +544,7 @@ namespace BusinessLogic.ApiClasses
                     foreach (var item in orderAttributProducts)
                     {
                         var attr = item.ProductAttribut;
-                        var attributProduct = await _repositoryManager.Attribute.GetProductOptionValue(productId , attr.OptionId, attr.ValueId);
+                        var attributProduct = await _repositoryManager.Attribute.GetProductOptionValue(productId, attr.OptionId, attr.ValueId);
 
                         if (attr.PricePrefix == "+")
                         {
@@ -656,268 +585,119 @@ namespace BusinessLogic.ApiClasses
 
             return optionDto;
         }
-        public async Task<List<OptionDto>> GetOptions(int productId, int langId = 1)
+        //Value------------------------------------------------
+        public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
         {
-            var lst = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-            var attrs = lst.GroupBy(x => x.OptionId).Select(x => x.First()).ToList();
-            var opt = new List<OptionDto>();
-
-            if (attrs.Count() > 0)
+            return await _repositoryManager.Value.GetValuesOPtionId(optionId);
+        }
+        public async Task<ProductOptionValue> FindOptionValue(int valueId)
+        {
+            return await _repositoryManager.Value.GetValueId(valueId, false);
+        }
+        public async Task<ValueDto> GetValue(int valueId)
+        {
+            var value = await _repositoryManager.Value.GetValueId(valueId, false);
+            if (value == null) { return null; }
+            else
             {
-                foreach (var t in attrs)
+                var valueDto = _mapper.Map<ValueDto>(value);
+                return valueDto;
+            }
+        }
+        public async Task<List<ValueDto>> GetListValues(int optionId)
+        {
+            var value = await _repositoryManager.Value.GetValuesOPtionId(optionId);
+            if (value == null) { return null; }
+            else
+            {
+                var valueDto = _mapper.Map<List<ValueDto>>(value);
+                return valueDto;
+            }
+        }
+        public async Task AddValue(int optionId ,CreateValueDto createValueDto)
+        {
+            var value = _mapper.Map<ProductOptionValue>(createValueDto);
+            value.OptionId = optionId;
+            _repositoryManager.Value.CreateValue(value);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task DeleteValueProduct(int valueId)
+        {
+            var value = await _repositoryManager.Value.GetValueId(valueId, false);
+            _repositoryManager.Value.DeleteValue(value);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task UpdateValue(int valueId, UpdateValueDto updateOptionDto)
+        {
+            var value = await _repositoryManager.Value.GetValueId(valueId, true);
+            _mapper.Map(updateOptionDto, value);
+            await _repositoryManager.SaveAsync();
+        }
+        //SpecialProducts------------------------------------------------
+        public async Task<List<ProductVM>> GetSpecialsProd(int CustomerId)
+        {
+            var items = _repositoryManager.SpecialProducts.GetSpecialProducts().Select(r => r.Id);
+            List<int> ids = items.ToList();
+            return await GetProductByModel(ids, CustomerId);
+        }
+        public async Task AddSpecialProducts(CreateSpecialDto createDto)
+        {
+            var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
+            var special = _mapper.Map<SpecialProducts>(createDto);
+            product.IsSpecial = true;
+            _repositoryManager.SpecialProducts.AddSpecialProduct(special);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task DeleteSpecialProduct(int productId , int id)
+        {
+            var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
+            if(product != null)
+            {
+                var specialProducts = await _repositoryManager.SpecialProducts.GetSpecialId(id, false);
+                if (specialProducts != null)
                 {
-                    var vs = new List<valus>();
-                    var a = await _repositoryManager.Option.GetOptionId(t.OptionId, false);
-                    var values = lst.Where(r => r.OptionId == a.Id).ToList();
-                    if (values.Count() > 0)
-                    {
-                        foreach (var v in values)
-                        {
-
-                            var val = await _repositoryManager.Value.GetValueId(t.ValueId ,false);
-                            vs.Add(new valus
-                            {
-                                IsDefault = ((short)(v.IsDefault == 0 ? 0 : 1)),
-                                OptionValueName = a.OptionName,
-                                OptionName = val.OptionValueName,
-                                ValueHexModel = val.ValueHexModel,
-                                OptionId = val.OptionId,
-                                ValueId = val.Id,
-                                option_attribute_id = v.Id,
-                                AttributePrice = (v.PricePrefix == "+" ? v.AttributePrice : -v.AttributePrice)
-                            });
-                        }
-                    }
-                    opt.Add(new OptionDto
-                    {
-                        OptionName = a.OptionName,
-                        Id = a.Id,
-                        OptionType = a.OptionType,
-                        Values = vs,
-                    });
-
+                    product.IsSpecial = false;
+                    _repositoryManager.SpecialProducts.DeleteSpecialProduct(specialProducts);
                 }
             }
-
-            return opt;
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task<SpecialDto> IsOffer(int productId)
+        {
+            var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
+            if(special == null)
+            {
+                return null;
+            }
+            var specialDto = _mapper.Map<SpecialDto>(special);
+            special.ProductId = productId;
+            return specialDto;
         }
         //salesProduct------------------------------------------------
-        public async Task<List<ProductVM>> GetFlashProds(int CustomerId, Currency curr)
+        public async Task<List<ProductVM>> GetFlashProds(int CustomerId)
         {
             var items = _repositoryManager.Sales.GetAllSales().Select(r => r.Id);
             List<int> ids = items.ToList();
-            return await GetProductByModel(ids, CustomerId, curr);
+            return await GetProductByModel(ids, CustomerId);
         }
-        public async Task AddFlashSale(CreateProductSalesDto createProductSalesDto)
+        public async Task AddFlashSale(CreateSaleDto createDto)
         {
-            var sales = _mapper.Map<ProductSales>(createProductSalesDto);
+            var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
+            product.IsSale = true;
+            var sales = _mapper.Map<ProductSales>(createDto);
             _repositoryManager.Sales.AddFlashSale(sales);
             await _repositoryManager.SaveAsync();
         }
         public async Task DeleteFlashSale(int productId)
         {
+            var product = await _repositoryManager.Product.GetActiveProductById(productId , true);
             var salesProduct = await _repositoryManager.Sales.CheckFlashExists(productId, false);
             if (salesProduct != null)
             {
+                product.IsSale = false;
                 _repositoryManager.Sales.DeleteFlashSale(salesProduct);
             }
             await _repositoryManager.SaveAsync();
-        }
-        public async Task EditSaleProduct(int productId, UpdateSalesProductDto updateProductDto)
-        {
-            var product = await _repositoryManager.Sales.CheckFlashExists(productId, true);
-            _mapper.Map(updateProductDto, product);
-            await _repositoryManager.SaveAsync();
-        }
-        //CustomerProduct------------------------------------------------
-        public async Task AddCustomerProduct(CreateCustomerProductDto createDto, int customerId, int productId)
-        {
-            var customerProduct = _mapper.Map<CustomerProduct>(createDto);
-            customerProduct.CustomerId = customerId;
-            customerProduct.ProductId = productId;
-
-            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-            var createAttributeDtos = createDto.CustomerAttributesProducts;
-            if (createAttributeDtos != null && createAttributeDtos.Count() > 0)
-            {
-                foreach (var item in createAttributeDtos)
-                {
-                    var attribut = attributs.Where(r => r.Id == item.AttributesProductId).FirstOrDefault();
-                    if (attribut != null)
-                    {
-                        var customerAttributesProduct = _mapper.Map<CustomerAttributesProduct>(item);
-                        _repositoryManager.CustomerAttributesProduct.AddAttributeCustomerProduct(customerAttributesProduct);
-                        await _repositoryManager.SaveAsync();
-                    }
-                }
-            }
-            _repositoryManager.CustomerProduct.AddCustomerProduct(customerProduct);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateCustomerProduct( int productId , UpdateCustomerProductDto customerProductDto)
-        {
-            var customerId = 0;//GetCurrentUserId();
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
-            customerProduct.CustomerId = customerId;
-            _mapper.Map(customerProductDto, customerProduct);
-            customerProduct.FinalPrice = customerProductDto.FinalPrice * customerProduct.Quantity;
-            customerProduct.UpdatedAt = DateTime.UtcNow;
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateAmountCart (int customerId, int qty, int productId, string lange)
-        {
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
-             var customerProductDto = _mapper.Map<UpdateCustomerProductDto>(customerProduct);
-            if (customerProduct != null)
-            {
-                var product = await _repositoryManager.Product.GetProductById(productId , false);
-                if (product != null)
-                {
-                    customerProductDto.FinalPrice = product.Price;
-                    var specialProduct = await IsOffer(productId);
-                    if (specialProduct != null)
-                    {
-                        customerProductDto.FinalPrice = specialProduct.SpecialPrice;
-                    }
-                    var attributesProducts = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(customerProduct.Id);
-                    if (attributesProducts.Count() > 0)
-                    {
-                        foreach (var item in attributesProducts)
-                        {
-                            var attribute = item.AttributesProduct;
-                            var productOptionValue = await _repositoryManager.Attribute.GetProductOptionValue(productId, attribute.OptionId, attribute.ValueId);
-                            if (productOptionValue != null)
-                            {
-                                if (productOptionValue.PricePrefix == "+")
-                                {
-                                    customerProductDto.FinalPrice += productOptionValue.AttributePrice;
-                                }
-
-                                if (productOptionValue.PricePrefix == "-" && customerProductDto.FinalPrice != 0)
-                                {   
-                                    customerProductDto.FinalPrice -= productOptionValue.AttributePrice; 
-                                }
-                            }
-                        }
-                    }
-                    await UpdateCustomerProduct(productId, customerProductDto);
-                }
-            }
-        }
-        public async Task<decimal> UpdatePriceAttributesProduct(int id, UpdateCustomerProductDto customerProductDto)
-        {
-            var attributeList = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(id);
-            foreach (var attribute in attributeList)
-            {
-                var productAttribut = await _repositoryManager.Attribute.GetProductOptionValue(attribute.CustomerProduct.ProductId.Value, attribute.AttributesProduct.OptionId, attribute.AttributesProduct.ValueId);
-                if (productAttribut != null && productAttribut.AttributePrice != 0)
-                {
-                    if (productAttribut.PricePrefix == "+")
-                    {
-                        customerProductDto.FinalPrice += productAttribut.AttributePrice;
-                    }
-                    if (productAttribut.PricePrefix == "-")
-                    {
-                        if (customerProductDto.FinalPrice != 0)
-                        {
-                            customerProductDto.FinalPrice -= productAttribut.AttributePrice;
-                        }
-                    }
-                }
-            }
-
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerProductId(id, true);
-            if (customerProduct != null)
-            {
-                _mapper.Map(customerProductDto, customerProduct);
-                customerProduct.FinalPrice = customerProductDto.FinalPrice * customerProduct.Quantity;
-                await _repositoryManager.SaveAsync();
-            }
-            decimal AllTotal = Convert.ToDecimal(customerProductDto.FinalPrice * customerProductDto.Quantity);
-
-            return AllTotal;
-        }
-        public async Task DeleteCustomerProduct(int id)
-        {
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerProductId(id, false);
-            if (customerProduct != null)
-            {
-                var attributeList = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(id);
-                if (attributeList.Count() > 0)
-                {
-                    foreach (var attribute in attributeList)
-                    {
-                        _repositoryManager.CustomerAttributesProduct.DeleteAttributeCustomerProduct(attribute);
-                        await _repositoryManager.SaveAsync();
-                    }
-                }
-                _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
-                await _repositoryManager.SaveAsync();
-            }
-        } 
-        public async Task DeleteCustomerStoreCart(int customerId , int storeId)
-        {
-            var storesCustomers = await _repositoryManager.CustomerProduct.GetStoreCustomer(customerId , storeId);
-            foreach (var storeCustomer in storesCustomers)
-            {
-                _repositoryManager.CustomerProduct.DeleteCustomerProduct(storeCustomer); 
-                await _repositoryManager.SaveAsync();
-            }
-        }
-        //inventory------------------------------------------------
-        public async Task<List<Inventory>> GetInventoryInByProductAttr(int productId, string attribute)
-        {
-            return await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(productId, Convert.ToInt32(attribute));
-        }
-        public async Task<List<Inventory>> GetInventoryOutByProductAttr(int productId, string attribute)
-        {
-            return await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(productId, Convert.ToInt32(attribute));
-        }
-        public async Task<List<Inventory>> GetInStock(int productsId)
-        {
-            return await _repositoryManager.Inventory.GetOptionsByProductIdInStock(productsId);
-        }
-        public async Task<List<Inventory>> GetOutStock(int productsId)
-        {
-            return await _repositoryManager.Inventory.GetOptionsByProductIdOutStock(productsId);
-        }
-        public async Task<Inventory> GetInventoryByProduct(int productId)
-        {
-            return await _repositoryManager.Inventory.GetInventoryByProductId(productId);
-        }
-        public async Task<List<Inventory>> GetInventoryListByProduct(int productId)
-        {
-            return await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
-        }
-        public async Task<int> AvailabilityProducts(int productId)
-        {
-            int total = 0;
-            var instock = 0;
-            var outstock = 0;
-
-            var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
-            if (inventories != null)
-            {
-                foreach (var inventory in inventories)
-                {
-                    if (inventory.StockType == "in")
-                    {
-                        instock += inventory.Stock;
-                    }
-                    if (inventory.StockType == "out")
-                    {
-                        outstock += inventory.Stock;
-                    }
-                }
-            }
-            if ((instock - outstock) > 0)
-            {
-                return total = instock - outstock;
-            }
-            else
-            {
-                return total;
-            }
         }
         //Review------------------------------------------------
         public int ReviewsCount(int productId)
@@ -1044,6 +824,238 @@ namespace BusinessLogic.ApiClasses
                 favId = WishList.Id;
             }
             return favId;
+        }
+        //CustomerProduct------------------------------------------------
+        public async Task AddCustomerProduct(CreateCustomerProductDto createDto, int customerId, int productId)
+        {
+            var customerProduct = _mapper.Map<CustomerProduct>(createDto);
+            customerProduct.CustomerId = customerId;
+            customerProduct.ProductId = productId;
+
+            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
+            var createAttributeDtos = createDto.CustomerAttributesProducts;
+            if (createAttributeDtos != null && createAttributeDtos.Count() > 0)
+            {
+                foreach (var item in createAttributeDtos)
+                {
+                    var attribut = attributs.Where(r => r.Id == item.AttributesProductId).FirstOrDefault();
+                    if (attribut != null)
+                    {
+                        var customerAttributesProduct = _mapper.Map<CustomerAttributesProduct>(item);
+                        _repositoryManager.CustomerAttributesProduct.AddAttributeCustomerProduct(customerAttributesProduct);
+                        await _repositoryManager.SaveAsync();
+                    }
+                }
+            }
+            _repositoryManager.CustomerProduct.AddCustomerProduct(customerProduct);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task UpdateCustomerProduct(int productId, UpdateCustomerProductDto customerProductDto)
+        {
+            var customerId = 0;//GetCurrentUserId();
+            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
+            customerProduct.CustomerId = customerId;
+            _mapper.Map(customerProductDto, customerProduct);
+            customerProduct.FinalPrice = customerProductDto.FinalPrice * customerProduct.Quantity;
+            customerProduct.UpdatedAt = DateTime.UtcNow;
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task UpdateAmountCart(int customerId, int qty, int productId, string lange)
+        {
+            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
+            var customerProductDto = _mapper.Map<UpdateCustomerProductDto>(customerProduct);
+            if (customerProduct != null)
+            {
+                var product = await _repositoryManager.Product.GetProductById(productId, false);
+                if (product != null)
+                {
+                    customerProductDto.FinalPrice = product.Price;
+                    var specialProduct = await IsOffer(productId);
+                    if (specialProduct != null)
+                    {
+                        customerProductDto.FinalPrice = specialProduct.SpecialPrice;
+                    }
+                    var attributesProducts = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(customerProduct.Id);
+                    if (attributesProducts.Count() > 0)
+                    {
+                        foreach (var item in attributesProducts)
+                        {
+                            var attribute = item.AttributesProduct;
+                            var productOptionValue = await _repositoryManager.Attribute.GetProductOptionValue(productId, attribute.OptionId, attribute.ValueId);
+                            if (productOptionValue != null)
+                            {
+                                if (productOptionValue.PricePrefix == "+")
+                                {
+                                    customerProductDto.FinalPrice += productOptionValue.AttributePrice;
+                                }
+
+                                if (productOptionValue.PricePrefix == "-" && customerProductDto.FinalPrice != 0)
+                                {
+                                    customerProductDto.FinalPrice -= productOptionValue.AttributePrice;
+                                }
+                            }
+                        }
+                    }
+                    await UpdateCustomerProduct(productId, customerProductDto);
+                }
+            }
+        }
+        public async Task<decimal> UpdatePriceAttributesProduct(int id, UpdateCustomerProductDto customerProductDto)
+        {
+            var attributeList = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(id);
+            foreach (var attribute in attributeList)
+            {
+                var productAttribut = await _repositoryManager.Attribute.GetProductOptionValue(attribute.CustomerProduct.ProductId.Value, attribute.AttributesProduct.OptionId, attribute.AttributesProduct.ValueId);
+                if (productAttribut != null && productAttribut.AttributePrice != 0)
+                {
+                    if (productAttribut.PricePrefix == "+")
+                    {
+                        customerProductDto.FinalPrice += productAttribut.AttributePrice;
+                    }
+                    if (productAttribut.PricePrefix == "-")
+                    {
+                        if (customerProductDto.FinalPrice != 0)
+                        {
+                            customerProductDto.FinalPrice -= productAttribut.AttributePrice;
+                        }
+                    }
+                }
+            }
+
+            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerProductId(id, true);
+            if (customerProduct != null)
+            {
+                _mapper.Map(customerProductDto, customerProduct);
+                customerProduct.FinalPrice = customerProductDto.FinalPrice * customerProduct.Quantity;
+                await _repositoryManager.SaveAsync();
+            }
+            decimal AllTotal = Convert.ToDecimal(customerProductDto.FinalPrice * customerProductDto.Quantity);
+
+            return AllTotal;
+        }
+        public async Task DeleteCustomerProduct(int id)
+        {
+            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerProductId(id, false);
+            if (customerProduct != null)
+            {
+                var attributeList = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(id);
+                if (attributeList.Count() > 0)
+                {
+                    foreach (var attribute in attributeList)
+                    {
+                        _repositoryManager.CustomerAttributesProduct.DeleteAttributeCustomerProduct(attribute);
+                        await _repositoryManager.SaveAsync();
+                    }
+                }
+                _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
+                await _repositoryManager.SaveAsync();
+            }
+        }
+        public async Task DeleteCustomerStoreCart(int customerId, int storeId)
+        {
+            var storesCustomers = await _repositoryManager.CustomerProduct.GetStoreCustomer(customerId, storeId);
+            foreach (var storeCustomer in storesCustomers)
+            {
+                _repositoryManager.CustomerProduct.DeleteCustomerProduct(storeCustomer);
+                await _repositoryManager.SaveAsync();
+            }
+        }
+        //inventory------------------------------------------------
+        public async Task<List<Inventory>> GetInventoryInByProductAttr(int productId, string attribute)
+        {
+            return await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(productId, Convert.ToInt32(attribute));
+        }
+        public async Task<List<Inventory>> GetInventoryOutByProductAttr(int productId, string attribute)
+        {
+            return await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(productId, Convert.ToInt32(attribute));
+        }
+        public async Task<List<Inventory>> GetInStock(int productsId)
+        {
+            return await _repositoryManager.Inventory.GetOptionsByProductIdInStock(productsId);
+        }
+        public async Task<List<Inventory>> GetOutStock(int productsId)
+        {
+            return await _repositoryManager.Inventory.GetOptionsByProductIdOutStock(productsId);
+        }
+        public async Task<Inventory> GetInventoryByProduct(int productId)
+        {
+            return await _repositoryManager.Inventory.GetInventoryByProductId(productId);
+        }
+        public async Task<List<Inventory>> GetInventoryListByProduct(int productId)
+        {
+            return await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+        }
+        public async Task AddInventory(CreateInventoryDto createDto)
+        {
+            var inventory = _mapper.Map<Inventory>(createDto);
+            //if (inventory.AdminId == null || inventory.VendorId == null) { }
+            var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
+            product.Availability = product.Availability + createDto.Stock;
+            inventory.StockType = "in";
+            inventory.TotalPurchasedPrice = 0;
+            inventory.AddedDate = _orderBL.EasternTime.Millisecond;
+            _repositoryManager.Inventory.AddInventory(inventory);
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task UpdateInventory(UpdateInventoryDto updateDto)
+        {
+            var product = await _repositoryManager.Product.GetActiveProductById(updateDto.ProductId, true);
+            var inventories = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(updateDto.ProductId, updateDto.AttributesProductId.Value);
+            if (inventories == null)
+            {
+                inventories = await _repositoryManager.Inventory.GetOptionsByProductIdInStock(updateDto.ProductId);
+            }
+            foreach (var inventory in inventories)
+            {
+                product.Availability = product.Availability - updateDto.Stock;
+                inventory.StockType = "out";
+                // inventory.TotalPurchasedPrice = ; //final price order
+                // inventory.PurchaseCode = ; //orderId
+                inventory.AddedDate = _orderBL.EasternTime.Millisecond;
+                // add out inventory .
+            }
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task DeleteInventory(int productId)
+        {
+            var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
+            var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+            if (inventories != null)
+            {
+                var inventory = inventories.First();
+                _repositoryManager.Inventory.DeleteInventory(inventory);
+                await _repositoryManager.SaveAsync();
+            }
+        }
+        public async Task<int> AvailabilityProducts(int productId)
+        {
+            int total = 0;
+            var instock = 0;
+            var outstock = 0;
+
+            var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+            if (inventories != null)
+            {
+                foreach (var inventory in inventories)
+                {
+                    if (inventory.StockType == "in")
+                    {
+                        instock += inventory.Stock;
+                    }
+                    if (inventory.StockType == "out")
+                    {
+                        outstock += inventory.Stock;
+                    }
+                }
+            }
+            if ((instock - outstock) > 0)
+            {
+                return total = instock - outstock;
+            }
+            else
+            {
+                return total;
+            }
         }
     }
 }

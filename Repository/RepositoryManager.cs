@@ -62,7 +62,6 @@ namespace Repository
         private IReviewRepository _reviewRepository;
         private IZoneRepository _zoneRepository; 
         private IUnitRepository _unitRepository; 
-        private IProductStoreRepository _productStoreRepository; 
         
 
         public RepositoryManager(RepositoryContext repositoryContext)
@@ -265,15 +264,6 @@ namespace Repository
                 if (_productRepository == null)
                     _productRepository = new ProductRepository(_repositoryContext);
                 return _productRepository;
-            }
-        }
-        public IProductStoreRepository ProductStore
-        {
-            get
-            {
-                if (_productStoreRepository == null)
-                    _productStoreRepository = new ProductStoreRepository(_repositoryContext);
-                return _productStoreRepository;
             }
         }
         public IMailListRepository MailList

@@ -52,7 +52,7 @@ namespace Entities.Models
         public List<CustomerStore> Stores { get; set; }
         public List<CategoriesStore> CategoriesStores { get; set; }
         public List<CustomerProduct> CustomerProducts { get; set; }
-        public List<ProductsStore> ProductsStores { get; set; }
+        public List<Product> Products { get; set; }
         public List<CartStore> CartStores { get; set; }
         public List<Order> StoreOrders { get; set; }
         public List<Order> CustomerOrders { get; set; }
