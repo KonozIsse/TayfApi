@@ -523,7 +523,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> AddProductToCart(int productId, int customerId, int Quantity, int?[] option = null)
         {
             var prod = await _repositoryManager.Product.GetProductById(productId, true);
-            var storeId = prod.ProductsStores.First().VendorId;
+            var storeId = prod.StoreId;
             if (prod == null)
             {
                 return _locService.GetLocalizedStringValue("noproducts");

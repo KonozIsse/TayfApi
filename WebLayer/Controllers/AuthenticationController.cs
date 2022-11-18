@@ -29,7 +29,8 @@ namespace WebLayer.Controllers
         {
 
             var user = _mapper.Map<User>(userForRegistration);
-           
+            user.UserName = userForRegistration.FirstName + userForRegistration.LastName;
+            user.RoleId = 2;
             var result = await _userManager.CreateAsync(user, userForRegistration.Password);
             if (!result.Succeeded)
             {

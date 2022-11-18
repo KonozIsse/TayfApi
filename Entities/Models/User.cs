@@ -12,7 +12,6 @@ namespace Entities.Models
         public string LastName { get; set; }
         public string Telephone { get; set; }
         public string Avater { get; set; }
-        public string Password { get; set; }
         public Status Status { get; set; }
         [Required(AllowEmptyStrings = true)]
         [StringLength(10)]

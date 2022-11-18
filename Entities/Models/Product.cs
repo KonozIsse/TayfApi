@@ -12,16 +12,16 @@ namespace Entities.Models
         public string Description { get; set; }
         public decimal Rate { get; set; }
         public int CountReviews { get; set; }
-        public int Like { get; set; }
+        public int NumLike { get; set; }
         public bool IsSpecial { get; set; }
         public bool IsSale { get; set; }
         public bool? IsFavorite { get; set; }
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        [ForeignKey(nameof(Vendor))]
-        public int VendorId { get; set; }
-        public User Vendor { get; set; }
+        [ForeignKey(nameof(Store))]
+        public int StoreId { get; set; }
+        public User Store { get; set; }
         public bool? IsAcceptAdmin { get; set; }
         [ForeignKey(nameof(ProductType))]
         public int TypeId { get; set; }

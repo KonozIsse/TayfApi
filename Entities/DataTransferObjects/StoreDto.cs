@@ -36,6 +36,7 @@ namespace Entities.DataTransferObjects
         public string Password { get; set; }
         public Status IsStatus { get; set; }
         public string Url { get; set; }
+        public string Lang { get; set; }
         public int? ImageId { get; set; }
         public int? CountryId { get; set; }
     }
@@ -54,6 +55,7 @@ namespace Entities.DataTransferObjects
         public string Telephone { get; set; }
         public string Avater { get; set; }
         public string Password { get; set; }
+        public string Email { get; set; }
         public string Lang { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public bool? IsSubscribe { get; set; }

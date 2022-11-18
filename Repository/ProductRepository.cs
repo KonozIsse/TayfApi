@@ -18,9 +18,10 @@ namespace Repository
 
         }
         public async Task<List<Product>> GetAllAcceptedProducts()
-        => await FindByCondition(c => c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false).OrderByDescending(c => c.CreatedAt)
-            .Include(c => c.Category).Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(c => c.Reviews)
-            .Include(e => e.WishLists).Include(c => c.AttributesProducts).Include(i=>i.Images).ToListAsync();
+          => await FindByCondition(c => c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false).OrderByDescending(c => c.CreatedAt)
+            .Include(c => c.Category).Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(e => e.WishLists)
+            .Include(c => c.Reviews).ThenInclude(c=>c.Customer).Include(c => c.AttributesProducts).ThenInclude(c=>c.ProductOption)
+            .Include(i=>i.Images).Include(c=>c.Store).ToListAsync();
         public async Task<Product> GetProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Product> GetActiveProductById(int id, bool trackChanges)
@@ -29,15 +30,15 @@ namespace Repository
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
             .Include(c=>c.Category).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
             .Include(c=>c.Reviews).Include(e=>e.WishLists).Include(c=>c.AttributesProducts).FirstOrDefaultAsync();
+         public async Task<List<Product>> GetProductsCatId(int categoryId)
+       => await FindByCondition(c => c.CategoryId == categoryId  , false).ToListAsync();
         public List<Product> GetAllProducts()
-        =>  FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToList();
+       => FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToList();
         public async Task<List<int>> GetProductsCategoryId(int categoryId)
-        => await FindByCondition(c => c.CategoryId == categoryId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).Select(c=>c.Id).ToListAsync();
-        public async Task<List<Product>> GetProductsCatId(int categoryId)
-       => await FindByCondition(c => c.CategoryId == categoryId , false).ToListAsync();
+        => await FindByCondition(c => c.CategoryId == categoryId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).Select(c => c.Id).ToListAsync();
 
         public async Task<List<Product>> GetProductsTOStoreId(int storeId)
-        => await FindByCondition(c => c.VendorId == storeId&& c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        => await FindByCondition(c => c.StoreId == storeId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<List<Product>> GetAllProductLikeCustomersId(int customerId)
         => await FindByCondition(c => c.WishLists.Any(c => c.CustomerId == customerId), false).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)
@@ -71,7 +72,7 @@ namespace Repository
             var list = FindByCondition(c => categoryId == 0 || c.Category.MainCategoryId == categoryId
             || (c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 1)
 
-            && storeId == 0 || c.VendorId == storeId && c.Vendor.Status == Status.Active
+            && storeId == 0 || c.StoreId == storeId && c.Store.Status == Status.Active
             && c.IsAcceptAdmin == true && c.IsStatus == Status.Active
 
             && ((!String.IsNullOrEmpty(c.Category.CategoryName) && c.Category.CategoryName.Contains(search)) || String.IsNullOrEmpty(search))

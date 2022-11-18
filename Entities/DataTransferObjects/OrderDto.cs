@@ -35,7 +35,7 @@ namespace Entities.DataTransferObjects
     }
     public class CreateOrderDto
     {
-        public List<ProductDto> Products { get; set; }
+       // public List<ProductDto> Products { get; set; }
         public int DeliveryTimeId { get; set; }
         public int AddressId { get; set; }
         public int? CouponId { get; set; }

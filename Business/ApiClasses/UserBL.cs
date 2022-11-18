@@ -29,7 +29,6 @@ namespace BusinessLogic.ApiClasses
             _imageBL = imageBL;
             _userManager = userManager;
         }
-
         //Store------------------------------------------------
         public async Task<List<StoreDto>> GetStores()
         {
@@ -54,7 +53,8 @@ namespace BusinessLogic.ApiClasses
         {
             var store = _mapper.Map<User>(createStoreDto);
             store.RoleId = 3;
-            store.Lang = "en";
+            store.Status = Status.Active;
+            store.UserName = createStoreDto.FirstName + createStoreDto.LastName;
             _repositoryManager.User.AddUser(store);
             await _repositoryManager.SaveAsync();
         }
@@ -69,12 +69,6 @@ namespace BusinessLogic.ApiClasses
         public async Task DeleteStore(int storeId)
         {
             var store = await _repositoryManager.User.GetUserId(storeId, false);
-            var productStore = await _repositoryManager.ProductStore.GetProductsToStoreId(storeId);
-            foreach (var item in productStore)
-            {
-                item.IsDeleted = true;
-                await _repositoryManager.SaveAsync();
-            }
             var customerStores = await _repositoryManager.CustomerStore.GetCustomersStoreId(storeId);
             foreach (var customerStore in customerStores)
             {
@@ -114,7 +108,7 @@ namespace BusinessLogic.ApiClasses
         public async Task ChangePassword(int userId, string newPassword)
         {
             var user = await _repositoryManager.User.GetUserId(userId, true);
-            user.Password = newPassword;
+            user.PasswordHash = newPassword;
             await _repositoryManager.SaveAsync();
         }
         public async Task VerifyUser(int userId, int code)
@@ -151,7 +145,7 @@ namespace BusinessLogic.ApiClasses
         public async Task UpdateUser(int userId, UpdateUserDto updateUserDto)
         {
             var user = await _repositoryManager.User.GetUserId(userId, true);
-            if (user.Password != updateUserDto.Password && user.Devices != null)
+            if (user.PasswordHash != updateUserDto.Password && user.Devices != null)
                 foreach (var device in user.Devices) { device.DeviceToken = updateUserDto.Password; }
             _mapper.Map(updateUserDto, user);
             await _repositoryManager.SaveAsync();
@@ -225,11 +219,8 @@ namespace BusinessLogic.ApiClasses
             }
             user.RoleId = 2;
             user.Status = Status.Active;
-            //user.CountryId = _countryZonesTaxApi.GetCountryCode(userRegister.CodeMobileCountry.Value) != null ? 0
-            //          : _countryZonesTaxApi.GetCountryCode(userRegister.CodeMobileCountry.Value).Id;
-
-            // await _userManager.CreateAsync(user, userRegister.Password);
-             _repositoryManager.User.AddUser(user);
+            user.UserName = userRegister.FirstName + userRegister.LastName;
+            _repositoryManager.User.AddUser(user);
             await _repositoryManager.SaveAsync();
         }
         public async Task<User> FacebookUser(string socialId)

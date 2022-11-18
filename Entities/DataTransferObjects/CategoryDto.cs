@@ -29,6 +29,7 @@ namespace Entities.DataTransferObjects
     }
     public class CreateCategoryDto
     {
+        public int? MainCategoryId { get; set; }
         public string CategoryName { get; set; }
         public int? ImgId { get; set; }
         public Status IsStatus { get; set; }

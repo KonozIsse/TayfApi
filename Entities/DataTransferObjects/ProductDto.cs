@@ -20,7 +20,11 @@ namespace Entities.DataTransferObjects
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
-        public ProductType ProductType { get; set; }
+        public int StoreId { get; set; }
+        public int TypeId { get; set; }
+        public string StoreName { get; set; }
+        public string StoreImage { get; set; }
+        public string ShareLink { get; set; }
         public bool IsSpecial { get; set; }
         public bool IsSale { get; set; }
         public short IsFeature { get; set; }
@@ -28,15 +32,12 @@ namespace Entities.DataTransferObjects
         public decimal Rate { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public bool? IsAcceptAdmin { get; set; }
-        public int? TopRateProductId { get; set; }
         public int CategoryId { get; set; }
         public List<WishListDto> WishLists { get; set; }
         public List<ReviewDto> Reviews { get; set; }
         public List<SpecialDto> SpecialProducts { get; set; }
         public List<SaleDto> ProductSales { get; set; }
         public List<AttributeDto> AttributesProducts { get; set; }
-        public List<ProductsStoreDto> ProductsStores { get; set; }
         public List<ImageDto> Images { get; set; }
     }
     public class CreateProductDto
@@ -46,12 +47,10 @@ namespace Entities.DataTransferObjects
         public decimal Price { get; set; }
         public string Description { get; set; }
         public int TypeId { get; set; } 
-        public int Vendor { get; set; }
+        public int StoreId { get; set; }
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public int? TopRateProductId { get; set; }
-        public int? ImgId { get; set; }
     }
     public class UpdateProductDto : CreateProductDto
     {

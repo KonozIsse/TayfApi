@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace BusinessLogic.ApiClasses
@@ -54,39 +55,40 @@ namespace BusinessLogic.ApiClasses
             var mainCategoryDto = _mapper.Map<List<CategoryDto>>(categories);
             return mainCategoryDto;
         }
-        public async Task CreateMainCategory(CreateCategoryDto createCategoryDto)
+        public async Task CreateCategory(CreateCategoryDto createCategoryDto)
         {
             var category = _mapper.Map<Category>(createCategoryDto);
-            category.MainCategoryId = 0;
+            if(createCategoryDto.MainCategoryId == null)
+            {
+                category.MainCategoryId = 0;
+            }
+            else
+            {
+                category.MainCategoryId = createCategoryDto.MainCategoryId.Value;
+            }
+            
             _repositoryManager.Categories.CreateMainCategory(category);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task CreateSupCategory(int mainId, CreateCategoryDto createCategoryDto)
-        {
-            var category = _mapper.Map<Category>(createCategoryDto);
-            category.MainCategoryId = mainId;
-            _repositoryManager.Categories.CreateSubCategory(mainId, category);
             await _repositoryManager.SaveAsync();
         }
         public async Task DeleteCategory(int id)
         {
-            var subCategoryList = await _repositoryManager.Categories.GetSubCategoriesByMainId(id, false);
-            if (subCategoryList != null)
-            {
-                foreach (var item in subCategoryList)
+            
+                var subCategoryList = await _repositoryManager.Categories.GetSubCategoriesByMainId(id, false);
+                if (subCategoryList != null)
                 {
-                    var products = await _repositoryManager.Product.GetProductsCatId(item.Id);
-                    if (products != null)
+                    foreach (var item in subCategoryList)
                     {
-                        foreach (var product in products)
+                        var products = await _repositoryManager.Product.GetProductsCatId(item.Id);
+                        if (products != null)
                         {
-                             //_repositoryManager.Product.DeleteProduct(product);
-                            await RemoveProduct(product.Id);
+                            foreach (var product in products)
+                            {
+                                await RemoveProduct(product.Id);
+                            }
                         }
+                        _repositoryManager.Categories.DeleteCategory(item);
                     }
-                    _repositoryManager.Categories.DeleteCategory(item);
                 }
-            }
             var MainCategory = await _repositoryManager.Categories.GetCategoryById(id, false);
             _repositoryManager.Categories.DeleteCategory(MainCategory);
             await _repositoryManager.SaveAsync();
@@ -110,7 +112,6 @@ namespace BusinessLogic.ApiClasses
         {
             var product = _mapper.Map<Product>(createProductDto);
             product.CategoryId = catId;
-           // product.Vendor = createProductDto.Vendor;
             _repositoryManager.Product.AddProductOnCategory(catId, product);
             await _repositoryManager.SaveAsync();
         }
@@ -129,53 +130,92 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task RemoveProduct(int productId)
         {
-            var customerProducts = await _repositoryManager.CustomerProduct.GetCustomersProductId(productId);
-            foreach (var customerProduct in customerProducts)
-            {
-                _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
-            }
-           
-            var carts = await _repositoryManager.CartProduct.GetAllCartProductProductId(productId);
-            foreach (var cart in carts)
-            {
-                _repositoryManager.CartProduct.DeleteCartProduct(cart);
-            }
-
-            var specials = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(productId);
-            foreach (var special in specials)
-            {
-                _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
-            }
-
-            var sales = await _repositoryManager.Sales.GetAllSalesProductId(productId);
-            foreach (var sale in sales)
-            {
-                _repositoryManager.Sales.DeleteFlashSale(sale);
-            }
-            var likes = await _repositoryManager.WishList.GetLikesProductId(productId);
-            foreach (var like in likes)
-            {
-                _repositoryManager.WishList.DeleteLike(like);
-            }
-            var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
-            foreach (var review in reviews)
-            {
-                _repositoryManager.Review.DeleteReview(review);
-            }
-            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-            foreach (var attribut in attributs)
-            {
-                _repositoryManager.Attribute.DeleteAttributesProduct(attribut);
-            }
-
             var product = await _repositoryManager.Product.GetProductById(productId, false);
-            _repositoryManager.Product.DeleteProduct(product);
+            if (product != null)
+            {
+                var carts = await _repositoryManager.CartProduct.GetAllCartProductProductId(productId);
+                if (carts != null)
+                {
+                    foreach (var cart in carts)
+                    {
+                        _repositoryManager.CartProduct.DeleteCartProduct(cart);
+                    }
+                }
+                var specials = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(productId);
+                if (specials != null)
+                {
+                    foreach (var special in specials)
+                    {
+                        _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
+                    }
+                }
+                var sales = await _repositoryManager.Sales.GetAllSalesProductId(productId);
+                if (sales != null)
+                {
+                    foreach (var sale in sales)
+                    {
+                        _repositoryManager.Sales.DeleteFlashSale(sale);
+                    }
+                }
+                var likes = await _repositoryManager.WishList.GetLikesProductId(productId);
+                if (likes != null)
+                {
+                    foreach (var like in likes)
+                    {
+                        _repositoryManager.WishList.DeleteLike(like);
+                    }
+                }
+                var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
+                if (reviews != null)
+                {
+                    foreach (var review in reviews)
+                    {
+                        _repositoryManager.Review.DeleteReview(review);
+                    }
+                }
+                var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
+                if (attributs != null)
+                {
+                    foreach (var attribut in attributs)
+                    {
+                        _repositoryManager.Attribute.DeleteAttributesProduct(attribut);
+                    }
+                }
+                var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+                if (inventories != null)
+                {
+                    foreach (var inventory in inventories)
+                    {
+                        _repositoryManager.Inventory.DeleteInventory(inventory);
+                    }
+                }
+
+                _repositoryManager.Product.DeleteProduct(product);
+            }
             await _repositoryManager.SaveAsync();
         }
         public async Task<List<ProductDto>> GetProducts()
         {
             var products = await _repositoryManager.Product.GetAllAcceptedProducts();
             var productsDto = _mapper.Map<List<ProductDto>>(products);
+            //if (products != null)
+            //{
+            //    foreach (var product in products)
+            //    {
+                
+            //        var productDto = productsDto.First();
+            //        var store = await _userBL.GetStore(product.StoreId);
+            //        //productsDto.Add(new ProductDto
+            //        //{
+            //            productDto.Availability = await AvailabilityProducts(product.Id);
+            //            productDto.ShareLink = _util.url1 + "/share.html?id=" + product.Id;
+
+            //            productDto.StoreId = product.StoreId;
+            //            productDto.StoreName = store.FirstName + " " + store.LastName;
+            //            productDto.StoreImage = store.ImageId.ToString();
+            //       // });
+            //    }
+            //}
             return productsDto;
         }
         public async Task<List<ProductVM>> GetProductByModel(List<int> prodList , int CustomerId)
@@ -205,12 +245,12 @@ namespace BusinessLogic.ApiClasses
                             Description = product.Description,
                             ProductModel = product.ProductModel,
                             TypeId = product.TypeId,
-                            ProductPrice = product.Price,
+                            //ProductPrice = product.Price,
                             ProductStatus = product.IsStatus.ToString(),
                             ProductImage = await _imageBL.GetImageThumbnail(product.Images.First().Id.ToString()),
                             images = _imageBL.GetListImagesProductId(id),
                             AvailabilityProduct = await AvailabilityProducts(id),
-                           // ShareLink = _util.url1 + "/share.html?id=" + id,
+                            ShareLink = _util.url1 + "/share.html?id=" + id,
                             Options = await GetOptions(id),
 
                             is_special = (special.Id == 0 ? false : true),
@@ -221,7 +261,7 @@ namespace BusinessLogic.ApiClasses
                             expireDate = (flash != null ? flash.EndDate : null),
 
                             IsBest = Convert.ToInt16(product.IsBest),
-                            IsFeature = product.IsFeature,
+                          //  IsFeature = product.IsFeature,
 
                             IsFav = (CustomerId == 0 ? false : await IsFavourite(CustomerId, id)),
                             likeId = await GetFavourite(CustomerId, id),
@@ -710,11 +750,11 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task AddReviews(int productId, CreateReviewDto createReviewDto)
         {
+            var review = _mapper.Map<Review>(createReviewDto);
             var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
             product.Rate = await Rate(productId);
             product.CountReviews++;
-            var review = _mapper.Map<Review>(createReviewDto);
-            //review.CustomerId = GetCurrentUserId();
+            
             review.ProductId = productId;
             review.IsStatus = Status.NotActive;
             _repositoryManager.Review.AddReview(review);
@@ -781,7 +821,6 @@ namespace BusinessLogic.ApiClasses
         public async Task<decimal> Rate(int productId)
         {
             var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
-            reviews.Where(c => c.IsStatus == Status.Active);
             decimal rate = (reviews.Count() > 0 ? Convert.ToDecimal(reviews.Sum(r => r.Rating) / reviews.Count()) : 0);
             return rate;
         }
@@ -789,7 +828,7 @@ namespace BusinessLogic.ApiClasses
         public async Task AddWishList( CreateLikeDto createLikeDto)
         {
             var product = await _repositoryManager.Product.GetActiveProductById(createLikeDto.ProductId , true);
-            product.Like++;
+            product.NumLike++;
             var wishList = _mapper.Map<WishList>(createLikeDto);
             _repositoryManager.WishList.Addlike(createLikeDto.ProductId, wishList);
             await _repositoryManager.SaveAsync();
@@ -797,7 +836,7 @@ namespace BusinessLogic.ApiClasses
         public async Task DeleteLike(int customerId, int productId)
         {
             var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
-            product.Like--;
+            product.NumLike--;
             var wishList = await _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId , productId);
             if (wishList != null)
             {
