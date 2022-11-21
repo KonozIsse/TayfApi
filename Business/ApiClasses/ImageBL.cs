@@ -17,19 +17,23 @@ namespace BusinessLogic.ApiClasses
     public class ImageBL
     {
         protected readonly IRepositoryManager _repositoryManager;
-        protected readonly IMapper _mapper;
+        protected readonly IMapper _mapper;  
+        protected readonly ImageUploadServices _imageUploadServices;
         string url;
 
-        public ImageBL(IRepositoryManager repositoryManager, IMapper mapper)
+        public ImageBL(IRepositoryManager repositoryManager, IMapper mapper, ImageUploadServices imageUploadServices)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
+            _imageUploadServices = imageUploadServices;
         }
-        public async Task UpdateAvatarCustomer (int customerId, string avatar)
+        public async Task UpdateAvatarCustomer (AvaterDto avaterDto)
         {
-            var customer = await _repositoryManager.User.GetCustomerId(customerId , true);
+            var customer = await _repositoryManager.User.GetCustomerId(avaterDto.CustomerId, true);
+            var fileName = avaterDto.Avater;
+            var pic = _imageUploadServices.Upload(fileName);
+            customer.Avater = pic;
             var oldLink = customer.Avater;
-            customer.Avater = avatar;
             await _repositoryManager.SaveAsync();
             if (!string.IsNullOrEmpty(oldLink))
             {
@@ -39,6 +43,9 @@ namespace BusinessLogic.ApiClasses
         public async Task<int> AddImage (CreateImageDto imageDto)
         {
             var image = _mapper.Map<Image>(imageDto);
+            var fileName = imageDto.Name;
+            var pic = _imageUploadServices.Upload(fileName);
+            image.Name = pic;
             _repositoryManager.Image.AddImage(image);
             try
             {
@@ -47,7 +54,7 @@ namespace BusinessLogic.ApiClasses
             catch { }
             return image.Id;
         }
-        public async Task AddImageSetting(ImageSettingDto settingDto)
+        public async Task AddImageSetting(CreateImageSettingDto settingDto)
         {
             var imageSetting = _mapper.Map<ImageSetting>(settingDto);
             _repositoryManager.ImageSetting.AddImageSetting(imageSetting);
@@ -125,15 +132,25 @@ namespace BusinessLogic.ApiClasses
             }
             return image;
         }
-        public List<String> GetListImagesProductId (int productId)
+        public async Task<List<string>> GetListImagesProductIdAsync (int productId)
         {
             List<String> listImages = new List<String>();
-            var images =  _repositoryManager.Image.GetProductImages(productId);
+            var images = await  _repositoryManager.Image.GetProductImages(productId);
             if (images != null)
             {
-                images.ForEach( async x1 => listImages.Add(await GetImageOriginal(x1.Id.ToString())));
+                foreach(var image in images)
+                {
+                    listImages.Add(await GetImageOriginal(image.Id.ToString()));
+                }
+                //images.ForEach( async x1 => listImages.Add(await GetImageOriginal(x1.Id.ToString())));
             }
             return listImages;
+        }
+        public async Task<List<Image>> GetImagesProduct (int productId)
+        {
+            var images = await  _repositoryManager.Image.GetProductImages(productId);
+            
+            return images;
         }
 
     }

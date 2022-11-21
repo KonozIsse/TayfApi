@@ -51,7 +51,7 @@ namespace Repository
         public void AddUser(User user) => Create(user);
         public void DeleteUser(User user) => Delete(user);
         
-        // Admin 1--------------------------------------------------
+        // Admin 1-------------------------------------------------
         public async Task<IEnumerable<User>> GetSuperAdmin(bool trackChanges)
          => await FindByCondition(c => c.RoleId == 1, trackChanges).ToListAsync();
         public async Task<User> GetAdminAndStoreEmail(string email)
@@ -60,7 +60,8 @@ namespace Repository
         public async Task<IEnumerable<User>> GetStores(bool trackChanges)
         => await FindByCondition(c => c.RoleId == 3, trackChanges).Include(c=>c.Products).Include(c => c.Addresses).ToListAsync();
         public async Task<IEnumerable<User>> GetAllStores (bool trackChanges)
-        => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, trackChanges).ToListAsync();
+        => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, trackChanges)
+            .Include(c=>c.Addresses).Include(c=>c.StoreOrders).ToListAsync();
         public async Task<User> GetStoreId (int id)
        => await FindByCondition(c =>c.Id == id && c.RoleId == 3 && c.Status == Status.Active, false)
             .Include(c=>c.Products).Include(c=>c.Addresses).FirstOrDefaultAsync();

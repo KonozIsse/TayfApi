@@ -47,10 +47,14 @@ namespace Entities.DataTransferObjects
         public decimal Price { get; set; }
         public string Description { get; set; }
         public int TypeId { get; set; } 
-        public int StoreId { get; set; }
+        public int? StoreId { get; set; }
+        public int? AdminId { get; set; }
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
+        public List<CreateImageDto> Images { get; set; }
+        public List<CreateSaleDto> ProductSales { get; set; }
+        public List<CreateSpecialDto> SpecialProducts { get; set; }
     }
     public class UpdateProductDto : CreateProductDto
     {
@@ -76,7 +80,6 @@ namespace Entities.DataTransferObjects
     }
     public class CreateSaleDto 
     {
-        public int ProductId { get; set; }
         public decimal DiscountPrice { get; set; }
         public Status IsStatus { get; set; }
         public DateTime? StartDate { get; set; }
@@ -99,7 +102,6 @@ namespace Entities.DataTransferObjects
     }
     public class CreateSpecialDto
     {
-        public int ProductId { get; set; }
         public decimal SpecialPrice { get; set; }
         public Status IsStatus { get; set; }
         public DateTime? EndDate { get; set; }

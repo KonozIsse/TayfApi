@@ -41,7 +41,7 @@ namespace Repository
         public async Task<IEnumerable<Category>> SearchMainCategoriesStoreId(int storeId ,int categoryId, string search)
         {
             var query = FindByCondition(c => c.Id == categoryId || c.MainCategoryId == categoryId && c.IsStatus == Status.Active
-           && c.Products.Any(x=>x.IsStatus == Status.Active) && c.CategoriesStores.Any(x=>x.VendorId== storeId), false);
+           && c.Products.Any(x=>x.IsStatus == Status.Active)/* && c.CategoriesStores.Any(x=>x.VendorId== storeId)*/, false);
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(x => x.CategoryName.Contains(search));

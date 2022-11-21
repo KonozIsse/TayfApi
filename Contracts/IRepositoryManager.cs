@@ -14,7 +14,6 @@ namespace Contracts
         ICartProductRepository CartProduct { get; }
         ICartAttributeProductRepository CartAttributeProduct { get; }
         ICategoriesRepository Categories { get; }
-        ICategoriesStoreRepository CategoriesStore { get; }
         IContactRepository Contact { get; }
         ICountryRepository Country { get; }
         ICouponRepository Coupon { get; }

@@ -108,10 +108,12 @@ namespace WebLayer
             //MapStore
             CreateMap<StoreDto, User>().ReverseMap();
             CreateMap<CreateStoreDto, User>().ReverseMap();
-            CreateMap<UpdateStoreDto, User>().ReverseMap(); 
+            CreateMap<UpdateStoreDto, User>().ReverseMap();  
+            CreateMap<ResetPasswordDto, User>().ReverseMap(); 
             //MapCustomer
             CreateMap<CreateCustomerDto, User>().ReverseMap();
             CreateMap<UserDto, User>().ReverseMap();
+            CreateMap<AvaterDto, User>().ReverseMap();
             CreateMap<UpdateUserDto, User>().ReverseMap();
             CreateMap<UserForRegistrationDto, User>().ReverseMap();
             //MapTaxRate
@@ -140,6 +142,7 @@ namespace WebLayer
             CreateMap<CreateImageDto, Image>().ReverseMap();
             //MapImageSetting
             CreateMap<ImageSettingDto, ImageSetting>().ReverseMap();
+            CreateMap<CreateImageSettingDto, ImageSetting>().ReverseMap();
             //MapDeliveryTime
             CreateMap<DeliveryTimeDto, DeliveryTime>().ReverseMap();
             //MapDevice

@@ -23,10 +23,8 @@ namespace Entities.DataTransferObjects
     public class CreateDeviceDto
     {
         public string DeviceType { get; set; }
-        public string Location { get; set; }
         public string DeviceModel { get; set; }
         public string OperatingSystem { get; set; }
-        public string DeviceToken { get; set; }
         public int UserId { get; set; }
     } 
     public class UpdateDeviceDto : CreateDeviceDto

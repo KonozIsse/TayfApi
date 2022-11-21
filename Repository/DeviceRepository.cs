@@ -21,9 +21,9 @@ namespace Repository
         public async Task<Device> CheckDevice(string token , bool trackChanges)
         => await FindByCondition(r => r.DeviceToken == token , trackChanges).FirstOrDefaultAsync();
         public async Task<Device> GetDeviceUser( int deviceId, int userId ,bool trackChanges)
-       => await FindByCondition(c => c.Id == deviceId && c.UserId == userId, trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Device>> GetDevicesUserId (int userId)
-        => await FindByCondition(r => r.UserId == userId, false).ToListAsync();
+       => await FindByCondition(c => c.Id == deviceId && c.UserId == userId, trackChanges).SingleOrDefaultAsync();
+        public async Task<List<Device>> GetDevicesUserId (int userId, bool trackChanges)
+        => await FindByCondition(r => r.UserId == userId, trackChanges).ToListAsync();
         public string GetTokenUser (int userId)
          =>  FindByCondition(r => r.UserId == userId, false).OrderByDescending(r => r.Id).FirstOrDefault().DeviceToken;
         public void AddDevice(Device device) => Create(device);

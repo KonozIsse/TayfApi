@@ -112,7 +112,33 @@ namespace BusinessLogic.ApiClasses
         {
             var product = _mapper.Map<Product>(createProductDto);
             product.CategoryId = catId;
+            if (createProductDto.StoreId != 0)
+            {
+                product.StoreId = createProductDto.StoreId;
+                product.IsAcceptAdmin = false;
+            }
+            else
+            {
+                product.IsAcceptAdmin = true;
+            }
             _repositoryManager.Product.AddProductOnCategory(catId, product);
+            if (createProductDto.Images != null)
+            {
+                var createImageDto = new CreateImageDto
+                {
+                    //Name = ,
+                    ProductId = product.Id
+                };
+                await _imageBL.AddImage(createImageDto);
+            }
+            if (product.IsSale == true)
+            {
+                await AddFlashSale(product.Id,createProductDto.ProductSales.First());
+            }
+            if (product.IsSpecial == true)
+            {
+                await AddSpecialProducts(product.Id,createProductDto.SpecialProducts.First());
+            }
             await _repositoryManager.SaveAsync();
         }
         public async Task EditProduct(int productId, UpdateProductDto updateProductDto)
@@ -248,7 +274,7 @@ namespace BusinessLogic.ApiClasses
                             //ProductPrice = product.Price,
                             ProductStatus = product.IsStatus.ToString(),
                             ProductImage = await _imageBL.GetImageThumbnail(product.Images.First().Id.ToString()),
-                            images = _imageBL.GetListImagesProductId(id),
+                            images = await _imageBL.GetListImagesProductIdAsync(id),
                             AvailabilityProduct = await AvailabilityProducts(id),
                             ShareLink = _util.url1 + "/share.html?id=" + id,
                             Options = await GetOptions(id),
@@ -680,10 +706,11 @@ namespace BusinessLogic.ApiClasses
             List<int> ids = items.ToList();
             return await GetProductByModel(ids, CustomerId);
         }
-        public async Task AddSpecialProducts(CreateSpecialDto createDto)
+        public async Task AddSpecialProducts(int productId, CreateSpecialDto createDto)
         {
-            var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
+            var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
             var special = _mapper.Map<SpecialProducts>(createDto);
+            special.ProductId = productId;
             product.IsSpecial = true;
             _repositoryManager.SpecialProducts.AddSpecialProduct(special);
             await _repositoryManager.SaveAsync();
@@ -720,11 +747,12 @@ namespace BusinessLogic.ApiClasses
             List<int> ids = items.ToList();
             return await GetProductByModel(ids, CustomerId);
         }
-        public async Task AddFlashSale(CreateSaleDto createDto)
+        public async Task AddFlashSale(int productId ,CreateSaleDto createDto)
         {
-            var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
+            var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
             product.IsSale = true;
             var sales = _mapper.Map<ProductSales>(createDto);
+            sales.ProductId = productId;
             _repositoryManager.Sales.AddFlashSale(sales);
             await _repositoryManager.SaveAsync();
         }

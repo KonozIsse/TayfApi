@@ -18,7 +18,6 @@ namespace Repository
         private IAddressRepository _addressRepository;
         private IProductAttributRepository _attributesProductRepository;
         private ICategoriesRepository _categoriesRepository; 
-        private ICategoriesStoreRepository _categoriesStoreRepository;
         private IContactRepository _contactRepository;
         private ICountryRepository _countryRepository;
         private ICurrencyRepository _currencyRepository;
@@ -500,16 +499,7 @@ namespace Repository
                 return _customerAttributesProductRepository;
             }
         } 
-        public ICategoriesStoreRepository CategoriesStore
-        {
-            get
-            {
-                if (_categoriesStoreRepository == null)
-                    _categoriesStoreRepository = new CategoriesStoreRepository(_repositoryContext);
-                return _categoriesStoreRepository;
-            }
-        } 
-
+        
         public IUnitRepository Unit
         {
             get

@@ -22,11 +22,6 @@ namespace Entities
         {
 
         }
-
-        public RepositoryContext()
-        {
-        }
-
         public DbSet<Address> Addresses { get; set; }
         public DbSet<ProductAttribut> AttributesProducts { get; set; }
         public DbSet<Banner> Banners { get; set; }
@@ -34,7 +29,6 @@ namespace Entities
         public DbSet<CartProduct> CartsProducts { get; set; } 
         public DbSet<CartAttributeProduct> CartAttributeProducts { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<CategoriesStore> CategoriesStores { get; set; }
         public DbSet<CommentNews> CommentNews { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Coupon> Coupons { get; set; }

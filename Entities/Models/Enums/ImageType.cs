@@ -3,9 +3,9 @@ namespace Entities.Models.Enums
 {
     public enum ImageType
     {
-        MEDIUM = 1,
-        THUMBNAIL,
-        ACTUAL,
+        ACTUAL = 1,
+        THUMBNAIL ,
+        MEDIUM,
         LARGE
     }
 }

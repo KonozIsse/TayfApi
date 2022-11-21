@@ -10,7 +10,6 @@ namespace Entities.Models
     { 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Telephone { get; set; }
         public string Avater { get; set; }
         public Status Status { get; set; }
         [Required(AllowEmptyStrings = true)]
@@ -49,7 +48,6 @@ namespace Entities.Models
         public List<Address> Addresses { get; set; }
         public List<CustomerStore> Customers { get; set; }
         public List<CustomerStore> Stores { get; set; }
-        public List<CategoriesStore> CategoriesStores { get; set; }
         public List<CustomerProduct> CustomerProducts { get; set; }
         public List<Product> Products { get; set; }
         public List<CartStore> CartStores { get; set; }

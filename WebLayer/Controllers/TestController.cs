@@ -20,8 +20,10 @@ namespace WebLayer.Controllers
         private readonly LocationTaxBL _locationTaxBL;
         private readonly OrderBL _orderBL;
         private readonly ProductBL _productBL;
+         private readonly ImageBL _imageBL;
+
         public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL, 
-            LocationTaxBL locationTaxBL , ProductBL productBL , OrderBL orderBL) : base(serviceProvider)
+            LocationTaxBL locationTaxBL , ProductBL productBL , OrderBL orderBL , ImageBL imageBL) : base(serviceProvider)
         {
             _homeBL = home;
             _newsBL = news;
@@ -29,36 +31,37 @@ namespace WebLayer.Controllers
             _locationTaxBL = locationTaxBL;
             _productBL = productBL;
             _orderBL = orderBL;
+            _imageBL = imageBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add(int id , CreateAttributeDto create)
+        public async Task<IActionResult> add([FromForm] CreateImageDto create)
         {
-            await _productBL.AddAttribute(id ,create);
+            await _imageBL.AddImage(create);
             return StatusCode(201);
         }
         [HttpPost("adduser")]
-        public async Task<IActionResult> addAdd (int id , CreateAddressDto create)
+        public async Task<IActionResult> addAdd ([FromForm] int id , CreateProductDto create)
         {
-            await _locationTaxBL.CreateAddress(id ,create);
+            await _productBL.AddProduct(id ,create);
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update(int id  )
+        public async Task<IActionResult> update([FromForm] AvaterDto update)
         {
-            await _productBL.ActiveReview(id);
+            await _imageBL.UpdateAvatarCustomer(update);
             return NoContent();
         } 
         [HttpDelete("delete")]
         public async Task<IActionResult> delete(int id)
         {
-            await _productBL.DeleteCategory(id);
+            await _userBL.LogOutDevice(id);
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id , int idw)
+        public IActionResult get(int id)
         {
-            var langs =  await _productBL.GetProductsCatId(id , idw);
+            var langs =   _imageBL.GetListImagesProductIdAsync(id);
             return Ok(langs);
         }
     }

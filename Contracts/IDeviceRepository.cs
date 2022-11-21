@@ -10,7 +10,7 @@ namespace Contracts
     public interface IDeviceRepository
     {
         Task<Device> CheckDevice(string token, bool trackChanges);
-        Task<List<Device>> GetDevicesUserId(int userId);
+        Task<List<Device>> GetDevicesUserId(int userId, bool trackChanges);
         Task<Device> GetDeviceUser(int deviceId, int userId, bool trackChanges);
         string GetTokenUser(int userId);
         void AddDevice(Device device);

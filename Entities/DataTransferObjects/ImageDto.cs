@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Entities.DataTransferObjects
 {
@@ -22,12 +23,12 @@ namespace Entities.DataTransferObjects
     } 
     public class CreateImageDto
     {
-        public string Name { get; set; }
+        public IFormFile Name { get; set; }
         public Status IsStatus { get; set; }
         public ImageCategory Category { get; set; }
         public int? ProductId { get; set; }
         public int? VendId { get; set; }
-        public int AdminId { get; set; }
+        public int? AdminId { get; set; }
     } 
     public class ImageSettingDto
     {
@@ -38,5 +39,19 @@ namespace Entities.DataTransferObjects
         public int Height { get; set; }
         public int Width { get; set; }
         public int ImgId { get; set; }
+    }
+    public class CreateImageSettingDto 
+    {
+        public string Path { get; set; }
+        public int Height { get; set; }
+        public int Width { get; set; }
+        public int ImgId { get; set; }
+        public ImageType ImageType { get; set; }
+       
+    }
+    public class AvaterDto
+    {
+        public IFormFile Avater { get; set; }
+        public int CustomerId { get; set; }
     }
 }

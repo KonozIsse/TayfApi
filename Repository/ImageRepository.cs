@@ -16,9 +16,9 @@ namespace Repository
         public ImageRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         {
         }
-        
-        public List<Image> GetProductImages(int productId)
-          =>  FindByCondition(c => c.ProductId == productId ,false).ToList();
+
+        public async Task<List<Image>> GetProductImages(int productId)
+          => await FindByCondition(c => c.ProductId == productId ,false).ToListAsync();
         public async Task<List<Image>> GetImages(ImageCategory category)
         => await FindByCondition(c => c.Category == category, false).OrderByDescending(r => r.CreatedAt).ToListAsync();
         public async Task<List<Image>> GetImageCategoryByVendor(int vendorId, ImageCategory category)

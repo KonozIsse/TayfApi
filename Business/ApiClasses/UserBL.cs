@@ -21,8 +21,7 @@ namespace BusinessLogic.ApiClasses
         protected readonly IMapper _mapper;
         private readonly ImageBL _imageBL;
         protected readonly UserManager<User> _userManager;
-
-        public UserBL(IRepositoryManager repositoryManager, IMapper mapper, ImageBL imageBL ,UserManager<User> userManager)
+        public UserBL(IRepositoryManager repositoryManager, IMapper mapper, ImageBL imageBL , UserManager<User> userManager)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
@@ -34,11 +33,11 @@ namespace BusinessLogic.ApiClasses
         {
             var stores = await _repositoryManager.User.GetAllStores(false);
             var storesDto = _mapper.Map<List<StoreDto>>(stores);
-            var storeDto = storesDto.First();
-            foreach (var store in stores)
-            {
-                storeDto.Avater = await _imageBL.GetImageThumbnail(store.Avater);
-            }
+           // var storeDto = storesDto.First();
+            //foreach (var store in stores)
+            //{
+            //    storeDto.Avater = await _imageBL.GetImageThumbnail(store.Avater);
+            //}
             return storesDto;
         }
      
@@ -46,14 +45,14 @@ namespace BusinessLogic.ApiClasses
         {
             var store = await _repositoryManager.User.GetStoreId(id);
             var storeDto = _mapper.Map<StoreDto>(store);
-            storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
+           // storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
             return storeDto;
         }
         public async Task AddStore(CreateStoreDto createStoreDto)
         {
             var store = _mapper.Map<User>(createStoreDto);
             store.RoleId = 3;
-            store.Status = Status.Active;
+            store.PhoneNumber = createStoreDto.PhoneNumber;
             store.UserName = createStoreDto.FirstName + createStoreDto.LastName;
             _repositoryManager.User.AddUser(store);
             await _repositoryManager.SaveAsync();
@@ -62,7 +61,6 @@ namespace BusinessLogic.ApiClasses
         {
             var store = await _repositoryManager.User.GetUserId(id, true);
             store.RoleId = 3;
-            store.Lang = "en";
             _mapper.Map(updateStoreDto, store);
             await _repositoryManager.SaveAsync();
         }
@@ -120,22 +118,6 @@ namespace BusinessLogic.ApiClasses
                 await _repositoryManager.SaveAsync();
             }
         }
-        public async Task ConfirmCode(int userId, UpdateUserDto updateUserDto)
-        {
-            var user = await _repositoryManager.User.GetUserId(userId, true);
-
-            if (updateUserDto.Telephone != null)
-                user.Telephone = updateUserDto.Telephone;
-
-            if (updateUserDto.CountryId != 0)
-                user.CountryId = updateUserDto.CountryId;
-
-            if (updateUserDto.VerifiedCode != 0)
-                user.VerifiedCode = updateUserDto.VerifiedCode;
-
-            user.IsMobileVerified = true;
-            await _repositoryManager.SaveAsync();
-        }
         public async Task EditeUserSubscribe(bool newsletter, int userId)
         {
             var user = await _repositoryManager.User.GetCustomerId(userId, true);
@@ -145,27 +127,28 @@ namespace BusinessLogic.ApiClasses
         public async Task UpdateUser(int userId, UpdateUserDto updateUserDto)
         {
             var user = await _repositoryManager.User.GetUserId(userId, true);
-            if (user.PasswordHash != updateUserDto.Password && user.Devices != null)
-                foreach (var device in user.Devices) { device.DeviceToken = updateUserDto.Password; }
-            _mapper.Map(updateUserDto, user);
+            user.UserName = updateUserDto.FirstName + updateUserDto.LastName;
+            var devices = await _repositoryManager.Device.GetDevicesUserId(userId, true);
+            if (user.PasswordHash != updateUserDto.Password && devices != null)
+            {
+                foreach (var device in devices) 
+                {
+                    user.PasswordHash = updateUserDto.Password;
+                    device.DeviceToken = user.PasswordHash;
+                }
+                _mapper.Map(updateUserDto, user);
+            }
             await _repositoryManager.SaveAsync();
         }
         public async Task RemoveUserData(int id)
         {
             var user = await _repositoryManager.User.GetUserId(id, false);
-
-            if (user.Addresses != null && user.Addresses.Count > 0)
+            var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(id);
+            if (addresses != null)
             {
-                foreach (var Address in user.Addresses)
+                foreach (var address in addresses)
                 {
-                    _repositoryManager.Address.DeleteAddress(Address);
-                }
-            }
-            if (user.Devices != null && user.Devices.Count > 0)
-            {
-                foreach (var Device in user.Devices)
-                {
-                    _repositoryManager.Device.DeleteDevice(Device);
+                    _repositoryManager.Address.DeleteAddress(address);
                 }
             }
             if (user.CustomerProducts != null && user.CustomerProducts.Count > 0)
@@ -219,8 +202,10 @@ namespace BusinessLogic.ApiClasses
             }
             user.RoleId = 2;
             user.Status = Status.Active;
+            user.PhoneNumber = userRegister.PhoneNumber;
             user.UserName = userRegister.FirstName + userRegister.LastName;
-            _repositoryManager.User.AddUser(user);
+            var result = await _userManager.CreateAsync(user, userRegister.Password);
+          //  _repositoryManager.User.AddUser(user);
             await _repositoryManager.SaveAsync();
         }
         public async Task<User> FacebookUser(string socialId)
@@ -235,28 +220,21 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.User.GetAppleRegisterUser(socialId);
         }
-        public async Task ResetPassword(ResetPasswordDto resetPasswordModel)
-        {
-            //var user = await _userManager.FindByEmailAsync(resetPasswordModel.Email);
-            //var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.Password);
-            
-           // return resetPassResult;
-        }
-      
+
         //Device------------------------------------------------
-        public async Task AddDevice(CreateDeviceDto createStoreDto)
+        public async Task AddDevice(CreateDeviceDto createDto)
         {
-            var device = _mapper.Map<Device>(createStoreDto);
+            var user = await _repositoryManager.User.GetUserId(createDto.UserId, true);
+            var device = _mapper.Map<Device>(createDto);
              //device.UserId = GetCurrentUserId() ;
             device.IsStatus = Status.Active;
+             device.DeviceToken= user.PasswordHash;
             _repositoryManager.Device.AddDevice(device);
             await _repositoryManager.SaveAsync();
         }
         public async Task UpdateDevice(string deviceId , UpdateDeviceDto updateDeviceDto)
         {
             var user = await _repositoryManager.User.GetUserId(updateDeviceDto.UserId, true);
-            //user.Lang = lang;
-            await _repositoryManager.SaveAsync();
             var device = await _repositoryManager.Device.GetDeviceUser(Convert.ToInt32(deviceId),updateDeviceDto.UserId, true);
             if (device == null )
             {
@@ -268,10 +246,9 @@ namespace BusinessLogic.ApiClasses
                 await _repositoryManager.SaveAsync();
             }
         }
-
-        public async Task UpdateFcm(int userId, string deviceId, string fcmToken)
+        public async Task UpdateFcm( int deviceId,int userId, string fcmToken)
         {
-            var device = await _repositoryManager.Device.GetDeviceUser(userId, Convert.ToInt32(deviceId), true); 
+            var device = await _repositoryManager.Device.GetDeviceUser(deviceId,userId,  true); 
             if (device != null)
             {
                 device.FcmToken = fcmToken;
@@ -280,16 +257,18 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task ResendToken(int userId)
         {
-            var user = await _repositoryManager.User.GetUserId(userId, false); 
+            var user = await _repositoryManager.User.GetUserId(userId, true); 
             string token = _repositoryManager.Device.GetTokenUser(userId);
-            //var code = Convert.ToInt32(GenerateRandomNo());
-            //user.VerifiedCode = code;
-            await _repositoryManager.SaveAsync();
+            if (token != null && token == user.PasswordHash)
+            {
+                var code = Convert.ToInt32(GenerateRandomNo());
+                user.VerifiedCode = code;
+                await _repositoryManager.SaveAsync();
+            }
         }
-       // DeleteDevicesUserId
         public async Task LogOutDevice(int userId)
         {
-            var devicesUser = await _repositoryManager.Device.GetDevicesUserId(userId);
+            var devicesUser = await _repositoryManager.Device.GetDevicesUserId(userId, false);
             if (devicesUser != null)
             {
                 foreach (var device in devicesUser)
@@ -302,6 +281,14 @@ namespace BusinessLogic.ApiClasses
         public async Task<Device> CheckDeviceToken(string token)
         {
             return await _repositoryManager.Device.CheckDevice(token, false);
+        }
+        public string GenerateRandomNo()
+        {
+            int _min = 1000;
+            int _max = 9999;
+            Random _rdm = new Random();
+            string rrd = _rdm.Next(_min, _max).ToString();
+            return rrd;
         }
     }
 }

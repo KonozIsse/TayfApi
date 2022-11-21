@@ -10,7 +10,7 @@ namespace Contracts
 {
     public interface IImageRepository
     {
-        List<Image> GetProductImages(int productId);
+        Task<List<Image>> GetProductImages(int productId);
         Task<List<Image>> GetImages(ImageCategory category);
         Task<List<Image>> GetImageCategoryByVendor(int vendorId, ImageCategory category);
         void AddImage(Image image);

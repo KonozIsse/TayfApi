@@ -27,7 +27,7 @@ namespace Repository
             {
                 query = query.Where(y => y.ImageType.Equals(ImageType));
             }
-            return await query.FirstOrDefaultAsync();
+            return await query.SingleOrDefaultAsync();
         }
         public async Task<IEnumerable<ImageSetting>> GetImagesStoreId(int vendorId , string category)
         {

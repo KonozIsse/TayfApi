@@ -13,17 +13,12 @@ namespace Entities.DataTransferObjects
     public class StoreDto
     {
         public int Id { get; set; }
-        public Status IsStatus { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Telephone { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public string Url { get; set; }
-        public int? ImageId { get; set; }
         public string Avater { get; set; }
-        public int? DefaultAddressId { get; set; }
-        public List<AddressDto> Addresses { get; set; }
-        public List<ProductsStoreDto> ProductsStores { get; set; }
+        public int? CountryId { get; set; }
        // public List<OrderDto> Orders { get; set; }
 
     }
@@ -31,28 +26,30 @@ namespace Entities.DataTransferObjects
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Telephone { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public Status IsStatus { get; set; }
+        public Status Status { get; set; }
         public string Url { get; set; }
         public string Lang { get; set; }
         public int? ImageId { get; set; }
         public int? CountryId { get; set; }
     }
-    public class UpdateStoreDto : CreateStoreDto
+    public class UpdateStoreDto 
     {
-    }
-    public class ProductsStoreDto
-    {
-        public int VendorId { get; set; }
-        public int ProductId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+        public Status Status { get; set; }
+        public string Url { get; set; }
+        public int? ImageId { get; set; }
+        public int? CountryId { get; set; }
     }
     public class CreateCustomerDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Telephone { get; set; }
+        public string PhoneNumber { get; set; }
         public string Avater { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
@@ -61,11 +58,15 @@ namespace Entities.DataTransferObjects
         public bool? IsSubscribe { get; set; }
         public string SocialImage { get; set; }
         public string SocialId { get; set; }
-        public int? DefaultAddressId { get; set; }
         public int? CountryId { get; set; }
     }
     public class UpdateUserDto : CreateCustomerDto
     {
+    }
+    public class CodeDto
+    {
+        public string PhoneNumber { get; set; }
+        public int? CountryId { get; set; }
         public int? VerifiedCode { get; set; }
     }
 
@@ -92,8 +93,6 @@ namespace Entities.DataTransferObjects
         public string SocialId { get; set; }
         public int? DefaultAddressId { get; set; }
     }
-    
-   
 
     public class ResetPasswordDto
     {

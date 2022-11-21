@@ -75,6 +75,7 @@ namespace WebLayer
             services.AddScoped<OrderBL>();
             services.AddScoped<UserBL>();
             services.AddScoped<LocationTaxBL>();
+            services.AddScoped<ImageUploadServices>();
             services.AddScoped<Util>();
 
            // services.Scan(scan => scan

@@ -10,7 +10,7 @@ namespace Entities.Models
         [ForeignKey(nameof(Images))]
         public int? ImgId { get; set; }
         public Image Images { get; set; }
-        public List<Product> Products { get; set; }
-        public List<CategoriesStore> CategoriesStores { get; set; }
+        public List<Product> Products { get; set; } 
+        //public List<User> Store { get; set; }
     }
 }

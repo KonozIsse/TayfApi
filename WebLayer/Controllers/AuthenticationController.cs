@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLogic.ApiClasses;
 using Contracts;
 using Entities;
 using Entities.DataTransferObjects;
@@ -20,14 +21,14 @@ namespace WebLayer.Controllers
     [ApiController]
     public class AuthenticationController : MyBaseController
     {
-        public AuthenticationController(IServiceProvider serviceProvider) : base(serviceProvider)
+        private readonly UserBL _userBL;
+        public AuthenticationController(IServiceProvider serviceProvider, UserBL userBL) : base(serviceProvider)
         {
-
+            _userBL = userBL;
         }
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromForm] CreateCustomerDto userForRegistration)
         {
-
             var user = _mapper.Map<User>(userForRegistration);
             user.UserName = userForRegistration.FirstName + userForRegistration.LastName;
             user.RoleId = 2;
@@ -40,8 +41,6 @@ namespace WebLayer.Controllers
                 }
                 return BadRequest(ModelState);
             }
-
-            // await _userManager.AddToRolesAsync(user, userForRegistration.Roles);
             return StatusCode(201);
         }
 
@@ -69,10 +68,6 @@ namespace WebLayer.Controllers
             {
                 if (model is null)
                     return BadRequest("No data found!");
-
-                //var userName = User.Identity.Name;
-                //var user = await _userManager.FindByNameAsync(userName);
-                //var user = await _userManager.GetUserAsync(HttpContext.User);
                var user = GetCurrentUser();
                 if (user == null)
                     return BadRequest("No user found!");
