@@ -24,7 +24,6 @@ namespace Entities.DataTransferObjects
     public class  CreateCartDto
     {
         public int Qty { get; set; }
-        public decimal FinalPrice { get; set; }
         public string Notes { get; set; }
         public List<CartProductDto> CartProducts { get; set; }
     }

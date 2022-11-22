@@ -18,10 +18,10 @@ namespace Repository
 
         }
         public async Task<List<Product>> GetAllAcceptedProducts()
-          => await FindByCondition(c => c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false).OrderByDescending(c => c.CreatedAt)
-            .Include(c => c.Category).Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(e => e.WishLists)
-            .Include(c => c.Reviews).ThenInclude(c=>c.Customer).Include(c => c.AttributesProducts).ThenInclude(c=>c.ProductOption)
-            .Include(i=>i.Images).Include(c=>c.Store).ToListAsync();
+          => await FindByCondition(c =>  c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
+            .Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(e => e.WishLists)
+            .Include(c => c.Reviews).Include(c => c.AttributesProducts).Include(i=>i.Images).Include(c=>c.Store)
+            .OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<Product> GetProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Product> GetActiveProductById(int id, bool trackChanges)
@@ -57,8 +57,8 @@ namespace Repository
          => await FindByCondition(c => c.IsPopular == 1 && c.IsStatus == Status.Active, false)
                 .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(pageSize).ToListAsync();
         public async Task<List<Product>> GetLatestPage(int pageSize)
-         => await FindByCondition(c => c.IsStatus == Status.Active, false)
-                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.CreatedAt).Take(pageSize).ToListAsync();
+         => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(i => i.Images).Include(r => r.Reviews)
+            .OrderByDescending(p => p.CreatedAt).Take(pageSize).ToListAsync();
 
         public async Task<List<Product>> SpecialsPage(int pageSize)
           => await FindByCondition(c => c.SpecialProducts.Any(x => x.IsStatus == Status.Active && x.EndDate > DateTime.Now), false)

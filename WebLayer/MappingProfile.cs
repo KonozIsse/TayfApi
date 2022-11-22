@@ -72,11 +72,9 @@ namespace WebLayer
             //MapProductSales
             CreateMap<SaleDto, ProductSales>().ReverseMap();
             CreateMap<CreateSaleDto, ProductSales>().ReverseMap();
-            CreateMap<UpdateSaleDto, ProductSales>().ReverseMap();
             //MapSpecialProducts
             CreateMap<SpecialDto, SpecialProducts>().ReverseMap();
             CreateMap<CreateSpecialDto, SpecialProducts>().ReverseMap();
-            CreateMap<UpdateSpecialDto, SpecialProducts>().ReverseMap();
             //MapAttribute
             CreateMap<AttributeDto, ProductAttribut>().ReverseMap();
             CreateMap<CreateAttributeDto, ProductAttribut>().ReverseMap();

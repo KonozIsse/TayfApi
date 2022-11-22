@@ -62,8 +62,7 @@ namespace WebLayer
             services.ConfigureLoggerService();
             services.AddControllers().AddJsonOptions(
                 options =>
-                options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter())
-                );
+                options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
             services.AddControllers();
             //--------------------------------
 

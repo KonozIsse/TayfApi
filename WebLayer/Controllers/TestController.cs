@@ -14,16 +14,17 @@ namespace WebLayer.Controllers
     [ApiController]
     public class TestController : MyBaseController
     {
-        private readonly HomeBL _homeBL; 
+        private readonly HomeBL _homeBL;
         private readonly NewsBL _newsBL;
         private readonly UserBL _userBL;
         private readonly LocationTaxBL _locationTaxBL;
         private readonly OrderBL _orderBL;
         private readonly ProductBL _productBL;
-         private readonly ImageBL _imageBL;
+        private readonly ImageBL _imageBL;
+        private readonly CartBL _cartBL;
 
-        public TestController(IServiceProvider serviceProvider , HomeBL home, NewsBL news, UserBL userBL, 
-            LocationTaxBL locationTaxBL , ProductBL productBL , OrderBL orderBL , ImageBL imageBL) : base(serviceProvider)
+        public TestController(IServiceProvider serviceProvider, ProductBL productBL  , HomeBL home , NewsBL news, UserBL userBL, 
+            LocationTaxBL locationTaxBL , OrderBL orderBL , ImageBL imageBL , CartBL cartBL) : base(serviceProvider)
         {
             _homeBL = home;
             _newsBL = news;
@@ -32,36 +33,37 @@ namespace WebLayer.Controllers
             _productBL = productBL;
             _orderBL = orderBL;
             _imageBL = imageBL;
+            _cartBL = cartBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add([FromForm] CreateImageDto create)
+        public async Task<IActionResult> add(int id , CreateCartDto create)
         {
-            await _imageBL.AddImage(create);
+            await _cartBL.AddCart(id ,create);
             return StatusCode(201);
         }
         [HttpPost("adduser")]
-        public async Task<IActionResult> addAdd ([FromForm] int id , CreateProductDto create)
+        public async Task<IActionResult> addAdd ( int p , int c , int q)
         {
-            await _productBL.AddProduct(id ,create);
+            await _cartBL.AddProductToCart(p ,c,q);
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update([FromForm] AvaterDto update)
+        public async Task<IActionResult> update( int id  ,int cid, UpdateCartDto update)
         {
-            await _imageBL.UpdateAvatarCustomer(update);
+            await _cartBL.UpdateCart(id , cid, update);
             return NoContent();
         } 
         [HttpDelete("delete")]
-        public async Task<IActionResult> delete(int id)
+        public async Task<IActionResult> delete(int id , int sid)
         {
-            await _userBL.LogOutDevice(id);
+            //await _productBL.DeleteSpecialProduct(id , sid);
             return NoContent();
         }  
         [HttpGet("get")]
-        public IActionResult get(int id)
+        public async Task<IActionResult> get()
         {
-            var langs =   _imageBL.GetListImagesProductIdAsync(id);
+            var langs = await _productBL.GetFlashProds();
             return Ok(langs);
         }
     }

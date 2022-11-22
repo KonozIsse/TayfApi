@@ -34,49 +34,161 @@ namespace BusinessLogic.ApiClasses
             _locationTaxBL = locationTaxBL;
         }
         //Cart------------------------------------------------
-        public async Task<List<CartDto>> GetCartByStore(int customerId)
-        {
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            var cartsDto = _mapper.Map<List<CartDto>>(carts);
-            var cartDto = cartsDto.First();
-            foreach (var cart in carts)
-                if (cart.CartStores != null)
-                {
-                    var voteGrouped = cart.CartStores.GroupBy(x => x.Store)
-                       .Select(x => new
-                       {
-                           x.Key.FirstName,
-                           PriceCount = x.Sum(c => c.FinalPrice)
-                       });
-                    cartDto.StoreGrouped = voteGrouped;
-                }
-            return cartsDto;
-        }
-        public int CartProductInCartCount()
-        {
-            return _repositoryManager.CartProduct.CartCount();
-        }
-        public async Task<List<Cart>> CartCount(int customerId)
-        {
-            return await _repositoryManager.Cart.CartsNotActiveCustomer(customerId);
-        }
-        public async Task<List<CustomerProduct>> GetProductsCustomerId(int customerId)
-        {
-            return await _repositoryManager.CustomerProduct.GetProductsCustomerId(customerId);
-        }
-
         public async Task ChangeActiveStatusCart(int id)
         {
             var cart = await _repositoryManager.Cart.GetCartId(id, true);
             cart.IsStatus = Status.Active;
             await _repositoryManager.SaveAsync();
         }
-        public async Task UpdateCart(int id, UpdateCartDto updateCartDto)
+        public async Task AddCart(int customerId ,CreateCartDto createDto)
+        {
+            var cart = _mapper.Map<Cart>(createDto);
+            cart.CustomerId = customerId;
+            var prod = cart.CartProducts.First().ProductId;
+            var product = await _repositoryManager.Product.GetActiveProductById(prod, true);
+            cart.FinalPrice = Convert.ToDecimal(product.Price * createDto.Qty);
+            //cart.CartStores.Add(new CartStore
+            //{
+            //    StoreId = product.StoreId.Value,
+            //    FinalPrice = cart.FinalPrice
+            //});
+            _repositoryManager.Cart.AddCart(cart);
+            await _repositoryManager.SaveAsync();
+         
+        }
+        public async Task UpdateCart(int id,int custId , UpdateCartDto updateCartDto)
         {
             var cart = await _repositoryManager.Cart.GetCartId(id, true);
+            cart.CustomerId = custId;
+            var prod = cart.CartProducts.First().ProductId;
+            var product = await _repositoryManager.Product.GetActiveProductById(prod, true);
+            cart.FinalPrice = Convert.ToDecimal(product.Price * updateCartDto.Qty);
             _mapper.Map(updateCartDto, cart);
             await _repositoryManager.SaveAsync();
         }
+        public async Task<string> AddProductToCart(int productId, int customerId, int Quantity, int?[] option = null)
+        {
+            var prod = await _repositoryManager.Product.GetProductById(productId, true);
+            var storeId = prod.StoreId;
+            if (prod == null)
+            {
+                return _locService.GetLocalizedStringValue("noproducts");
+            }
+            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
+            var availabalProduct = _productBl.AvailabilityProducts(productId);
+
+            var distinct = _repositoryManager.Attribute.GetDistinctProdCart(productId);
+
+            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
+
+            if (attributs.First() != null)
+            {
+                if (option != null)
+                {
+                    if (option.Count() != distinct) { return _locService.GetLocalizedStringValue("plzchooseoption"); } else { }
+                }
+                else
+                {
+                    return _locService.GetLocalizedStringValue("plzchooseoption");
+                }
+            }
+            else { }
+
+            //Availability
+            var instock = 0;
+            var outstock = 0;
+            var optStr = "";
+            if (option != null)
+            {
+                foreach (var p in option)
+                {
+                    optStr = optStr + p.Value + ",";
+                }
+            }
+            if (option != null)
+            {
+                var instock2 = 0; var outstock2 = 0;
+                var inventories = await _repositoryManager.Inventory.GetAllInventoryByProductIdOption(productId, Convert.ToInt32(optStr));
+                foreach (var inventory in inventories)
+                {
+                    if (inventory.StockType == "in")
+                    {
+                        instock2 += inventory.Stock;
+                    }
+                    if (inventory.StockType == "out")
+                    {
+                        outstock2 += inventory.Stock;
+                    }
+                }
+                int inv0All = instock2 - outstock2;
+                if ((inv0All) >= Quantity) { } else { return _locService.GetLocalizedStringValue("notAvOp"); }
+
+                if (customerProduct != null && (inv0All) < (customerProduct.Quantity + Quantity))
+                {
+                    return _locService.GetLocalizedStringValue("notAvOp");
+                }
+                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId.Value, customerId);
+                if (order != null)
+                {
+                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, order.Id);
+                    if (orderProduct != null)
+                    {
+                        if ((orderProduct.Qty + Quantity) > (inv0All))
+                        {
+                            return _locService.GetLocalizedStringValue("notAvOp");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                int invall;
+                var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+                if (inventories != null && inventories.Count() > 0)
+                {
+                    foreach (var inventory in inventories)
+                    {
+                        if (inventory.StockType == "in")
+                        {
+                            instock += inventory.Stock;
+                        }
+                        if (inventory.StockType == "out")
+                        {
+                            outstock += inventory.Stock;
+                        }
+                    }
+                    invall = instock - outstock;
+                    if (invall >= Quantity) { }
+                    else { return _locService.GetLocalizedStringValue("notAv"); }
+                }
+                else
+                {
+                    return _locService.GetLocalizedStringValue("notAv");
+                }
+                if (customerProduct != null && invall < (customerProduct.Quantity + Quantity))
+                {
+                    return _locService.GetLocalizedStringValue("notAvOp");
+                }
+
+                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId.Value, customerId);
+                if (order != null)
+                {
+                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, order.Id);
+                    if (orderProduct != null)
+                    {
+                        if ((orderProduct.Qty + Quantity) > (invall))
+                        {
+                            return _locService.GetLocalizedStringValue("notAvOp");
+                        }
+                    }
+                }
+            }
+            var createDto = _mapper.Map<CreateCustomerProductDto>(customerProduct);
+            await AddCustomerProduct(productId, createDto);
+
+            return _locService.GetLocalizedStringValue("addedtoCart");
+        }
+       
         public async Task DeleteCartAttributeProduct(int id, int cartAttributeProductId)
         {
             var cartProduct = await _repositoryManager.CartProduct.GetCartProductId(id, false);
@@ -88,6 +200,25 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.CartProduct.DeleteCartProduct(cartProduct);
             await _repositoryManager.SaveAsync();
         }
+        public async Task<List<CartDto>> GetCartByStore(int customerId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            var cartsDto = _mapper.Map<List<CartDto>>(carts);
+            var cartDto = cartsDto.First();
+            foreach (var cart in carts)
+                if (cart.CartStores != null)
+                {
+                    var voteGrouped = cart.CartStores.GroupBy(x => x.Store)
+                       .Select(x => new
+                       {
+                           x.Key.FullName,
+                           PriceCount = x.Sum(c => c.FinalPrice)
+                       });
+                    cartDto.StoreGrouped = voteGrouped;
+                }
+            return cartsDto;
+        }
+       
         public async Task<decimal> AvailableAmountForCart(int cartId, int customerId)
         {
             int availableInventory = 0;
@@ -520,128 +651,7 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
         }
-        public async Task<string> AddProductToCart(int productId, int customerId, int Quantity, int?[] option = null)
-        {
-            var prod = await _repositoryManager.Product.GetProductById(productId, true);
-            var storeId = prod.StoreId;
-            if (prod == null)
-            {
-                return _locService.GetLocalizedStringValue("noproducts");
-            }
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
-            var availabalProduct = _productBl.AvailabilityProducts(productId);
-
-            var distinct = _repositoryManager.Attribute.GetDistinctProdCart(productId);
-
-            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-
-            if (attributs.First() != null)
-            {
-                if (option != null)
-                {
-                    if (option.Count() != distinct) { return _locService.GetLocalizedStringValue("plzchooseoption"); } else { }
-                }
-                else
-                {
-                    return _locService.GetLocalizedStringValue("plzchooseoption");
-                }
-            }
-            else { }
-
-            //Availability
-            var instock = 0;
-            var outstock = 0;
-            var optStr = "";
-            if (option != null)
-            {
-                foreach (var p in option)
-                {
-                    optStr = optStr + p.Value + ",";
-                }
-            }
-            if (option != null)
-            {
-                var instock2 = 0; var outstock2 = 0;
-                var inventories = await _repositoryManager.Inventory.GetAllInventoryByProductIdOption(productId, Convert.ToInt32(optStr));
-                foreach (var inventory in inventories)
-                {
-                    if (inventory.StockType == "in")
-                    {
-                        instock2 += inventory.Stock;
-                    }
-                    if (inventory.StockType == "out")
-                    {
-                        outstock2 += inventory.Stock;
-                    }
-                }
-                int inv0All = instock2 - outstock2;
-                if ((inv0All) >= Quantity) { } else { return _locService.GetLocalizedStringValue("notAvOp"); }
-
-                if (customerProduct != null && (inv0All) < (customerProduct.Quantity + Quantity))
-                {
-                    return _locService.GetLocalizedStringValue("notAvOp");
-                }
-                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
-                if (order != null)
-                {
-                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, order.Id);
-                    if (orderProduct != null)
-                    {
-                        if ((orderProduct.Qty + Quantity) > (inv0All))
-                        {
-                            return _locService.GetLocalizedStringValue("notAvOp");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                int invall;
-                var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
-                if (inventories != null && inventories.Count() > 0)
-                {
-                    foreach (var inventory in inventories)
-                    {
-                        if (inventory.StockType == "in")
-                        {
-                            instock += inventory.Stock;
-                        }
-                        if (inventory.StockType == "out")
-                        {
-                            outstock += inventory.Stock;
-                        }
-                    }
-                    invall = instock - outstock;
-                    if (invall >= Quantity) { }
-                    else { return _locService.GetLocalizedStringValue("notAv"); }
-                }
-                else
-                {
-                    return _locService.GetLocalizedStringValue("notAv");
-                }
-                if (customerProduct != null && invall < (customerProduct.Quantity + Quantity))
-                {
-                    return _locService.GetLocalizedStringValue("notAvOp");
-                }
-
-                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
-                if (order != null)
-                {
-                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, order.Id);
-                    if (orderProduct != null)
-                    {
-                        if ((orderProduct.Qty + Quantity) > (invall))
-                        {
-                            return _locService.GetLocalizedStringValue("notAvOp");
-                        }
-                    }
-                }
-            }
-            var createDto = _mapper.Map<CreateCustomerProductDto>(customerProduct);
-            await AddCustomerProduct(productId, createDto);
-
-            return _locService.GetLocalizedStringValue("addedtoCart");
-        }
+       
 
 
 

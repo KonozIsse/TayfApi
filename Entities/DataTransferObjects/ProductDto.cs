@@ -20,7 +20,10 @@ namespace Entities.DataTransferObjects
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
-        public int StoreId { get; set; }
+        public int CountReviews { get; set; }
+        public int NumLike { get; set; }
+        public int? StoreId { get; set; }
+        public int? AdminId { get; set; }
         public int TypeId { get; set; }
         public string StoreName { get; set; }
         public string StoreImage { get; set; }
@@ -28,7 +31,6 @@ namespace Entities.DataTransferObjects
         public bool IsSpecial { get; set; }
         public bool IsSale { get; set; }
         public short IsFeature { get; set; }
-        public bool? IsFavorite { get; set; }
         public decimal Rate { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
@@ -53,7 +55,9 @@ namespace Entities.DataTransferObjects
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
         public List<CreateImageDto> Images { get; set; }
+        public bool IsSale { get; set; }
         public List<CreateSaleDto> ProductSales { get; set; }
+        public bool IsSpecial { get; set; }
         public List<CreateSpecialDto> SpecialProducts { get; set; }
     }
     public class UpdateProductDto : CreateProductDto
@@ -72,8 +76,6 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public decimal DiscountPrice { get; set; }
-        public DateTime? AddDate { get; set; }
-        public DateTime? LastUpdate { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int ProductId { get; set; }
@@ -82,13 +84,6 @@ namespace Entities.DataTransferObjects
     {
         public decimal DiscountPrice { get; set; }
         public Status IsStatus { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-    }
-    public class UpdateSaleDto
-    {
-        public decimal DiscountPrice { get; set; }
-        public DateTime? LastUpdate { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }
@@ -106,9 +101,5 @@ namespace Entities.DataTransferObjects
         public Status IsStatus { get; set; }
         public DateTime? EndDate { get; set; }
     } 
-    public class UpdateSpecialDto  : CreateSpecialDto
-    {
-    } 
 
-   
 }

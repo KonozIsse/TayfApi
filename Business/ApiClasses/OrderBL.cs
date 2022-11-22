@@ -272,7 +272,7 @@ namespace BusinessLogic.ApiClasses
                         OrderPrice = Convert.ToDecimal(order.OrderPrice),
                         Symbol = currency.Symbol,
                         pcount = count,
-                        FirstName = customer.FirstName,
+                        FirstName = customer.FullName,
                         LastName = customer.LastName,
                         OrderStatusId = order.OrderStatusId,
                         StatusName = state

@@ -10,6 +10,8 @@ namespace Entities.Models
     { 
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        [NotMapped]
+        public string FullName { get { return $"{FirstName} {LastName}"; } }
         public string Avater { get; set; }
         public Status Status { get; set; }
         [Required(AllowEmptyStrings = true)]

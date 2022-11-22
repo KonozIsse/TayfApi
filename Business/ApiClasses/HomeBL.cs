@@ -68,8 +68,8 @@ namespace BusinessLogic.ApiClasses
                 ProductsTopRated = await _productBL.TopRatedPage(),
                 ProductsDailyDeal = await _productBL.DailyDeals(),
                 //products = await _productBL.GetProductsCatId(0, customerId),
-                flash = await _productBL.GetFlashProds(customerId),
-                specialProducts = await _productBL.GetSpecialsProd(customerId),
+                flash = await _productBL.GetFlashProds(),
+                specialProducts = await _productBL.GetSpecialsProd(),
                 stores = await _userBL.GetStores()
             };
             return model;
