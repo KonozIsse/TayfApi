@@ -5,6 +5,7 @@ using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
 using Newtonsoft.Json;
+using Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,3 +117,43 @@ namespace BusinessLogic.ApiClasses
         }
     }
 }
+
+//var cartAttributesDto = cartProductDto.CartAttributeProducts;
+//if (cartAttributesDto != null)
+//{
+//    foreach (var cartAttributDto in cartAttributesDto)
+//    {
+//        var attributes = await _repositoryManager.Attribute.GetAttributesProductId(cartProductDto.ProductId);
+//        var attribut = attributes.Where(c => c.Id == cartAttributDto.AttributesProductId).FirstOrDefault();
+//        if (attribut != null)
+//        {
+//            if (attribut != null && attribut.AttributePrice != 0)
+//            {
+//                if (attribut.PricePrefix == "+")
+//                {
+//                    totalPrice += attribut.AttributePrice;
+//                }
+//                if (attribut.PricePrefix == "-")
+//                {
+//                    if (totalPrice != 0)
+//                    {
+//                        totalPrice -= attribut.AttributePrice;
+//                    }
+//                }
+//            }
+
+//            var cartAttributes = await _repositoryManager.CartAttributeProduct.CartAttributeProducts(cartProductDto.Id);
+
+//            if (cartAttributes.Count == 0)
+//            {
+//                var cartAttribute = _mapper.Map<CartAttributeProduct>(cartAttributDto);
+//                _repositoryManager.CartAttributeProduct.AddCartAttribute(cartAttribute);
+//            }
+//            else
+//            {
+//                var cartAttribut = cartAttributes.First();
+//                _mapper.Map(cartAttributDto, cartAttribut);
+//            }
+//        }
+//    }
+//}

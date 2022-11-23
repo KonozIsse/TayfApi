@@ -13,7 +13,6 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public Status IsStatus { get; set; }
-        public int Qty { get; set; }
         public decimal FinalPrice { get; set; }
         public string Notes { get; set; }
         public int CustomerId { get; set; }
@@ -23,7 +22,6 @@ namespace Entities.DataTransferObjects
     }
     public class  CreateCartDto
     {
-        public int Qty { get; set; }
         public string Notes { get; set; }
         public List<CartProductDto> CartProducts { get; set; }
     }
@@ -33,17 +31,19 @@ namespace Entities.DataTransferObjects
     public class CartStoreDto
     {
         public int StoreId { get; set; }
-        public int CartId { get; set; }
+        public int? CartId { get; set; }
     } 
     public class CartProductDto 
     {
+        public int Id { get; set; }
         public int ProductId { get; set; }
-        public int CartId { get; set; }
+        public int Qty { get; set; }
+        public int? CartId { get; set; }
         public List<CartAttributeProductDto> CartAttributeProducts { get; set; }
     }
     public class CartAttributeProductDto
     {
-        public int CartProductId { get; set; }
+        public int? CartProductId { get; set; }
         public int AttributesProductId { get; set; }
     }
 }

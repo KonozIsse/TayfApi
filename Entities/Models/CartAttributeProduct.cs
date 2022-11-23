@@ -10,7 +10,7 @@ namespace Entities.Models
     public class CartAttributeProduct : BaseEntity
     {
         [ForeignKey(nameof(CartProduct))]
-        public int CartProductId { get; set; }
+        public int? CartProductId { get; set; }
         public CartProduct CartProduct { get; set; }
 
         [ForeignKey(nameof(AttributesProduct))]

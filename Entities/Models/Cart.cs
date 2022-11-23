@@ -4,7 +4,6 @@ namespace Entities.Models
     using System.ComponentModel.DataAnnotations.Schema;
     public class Cart : BaseEntity
     {
-        public int Qty { get; set; }
         public decimal FinalPrice { get; set; }
         public string Notes { get; set; }
         [ForeignKey(nameof(Customer))]

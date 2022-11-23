@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface ICartRepository
     {
-        Task<Cart> GetCustomerProduct(int productId, int customerId);
+        Task<Cart> GetCustomerProduct(int productId, int customerId, bool trackChanges);
         Task<List<Cart>> GetCartsToCustomerId(int customerId);
         Task<List<Cart>> CartsNotActiveCustomer(int customerId);
         Task<Cart> GetCartId(int id, bool trackChanges);

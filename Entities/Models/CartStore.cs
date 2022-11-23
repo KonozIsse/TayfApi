@@ -13,7 +13,7 @@ namespace Entities.Models
         public int StoreId { get; set; }
         public User Store { get; set; } 
         [ForeignKey(nameof(Cart))]
-        public int CartId { get; set; }
+        public int? CartId { get; set; }
         public Cart Cart { get; set; }
         public decimal FinalPrice { get; set; }
     }

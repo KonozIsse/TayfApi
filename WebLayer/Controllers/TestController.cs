@@ -42,9 +42,9 @@ namespace WebLayer.Controllers
             return StatusCode(201);
         }
         [HttpPost("adduser")]
-        public async Task<IActionResult> addAdd ( int p , int c , int q)
+        public async Task<IActionResult> addAdd ( int p ,int id , CreateCustomerProductDto create)
         {
-            await _cartBL.AddProductToCart(p ,c,q);
+            await _cartBL.AddCustomerProduct(p , id , create);
             return StatusCode(201);
         }
 

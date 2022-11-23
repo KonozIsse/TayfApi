@@ -12,8 +12,9 @@ namespace Entities.Models
         [ForeignKey(nameof(Product))]
         public int ProductId { get; set; }
         public Product Product { get; set; }
+        public int Qty { get; set; }
         [ForeignKey(nameof(Cart))]
-        public int CartId { get; set; }
+        public int? CartId { get; set; }
         public Cart Cart { get; set; }
         public List<CartAttributeProduct> CartAttributeProducts { get; set; }
     }

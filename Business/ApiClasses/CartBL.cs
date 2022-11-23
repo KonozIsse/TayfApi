@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using BusinessLogic.ViewModel;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
@@ -7,6 +8,7 @@ using Entities.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Cms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,6 @@ namespace BusinessLogic.ApiClasses
         protected readonly IMapper _mapper;
         private readonly LocService _locService;
         private readonly LocationTaxBL _locationTaxBL;
-
         public CartBL( ProductBL productBl, IRepositoryManager repositoryManager, IMapper mapper, LocService locService, LocationTaxBL locationTaxBL)
         {
             _repositoryManager = repositoryManager;
@@ -42,19 +43,59 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task AddCart(int customerId ,CreateCartDto createDto)
         {
-            var cart = _mapper.Map<Cart>(createDto);
-            cart.CustomerId = customerId;
-            var prod = cart.CartProducts.First().ProductId;
-            var product = await _repositoryManager.Product.GetActiveProductById(prod, true);
-            cart.FinalPrice = Convert.ToDecimal(product.Price * createDto.Qty);
-            //cart.CartStores.Add(new CartStore
-            //{
-            //    StoreId = product.StoreId.Value,
-            //    FinalPrice = cart.FinalPrice
-            //});
-            _repositoryManager.Cart.AddCart(cart);
+            decimal totalPrice = 0;
+            var cartProductDto = createDto.CartProducts.First();
+            var CustomerProduct = await _repositoryManager.Cart.GetCustomerProduct(customerId, cartProductDto.ProductId , true);
+            var product = await _repositoryManager.Product.GetActiveProductById(cartProductDto.ProductId, true);
+            var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(cartProductDto.ProductId);
+            var flash = await _repositoryManager.Sales.GetFlashProductId(cartProductDto.ProductId);
+            if (special != null)
+            {
+                totalPrice = special.SpecialPrice;
+            }
+            else if (flash != null)
+            {
+                totalPrice = flash.DiscountPrice;
+            }
+            else
+            {
+                totalPrice = product.Price;
+            }
+            var cartAttributesDto = cartProductDto.CartAttributeProducts;
+            if (cartAttributesDto != null)
+            {
+                foreach (var cartAttributDto in cartAttributesDto)
+                {
+                    var attributes = await _repositoryManager.Attribute.GetAttributesProductId(cartProductDto.ProductId);
+                    var attribut = attributes.Where(c => c.Id == cartAttributDto.AttributesProductId).FirstOrDefault();
+                    if (attribut != null && attribut.AttributePrice != 0)
+                    {
+                        if (attribut.PricePrefix == "+")
+                        {
+                            totalPrice += attribut.AttributePrice;
+                        }
+                        if (attribut.PricePrefix == "-" && totalPrice != 0)
+                        {
+                                totalPrice -= attribut.AttributePrice;
+                        }
+                    } 
+                }
+            }
+            if (CustomerProduct == null)
+            {
+                var cart = _mapper.Map<Cart>(createDto);
+                cart.CustomerId = customerId;
+                cart.FinalPrice = Convert.ToDecimal(totalPrice * cartProductDto.Qty);
+                _repositoryManager.Cart.AddCart(cart);
+            }
+            else
+            {
+                var cartProduct = await _repositoryManager.CartProduct.GetCartProductId(cartProductDto.Id, false);
+                cartProductDto.Qty = cartProduct.Qty + cartProductDto.Qty;
+                CustomerProduct.FinalPrice = Convert.ToDecimal(totalPrice * cartProductDto.Qty);
+                _mapper.Map(createDto, CustomerProduct);
+            }
             await _repositoryManager.SaveAsync();
-         
         }
         public async Task UpdateCart(int id,int custId , UpdateCartDto updateCartDto)
         {
@@ -62,7 +103,8 @@ namespace BusinessLogic.ApiClasses
             cart.CustomerId = custId;
             var prod = cart.CartProducts.First().ProductId;
             var product = await _repositoryManager.Product.GetActiveProductById(prod, true);
-            cart.FinalPrice = Convert.ToDecimal(product.Price * updateCartDto.Qty);
+            var cartProductDto = updateCartDto.CartProducts.First();
+            cart.FinalPrice = Convert.ToDecimal(product.Price * cartProductDto.Qty);
             _mapper.Map(updateCartDto, cart);
             await _repositoryManager.SaveAsync();
         }
@@ -184,11 +226,10 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             var createDto = _mapper.Map<CreateCustomerProductDto>(customerProduct);
-            await AddCustomerProduct(productId, createDto);
+            await AddCustomerProduct(productId , customerId, createDto);
 
             return _locService.GetLocalizedStringValue("addedtoCart");
         }
-       
         public async Task DeleteCartAttributeProduct(int id, int cartAttributeProductId)
         {
             var cartProduct = await _repositoryManager.CartProduct.GetCartProductId(id, false);
@@ -218,7 +259,6 @@ namespace BusinessLogic.ApiClasses
                 }
             return cartsDto;
         }
-       
         public async Task<decimal> AvailableAmountForCart(int cartId, int customerId)
         {
             int availableInventory = 0;
@@ -263,7 +303,7 @@ namespace BusinessLogic.ApiClasses
                     }
                 }
                 availableInventory = instock - outstock;
-                if (cart != null && availableInventory < cart.Qty)
+                if (cart != null && availableInventory < cart.CartProducts.First().Qty)
                 {
                     return -1;
                 }
@@ -299,7 +339,7 @@ namespace BusinessLogic.ApiClasses
                         }
                     }
                     availableInventory = instock - outstock;
-                    if (cart != null && availableInventory < cart.Qty)
+                    if (cart != null && availableInventory < cart.CartProducts.First().Qty)
                     {
                         return -1;
                     }
@@ -351,7 +391,7 @@ namespace BusinessLogic.ApiClasses
                     }
                 }
                 availableInventory = instock - outstock;
-                if (cart != null && availableInventory < cart.Qty)
+                if (cart != null && availableInventory < cart.CartProducts.First().Qty)
                 {
                     return -1;
                 }
@@ -387,7 +427,7 @@ namespace BusinessLogic.ApiClasses
                         }
                     }
                     availableInventory = instock - outstock;
-                    if (cart != null && availableInventory < cart.Qty)
+                    if (cart != null && availableInventory < cart.CartProducts.First().Qty)
                     {
                         return -1;
                     }
@@ -438,7 +478,6 @@ namespace BusinessLogic.ApiClasses
             }
             return total;
         }
-
         public async Task<decimal> GetCartWithCoupon(int storeId, int customerId, string code)
         {
             decimal total = 0;
@@ -586,9 +625,8 @@ namespace BusinessLogic.ApiClasses
             }
             return tot;
         }
-        public async Task AddCustomerProduct(int productId, CreateCustomerProductDto updateDto)
+        public async Task AddCustomerProduct(int productId,int customerId, CreateCustomerProductDto updateDto)
         {
-            var customerId = 0 /* GetCurrentUserId()*/;
             var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
             var flash = await _repositoryManager.Sales.GetFlashProductId(productId);
@@ -602,45 +640,47 @@ namespace BusinessLogic.ApiClasses
             }
             else
             {
-                updateDto.FinalPrice = customerProduct.FinalPrice.Value;
+                 updateDto.FinalPrice = customerProduct.FinalPrice.Value;
             }
             if (customerProduct == null)
             {
-                var customerAttributesProducts = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(customerProduct.Id);
-                if (customerAttributesProducts != null && customerAttributesProducts.Count() > 0)
+                if(updateDto.CustomerAttributesProducts != null)
                 {
-                    foreach (var item in customerAttributesProducts)
+                    var customerAttributesProducts = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(customerProduct.Id);
+                    if (customerAttributesProducts != null)
                     {
-                        var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-
-                        var attribut = attributs.Where(r => r.Id == item.AttributesProductId).FirstOrDefault();
-                        if (attribut != null)
+                        foreach (var item in customerAttributesProducts)
                         {
-                            if (attribut != null && attribut.AttributePrice != 0)
+                            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
+                            var attribut = attributs.Where(r => r.Id == item.AttributesProductId).FirstOrDefault();
+                            if (attribut != null)
                             {
-                                if (attribut.PricePrefix == "+")
+                                if (attribut != null && attribut.AttributePrice != 0)
                                 {
-                                    updateDto.FinalPrice += attribut.AttributePrice;
-                                }
-                                if (attribut.PricePrefix == "-")
-                                {
-                                    if (updateDto.FinalPrice != 0)
+                                    if (attribut.PricePrefix == "+")
                                     {
-                                        updateDto.FinalPrice -= attribut.AttributePrice;
+                                        updateDto.FinalPrice += attribut.AttributePrice;
+                                    }
+                                    if (attribut.PricePrefix == "-")
+                                    {
+                                        if (updateDto.FinalPrice != 0)
+                                        {
+                                            updateDto.FinalPrice -= attribut.AttributePrice;
+                                        }
                                     }
                                 }
+                                _repositoryManager.CustomerAttributesProduct.AddAttributeCustomerProduct(item);
+                                await _repositoryManager.SaveAsync();
                             }
-
-                            _repositoryManager.CustomerAttributesProduct.AddAttributeCustomerProduct(item);
+                            customerProduct.FinalPrice = updateDto.FinalPrice * updateDto.Quantity;
                             await _repositoryManager.SaveAsync();
-                        }
-                        customerProduct.FinalPrice = updateDto.FinalPrice * updateDto.Quantity;
-                        await _repositoryManager.SaveAsync();
 
+                        }
                     }
                 }
-                customerProduct.FinalPrice = updateDto.FinalPrice * updateDto.Quantity;
-                _repositoryManager.CustomerProduct.AddCustomerProduct(customerProduct);
+                var entity = _mapper.Map<CustomerProduct>(updateDto);
+                entity.FinalPrice = updateDto.FinalPrice * updateDto.Quantity;
+                _repositoryManager.CustomerProduct.AddCustomerProduct(entity);
                 await _repositoryManager.SaveAsync();
             }
             else
@@ -652,11 +692,6 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
         }
        
-
-
-
-
-
         /*
         public async Task<string> AddProductToCart(int productId, UpdateCustomerProductDto updateDto)
         {

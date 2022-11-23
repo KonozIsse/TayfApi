@@ -94,16 +94,9 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Categories.DeleteCategory(MainCategory);
             await _repositoryManager.SaveAsync();
         }
-        public async Task EditMainCategory (int id, UpdateCategoryDto updateDto)
+        public async Task EditCategory (int id, UpdateCategoryDto updateDto)
         {
             var category = await _repositoryManager.Categories.GetCategoryById(id, true);
-            category.MainCategoryId = 0;
-            _mapper.Map(updateDto, category);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task EditSubCategory (int id,int mainId , UpdateCategoryDto updateDto)
-        {
-            var category = await _repositoryManager.Categories.GetCategoryIdMainId(id, mainId, true);
             _mapper.Map(updateDto, category);
             await _repositoryManager.SaveAsync();
         }
@@ -350,7 +343,7 @@ namespace BusinessLogic.ApiClasses
                 return new List<ProductVM>();
             }
         }
-        public async Task<List<ProductVM>> GetAllProductsCatId(int catId)
+        public async Task<List<ProductVM>> GetProductsCatId(int catId)
         {
             var products = await GetProducts();
             var productsCatId = products.Where(c => c.CategoryId == catId).ToList();

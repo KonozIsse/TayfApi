@@ -12,6 +12,7 @@ namespace Contracts
         Task<CartAttributeProduct> CartAttributeProductId(int id, bool trackChanges);
         Task<List<CartAttributeProduct>> CartAttributeProducts(int cartProductId);
         Task<List<CartAttributeProduct>> CartAttributeProductsCartId(int cartId);
+        void AddCartAttribute(CartAttributeProduct cartAttribute);
         Task DeleteCartAttributeProductList(List<int> Ids);
     }
 }

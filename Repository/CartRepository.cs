@@ -16,9 +16,9 @@ namespace Repository
         {
 
         }
-        public async Task<Cart> GetCustomerProduct(int productId, int customerId)
+        public async Task<Cart> GetCustomerProduct(int productId, int customerId , bool trackChanges)
         => await FindByCondition(x => x.CustomerId == customerId && x.CartProducts.Any(c=>c.ProductId == productId) 
-        && x.IsStatus == Status.Active ,false).FirstOrDefaultAsync();
+        && x.IsStatus == Status.Active ,trackChanges).FirstOrDefaultAsync();
         public async Task<List<Cart>> CartsNotActiveCustomer(int customerId)
          => await FindByCondition(x => x.CustomerId == customerId && x.IsStatus == Status.NotActive, false).ToListAsync();
          public async Task<List<Cart>> GetCartsToCustomerId(int customerId)
