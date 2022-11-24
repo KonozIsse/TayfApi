@@ -73,7 +73,15 @@ namespace BusinessLogic.ApiClasses
         {
             var order = _mapper.Map<Order>(createOrderDto);
             order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-            order.OrderStatusId = 1;
+            order.OrderStatusId = 2;
+            //order.CustomerId = 2;
+            //order.CurrencyId = 1;
+            //order.StoreId = 1;
+            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+            if (coupon != null)
+            {
+                coupon.CouponCode = createOrderDto.CouponCode;
+            }
             _repositoryManager.Order.CreateOrder(order);
             try
             {
@@ -84,14 +92,14 @@ namespace BusinessLogic.ApiClasses
         public async Task OrderPending(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 1;
+            order.OrderStatusId = 2;
             await _repositoryManager.SaveAsync();
         }
 
         public async Task OrderComplete(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 2;
+            order.OrderStatusId = 3;
             await _repositoryManager.SaveAsync();
         }
         public async Task OrderCancal(int id)
@@ -129,8 +137,8 @@ namespace BusinessLogic.ApiClasses
         {
             var order = await _repositoryManager.Order.GetActiveOrderId(updateOderDto.Id, true);
             _mapper.Map(updateOderDto, order);
-            var coupon = await _repositoryManager.Coupon.GetCouponIdNotFinished(updateOderDto.CouponId.Value);
-            if (updateOderDto.CouponId.Value != 0)
+            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(updateOderDto.CouponCode);
+            if (coupon != null)
             {
                 order.Coupon.CouponCode = code;
                 order.Coupon.CouponAmount = amount;
@@ -146,7 +154,7 @@ namespace BusinessLogic.ApiClasses
 
             await _repositoryManager.SaveAsync();
         }
-        public async Task UpdateStatusOrder(/*UpdateOderDto updateOderDto, */int id, int vendorId, int adminId)
+        public async Task UpdateStatusOrder(/*UpdateOderDto updateOderDto, */ int id, int vendorId, int adminId)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
             // _mapper.Map(updateOderDto, order);
@@ -286,7 +294,8 @@ namespace BusinessLogic.ApiClasses
         public async Task AddCoupon(CreateCouponDto createCouponDto)
         {
             var coupon = _mapper.Map<Coupon>(createCouponDto);
-           // coupon.StoreId = GetCurrentUserId();
+            coupon.StoreId = 1;
+            coupon.Product = createCouponDto.Products == null ? null : string.Join(",", createCouponDto.Products);
             _repositoryManager.Coupon.AddCoupon(coupon);
             await _repositoryManager.SaveAsync();
         }
@@ -299,6 +308,8 @@ namespace BusinessLogic.ApiClasses
         public async Task UpdateCoupon(int id, UpdateCouponDto updateCouponDto)
         {
             var coupon = await _repositoryManager.Coupon.GetCouponId(id, true);
+            coupon.StoreId = 1;
+            coupon.Product = updateCouponDto.Products == null ? null : string.Join(",", updateCouponDto.Products);
             _mapper.Map(updateCouponDto, coupon);
             await _repositoryManager.SaveAsync();
         }

@@ -39,6 +39,8 @@ namespace Repository
 
         public async Task<List<Product>> GetProductsTOStoreId(int storeId)
         => await FindByCondition(c => c.StoreId == storeId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        public async Task<Product> GetProductStore( int productId ,int storeId )
+       => await FindByCondition(c => c.Id == productId && c.StoreId == storeId && c.IsStatus == Status.Active, false).FirstOrDefaultAsync();
         public async Task<List<Product>> GetAllProductLikeCustomersId(int customerId)
         => await FindByCondition(c => c.WishLists.Any(c => c.CustomerId == customerId), false).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)

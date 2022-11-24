@@ -9,7 +9,6 @@ namespace Entities.Models
         [ForeignKey(nameof(Customer))]
         public int CustomerId { get; set; }
         public User Customer { get; set; }
-        public List<CartStore> CartStores { get; set; }
         public List<CartProduct> CartProducts { get; set; }
     }
 }

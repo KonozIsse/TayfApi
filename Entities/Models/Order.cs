@@ -48,7 +48,6 @@ namespace Entities.Models
         [ForeignKey(nameof(Currency))]
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
-
         public List<OrderProduct> OrderProducts { get; set; }
     }
 }

@@ -36,22 +36,22 @@ namespace WebLayer.Controllers
             _cartBL = cartBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add(int id , CreateCartDto create)
+        public async Task<IActionResult> add( CreateOrderDto create)
         {
-            await _cartBL.AddCart(id ,create);
+            await _orderBL.AddOrder(create);
             return StatusCode(201);
         }
         [HttpPost("adduser")]
-        public async Task<IActionResult> addAdd ( int p ,int id , CreateCustomerProductDto create)
+        public async Task<IActionResult> addAdd ( CreateCouponDto create)
         {
-            await _cartBL.AddCustomerProduct(p , id , create);
+            await _orderBL.AddCoupon( create);
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update( int id  ,int cid, UpdateCartDto update)
+        public async Task<IActionResult> update( int id  ,UpdateCouponDto update)
         {
-            await _cartBL.UpdateCart(id , cid, update);
+            await _orderBL.UpdateCoupon(id , update);
             return NoContent();
         } 
         [HttpDelete("delete")]
@@ -61,9 +61,15 @@ namespace WebLayer.Controllers
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get()
+        public async Task<IActionResult> get(int id , int cutId , string code)
         {
-            var langs = await _productBL.GetFlashProds();
+            var langs = await _cartBL.GetTotalCart(id , cutId , code);
+            return Ok(langs);
+        }
+        [HttpGet("get2")]
+        public async Task<IActionResult> get2(int id, int cutId)
+        {
+            var langs = await _cartBL.AvailableAmountForCart(id , cutId);
             return Ok(langs);
         }
     }

@@ -534,7 +534,7 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Option.DeleteOption(option);
             await _repositoryManager.SaveAsync();
         }
-        // test not finish
+        //test not finish
         public async Task<decimal> getOptionsOrdersTotalPrice(int productId, int orderId)
         {
             decimal tot = 0;

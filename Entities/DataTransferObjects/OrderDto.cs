@@ -38,7 +38,7 @@ namespace Entities.DataTransferObjects
        // public List<ProductDto> Products { get; set; }
         public int DeliveryTimeId { get; set; }
         public int AddressId { get; set; }
-        public int? CouponId { get; set; }
+        public string CouponCode { get; set; }
         public decimal TotalTax { get; set; }
         public decimal OrderPrice { get; set; }
     }

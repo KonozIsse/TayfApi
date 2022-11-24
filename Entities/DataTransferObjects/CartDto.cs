@@ -16,23 +16,15 @@ namespace Entities.DataTransferObjects
         public decimal FinalPrice { get; set; }
         public string Notes { get; set; }
         public int CustomerId { get; set; }
-        public List<CartStoreDto> CartStores { get; set; }
         public List<CartProductDto> CartProducts { get; set; }
         public object StoreGrouped { get; set; }
     }
     public class  CreateCartDto
     {
+        public int Id { get; set; }
         public string Notes { get; set; }
         public List<CartProductDto> CartProducts { get; set; }
     }
-    public class UpdateCartDto : CreateCartDto
-    {
-    } 
-    public class CartStoreDto
-    {
-        public int StoreId { get; set; }
-        public int? CartId { get; set; }
-    } 
     public class CartProductDto 
     {
         public int Id { get; set; }
@@ -43,6 +35,7 @@ namespace Entities.DataTransferObjects
     }
     public class CartAttributeProductDto
     {
+        public int Id { get; set; }
         public int? CartProductId { get; set; }
         public int AttributesProductId { get; set; }
     }

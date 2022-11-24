@@ -13,6 +13,7 @@ namespace Entities.Models
         public int ProductId { get; set; }
         public Product Product { get; set; }
         public int Qty { get; set; }
+        public int StoreId { get; set; }
         [ForeignKey(nameof(Cart))]
         public int? CartId { get; set; }
         public Cart Cart { get; set; }

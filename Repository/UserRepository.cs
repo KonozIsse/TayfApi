@@ -62,7 +62,7 @@ namespace Repository
         public async Task<IEnumerable<User>> GetAllStores (bool trackChanges)
         => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, trackChanges)
             .Include(c=>c.Addresses).Include(c=>c.StoreOrders).ToListAsync();
-        public async Task<User> GetStoreId (int id)
+        public async Task<User> GetStoreId(int id)
        => await FindByCondition(c =>c.Id == id && c.RoleId == 3 && c.Status == Status.Active, false)
             .Include(c=>c.Products).Include(c=>c.Addresses).FirstOrDefaultAsync();
         public async Task<IEnumerable<User>> Get10Stores()

@@ -32,7 +32,7 @@ namespace Entities.DataTransferObjects
         public string DiscountType { get; set; }
         public decimal CouponAmount { get; set; }
         public DateTime? ExpiryDate { get; set; }
-        public List<int> ProductIds { get; set; }
+        public List<string> Products { get; set; }
     }
     public class UpdateCouponDto: CreateCouponDto
     {

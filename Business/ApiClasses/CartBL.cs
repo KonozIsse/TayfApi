@@ -35,6 +35,26 @@ namespace BusinessLogic.ApiClasses
             _locationTaxBL = locationTaxBL;
         }
         //Cart------------------------------------------------
+        public async Task<decimal> GetTotalCartsCustomer(int customerId)
+        {
+            decimal total = 0;
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            if (carts.Count() > 0)
+            {
+                total = Convert.ToDecimal(carts.Sum(t => t.FinalPrice));
+            }
+            return total;
+        }
+        public async Task<decimal> GetTotalCartsStore (int storeId)
+        {
+            decimal total = 0;
+            var carts = await _repositoryManager.Cart.GetCartsToStoreId(storeId);
+            if (carts.Count() > 0)
+            {
+                total = Convert.ToDecimal(carts.Sum(t => t.FinalPrice));
+            }
+            return total;
+        }
         public async Task ChangeActiveStatusCart(int id)
         {
             var cart = await _repositoryManager.Cart.GetCartId(id, true);
@@ -45,7 +65,6 @@ namespace BusinessLogic.ApiClasses
         {
             decimal totalPrice = 0;
             var cartProductDto = createDto.CartProducts.First();
-            var CustomerProduct = await _repositoryManager.Cart.GetCustomerProduct(customerId, cartProductDto.ProductId , true);
             var product = await _repositoryManager.Product.GetActiveProductById(cartProductDto.ProductId, true);
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(cartProductDto.ProductId);
             var flash = await _repositoryManager.Sales.GetFlashProductId(cartProductDto.ProductId);
@@ -76,36 +95,29 @@ namespace BusinessLogic.ApiClasses
                         }
                         if (attribut.PricePrefix == "-" && totalPrice != 0)
                         {
-                                totalPrice -= attribut.AttributePrice;
+                            totalPrice -= attribut.AttributePrice;
                         }
                     } 
                 }
             }
-            if (CustomerProduct == null)
+            //var store = await _repositoryManager.User.GetUserId(product.StoreId.Value , false);
+            var cart = await _repositoryManager.Cart.GetCartId(createDto.Id, true);
+            if (cart == null)
             {
-                var cart = _mapper.Map<Cart>(createDto);
-                cart.CustomerId = customerId;
-                cart.FinalPrice = Convert.ToDecimal(totalPrice * cartProductDto.Qty);
-                _repositoryManager.Cart.AddCart(cart);
+                var addCart = _mapper.Map<Cart>(createDto);
+                addCart.CustomerId = customerId;
+                addCart.CartProducts.First().StoreId = product.StoreId.Value;    
+                addCart.FinalPrice = Convert.ToDecimal(totalPrice * cartProductDto.Qty);
+                _repositoryManager.Cart.AddCart(addCart);
             }
             else
             {
                 var cartProduct = await _repositoryManager.CartProduct.GetCartProductId(cartProductDto.Id, false);
+                cartProduct.StoreId = product.StoreId.Value;
                 cartProductDto.Qty = cartProduct.Qty + cartProductDto.Qty;
-                CustomerProduct.FinalPrice = Convert.ToDecimal(totalPrice * cartProductDto.Qty);
-                _mapper.Map(createDto, CustomerProduct);
+                cart.FinalPrice = Convert.ToDecimal(totalPrice * cartProductDto.Qty);
+                _mapper.Map(createDto, cart);
             }
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateCart(int id,int custId , UpdateCartDto updateCartDto)
-        {
-            var cart = await _repositoryManager.Cart.GetCartId(id, true);
-            cart.CustomerId = custId;
-            var prod = cart.CartProducts.First().ProductId;
-            var product = await _repositoryManager.Product.GetActiveProductById(prod, true);
-            var cartProductDto = updateCartDto.CartProducts.First();
-            cart.FinalPrice = Convert.ToDecimal(product.Price * cartProductDto.Qty);
-            _mapper.Map(updateCartDto, cart);
             await _repositoryManager.SaveAsync();
         }
         public async Task<string> AddProductToCart(int productId, int customerId, int Quantity, int?[] option = null)
@@ -233,31 +245,17 @@ namespace BusinessLogic.ApiClasses
         public async Task DeleteCartAttributeProduct(int id, int cartAttributeProductId)
         {
             var cartProduct = await _repositoryManager.CartProduct.GetCartProductId(id, false);
-
-            var cartAttributeProduct = await _repositoryManager.CartAttributeProduct.CartAttributeProducts(cartAttributeProductId);
-            var cartAttributeProductList = cartAttributeProduct.Select(c => c.Id).ToList();
-            await _repositoryManager.CartAttributeProduct.DeleteCartAttributeProductList(cartAttributeProductList);
-
-            _repositoryManager.CartProduct.DeleteCartProduct(cartProduct);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task<List<CartDto>> GetCartByStore(int customerId)
-        {
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            var cartsDto = _mapper.Map<List<CartDto>>(carts);
-            var cartDto = cartsDto.First();
-            foreach (var cart in carts)
-                if (cart.CartStores != null)
+            if(cartProduct != null)
+            {
+                var cartAttributeProduct = await _repositoryManager.CartAttributeProduct.CartAttributeProducts(cartAttributeProductId);
+                if (cartAttributeProduct != null)
                 {
-                    var voteGrouped = cart.CartStores.GroupBy(x => x.Store)
-                       .Select(x => new
-                       {
-                           x.Key.FullName,
-                           PriceCount = x.Sum(c => c.FinalPrice)
-                       });
-                    cartDto.StoreGrouped = voteGrouped;
+                    var cartAttributeProductList = cartAttributeProduct.Select(c => c.Id).ToList();
+                    await _repositoryManager.CartAttributeProduct.DeleteCartAttributeProductList(cartAttributeProductList);
                 }
-            return cartsDto;
+                _repositoryManager.CartProduct.DeleteCartProduct(cartProduct);
+            }
+            await _repositoryManager.SaveAsync();
         }
         public async Task<decimal> AvailableAmountForCart(int cartId, int customerId)
         {
@@ -307,7 +305,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     return -1;
                 }
-                var storeId = cart.CartStores.First().StoreId;
+                var storeId = cart.CartProducts.First().StoreId;
                 var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
                 if (order != null)
                 {
@@ -343,7 +341,7 @@ namespace BusinessLogic.ApiClasses
                     {
                         return -1;
                     }
-                    var storeId = cart.CartStores.First().StoreId;
+                    var storeId = cart.CartProducts.First().StoreId;
                     var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
                     if (order != null)
                     {
@@ -370,9 +368,11 @@ namespace BusinessLogic.ApiClasses
             var instock = 0;
             var outstock = 0;
             var cart = await _repositoryManager.Cart.GetCartId(cartId, false);
-            int productId = cart.CartProducts.Select(c => c.ProductId).First();
-
-            var cartProduct = await _repositoryManager.CartProduct.GetCartIdProductId(productId, cartId);
+            cart.Id = cartId;
+            cart.CustomerId = customerId;
+           
+            var cartProduct = await _repositoryManager.CartProduct.GetCartIdProductId(cart.CartProducts.First().ProductId, cartId);
+            int productId = cart.CartProducts.First().ProductId;
             int optionId = cartProduct.CartAttributeProducts.Select(c => c.AttributesProduct).First().OptionId;
             int valueId = cartProduct.CartAttributeProducts.Select(c => c.AttributesProduct).First().ValueId;
             var attribute = await _repositoryManager.Attribute.GetProductOptionValue(productId, optionId, valueId);
@@ -395,7 +395,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     return -1;
                 }
-                var storeId = cart.CartStores.First().StoreId;
+                var storeId = cart.CartProducts.First().StoreId;
                 var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
                 if (order != null)
                 {
@@ -431,7 +431,7 @@ namespace BusinessLogic.ApiClasses
                     {
                         return -1;
                     }
-                    var storeId = cart.CartStores.First().StoreId;
+                    var storeId = cart.CartProducts.First().StoreId;
                     var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
                     if (order != null)
                     {
@@ -455,110 +455,87 @@ namespace BusinessLogic.ApiClasses
         public async Task<decimal> GetTotalCart(int storeId, int customerId, string code)
         {
             decimal total = 0;
-            var customerCarts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            var cart = carts.First();
+            var cartProduct = await _repositoryManager.CartProduct.GetAllCartProductToCatId(cart.Id);
+            var cartPro = cartProduct.First();
             if (storeId != 0)
             {
-                customerCarts = customerCarts.Where(c => c.CartStores.Any(c => c.StoreId == storeId)).ToList();
+                 cartProduct.Where(c => c.StoreId == storeId).ToList();
             }
-            if (customerCarts.Count() > 0)
+            if (carts.Count() > 0)
             {
-                foreach (var cart in customerCarts)
+                foreach (var item in carts)
                 {
-                    total = total + Convert.ToDecimal(cart.FinalPrice);
+                    total = total + Convert.ToDecimal(item.FinalPrice);
                 }
             }
             if (code != null)
             {
-                total = await GetCartWithCoupon(storeId, customerId, code);
+                var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(code);
+                if(coupon != null)
+                {
+                    if (coupon.DiscountType == "fixed_cart")
+                    {
+                        if (total > coupon.CouponAmount)
+                        {
+                            total = total - Convert.ToDecimal(coupon.CouponAmount);
+                        }
+                    }
+                    else if (coupon.DiscountType == "percent")
+                    {
+                        if (total > 0)
+                        {
+                            total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
+                        }
+                    }
+                    else if (coupon.DiscountType == "fixed_product")
+                    {
+                        total = 0;
+                        foreach (var item in carts)
+                        {
+                            foreach(var item2 in cartProduct)
+                            {
+                                var product = await _repositoryManager.Product.GetProductById(item2.ProductId, false);
+                                if (coupon.Product.Contains(item2.ProductId.ToString()))
+                                {
+                                    var newTotal = Convert.ToDecimal(product.Price) - Convert.ToDecimal(coupon.CouponAmount);
+                                    total = total + newTotal;
+                                }
+                                else
+                                {
+                                    total = total + Convert.ToDecimal(product.Price);
+                                }
+                            }
+                        }
+                    }
+                    else if (coupon.DiscountType == "percent_product")
+                    {
+                        total = 0;
+                        foreach (var item in carts)
+                        {
+                            foreach (var item2 in cartProduct)
+                            {
+                                var product = await _repositoryManager.Product.GetProductById(item2.ProductId, false);
+                                if (coupon.Product.Contains(item2.ProductId.ToString()))
+                                {
+                                    decimal newval = Convert.ToDecimal(product.Price) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
+                                    total = total + newval;
+                                }
+                                else
+                                {
+                                    total = total + Convert.ToDecimal(product.Price);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             decimal tax = await _locationTaxBL.GetTax(customerId);
             if (tax != 0)
             {
                 total = total + ((total * tax) / 100);
             }
-            return total;
-        }
-        public async Task<decimal> GetCartWithCoupon(int storeId, int customerId, string code)
-        {
-            decimal total = 0;
-            var customerCarts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            if (storeId != 0)
-            {
-                customerCarts = customerCarts.Where(c => c.CartStores.Any(c => c.StoreId == storeId)).ToList();
-            }
-            if (customerCarts.Count() > 0)
-            {
-                foreach (var cart in customerCarts)
-                {
-                    total = total + Convert.ToDecimal(cart.FinalPrice);
-                }
-            }
-
-            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(code);
-            if (coupon == null)
-            {
-                return total;
-            }
-            else
-            {
-                if (coupon.DiscountType == "fixed_cart")
-                {
-                    if (total < coupon.CouponAmount)
-                    {
-                    }
-                    else
-                    {
-                        total = total - Convert.ToDecimal(coupon.CouponAmount);
-                    }
-
-                }
-                else if (coupon.DiscountType == "percent")
-                {
-                    if (total > 0)
-                    {
-                        total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
-                    }
-                    else
-                    {
-                    }
-                }
-                else if (coupon.DiscountType == "fixed_product")
-                {
-                    total = 0;
-                    foreach (var cart in customerCarts)
-                    {
-                        string productId = cart.CartProducts.First().ProductId.ToString();
-                        if (coupon.Product.Contains(productId))
-                        {
-                            decimal newTotal = Convert.ToDecimal(cart.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
-                            total = total + newTotal;
-                        }
-                        else
-                        {
-                            total = total + Convert.ToDecimal(cart.FinalPrice);
-                        }
-                    }
-                }
-                else if (coupon.DiscountType == "percent_product")
-                {
-                    total = 0;
-                    foreach (var cart in customerCarts)
-                    {
-                        string productId = cart.CartProducts.First().ProductId.ToString();
-                        if (coupon.Product.Contains(productId))
-                        {
-                            decimal newval = Convert.ToDecimal(cart.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
-                            total = total + newval;
-                        }
-                        else
-                        {
-                            total = total + Convert.ToDecimal(cart.FinalPrice);
-                        }
-                    }
-                }
-            }
-            decimal tax = await _locationTaxBL.GetTax(customerId);
-            total = total + ((total * tax) / 100);
             return total;
         }
         public async Task<string> GetValueCodeCoupon(int customerId, string code, Currency currency)
@@ -692,125 +669,5 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
         }
        
-        /*
-        public async Task<string> AddProductToCart(int productId, UpdateCustomerProductDto updateDto)
-        {
-            var customerId = GetCurrentUserId();
-            if (productId == 0)
-            {
-                return _locService.GetLocalizedStringValue("NoProducts");
-            }
-            var product = await _repositoryManager.Product.GetProductById(productId, true);
-            if (product == null)
-            {
-                return _locService.GetLocalizedStringValue("NoProducts");
-            }
-            product.CustomerProducts.Select(c => c.CustomerId == customerId);
-            // await AddCartProduct(productId, updateDto);
-            return _locService.GetLocalizedStringValue("AddedToCart");
-        }
-        public async Task AddCustomerProductCart3(CreateCustomerProductDto createDto, int productId, int customerId)
-        {
-            var customerProduct = _mapper.Map<CustomerProduct>(createDto);
-            var product = await _repositoryManager.Product.GetProductById(productId, true);
-            var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
-            var flash = await _repositoryManager.Sales.GetFlashProductId(productId);
-            if (product != null)
-            {
-                if (special != null)
-                {
-                    createDto.FinalPrice = special.SpecialPrice;
-                }
-                else if (flash != null)
-                {
-                    createDto.FinalPrice = flash.DiscountPrice;
-                }
-                else
-                {
-                    createDto.FinalPrice = product.Price;
-                }
-               
-                var attributes = customerProduct.CustomerAttributesProducts.Select(c=>c.AttributesProduct);
-                var option = createDto.CustomerAttributesProducts;
-                if (option != null && option.Count() > 0)
-                {
-                    foreach (var opt in option)
-                    {
-                        var attribute = attributes.Where(r => r.Id == opt.AttributesProductId).FirstOrDefault();
-                        if (attribute != null && attribute.AttributePrice != 0)
-                        {
-                            if (attribute.PricePrefix == "+")
-                            {
-                                createDto.FinalPrice += attribute.AttributePrice;
-                            }
-                            if (attribute.PricePrefix == "-")
-                            {
-                                if (createDto.FinalPrice != 0)
-                                {
-                                    createDto.FinalPrice -= attribute.AttributePrice;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (customerProduct == null)
-            {
-                customerProduct.FinalPrice = createDto.FinalPrice * createDto.Quantity;
-                await _productApi.AddCustomerProduct(createDto, customerId, productId);
-            }
-            else 
-            {
-                customerProduct.Quantity = customerProduct.Quantity + createDto.Quantity;
-                customerProduct.FinalPrice = customerProduct.Quantity * createDto.FinalPrice;
-                _mapper.Map(createDto, customerProduct);
-            }
-
-            await _repositoryManager.SaveAsync();
-        }
-        */
-
-        //ggg------------------------------------------------
-        //public async Task<List<CartDto>> GetCart(int storeId, int userId, Currency curr)
-        //{
-        //    var cart = await _repositoryManager.Cart.GetCartsToCustomerId(userId);
-
-        //    if (storeId != 0)
-        //    {
-        //        cart.Where(r => r.CartStores.Any(c=>c.StoreId == storeId)).ToList();
-        //    }
-        //    return await getCartModel();
-        //}
-        //public async Task<List<CartDto>> getCartModel()
-        //{
-        //    var carts = await _repositoryManager.Cart.GetCarts();
-        //    var cartsDto = _mapper.Map<List<CartDto>>(carts);
-        //    var cartDto = cartsDto.First();
-        //    if (carts.Count() > 0)
-        //    {
-        //        foreach (var cart in carts)
-        //        {
-        //            var storeId = cart.CartStores.First().StoreId;
-        //            var productId = cart.CartProducts.First().ProductId;
-        //            if (storeId != 0)
-        //            {
-        //                var product = await _repositoryManager.Product.GetProductById(productId , false);
-        //                if (product != null)
-        //                {
-        //                    var store = _userApi.GetStore(storeId);
-        //                    var category = await _repositoryManager.Categories.GetCategoryToPrductId(productId);
-        //                    var special = await _productApi.IsOffer(productId);
-        //                    var flash = await _repositoryManager.Sales.GetFlashProductId(productId);
-        //                    var offerPrice = special.Id == 0 ? 0 : special.SpecialPrice;
-
-        //                    //-------------------
-        //                    //  cartDto. = optionCart(product_id, t.customers_basket_id),
-        //                    cartDto.CartStores.First().StoreId = storeId;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return cartsDto;
-        //}
     }
 }

@@ -19,7 +19,8 @@ namespace Contracts
         Task<List<Product>> GetProductsCatId(int categoryId);
         Task<List<Product>> GetProductsTOStoreId(int storeId);
         Task<List<Product>> GetAllProductLikeCustomersId(int customerId);
-        Task<Product> CheckApproveProduct(int id);
+        Task<Product> CheckApproveProduct(int id); 
+        Task<Product> GetProductStore(int productId , int storeId);
         Task<List<Product>> GetFeartureProducts(int pageSize);
         Task<List<Product>> TopRatedPage(int pageSize);
         Task<List<Product>> GetBestProducts(int pageSize);

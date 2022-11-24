@@ -32,7 +32,6 @@ namespace WebLayer
             //MapCart
             CreateMap<CartDto, Cart>().ReverseMap();
             CreateMap<CreateCartDto, Cart>().ReverseMap();
-            CreateMap<UpdateCartDto, Cart>().ReverseMap();
             //MapCartProduct
             CreateMap<CartProductDto, CartProduct>().ReverseMap();
             //MapCartAttributeProduct
