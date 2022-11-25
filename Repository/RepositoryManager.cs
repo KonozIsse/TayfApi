@@ -36,7 +36,6 @@ namespace Repository
         private IProductOptionRepository _productOptionRepository;
         private IProductOptionValueRepository _productOptionValueRepository;
         private ICartRepository _cartRepository;
-        private ICartProductRepository _cartProductRepository;
         private ICartAttributeProductRepository _cartAttributeProductRepository;
         private IMailListRepository _mailListRepository;
         private IDeliveryTimeRepository _deliveryTimeRepository;
@@ -173,15 +172,6 @@ namespace Repository
                 if (_cartRepository == null)
                     _cartRepository = new CartRepository(_repositoryContext);
                 return _cartRepository;
-            }
-        }
-        public ICartProductRepository CartProduct
-        {
-            get
-            {
-                if (_cartProductRepository == null)
-                    _cartProductRepository = new CartProductRepository(_repositoryContext);
-                return _cartProductRepository;
             }
         }
         public ICartAttributeProductRepository CartAttributeProduct

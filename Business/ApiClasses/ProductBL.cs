@@ -204,14 +204,7 @@ namespace BusinessLogic.ApiClasses
             var product = await _repositoryManager.Product.GetProductById(productId, false);
             if (product != null)
             {
-                var carts = await _repositoryManager.CartProduct.GetAllCartProductProductId(productId);
-                if (carts != null)
-                {
-                    foreach (var cart in carts)
-                    {
-                        _repositoryManager.CartProduct.DeleteCartProduct(cart);
-                    }
-                }
+                
                 var specials = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(productId);
                 if (specials != null)
                 {
@@ -630,28 +623,28 @@ namespace BusinessLogic.ApiClasses
             }
             return total;
         }
-        public async Task<List<OptionDto>> GetOptionsCart(int cartProductId)
-        {
-            var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProducts(cartProductId);
-            var optionDto = new List<OptionDto>();
-            if (cartAttributeProducts.Count() > 0)
-            {
-                foreach (var item in cartAttributeProducts)
-                {
-                    var option = await _repositoryManager.Option.GetAllOptions();
-                    var productAttribut = await _repositoryManager.Attribute.GetProductOptionValue(item.CartProduct.ProductId, item.AttributesProduct.OptionId, item.AttributesProduct.ValueId);
-                    if (productAttribut != null)
-                    {
-                        var value = await _repositoryManager.Value.GetValueId(item.AttributesProduct.ValueId, false);
-                        var attributeDto = _mapper.Map<AttributeDto>(productAttribut);
-                        attributeDto.AttributePrice = (productAttribut.PricePrefix == "+" ? productAttribut.AttributePrice : -productAttribut.AttributePrice);
-                    }
-                    optionDto = _mapper.Map<List<OptionDto>>(option);
-                }
-            }
+        //public async Task<List<OptionDto>> GetOptionsCart(int cartId)
+        //{
+        //    var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId);
+        //    var optionDto = new List<OptionDto>();
+        //    if (cartAttributeProducts.Count() > 0)
+        //    {
+        //        foreach (var item in cartAttributeProducts)
+        //        {
+        //            var option = await _repositoryManager.Option.GetAllOptions();
+        //            var productAttribut = await _repositoryManager.Attribute.GetProductOptionValue(item.Cart.ProductId, item.AttributesProduct.OptionId, item.AttributesProduct.ValueId);
+        //            if (productAttribut != null)
+        //            {
+        //                var value = await _repositoryManager.Value.GetValueId(item.AttributesProduct.ValueId, false);
+        //                var attributeDto = _mapper.Map<AttributeDto>(productAttribut);
+        //                attributeDto.AttributePrice = (productAttribut.PricePrefix == "+" ? productAttribut.AttributePrice : -productAttribut.AttributePrice);
+        //            }
+        //            optionDto = _mapper.Map<List<OptionDto>>(option);
+        //        }
+        //    }
 
-            return optionDto;
-        }
+        //    return optionDto;
+        //}
         //Value------------------------------------------------
         public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
         {

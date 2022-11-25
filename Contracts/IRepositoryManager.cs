@@ -11,7 +11,6 @@ namespace Contracts
         IAddressRepository Address { get; }
         IBannerRepository Banner { get; }
         ICartRepository Cart { get; }
-        ICartProductRepository CartProduct { get; }
         ICartAttributeProductRepository CartAttributeProduct { get; }
         ICategoriesRepository Categories { get; }
         IContactRepository Contact { get; }

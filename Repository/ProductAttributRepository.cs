@@ -30,7 +30,7 @@ namespace Repository
          => await FindByCondition(c => c.ProductId == productId && c.OptionId == optionId && c.ValueId == valueId, false).FirstOrDefaultAsync();
 
         public int GetDistinctProdCart(int productId)
-         => FindByCondition(c => c.ProductId == productId, false).ToList().GroupBy(x => x.OptionId).Distinct().Select(g => g.First()).Count();
+         => FindByCondition(c => c.ProductId == productId, false).ToList().GroupBy(x => x.OptionId).Distinct().Count();
         public void AddAttributesProduct(int productId, ProductAttribut option)
         {
             option.ProductId = productId;

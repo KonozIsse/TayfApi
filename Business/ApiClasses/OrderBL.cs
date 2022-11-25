@@ -20,10 +20,14 @@ namespace BusinessLogic.ApiClasses
     {
         protected readonly IRepositoryManager _repositoryManager;
         protected readonly IMapper _mapper;
-        public OrderBL(IRepositoryManager repositoryManager, IMapper mapper)
+        protected readonly CartBL _cartBL;  
+        protected readonly LocationTaxBL _locationTaxBL;
+        public OrderBL(IRepositoryManager repositoryManager, IMapper mapper, CartBL cartBL, LocationTaxBL locationTaxBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
+            _cartBL = cartBL;
+            _locationTaxBL = locationTaxBL;
         }
         //Order------------------------------------------------
         public async Task<List<Order>> GetPendOrders()
@@ -69,26 +73,28 @@ namespace BusinessLogic.ApiClasses
             order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
             await _repositoryManager.SaveAsync();
         }
-        public async Task AddOrder(CreateOrderDto createOrderDto)
-        {
-            var order = _mapper.Map<Order>(createOrderDto);
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-            order.OrderStatusId = 2;
-            //order.CustomerId = 2;
-            //order.CurrencyId = 1;
-            //order.StoreId = 1;
-            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
-            if (coupon != null)
-            {
-                coupon.CouponCode = createOrderDto.CouponCode;
-            }
-            _repositoryManager.Order.CreateOrder(order);
-            try
-            {
-                await _repositoryManager.SaveAsync();
-            }
-            catch (Exception) { }
-        }
+        //public async Task AddOrder(CreateOrderDto createOrderDto)
+        //{
+        //    var order = _mapper.Map<Order>(createOrderDto);
+        //    order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+        //    order.OrderStatusId = 2;
+        //    order.CustomerId = 2;
+        //    order.CurrencyId = 1;
+        //    order.StoreId = 1;
+        //    order.PaymentMethodsId = 7;
+        //    order.IsSeen = 0;
+        //    var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+        //    if (coupon != null)
+        //    {
+        //        coupon.CouponCode = createOrderDto.CouponCode;
+        //    }
+        //    _repositoryManager.Order.CreateOrder(order);
+        //    try
+        //    {
+        //        await _repositoryManager.SaveAsync();
+        //    }
+        //    catch (Exception) { }
+        //}
         public async Task OrderPending(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
@@ -142,13 +148,13 @@ namespace BusinessLogic.ApiClasses
             {
                 order.Coupon.CouponCode = code;
                 order.Coupon.CouponAmount = amount;
-                order.OrderPrice = updateOderDto.OrderPrice;
+               // order.OrderPrice = updateOderDto.OrderPrice;
             }
             else
             {
                 order.Coupon.CouponCode = "";
                 order.Coupon.CouponAmount = 0;
-                order.OrderPrice = totalBeforCode + (totalBeforCode * (updateOderDto.TotalTax / 100));
+             //   order.OrderPrice = totalBeforCode + (totalBeforCode * (updateOderDto.TotalTax / 100));
             }
             order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}",order.Id, order.OrderPrice.ToString("0.00")));
 
@@ -373,5 +379,292 @@ namespace BusinessLogic.ApiClasses
                 return builder.ToString();
             }
         }
+
+        public async Task AddOrder(CreateOrderDto createOrderDto)
+        {
+            var storeId = 1;
+            var customerId = 2;
+            var order = _mapper.Map<Order>(createOrderDto);
+            order.StoreId = storeId;
+            order.CustomerId = customerId;
+            order.OrderStatusId = 2;
+            order.CurrencyId = 1;
+            order.PaymentMethodsId = 7;
+            order.IsSeen = 0;
+            order.TotalTax = await _locationTaxBL.GetTax(customerId);
+            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+
+            //if(createOrderDto.OrderProducts != null)
+            //{
+            //    var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            //    foreach(var cart in carts)
+            //    {
+            //        cart.CartAttributeProducts.Where(c => c.CartId == cart.Id);
+            //    }
+            //}
+           
+            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+            if (coupon != null)
+            {
+                coupon.CouponCode = createOrderDto.CouponCode;
+            }
+            _repositoryManager.Order.CreateOrder(order);
+            try
+            {
+                await _repositoryManager.SaveAsync();
+            }
+            catch (Exception) { }
+        }
+
+        //public async Task<decimal> AddOrder2(CreateOrderDto createOrderDto)
+        //{
+        //    int oid = 0; decimal tot = 0; decimal all = 0;
+        //    if (createOrderDto != null)
+        //    {
+        //        decimal cop_amount = 0; var discount_type = ""; var coponCode = "";
+        //        if (createOrderDto.CouponCode != null)
+        //        {
+        //            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+        //            if (coupon != null)
+        //            {
+        //                coupon.CouponCode = createOrderDto.CouponCode;
+        //            }
+        //        }
+        //        int CustomerId = 2;
+
+        //        decimal prev_tot = 0;
+        //        var prods = await _repositoryManager.Cart.GetCartsToCustomerId(CustomerId);
+        //        foreach (var p in prods)
+        //        {
+        //            var prd = p.Product;
+        //            if (prd != null)
+        //            {
+        //                prev_tot += (prd.Price * p.Qty);
+        //            }
+        //        }
+
+        //        decimal tax = await _locationTaxBL.GetTax(CustomerId);
+
+
+        //        //foreach (var b in obj.stores)
+        //        //{
+        //            var all_prods = new List<OrderProduct>();
+        //            foreach (var p in createOrderDto.OrderProducts)
+        //            {
+        //                var cartItem = _cartBL.getCartById(p.prod_id);
+        //                var prd = _cartBL.getProduct(Convert.ToInt32(cartItem.products_id));   // Find(p.prod_id);
+        //                if (cartItem != null)
+        //                {
+        //                    var attr_prod = db.products_attributes.Where(r => r.products_id == prd.products_id);
+        //                    var det = db.customers_basket_attributes.Where(r => r.customers_basket_id == p.prod_id).ToList();
+        //                    decimal prod_price = prd.products_price;
+        //                    var flash = _cartBL.getFlashById(prd.products_id);
+        //                    if (flash != null)
+        //                    {
+        //                        prod_price = flash.flash_sale_products_price;
+        //                    }
+
+        //                    var special = _cartBL.getSpecialById(prd.products_id);
+        //                    if (special != null)
+        //                    {
+        //                        prod_price = special.specials_new_products_price;
+        //                    }
+        //                    var orde_det = new List<orders_products_attributes>();
+
+        //                    if (det.Count() > 0)
+        //                    {
+        //                        foreach (var d in det)
+        //                        {
+        //                            var opattr = attr_prod.Where(r => r.products_id == prd.products_id && r.options_id == d.products_options_id && r.options_values_id == d.products_options_values_id).FirstOrDefault();
+        //                            if (opattr != null)
+        //                            {
+        //                                if (opattr.price_prefix == "+")
+        //                                {
+        //                                    prod_price += opattr.options_values_price;
+        //                                }
+        //                                if (opattr.price_prefix == "-")
+        //                                {
+        //                                    if (prod_price != 0)
+        //                                    {
+        //                                        prod_price -= opattr.options_values_price;
+        //                                    }
+        //                                }
+        //                                var getop = db.products_options.Where(op => op.products_options_id == opattr.options_id).FirstOrDefault();
+        //                                var getopVal = db.products_options_values.Where(t => t.products_options_values_id == opattr.options_values_id).FirstOrDefault();
+        //                                orde_det.Add(new orders_products_attributes
+        //                                {
+        //                                    products_id = prd.products_id,
+        //                                    options_attribute_id = opattr.products_attributes_id,
+        //                                    price_prefix = opattr.price_prefix,
+        //                                    options_id = opattr.options_id,
+        //                                    options_value_id = opattr.options_values_id,
+        //                                    options_values_price = opattr.options_values_price,
+        //                                    products_options = (getop != null ? (getop.OptionsNames != null ? getop.OptionsNames[lang] : "") : ""),
+        //                                    products_options_values = (getopVal != null ? (getopVal.OptionsValuesNames != null ? getopVal.OptionsValuesNames[lang] : "") : "")
+        //                                });
+
+        //                            }
+
+        //                        }
+        //                    }
+
+        //                    if (prd != null)
+        //                    {
+
+        //                        all_prods.Add(new orders_products
+        //                        {
+        //                            products_quantity = p.qty,
+        //                            products_model = prd.products_model,
+        //                            products_name = prd.products_name,
+        //                            products_id = prd.products_id,
+        //                            products_tax = 0,
+        //                            vendor_id = prd.vendorId,
+        //                            products_price = prod_price,
+        //                            final_price = p.qty * prod_price,
+        //                            orders_products_attributes = orde_det
+        //                        });
+
+
+        //                    }
+
+        //                }
+        //            }
+
+        //            decimal sub_tot = all_prods.Sum(r => r.final_price);
+        //            var stor = new order
+        //            {
+        //                total_tax = tax,
+        //                shipping_cost = 0,
+        //                order_status = 1,
+        //                customers_id = Convert.ToInt32(CustomerID),
+        //                is_delete = false,
+        //                shipping_method = "",
+        //                payment_method = "Qatar Charity",// obj.paym;
+        //                order_information = obj.notes,
+        //                address_id = obj.address_id,
+        //                currency = "QAR",
+        //                currency_value = 1,
+        //                times = obj.times,
+        //                is_seen = 0,
+        //                coupon_code = coponCode,
+        //                orders_products = all_prods,
+        //                coupon_amount = cop_amount,
+        //                created_at = DateTime.UtcNow,
+        //                ordered_source = 1, // 1 mobile , 2 web
+        //                product_ids = "",
+        //                order_price = 0,
+        //                free_shipping = 1,
+        //                vendor_id = b.store_id,
+        //                billing_phone = ""
+        //            };
+        //            var strObj = _cartBL.AddOrderByItem(stor);
+        //            oid = strObj.orders_id;
+        //            try
+        //            {
+        //                Log.Info(string.Format("{0}  order added by Website with id ", oid));
+        //            }
+        //            catch (Exception e) { }
+        //            int Customerid = Convert.ToInt32(CustomerID);
+
+        //            if (discount_type == "fixed_cart")
+        //            {
+        //                sub_tot -= cop_amount;
+        //            }
+        //            else if (discount_type == "percent")
+        //            {
+        //                sub_tot = (sub_tot - (sub_tot * (cop_amount / 100)));
+        //            }
+        //            else if (discount_type == "fixed_product")
+        //            {
+        //                var copon = _cartBL.GetCouponById(obj.coupon);
+
+        //                if (copon != null)
+        //                {
+        //                    sub_tot = 0;
+        //                    List<string> SelectedValues = new List<string>();
+        //                    string[] split = copon.product_ids.Split(',');
+        //                    foreach (var t in split)
+        //                    {
+        //                        if (!String.IsNullOrEmpty(t))
+        //                        {
+        //                            SelectedValues.Add(t.ToString());
+        //                        }
+        //                    }
+        //                    ViewBag.SelectedValues = SelectedValues;
+        //                    foreach (var t in b.prods)
+        //                    {
+        //                        var bsk = _cartBL.getProductCartByProduct(t.prod_id, Convert.ToInt32(CustomerID));
+        //                        if (bsk != null)
+        //                        {
+        //                            if (SelectedValues.Contains(t.prod_id.ToString()))
+        //                            {
+        //                                //iscode = true;
+        //                                decimal newval = Convert.ToDecimal(bsk.final_price) - cop_amount;
+        //                                sub_tot += newval;
+        //                            }
+        //                            else
+        //                            {
+        //                                sub_tot += Convert.ToDecimal(bsk.final_price);
+        //                            }
+        //                        }
+
+        //                    }
+        //                }
+        //            }
+        //            else if (discount_type == "percent_product")
+        //            {
+        //                var copon = _cartBL.GetCouponById(obj.coupon);
+        //                if (copon != null)
+        //                {
+        //                    sub_tot = 0;
+        //                    List<string> SelectedValues = new List<string>();
+        //                    string[] split = copon.product_ids.Split(',');
+        //                    foreach (var t in split)
+        //                    {
+        //                        if (!String.IsNullOrEmpty(t))
+        //                        {
+        //                            SelectedValues.Add(t.ToString());
+        //                        }
+        //                    }
+        //                    ViewBag.SelectedValues = SelectedValues;
+        //                    foreach (var t in b.prods)
+        //                    {
+
+        //                        var bsk = _cartBL.getProductCartByProduct(t.prod_id, Convert.ToInt32(CustomerID));
+        //                        if (bsk != null)
+        //                        {
+        //                            if (SelectedValues.Contains(t.prod_id.ToString()))
+        //                            {
+        //                                decimal newval = Convert.ToDecimal(bsk.final_price) * (cop_amount / 100);
+        //                                sub_tot += newval;
+        //                            }
+        //                            else
+        //                            {
+        //                                sub_tot += Convert.ToDecimal(bsk.final_price);
+        //                            }
+        //                        }
+        //                    }
+
+        //                }
+        //            }
+
+
+        //            if (tax > 0)
+        //            {
+        //                sub_tot = (sub_tot + (sub_tot * (tax / 100)));
+        //            }
+        //            tot = sub_tot;
+        //            _cartBL.updateTotal(stor.orders_id, tot);
+        //            oid = stor.orders_id;
+        //            all += tot;
+
+        //        }
+
+        //    }
+
+        //    _cartBL.deleteOrderItems(Convert.ToInt32(CustomerID), obj);
+        //    return Decimal.Round(all, 2);
+
+        //}
     }
 }

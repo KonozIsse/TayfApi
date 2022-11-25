@@ -26,7 +26,6 @@ namespace Entities
         public DbSet<ProductAttribut> AttributesProducts { get; set; }
         public DbSet<Banner> Banners { get; set; }
         public DbSet<Cart> Carts { get; set; }
-        public DbSet<CartProduct> CartsProducts { get; set; } 
         public DbSet<CartAttributeProduct> CartAttributeProducts { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CommentNews> CommentNews { get; set; }

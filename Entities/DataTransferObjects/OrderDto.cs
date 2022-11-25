@@ -35,12 +35,11 @@ namespace Entities.DataTransferObjects
     }
     public class CreateOrderDto
     {
-       // public List<ProductDto> Products { get; set; }
+        public string Notes { get; set; }
         public int DeliveryTimeId { get; set; }
         public int AddressId { get; set; }
         public string CouponCode { get; set; }
-        public decimal TotalTax { get; set; }
-        public decimal OrderPrice { get; set; }
+        public List<OrderProductDto> OrderProducts { get; set; }
     }
     public class UpdateOderDto : CreateOrderDto
     {
@@ -49,10 +48,14 @@ namespace Entities.DataTransferObjects
     public class OrderProductDto
     {
         public int Qty { get; set; }
-        public decimal FinalPrice { get; set; }
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
         public int ProductId { get; set; }
-        //public List<OrderAttributProduct> OrderAttributesProducts { get; set; }
+        public List<OrderAttributProductDto> OrderAttributesProducts { get; set; }
+    } 
+    public class OrderAttributProductDto
+    {
+        public int? OrderProductsId { get; set; }
+        public int? ProductAttributId { get; set; }
     }
     public class HistoryOrderDto
     {

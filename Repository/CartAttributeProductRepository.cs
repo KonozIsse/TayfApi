@@ -19,15 +19,9 @@ namespace Repository
         }
         public async Task<CartAttributeProduct> CartAttributeProductId(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
-        public async Task<List<CartAttributeProduct>> CartAttributeProducts(int cartProductId)
-         => await FindByCondition(c => c.CartProductId == cartProductId, false).ToListAsync();
         public async Task<List<CartAttributeProduct>> CartAttributeProductsCartId(int cartId)
-        => await FindByCondition(c => c.CartProduct.CartId == cartId, false).ToListAsync();
+        => await FindByCondition(c => c.CartId == cartId, false).ToListAsync();
         public void AddCartAttribute(CartAttributeProduct cartAttribute) => Create(cartAttribute);
-        public async Task DeleteCartAttributeProductList(List<int> Ids)
-        {
-            var cartProducts = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
-            DeleteRange(cartProducts);
-        }
+        public void DeleteCartAttributeProduct(CartAttributeProduct cartAttribute) => Delete(cartAttribute);
     }
 }
