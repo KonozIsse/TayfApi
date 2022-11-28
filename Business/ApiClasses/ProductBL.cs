@@ -531,7 +531,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<decimal> getOptionsOrdersTotalPrice(int productId, int orderId)
         {
             decimal tot = 0;
-            var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, orderId);
+            var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, orderId,false);
             if (orderProduct != null)
             {
                 tot = orderProduct.FinalPrice;
@@ -581,7 +581,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<decimal> getOptionsOrdersTotalPriceTest(int productId, int orderId)
         {
             decimal total = 0;
-            var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, orderId);
+            var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, orderId , false);
             if (orderProduct != null)
             {
                 var special = await IsOffer(productId);
@@ -818,141 +818,7 @@ namespace BusinessLogic.ApiClasses
             }
             return favId;
         }
-        //CustomerProduct------------------------------------------------
-        public async Task AddCustomerProduct(CreateCustomerProductDto createDto, int customerId, int productId)
-        {
-            var customerProduct = _mapper.Map<CustomerProduct>(createDto);
-            customerProduct.CustomerId = customerId;
-            customerProduct.ProductId = productId;
-
-            var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-            var createAttributeDtos = createDto.CustomerAttributesProducts;
-            if (createAttributeDtos != null && createAttributeDtos.Count() > 0)
-            {
-                foreach (var item in createAttributeDtos)
-                {
-                    var attribut = attributs.Where(r => r.Id == item.AttributesProductId).FirstOrDefault();
-                    if (attribut != null)
-                    {
-                        var customerAttributesProduct = _mapper.Map<CustomerAttributesProduct>(item);
-                        _repositoryManager.CustomerAttributesProduct.AddAttributeCustomerProduct(customerAttributesProduct);
-                        await _repositoryManager.SaveAsync();
-                    }
-                }
-            }
-            _repositoryManager.CustomerProduct.AddCustomerProduct(customerProduct);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateCustomerProduct(int productId, UpdateCustomerProductDto customerProductDto)
-        {
-            var customerId = 0;//GetCurrentUserId();
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
-            customerProduct.CustomerId = customerId;
-            _mapper.Map(customerProductDto, customerProduct);
-            customerProduct.FinalPrice = customerProductDto.FinalPrice * customerProduct.Quantity;
-            customerProduct.UpdatedAt = DateTime.UtcNow;
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateAmountCart(int customerId, int qty, int productId, string lange)
-        {
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerIdProduct(productId, customerId);
-            var customerProductDto = _mapper.Map<UpdateCustomerProductDto>(customerProduct);
-            if (customerProduct != null)
-            {
-                var product = await _repositoryManager.Product.GetProductById(productId, false);
-                if (product != null)
-                {
-                    customerProductDto.FinalPrice = product.Price;
-                    var specialProduct = await IsOffer(productId);
-                    if (specialProduct != null)
-                    {
-                        customerProductDto.FinalPrice = specialProduct.SpecialPrice;
-                    }
-                    var attributesProducts = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(customerProduct.Id);
-                    if (attributesProducts.Count() > 0)
-                    {
-                        foreach (var item in attributesProducts)
-                        {
-                            var attribute = item.AttributesProduct;
-                            var productOptionValue = await _repositoryManager.Attribute.GetProductOptionValue(productId, attribute.OptionId, attribute.ValueId);
-                            if (productOptionValue != null)
-                            {
-                                if (productOptionValue.PricePrefix == "+")
-                                {
-                                    customerProductDto.FinalPrice += productOptionValue.AttributePrice;
-                                }
-
-                                if (productOptionValue.PricePrefix == "-" && customerProductDto.FinalPrice != 0)
-                                {
-                                    customerProductDto.FinalPrice -= productOptionValue.AttributePrice;
-                                }
-                            }
-                        }
-                    }
-                    await UpdateCustomerProduct(productId, customerProductDto);
-                }
-            }
-        }
-        public async Task<decimal> UpdatePriceAttributesProduct(int id, UpdateCustomerProductDto customerProductDto)
-        {
-            var attributeList = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(id);
-            foreach (var attribute in attributeList)
-            {
-                var productAttribut = await _repositoryManager.Attribute.GetProductOptionValue(attribute.CustomerProduct.ProductId.Value, attribute.AttributesProduct.OptionId, attribute.AttributesProduct.ValueId);
-                if (productAttribut != null && productAttribut.AttributePrice != 0)
-                {
-                    if (productAttribut.PricePrefix == "+")
-                    {
-                        customerProductDto.FinalPrice += productAttribut.AttributePrice;
-                    }
-                    if (productAttribut.PricePrefix == "-")
-                    {
-                        if (customerProductDto.FinalPrice != 0)
-                        {
-                            customerProductDto.FinalPrice -= productAttribut.AttributePrice;
-                        }
-                    }
-                }
-            }
-
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerProductId(id, true);
-            if (customerProduct != null)
-            {
-                _mapper.Map(customerProductDto, customerProduct);
-                customerProduct.FinalPrice = customerProductDto.FinalPrice * customerProduct.Quantity;
-                await _repositoryManager.SaveAsync();
-            }
-            decimal AllTotal = Convert.ToDecimal(customerProductDto.FinalPrice * customerProductDto.Quantity);
-
-            return AllTotal;
-        }
-        public async Task DeleteCustomerProduct(int id)
-        {
-            var customerProduct = await _repositoryManager.CustomerProduct.GetCustomerProductId(id, false);
-            if (customerProduct != null)
-            {
-                var attributeList = await _repositoryManager.CustomerAttributesProduct.GetAllAttributesCustomerProduct(id);
-                if (attributeList.Count() > 0)
-                {
-                    foreach (var attribute in attributeList)
-                    {
-                        _repositoryManager.CustomerAttributesProduct.DeleteAttributeCustomerProduct(attribute);
-                        await _repositoryManager.SaveAsync();
-                    }
-                }
-                _repositoryManager.CustomerProduct.DeleteCustomerProduct(customerProduct);
-                await _repositoryManager.SaveAsync();
-            }
-        }
-        public async Task DeleteCustomerStoreCart(int customerId, int storeId)
-        {
-            var storesCustomers = await _repositoryManager.CustomerProduct.GetStoreCustomer(customerId, storeId);
-            foreach (var storeCustomer in storesCustomers)
-            {
-                _repositoryManager.CustomerProduct.DeleteCustomerProduct(storeCustomer);
-                await _repositoryManager.SaveAsync();
-            }
-        }
+       
         //inventory------------------------------------------------
         public async Task<List<Inventory>> GetInventoryInByProductAttr(int productId, string attribute)
         {

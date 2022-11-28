@@ -34,7 +34,6 @@ namespace Entities.Models
         public List<WishList> WishLists { get; set; }
         public List<Review> Reviews { get; set; }
         public List<SpecialProducts> SpecialProducts { get; set; } 
-        public List<CustomerProduct> CustomerProducts { get; set; }
         public List<ProductSales> ProductSales { get; set; }
         public List<ProductAttribut> AttributesProducts { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }

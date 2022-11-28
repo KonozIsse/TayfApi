@@ -33,6 +33,21 @@ namespace BusinessLogic.ApiClasses
             _locationTaxBL = locationTaxBL;
         }
         //Cart------------------------------------------------
+        public async Task<decimal> GetTotalOrder (int customerId, int orderId = 0)
+        {
+            decimal total = 0;
+            if (orderId != 0)
+            {
+                var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
+                total = orderProducts.Sum(r => r.FinalPrice);
+            }
+            else
+            {
+                var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+                total = carts.Sum(r => r.FinalPrice);
+            }
+            return total;
+        }
         public async Task<decimal> GetTotalCartsCustomer(int customerId)
         {
             decimal total = 0;
@@ -61,22 +76,17 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task AddCart(int customerId ,CreateCartDto createDto)
         {
-            decimal totalPrice = 0;
             var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
-            
+            var productPrice = product.Price;
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(createDto.ProductId);
-            var flash = await _repositoryManager.Sales.GetFlashProductId(createDto.ProductId);
             if (special != null)
             {
-                totalPrice = special.SpecialPrice;
+                productPrice = special.SpecialPrice;
             }
-            else if (flash != null)
+            var flash = await _repositoryManager.Sales.GetFlashProductId(createDto.ProductId);
+            if (flash != null)
             {
-                totalPrice = flash.DiscountPrice;
-            }
-            else
-            {
-                totalPrice = product.Price;
+                productPrice = flash.DiscountPrice;
             }
             var cartAttributesDto = createDto.CartAttributeProducts;
             if (cartAttributesDto != null)
@@ -89,11 +99,11 @@ namespace BusinessLogic.ApiClasses
                     {
                         if (attribut.PricePrefix == "+")
                         {
-                            totalPrice += attribut.AttributePrice;
+                            productPrice += attribut.AttributePrice;
                         }
-                        if (attribut.PricePrefix == "-" && totalPrice != 0)
+                        if (attribut.PricePrefix == "-" && productPrice != 0)
                         {
-                            totalPrice -= attribut.AttributePrice;
+                            productPrice -= attribut.AttributePrice;
                         }
                     } 
                 }
@@ -104,14 +114,14 @@ namespace BusinessLogic.ApiClasses
                 var addCart = _mapper.Map<Cart>(createDto);
                 addCart.CustomerId = customerId;
                 addCart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
-                addCart.FinalPrice = Convert.ToDecimal(totalPrice * createDto.Qty);
+                addCart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
                 _repositoryManager.Cart.AddCart(addCart);
             }
             else
             {
                 cart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
                 createDto.Qty = cart.Qty + createDto.Qty;
-                cart.FinalPrice = Convert.ToDecimal(totalPrice * createDto.Qty);
+                cart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
                 _mapper.Map(createDto, cart);
             }
             await _repositoryManager.SaveAsync();
@@ -119,7 +129,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> AddProductToCart( int customerId , CreateCartDto createDto)
         {
             var prod = await _repositoryManager.Product.GetProductById(createDto.ProductId, true);
-            var storeId = prod.StoreId;
+            var storeId = prod.StoreId == 0 ? 0 : prod.StoreId;
             if (prod == null)
             {
                 return _locService.GetLocalizedStringValue("noproducts");
@@ -156,7 +166,7 @@ namespace BusinessLogic.ApiClasses
                 var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId.Value, customerId);
                 if (order != null)
                 {
-                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(createDto.ProductId, order.Id);
+                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(createDto.ProductId, order.Id , true);
                     if (orderProduct != null)
                     {
                         if ((orderProduct.Qty + createDto.Qty) > (inv0All))
@@ -199,7 +209,7 @@ namespace BusinessLogic.ApiClasses
                 var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId.Value, customerId);
                 if (order != null)
                 {
-                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(createDto.ProductId, order.Id);
+                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(createDto.ProductId, order.Id ,true);
                     if (orderProduct != null)
                     {
                         if ((orderProduct.Qty + createDto.Qty) > (invall))
@@ -294,7 +304,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> GetValueCodeCoupon(int customerId, string code, Currency currency)
         {
             string tot = "0";
-            var carts = await _repositoryManager.CustomerProduct.GetProductsCustomerId(customerId);
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
             var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(code);
             if (coupon == null)
             {
@@ -390,7 +400,7 @@ namespace BusinessLogic.ApiClasses
                     var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(cart.StoreId, customerId);
                     if (order != null)
                     {
-                        var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(cart.ProductId, order.Id);
+                        var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(cart.ProductId, order.Id , true);
                         if (orderProduct != null)
                         {
                             if (orderProduct.Qty > availableInventory)
@@ -428,7 +438,7 @@ namespace BusinessLogic.ApiClasses
                     var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(cart.StoreId, customerId);
                     if (order != null)
                     {
-                        var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(cart.ProductId, order.Id);
+                        var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(cart.ProductId, order.Id,true);
                         if (orderProduct != null)
                         {
                             if (orderProduct.Qty > availableInventory)

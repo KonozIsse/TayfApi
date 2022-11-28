@@ -2,6 +2,7 @@
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.Models.Enums;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -49,21 +50,27 @@ namespace WebLayer.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update( int id  ,UpdateCouponDto update)
+        public async Task<IActionResult> update(int id , int st )
         {
-            await _orderBL.UpdateCoupon(id , update);
+            await _orderBL.UpdateStatusOrder(id , st);
+            return NoContent();
+        } 
+        [HttpPut("update1")]
+        public async Task<IActionResult> update1(int id )
+        {
+            await _orderBL.OrderCancal(id );
             return NoContent();
         } 
         [HttpDelete("delete")]
         public async Task<IActionResult> delete(int id )
         {
-            await _cartBL.DeleteCart(id);
+            await _orderBL.DeleteOrder(id);
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id , int cutId )
+        public async Task<IActionResult> get(int id)
         {
-            var langs = await _cartBL.AvailableAmountForCart(id , cutId );
+            var langs = await _orderBL.GetHistoryOrder( id );
             return Ok(langs);
         }
     }

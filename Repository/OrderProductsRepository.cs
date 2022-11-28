@@ -19,10 +19,11 @@ namespace Repository
         }
         public async Task<List<OrderProduct>> GetOrderProducts(int productId, int orderId)
         => await FindByCondition(r => r.ProductId == productId && r.OrderId == orderId, false).ToListAsync();
-        public async Task<OrderProduct> GetOrderProductsId(int productId, int orderId)
-        => await FindByCondition(r => r.ProductId == productId && r.OrderId == orderId, false).FirstOrDefaultAsync();
+        public async Task<OrderProduct> GetOrderProductsId(int productId, int orderId , bool trackChanges)
+        => await FindByCondition(r => r.ProductId == productId && r.OrderId == orderId, trackChanges).FirstOrDefaultAsync();
         public async Task<List<OrderProduct>> GetAllProductsToOrderId (int orderId)
-        => await FindByCondition(r =>  r.OrderId == orderId, false).Include(r => r.Product).ToListAsync();
+        => await FindByCondition(r =>  r.OrderId == orderId, false).ToListAsync();
+        public void CreateOrderProduct (OrderProduct orderProducts) => Create(orderProducts);
         public void DeleteOrderProduct(OrderProduct orderProducts) => Delete(orderProducts);
     }
 

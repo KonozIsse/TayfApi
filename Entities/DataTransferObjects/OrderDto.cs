@@ -39,11 +39,9 @@ namespace Entities.DataTransferObjects
         public int DeliveryTimeId { get; set; }
         public int AddressId { get; set; }
         public string CouponCode { get; set; }
-        public List<OrderProductDto> OrderProducts { get; set; }
     }
     public class UpdateOderDto : CreateOrderDto
     {
-        public int Id { get; set; }
     }
     public class OrderProductDto
     {
@@ -62,13 +60,10 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
         public Status IsStatus { get; set; }
         public int pcount { get; set; }
-        public int CustomerId { get; set; }
         public int OrderStatusId { get; set; }
         public string StatusName { get; set; }
         public string Symbol { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public int Quantity { get; set; }
+        public string FullName { get; set; }
         public decimal OrderPrice { get; set; }
         public string payUrl { get; set; }
 

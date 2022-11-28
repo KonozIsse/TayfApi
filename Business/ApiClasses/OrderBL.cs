@@ -66,6 +66,241 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Order.GetAllOrders();
         }
+        public async Task AddOrder(CreateOrderDto createOrderDto)
+         {
+            decimal total = 0;
+            var storeId = 1;
+            var customerId = 2;
+            var tax = await _locationTaxBL.GetTax(customerId);
+
+            var order = _mapper.Map<Order>(createOrderDto);
+            order.StoreId = storeId;
+            order.CustomerId = customerId;
+            order.OrderStatusId = 2;
+            order.CurrencyId = 1;
+            order.PaymentMethodsId = 7;
+            order.IsSeen = 0;
+            order.TotalTax = tax;
+            order.CodeCoupon = createOrderDto.CouponCode;
+
+            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            if(carts != null)
+            {
+                foreach(var cart in carts)
+                {
+                    var orderAttributs = new List<OrderAttributProduct>();
+                    var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
+                    if (cartAttributeProducts != null)
+                    {
+                        foreach (var cartAttribute in cartAttributeProducts)
+                        {
+                            orderAttributs.Add(new OrderAttributProduct
+                            {
+                                ProductAttributId = cartAttribute.AttributesProductId
+                            });
+                        }
+                    }
+                    //var orderProducts = new List<OrderProduct>()
+                    // {
+                    //     new OrderProduct()
+                    //     {
+                    //         ProductId = cart.ProductId,
+                    //         Qty = cart.Qty,
+                    //         FinalPrice = cart.FinalPrice,
+                    //         OrderAttributesProducts = orderAttributs
+                    //     }
+                    // };
+                    // orderProducts.AddRange(orderProducts);
+
+                    var orderProducts = new List<OrderProduct>();
+                    orderProducts.Add(new OrderProduct
+                    {
+                        ProductId = cart.ProductId,
+                        Qty = cart.Qty,
+                        FinalPrice = cart.FinalPrice,
+                        OrderAttributesProducts = orderAttributs
+                    });
+                   order.OrderProducts = orderProducts;
+
+                    total += orderProducts.First().FinalPrice;
+                }
+
+                if (createOrderDto.CouponCode != null)
+                {
+                    var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+                    if (coupon != null)
+                    {
+                        if (coupon.DiscountType == "fixed_cart")
+                        {
+                            if (total > coupon.CouponAmount)
+                            {
+                                total = total - Convert.ToDecimal(coupon.CouponAmount);
+                            }
+                        }
+                        else if (coupon.DiscountType == "percent")
+                        {
+                            if (total > 0)
+                            {
+                                total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
+                            }
+                        }
+                        else if (coupon.DiscountType == "fixed_product")
+                        {
+                             total = 0;
+                            foreach (var item in carts)
+                            {
+                                if (coupon.Product.Contains(item.ProductId.ToString()))
+                                {
+                                    var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
+                                    total += newTotal;
+                                }
+                                else
+                                {
+                                    total += Convert.ToDecimal(item.FinalPrice);
+                                }
+                            }
+                        }
+                        else if (coupon.DiscountType == "percent_product")
+                        {
+                            total = 0;
+                            foreach (var item in carts)
+                            {
+                                if (coupon.Product.Contains(item.ProductId.ToString()))
+                                {
+                                    decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
+                                    total = total + newval;
+                                }
+                                else
+                                {
+                                    total = total + Convert.ToDecimal(item.FinalPrice);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (tax != 0)
+            {
+                total = total + ((total * tax) / 100);
+            }
+            order.OrderPrice = total;
+            _repositoryManager.Order.CreateOrder(order);
+            try
+            {
+                await _repositoryManager.SaveAsync();
+            }
+            catch (Exception) { }
+        }
+        public async Task EditOrder(int id, UpdateOderDto updateOderDto)
+        {
+            var order = await _repositoryManager.Order.GetActiveOrderId(id, true);
+
+            decimal total = 0;
+            var storeId = 1;
+            var customerId = 3;
+            var tax = await _locationTaxBL.GetTax(customerId);
+
+            order.StoreId = storeId;
+            order.CustomerId = customerId;
+            order.OrderStatusId = 2;
+            order.CurrencyId = 1;
+            order.PaymentMethodsId = 7;
+            order.IsSeen = 0;
+            order.TotalTax = tax;
+            order.CodeCoupon = updateOderDto.CouponCode;
+
+            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            if (carts != null)
+            {
+                foreach (var cart in carts)
+                {
+                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(cart.ProductId, id, true);
+                    //var orderProduct = order.OrderProducts.First() ?? null;
+
+
+                    orderProduct.ProductId = cart.ProductId;
+                    orderProduct.Qty = cart.Qty;
+                    orderProduct.FinalPrice = cart.FinalPrice;
+
+
+                    var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
+                    if (cartAttributeProducts != null)
+                    {
+                        foreach (var cartAttribute in cartAttributeProducts)
+                        {
+                            var orderAttribute = await _repositoryManager.OrderAttributesProducts.GetOrderAttributesProduct(orderProduct.Id, true);
+                            orderAttribute.ProductAttributId = cartAttribute.AttributesProductId;
+                        }
+                    }
+
+
+                    total += orderProduct.FinalPrice;
+                }
+
+                if (updateOderDto.CouponCode != null)
+                {
+                    var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(updateOderDto.CouponCode);
+                    if (coupon != null)
+                    {
+                        if (coupon.DiscountType == "fixed_cart")
+                        {
+                            if (total > coupon.CouponAmount)
+                            {
+                                total = total - Convert.ToDecimal(coupon.CouponAmount);
+                            }
+                        }
+                        else if (coupon.DiscountType == "percent")
+                        {
+                            if (total > 0)
+                            {
+                                total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
+                            }
+                        }
+                        else if (coupon.DiscountType == "fixed_product")
+                        {
+                            total = 0;
+                            foreach (var item in carts)
+                            {
+                                if (coupon.Product.Contains(item.ProductId.ToString()))
+                                {
+                                    var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
+                                    total += newTotal;
+                                }
+                                else
+                                {
+                                    total += Convert.ToDecimal(item.FinalPrice);
+                                }
+                            }
+                        }
+                        else if (coupon.DiscountType == "percent_product")
+                        {
+                            total = 0;
+                            foreach (var item in carts)
+                            {
+                                if (coupon.Product.Contains(item.ProductId.ToString()))
+                                {
+                                    decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
+                                    total = total + newval;
+                                }
+                                else
+                                {
+                                    total = total + Convert.ToDecimal(item.FinalPrice);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (tax != 0)
+            {
+                total = total + ((total * tax) / 100);
+            }
+            order.OrderPrice = total;
+            _mapper.Map(updateOderDto, order);
+            await _repositoryManager.SaveAsync();
+        }
         public async Task UpdateTotalOrderPrice(int id, decimal totalPrice)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
@@ -73,28 +308,6 @@ namespace BusinessLogic.ApiClasses
             order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
             await _repositoryManager.SaveAsync();
         }
-        //public async Task AddOrder(CreateOrderDto createOrderDto)
-        //{
-        //    var order = _mapper.Map<Order>(createOrderDto);
-        //    order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-        //    order.OrderStatusId = 2;
-        //    order.CustomerId = 2;
-        //    order.CurrencyId = 1;
-        //    order.StoreId = 1;
-        //    order.PaymentMethodsId = 7;
-        //    order.IsSeen = 0;
-        //    var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
-        //    if (coupon != null)
-        //    {
-        //        coupon.CouponCode = createOrderDto.CouponCode;
-        //    }
-        //    _repositoryManager.Order.CreateOrder(order);
-        //    try
-        //    {
-        //        await _repositoryManager.SaveAsync();
-        //    }
-        //    catch (Exception) { }
-        //}
         public async Task OrderPending(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
@@ -105,81 +318,80 @@ namespace BusinessLogic.ApiClasses
         public async Task OrderComplete(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 3;
+            order.OrderStatusId = 4;
             await _repositoryManager.SaveAsync();
         }
         public async Task OrderCancal(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 3;
+            order.OrderStatusId = 5;
             await _repositoryManager.SaveAsync();
         }
         public async Task OrderReject(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 4;
+            order.OrderStatusId = 6;
             await _repositoryManager.SaveAsync();
         }
-        public async Task UpdateOrderAfterPay(int id, string PaymentsId, string payment)
+        public async Task UpdateOrderAfterPay(int id, string PaymentsId, int paymentMethodsId)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
             if (order.OrderStatusId == 1)
             {
-                order.OrderStatusId = 5; //recieved order
+                order.OrderStatusId = 7; //recieved order
                 order.DatePurchased = EasternTime;
                 order.TransactionId = PaymentsId;
                 order.UpdatedAt = EasternTime;
-                order.PaymentMethods.PaymentMethod = payment;// "Qatar Charity";
+                order.PaymentMethodsId = paymentMethodsId;// "Qatar Charity";
                 await _repositoryManager.SaveAsync();
             }
         }
-        public async Task DeleteOrder(int id)
+        public async Task DeleteOrder(int orderId)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            _repositoryManager.Order.DeleteOrder(order);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task EditOrder(UpdateOderDto updateOderDto, decimal totalBeforCode,  string code, decimal amount)
-        {
-            var order = await _repositoryManager.Order.GetActiveOrderId(updateOderDto.Id, true);
-            _mapper.Map(updateOderDto, order);
-            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(updateOderDto.CouponCode);
-            if (coupon != null)
+            var order = await _repositoryManager.Order.GetOrderId(orderId, false);
+            if(order != null)
             {
-                order.Coupon.CouponCode = code;
-                order.Coupon.CouponAmount = amount;
-               // order.OrderPrice = updateOderDto.OrderPrice;
-            }
-            else
-            {
-                order.Coupon.CouponCode = "";
-                order.Coupon.CouponAmount = 0;
-             //   order.OrderPrice = totalBeforCode + (totalBeforCode * (updateOderDto.TotalTax / 100));
-            }
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}",order.Id, order.OrderPrice.ToString("0.00")));
+                var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
+                foreach(var orderProduct in orderProducts)
+                {
+                    _repositoryManager.OrderProducts.DeleteOrderProduct(orderProduct);
+                    var attributes = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(orderProduct.Id, false);
+                    if(attributes != null)
+                    {
+                        foreach (var attribut in attributes)
+                        {
+                            _repositoryManager.OrderAttributesProducts.DeleteOrderAttributProduct(attribut);
+                        }
+                    }
+                }
 
+                _repositoryManager.Order.DeleteOrder(order);
+            }
             await _repositoryManager.SaveAsync();
         }
-        public async Task UpdateStatusOrder(/*UpdateOderDto updateOderDto, */ int id, int vendorId, int adminId)
+       
+        public async Task UpdateStatusOrder(/*UpdateOderDto updateOderDto, */ int id, int adminId, int vendorId = 0)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            // _mapper.Map(updateOderDto, order);
-            await _repositoryManager.SaveAsync();
+           //_mapper.Map(updateOderDto, order);
+           // await _repositoryManager.SaveAsync();
 
             //out stock 
             var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
             foreach (var item in orderProducts)
             {
-                string attribute = "";
+                var inventory = new Inventory();
+                int attribute = 0;
                 var orderAttributesProducts = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(item.Id, true);
                 if (orderAttributesProducts != null)
                 {
                     foreach (var option in orderAttributesProducts)
                     {
-                        attribute += option.ProductAttributId + ",";
+                        attribute = option.ProductAttributId.Value ;
+                        inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
                     }
                 }
-                var inventory = new Inventory();
+              
                 inventory.AddedDate = EasternTime.Millisecond;
                 inventory.AdminId = adminId;
                 if (vendorId != 0)
@@ -191,41 +403,11 @@ namespace BusinessLogic.ApiClasses
                 inventory.TotalPurchasedPrice = item.FinalPrice;
                 inventory.PurchaseCode = item.OrderId.ToString();
                 inventory.StockType = "out";
-                inventory.AttributesProductId = Convert.ToInt32(attribute);
+               // inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
                 _repositoryManager.Inventory.AddInventory(inventory);
-                await _repositoryManager.SaveAsync();
+                
             }
-        }
-        public async Task DeleteOrderProduct(int productId, int id)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, false);
-            var orderProductList = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
-            if (orderProductList.Count() > 0)
-            {
-                if (orderProductList.Count() == 1)
-                {
-                    order.IsDeleted = true;
-                    await _repositoryManager.SaveAsync();
-                }
-                else
-                {
-                    var orderProduct = orderProductList.Where(r => r.ProductId == productId).FirstOrDefault();
-                    if (orderProduct != null)
-                    {
-                        var orderAttributProducts = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(orderProduct.Id,false);
-                        if (orderAttributProducts != null)
-                        {
-                            foreach (var orderAttributProduct in orderAttributProducts)
-                            {
-                                _repositoryManager.OrderAttributesProducts.DeleteOrderAttributProduct(orderAttributProduct);
-                                await _repositoryManager.SaveAsync();
-                            }
-                        }
-                        _repositoryManager.OrderProducts.DeleteOrderProduct(orderProduct);
-                        await _repositoryManager.SaveAsync();
-                    }
-                }
-            }
+            await _repositoryManager.SaveAsync();
         }
         public async Task<List<OrderDto>> GetOrdersByFilter(int customerId)
         {
@@ -262,19 +444,20 @@ namespace BusinessLogic.ApiClasses
             }
             return ordersDto;
         }
-        public async Task<List<HistoryOrderDto>> getProductsOrders(int customerId, Currency currency, List<Order> Orders)
+        public async Task<List<HistoryOrderDto>> GetHistoryOrder (int customerId)
         {
             var model = new List<HistoryOrderDto>();
-            foreach (var order in Orders)
+            var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
+            foreach (var order in orders)
             {
                 if (order.StoreId != 0)
                 {
-                    var orderProducts = order.OrderProducts.ToList();
+                    var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
                     int count = orderProducts.Count();
                     var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId , false);
 
                     string state = "";
-                    var orderStatus = order.OrderStatus;
+                    var orderStatus = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId , false);
                     if (orderStatus != null)
                     {
                         state = orderStatus.StatusName;
@@ -283,11 +466,11 @@ namespace BusinessLogic.ApiClasses
                     model.Add(new HistoryOrderDto
                     {
                         Id = order.Id,
+                        IsStatus = order.IsStatus,
                         OrderPrice = Convert.ToDecimal(order.OrderPrice),
-                        Symbol = currency.Symbol,
+                        Symbol = "QAR" , //currency.Symbol,
                         pcount = count,
-                        FirstName = customer.FullName,
-                        LastName = customer.LastName,
+                        FullName = customer.FullName,
                         OrderStatusId = order.OrderStatusId,
                         StatusName = state
                     });
@@ -379,292 +562,5 @@ namespace BusinessLogic.ApiClasses
                 return builder.ToString();
             }
         }
-
-        public async Task AddOrder(CreateOrderDto createOrderDto)
-        {
-            var storeId = 1;
-            var customerId = 2;
-            var order = _mapper.Map<Order>(createOrderDto);
-            order.StoreId = storeId;
-            order.CustomerId = customerId;
-            order.OrderStatusId = 2;
-            order.CurrencyId = 1;
-            order.PaymentMethodsId = 7;
-            order.IsSeen = 0;
-            order.TotalTax = await _locationTaxBL.GetTax(customerId);
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-
-            //if(createOrderDto.OrderProducts != null)
-            //{
-            //    var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            //    foreach(var cart in carts)
-            //    {
-            //        cart.CartAttributeProducts.Where(c => c.CartId == cart.Id);
-            //    }
-            //}
-           
-            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
-            if (coupon != null)
-            {
-                coupon.CouponCode = createOrderDto.CouponCode;
-            }
-            _repositoryManager.Order.CreateOrder(order);
-            try
-            {
-                await _repositoryManager.SaveAsync();
-            }
-            catch (Exception) { }
-        }
-
-        //public async Task<decimal> AddOrder2(CreateOrderDto createOrderDto)
-        //{
-        //    int oid = 0; decimal tot = 0; decimal all = 0;
-        //    if (createOrderDto != null)
-        //    {
-        //        decimal cop_amount = 0; var discount_type = ""; var coponCode = "";
-        //        if (createOrderDto.CouponCode != null)
-        //        {
-        //            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
-        //            if (coupon != null)
-        //            {
-        //                coupon.CouponCode = createOrderDto.CouponCode;
-        //            }
-        //        }
-        //        int CustomerId = 2;
-
-        //        decimal prev_tot = 0;
-        //        var prods = await _repositoryManager.Cart.GetCartsToCustomerId(CustomerId);
-        //        foreach (var p in prods)
-        //        {
-        //            var prd = p.Product;
-        //            if (prd != null)
-        //            {
-        //                prev_tot += (prd.Price * p.Qty);
-        //            }
-        //        }
-
-        //        decimal tax = await _locationTaxBL.GetTax(CustomerId);
-
-
-        //        //foreach (var b in obj.stores)
-        //        //{
-        //            var all_prods = new List<OrderProduct>();
-        //            foreach (var p in createOrderDto.OrderProducts)
-        //            {
-        //                var cartItem = _cartBL.getCartById(p.prod_id);
-        //                var prd = _cartBL.getProduct(Convert.ToInt32(cartItem.products_id));   // Find(p.prod_id);
-        //                if (cartItem != null)
-        //                {
-        //                    var attr_prod = db.products_attributes.Where(r => r.products_id == prd.products_id);
-        //                    var det = db.customers_basket_attributes.Where(r => r.customers_basket_id == p.prod_id).ToList();
-        //                    decimal prod_price = prd.products_price;
-        //                    var flash = _cartBL.getFlashById(prd.products_id);
-        //                    if (flash != null)
-        //                    {
-        //                        prod_price = flash.flash_sale_products_price;
-        //                    }
-
-        //                    var special = _cartBL.getSpecialById(prd.products_id);
-        //                    if (special != null)
-        //                    {
-        //                        prod_price = special.specials_new_products_price;
-        //                    }
-        //                    var orde_det = new List<orders_products_attributes>();
-
-        //                    if (det.Count() > 0)
-        //                    {
-        //                        foreach (var d in det)
-        //                        {
-        //                            var opattr = attr_prod.Where(r => r.products_id == prd.products_id && r.options_id == d.products_options_id && r.options_values_id == d.products_options_values_id).FirstOrDefault();
-        //                            if (opattr != null)
-        //                            {
-        //                                if (opattr.price_prefix == "+")
-        //                                {
-        //                                    prod_price += opattr.options_values_price;
-        //                                }
-        //                                if (opattr.price_prefix == "-")
-        //                                {
-        //                                    if (prod_price != 0)
-        //                                    {
-        //                                        prod_price -= opattr.options_values_price;
-        //                                    }
-        //                                }
-        //                                var getop = db.products_options.Where(op => op.products_options_id == opattr.options_id).FirstOrDefault();
-        //                                var getopVal = db.products_options_values.Where(t => t.products_options_values_id == opattr.options_values_id).FirstOrDefault();
-        //                                orde_det.Add(new orders_products_attributes
-        //                                {
-        //                                    products_id = prd.products_id,
-        //                                    options_attribute_id = opattr.products_attributes_id,
-        //                                    price_prefix = opattr.price_prefix,
-        //                                    options_id = opattr.options_id,
-        //                                    options_value_id = opattr.options_values_id,
-        //                                    options_values_price = opattr.options_values_price,
-        //                                    products_options = (getop != null ? (getop.OptionsNames != null ? getop.OptionsNames[lang] : "") : ""),
-        //                                    products_options_values = (getopVal != null ? (getopVal.OptionsValuesNames != null ? getopVal.OptionsValuesNames[lang] : "") : "")
-        //                                });
-
-        //                            }
-
-        //                        }
-        //                    }
-
-        //                    if (prd != null)
-        //                    {
-
-        //                        all_prods.Add(new orders_products
-        //                        {
-        //                            products_quantity = p.qty,
-        //                            products_model = prd.products_model,
-        //                            products_name = prd.products_name,
-        //                            products_id = prd.products_id,
-        //                            products_tax = 0,
-        //                            vendor_id = prd.vendorId,
-        //                            products_price = prod_price,
-        //                            final_price = p.qty * prod_price,
-        //                            orders_products_attributes = orde_det
-        //                        });
-
-
-        //                    }
-
-        //                }
-        //            }
-
-        //            decimal sub_tot = all_prods.Sum(r => r.final_price);
-        //            var stor = new order
-        //            {
-        //                total_tax = tax,
-        //                shipping_cost = 0,
-        //                order_status = 1,
-        //                customers_id = Convert.ToInt32(CustomerID),
-        //                is_delete = false,
-        //                shipping_method = "",
-        //                payment_method = "Qatar Charity",// obj.paym;
-        //                order_information = obj.notes,
-        //                address_id = obj.address_id,
-        //                currency = "QAR",
-        //                currency_value = 1,
-        //                times = obj.times,
-        //                is_seen = 0,
-        //                coupon_code = coponCode,
-        //                orders_products = all_prods,
-        //                coupon_amount = cop_amount,
-        //                created_at = DateTime.UtcNow,
-        //                ordered_source = 1, // 1 mobile , 2 web
-        //                product_ids = "",
-        //                order_price = 0,
-        //                free_shipping = 1,
-        //                vendor_id = b.store_id,
-        //                billing_phone = ""
-        //            };
-        //            var strObj = _cartBL.AddOrderByItem(stor);
-        //            oid = strObj.orders_id;
-        //            try
-        //            {
-        //                Log.Info(string.Format("{0}  order added by Website with id ", oid));
-        //            }
-        //            catch (Exception e) { }
-        //            int Customerid = Convert.ToInt32(CustomerID);
-
-        //            if (discount_type == "fixed_cart")
-        //            {
-        //                sub_tot -= cop_amount;
-        //            }
-        //            else if (discount_type == "percent")
-        //            {
-        //                sub_tot = (sub_tot - (sub_tot * (cop_amount / 100)));
-        //            }
-        //            else if (discount_type == "fixed_product")
-        //            {
-        //                var copon = _cartBL.GetCouponById(obj.coupon);
-
-        //                if (copon != null)
-        //                {
-        //                    sub_tot = 0;
-        //                    List<string> SelectedValues = new List<string>();
-        //                    string[] split = copon.product_ids.Split(',');
-        //                    foreach (var t in split)
-        //                    {
-        //                        if (!String.IsNullOrEmpty(t))
-        //                        {
-        //                            SelectedValues.Add(t.ToString());
-        //                        }
-        //                    }
-        //                    ViewBag.SelectedValues = SelectedValues;
-        //                    foreach (var t in b.prods)
-        //                    {
-        //                        var bsk = _cartBL.getProductCartByProduct(t.prod_id, Convert.ToInt32(CustomerID));
-        //                        if (bsk != null)
-        //                        {
-        //                            if (SelectedValues.Contains(t.prod_id.ToString()))
-        //                            {
-        //                                //iscode = true;
-        //                                decimal newval = Convert.ToDecimal(bsk.final_price) - cop_amount;
-        //                                sub_tot += newval;
-        //                            }
-        //                            else
-        //                            {
-        //                                sub_tot += Convert.ToDecimal(bsk.final_price);
-        //                            }
-        //                        }
-
-        //                    }
-        //                }
-        //            }
-        //            else if (discount_type == "percent_product")
-        //            {
-        //                var copon = _cartBL.GetCouponById(obj.coupon);
-        //                if (copon != null)
-        //                {
-        //                    sub_tot = 0;
-        //                    List<string> SelectedValues = new List<string>();
-        //                    string[] split = copon.product_ids.Split(',');
-        //                    foreach (var t in split)
-        //                    {
-        //                        if (!String.IsNullOrEmpty(t))
-        //                        {
-        //                            SelectedValues.Add(t.ToString());
-        //                        }
-        //                    }
-        //                    ViewBag.SelectedValues = SelectedValues;
-        //                    foreach (var t in b.prods)
-        //                    {
-
-        //                        var bsk = _cartBL.getProductCartByProduct(t.prod_id, Convert.ToInt32(CustomerID));
-        //                        if (bsk != null)
-        //                        {
-        //                            if (SelectedValues.Contains(t.prod_id.ToString()))
-        //                            {
-        //                                decimal newval = Convert.ToDecimal(bsk.final_price) * (cop_amount / 100);
-        //                                sub_tot += newval;
-        //                            }
-        //                            else
-        //                            {
-        //                                sub_tot += Convert.ToDecimal(bsk.final_price);
-        //                            }
-        //                        }
-        //                    }
-
-        //                }
-        //            }
-
-
-        //            if (tax > 0)
-        //            {
-        //                sub_tot = (sub_tot + (sub_tot * (tax / 100)));
-        //            }
-        //            tot = sub_tot;
-        //            _cartBL.updateTotal(stor.orders_id, tot);
-        //            oid = stor.orders_id;
-        //            all += tot;
-
-        //        }
-
-        //    }
-
-        //    _cartBL.deleteOrderItems(Convert.ToInt32(CustomerID), obj);
-        //    return Decimal.Round(all, 2);
-
-        //}
     }
 }

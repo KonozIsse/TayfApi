@@ -22,8 +22,6 @@ namespace Repository
         private ICountryRepository _countryRepository;
         private ICurrencyRepository _currencyRepository;
         private ICouponRepository _couponRepository;
-        private ICustomerProductRepository _customerProductRepository;
-        private ICustomerAttributesProductRepository _customerAttributesProductRepository;
         private IImageRepository _imageRepository;
         private IInventoryRepository _inventoryRepository;
         private ILanguageRepository _languageRepository;
@@ -46,7 +44,6 @@ namespace Repository
         private ISpecialProductsRepository _specialProductsRepository;
         private IOrderStatusRepository _orderStatusRepository;
         private ICommentNewsRepository _commentNewsRepository;
-        private ICustomerStoresRepository _customerStoreRepository ;
         private ITaxClassRepository _taxClassRepository ;
         private ITaxRateRepository _taxRateRepository ;
         private ISalesRepository _salesRepository;
@@ -336,24 +333,7 @@ namespace Repository
                 return _commentNewsRepository;
             }
         }
-        public ICustomerStoresRepository CustomerStore 
-        {
-            get
-            {
-                if (_customerStoreRepository == null)
-                    _customerStoreRepository = new CustomerStoreRepository(_repositoryContext);
-                return _customerStoreRepository;
-            }
-        }
-        public ICustomerProductRepository CustomerProduct
-        {
-            get
-            {
-                if (_customerProductRepository == null)
-                    _customerProductRepository = new CustomerProductRepository(_repositoryContext);
-                return _customerProductRepository;
-            }
-        }
+       
         public ITaxClassRepository TaxClass
         {
             get
@@ -480,16 +460,6 @@ namespace Repository
                 return _productOptionValueRepository;
             }
         }
-        public ICustomerAttributesProductRepository CustomerAttributesProduct
-        {
-            get
-            {
-                if (_customerAttributesProductRepository == null)
-                    _customerAttributesProductRepository = new CustomerAttributesProductRepository(_repositoryContext);
-                return _customerAttributesProductRepository;
-            }
-        } 
-        
         public IUnitRepository Unit
         {
             get

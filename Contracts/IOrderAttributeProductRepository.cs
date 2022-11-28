@@ -9,6 +9,7 @@ namespace Contracts
 {
     public interface IOrderAttributeProductRepository
     {
+        Task<OrderAttributProduct> GetOrderAttributesProduct(int orderProductId, bool trackChanges);
         Task<IEnumerable<OrderAttributProduct>> GetAllOrderAttributesProducts(int orderProductId, bool trackChanges);
         Task<IEnumerable<OrderAttributProduct>> GetAttributesOrderProduct(int orderId, int productId);
         void DeleteOrderAttributProduct(OrderAttributProduct orderAttributProduct);

@@ -20,9 +20,7 @@ namespace Entities.Models
         [ForeignKey(nameof(DeliveryTime))]
         public int DeliveryTimeId { get; set; }
         public DeliveryTime DeliveryTime { get; set; }
-
-        [ForeignKey(nameof(Coupon))]
-        public int? CouponId { get; set; }
+        public string CodeCoupon { get; set; }
         public Coupon Coupon { get; set; }
 
         [ForeignKey(nameof(PaymentMethods))]

@@ -21,7 +21,6 @@ namespace Repository
         => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
         public async Task<List<CartAttributeProduct>> CartAttributeProductsCartId(int cartId)
         => await FindByCondition(c => c.CartId == cartId, false).ToListAsync();
-        public void AddCartAttribute(CartAttributeProduct cartAttribute) => Create(cartAttribute);
         public void DeleteCartAttributeProduct(CartAttributeProduct cartAttribute) => Delete(cartAttribute);
     }
 }

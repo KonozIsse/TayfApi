@@ -16,6 +16,8 @@ namespace Repository
         {
 
         }
+        public async Task<OrderAttributProduct> GetOrderAttributesProduct(int orderProductId, bool trackChanges)
+        => await FindByCondition(c => c.OrderProductsId == orderProductId, trackChanges).FirstOrDefaultAsync();
         public async Task<IEnumerable<OrderAttributProduct>> GetAllOrderAttributesProducts(int orderProductId, bool trackChanges)
         => await FindByCondition(c => c.OrderProductsId == orderProductId, trackChanges).ToListAsync();
         public async Task<IEnumerable<OrderAttributProduct>> GetAttributesOrderProduct(int orderId, int productId)

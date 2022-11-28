@@ -34,10 +34,7 @@ namespace WebLayer
             CreateMap<CreateCartDto, Cart>().ReverseMap();
             //MapCartAttributeProduct
             CreateMap<CartAttributeProductDto, CartAttributeProduct>().ReverseMap();
-            //MapCustomerProduct
-            CreateMap<CustomerProductDto, CustomerProduct>().ReverseMap(); 
-            CreateMap<CreateCustomerProductDto, CustomerProduct>().ReverseMap();
-            CreateMap<UpdateCustomerProductDto, CustomerProduct>().ReverseMap();
+           
             //MapCoupon
             CreateMap<CreateCouponDto, Coupon>().ReverseMap();
             CreateMap<CouponDto, Coupon>().ReverseMap();

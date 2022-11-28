@@ -33,9 +33,6 @@ namespace Entities
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<CustomerStore> CustomerStores { get; set; }
-        public DbSet<CustomerProduct> CustomerProducts { get; set; }
-        public DbSet<CustomerAttributesProduct> CustomerAttributesProducts { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeliveryTime> DeliveryTimes { get; set; }
         public DbSet<Image> Images { get; set; }
@@ -150,11 +147,6 @@ namespace Entities
             modelBuilder.Entity<User>().HasMany(address => address.Addresses)
                           .WithOne(user => user.User).HasForeignKey(con => con.UserId);
 
-            modelBuilder.Entity<User>().HasMany(customer => customer.Customers)
-                         .WithOne(user => user.Customer).HasForeignKey(con => con.CustomerId);
-
-            modelBuilder.Entity<User>().HasMany(store => store.Stores)
-                           .WithOne(user => user.Store).HasForeignKey(con => con.StoreId);
 
             modelBuilder.Entity<User>().HasMany(store => store.StoreOrders)
                          .WithOne(order => order.Store).HasForeignKey(con => con.StoreId);

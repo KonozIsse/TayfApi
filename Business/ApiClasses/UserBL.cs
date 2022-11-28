@@ -64,34 +64,6 @@ namespace BusinessLogic.ApiClasses
             _mapper.Map(updateStoreDto, store);
             await _repositoryManager.SaveAsync();
         }
-        public async Task DeleteStore(int storeId)
-        {
-            var store = await _repositoryManager.User.GetUserId(storeId, false);
-            var customerStores = await _repositoryManager.CustomerStore.GetCustomersStoreId(storeId);
-            foreach (var customerStore in customerStores)
-            {
-                _repositoryManager.CustomerStore.DeleteCustomerStore(customerStore);
-                await _repositoryManager.SaveAsync();
-            }
-            var orders = await _repositoryManager.Order.GetOrdersToStore(storeId);
-            foreach (var item in orders)
-            {
-                item.IsDeleted = true;
-                await _repositoryManager.SaveAsync();
-            }
-
-            _repositoryManager.User.DeleteUser(store);
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task DeleteByStore(int storeId)
-        {
-            var customerStores = await _repositoryManager.CustomerStore.GetCustomersStoreId(storeId);
-            foreach (var customerStore in customerStores)
-            {
-                _repositoryManager.CustomerStore.DeleteCustomerStore(customerStore);
-                await _repositoryManager.SaveAsync();
-            }
-        }
         //user------------------------------------------------
         public async Task<User> GetUserById(int id)
         {
@@ -149,13 +121,6 @@ namespace BusinessLogic.ApiClasses
                 foreach (var address in addresses)
                 {
                     _repositoryManager.Address.DeleteAddress(address);
-                }
-            }
-            if (user.CustomerProducts != null && user.CustomerProducts.Count > 0)
-            {
-                foreach (var CustomerProduct in user.CustomerProducts)
-                {
-                    _repositoryManager.CustomerProduct.DeleteCustomerProduct(CustomerProduct);
                 }
             }
             var orders = await _repositoryManager.Order.GetOrdersToCustomer(id);

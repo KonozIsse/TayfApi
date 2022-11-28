@@ -48,9 +48,6 @@ namespace Entities.Models
         public Role Role { get; set; }
         public List<Device> Devices { get; set; }
         public List<Address> Addresses { get; set; }
-        public List<CustomerStore> Customers { get; set; }
-        public List<CustomerStore> Stores { get; set; }
-        public List<CustomerProduct> CustomerProducts { get; set; }
         public List<Product> Products { get; set; }
         public List<Order> StoreOrders { get; set; }
         public List<Order> CustomerOrders { get; set; }

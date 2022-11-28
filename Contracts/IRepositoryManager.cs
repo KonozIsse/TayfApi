@@ -18,8 +18,6 @@ namespace Contracts
         ICouponRepository Coupon { get; }
         ICurrencyRepository Currency { get; }
         ICommentNewsRepository CommentNews { get; }
-        ICustomerStoresRepository CustomerStore { get; }
-        ICustomerProductRepository CustomerProduct { get; }
         IImageRepository Image { get; }
         IInventoryRepository Inventory { get; }
         ILanguageRepository Language { get; }
@@ -42,7 +40,6 @@ namespace Contracts
         IOrderStatusRepository OrderStatus { get; }
         IOrderProductsRepository OrderProducts { get; }
         IOrderAttributeProductRepository OrderAttributesProducts { get; }
-        ICustomerAttributesProductRepository CustomerAttributesProduct { get; }
         ITaxClassRepository TaxClass { get; }
         ITaxRateRepository TaxRate { get; }
         IProductRepository Product { get; }

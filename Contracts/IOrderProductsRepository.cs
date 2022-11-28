@@ -10,8 +10,9 @@ namespace Contracts
     public interface IOrderProductsRepository
     {
         Task<List<OrderProduct>> GetOrderProducts(int productId, int orderId);
-        Task<OrderProduct> GetOrderProductsId(int productId, int orderId);
+        Task<OrderProduct> GetOrderProductsId(int productId, int orderId, bool trackChanges);
         Task<List<OrderProduct>> GetAllProductsToOrderId(int orderId);
+        void CreateOrderProduct(OrderProduct orderProducts);
         void DeleteOrderProduct(OrderProduct orderProducts);
     }  
 
