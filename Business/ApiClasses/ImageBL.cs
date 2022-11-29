@@ -146,12 +146,6 @@ namespace BusinessLogic.ApiClasses
             }
             return listImages;
         }
-        public async Task<List<Image>> GetImagesProduct (int productId)
-        {
-            var images = await  _repositoryManager.Image.GetProductImages(productId);
-            
-            return images;
-        }
 
     }
 }

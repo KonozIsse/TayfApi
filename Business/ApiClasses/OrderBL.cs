@@ -67,10 +67,10 @@ namespace BusinessLogic.ApiClasses
             return await _repositoryManager.Order.GetAllOrders();
         }
         public async Task AddOrder(CreateOrderDto createOrderDto)
-         {
+        {
             decimal total = 0;
             var storeId = 1;
-            var customerId = 2;
+            var customerId = 3;
             var tax = await _locationTaxBL.GetTax(customerId);
 
             var order = _mapper.Map<Order>(createOrderDto);
@@ -85,9 +85,10 @@ namespace BusinessLogic.ApiClasses
 
             order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
             var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            if(carts != null)
+            if (carts != null)
             {
-                foreach(var cart in carts)
+                var orderProducts = new List<OrderProduct>();
+                foreach (var cart in carts)
                 {
                     var orderAttributs = new List<OrderAttributProduct>();
                     var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
@@ -101,19 +102,6 @@ namespace BusinessLogic.ApiClasses
                             });
                         }
                     }
-                    //var orderProducts = new List<OrderProduct>()
-                    // {
-                    //     new OrderProduct()
-                    //     {
-                    //         ProductId = cart.ProductId,
-                    //         Qty = cart.Qty,
-                    //         FinalPrice = cart.FinalPrice,
-                    //         OrderAttributesProducts = orderAttributs
-                    //     }
-                    // };
-                    // orderProducts.AddRange(orderProducts);
-
-                    var orderProducts = new List<OrderProduct>();
                     orderProducts.Add(new OrderProduct
                     {
                         ProductId = cart.ProductId,
@@ -121,10 +109,9 @@ namespace BusinessLogic.ApiClasses
                         FinalPrice = cart.FinalPrice,
                         OrderAttributesProducts = orderAttributs
                     });
-                   order.OrderProducts = orderProducts;
-
                     total += orderProducts.First().FinalPrice;
                 }
+                order.OrderProducts = orderProducts;
 
                 if (createOrderDto.CouponCode != null)
                 {
@@ -147,7 +134,7 @@ namespace BusinessLogic.ApiClasses
                         }
                         else if (coupon.DiscountType == "fixed_product")
                         {
-                             total = 0;
+                            total = 0;
                             foreach (var item in carts)
                             {
                                 if (coupon.Product.Contains(item.ProductId.ToString()))
@@ -192,114 +179,38 @@ namespace BusinessLogic.ApiClasses
             }
             catch (Exception) { }
         }
-        public async Task EditOrder(int id, UpdateOderDto updateOderDto)
+        public async Task<List<HistoryOrderDto>> GetHistoryOrder(int customerId)
         {
-            var order = await _repositoryManager.Order.GetActiveOrderId(id, true);
-
-            decimal total = 0;
-            var storeId = 1;
-            var customerId = 3;
-            var tax = await _locationTaxBL.GetTax(customerId);
-
-            order.StoreId = storeId;
-            order.CustomerId = customerId;
-            order.OrderStatusId = 2;
-            order.CurrencyId = 1;
-            order.PaymentMethodsId = 7;
-            order.IsSeen = 0;
-            order.TotalTax = tax;
-            order.CodeCoupon = updateOderDto.CouponCode;
-
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            if (carts != null)
+            var model = new List<HistoryOrderDto>();
+            var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
+            foreach (var order in orders)
             {
-                foreach (var cart in carts)
+                if (order.StoreId != 0)
                 {
-                    var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(cart.ProductId, id, true);
-                    //var orderProduct = order.OrderProducts.First() ?? null;
+                    var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
+                    int count = orderProducts.Count();
+                    var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
 
-
-                    orderProduct.ProductId = cart.ProductId;
-                    orderProduct.Qty = cart.Qty;
-                    orderProduct.FinalPrice = cart.FinalPrice;
-
-
-                    var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
-                    if (cartAttributeProducts != null)
+                    string state = "";
+                    var orderStatus = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
+                    if (orderStatus != null)
                     {
-                        foreach (var cartAttribute in cartAttributeProducts)
-                        {
-                            var orderAttribute = await _repositoryManager.OrderAttributesProducts.GetOrderAttributesProduct(orderProduct.Id, true);
-                            orderAttribute.ProductAttributId = cartAttribute.AttributesProductId;
-                        }
+                        state = orderStatus.StatusName;
                     }
-
-
-                    total += orderProduct.FinalPrice;
-                }
-
-                if (updateOderDto.CouponCode != null)
-                {
-                    var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(updateOderDto.CouponCode);
-                    if (coupon != null)
+                    model.Add(new HistoryOrderDto
                     {
-                        if (coupon.DiscountType == "fixed_cart")
-                        {
-                            if (total > coupon.CouponAmount)
-                            {
-                                total = total - Convert.ToDecimal(coupon.CouponAmount);
-                            }
-                        }
-                        else if (coupon.DiscountType == "percent")
-                        {
-                            if (total > 0)
-                            {
-                                total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
-                            }
-                        }
-                        else if (coupon.DiscountType == "fixed_product")
-                        {
-                            total = 0;
-                            foreach (var item in carts)
-                            {
-                                if (coupon.Product.Contains(item.ProductId.ToString()))
-                                {
-                                    var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
-                                    total += newTotal;
-                                }
-                                else
-                                {
-                                    total += Convert.ToDecimal(item.FinalPrice);
-                                }
-                            }
-                        }
-                        else if (coupon.DiscountType == "percent_product")
-                        {
-                            total = 0;
-                            foreach (var item in carts)
-                            {
-                                if (coupon.Product.Contains(item.ProductId.ToString()))
-                                {
-                                    decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
-                                    total = total + newval;
-                                }
-                                else
-                                {
-                                    total = total + Convert.ToDecimal(item.FinalPrice);
-                                }
-                            }
-                        }
-                    }
+                        Id = order.Id,
+                        IsStatus = order.IsStatus,
+                        OrderPrice = Convert.ToDecimal(order.OrderPrice),
+                        Symbol = "QAR", //currency.Symbol,
+                        pcount = count,
+                        FullName = customer.FullName,
+                        OrderStatusId = order.OrderStatusId,
+                        StatusName = state
+                    });
                 }
             }
-            if (tax != 0)
-            {
-                total = total + ((total * tax) / 100);
-            }
-            order.OrderPrice = total;
-            _mapper.Map(updateOderDto, order);
-            await _repositoryManager.SaveAsync();
+            return model;
         }
         public async Task UpdateTotalOrderPrice(int id, decimal totalPrice)
         {
@@ -314,7 +225,6 @@ namespace BusinessLogic.ApiClasses
             order.OrderStatusId = 2;
             await _repositoryManager.SaveAsync();
         }
-
         public async Task OrderComplete(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
@@ -369,13 +279,9 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
         }
-       
-        public async Task UpdateStatusOrder(/*UpdateOderDto updateOderDto, */ int id, int adminId, int vendorId = 0)
+        public async Task UpdateStatusOrder(int id, int adminId, int vendorId = 0)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-           //_mapper.Map(updateOderDto, order);
-           // await _repositoryManager.SaveAsync();
-
             //out stock 
             var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
             foreach (var item in orderProducts)
@@ -443,41 +349,6 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             return ordersDto;
-        }
-        public async Task<List<HistoryOrderDto>> GetHistoryOrder (int customerId)
-        {
-            var model = new List<HistoryOrderDto>();
-            var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
-            foreach (var order in orders)
-            {
-                if (order.StoreId != 0)
-                {
-                    var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
-                    int count = orderProducts.Count();
-                    var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId , false);
-
-                    string state = "";
-                    var orderStatus = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId , false);
-                    if (orderStatus != null)
-                    {
-                        state = orderStatus.StatusName;
-                    }
-
-                    model.Add(new HistoryOrderDto
-                    {
-                        Id = order.Id,
-                        IsStatus = order.IsStatus,
-                        OrderPrice = Convert.ToDecimal(order.OrderPrice),
-                        Symbol = "QAR" , //currency.Symbol,
-                        pcount = count,
-                        FullName = customer.FullName,
-                        OrderStatusId = order.OrderStatusId,
-                        StatusName = state
-                    });
-                }
-            }
-
-            return model;
         }
         //Coupon------------------------------------------------
         public async Task AddCoupon(CreateCouponDto createCouponDto)

@@ -336,6 +336,62 @@ namespace BusinessLogic.ApiClasses
                 return new List<ProductVM>();
             }
         }
+        public async Task<ProductVM> GetProduct(int productId, int customerId )
+        {
+            var special = await IsOffer(productId);
+            var flash = await _repositoryManager.Sales.GetFlashProductId(productId);
+            var category = await _repositoryManager.Categories.GetCategoryToPrductId(productId);
+            var product = await _repositoryManager.Product.GetProductById(productId, false);
+            var store = await _repositoryManager.User.GetStoreId(product.StoreId.Value);
+            if(store != null)
+            {
+                product.StoreId = store.Id;
+            }
+           
+            return product == null ? null : new ProductVM
+            {
+                MainCategoryId = (category != null ? category.MainCategoryId : 0),
+                CategoryId = (category != null ? category.Id : 0),
+                CategoryName = (category == null ? null : category.CategoryName),
+                // CategoryImage = (category != null ? await _imageBL.GetImageThumbnail(category.ImgId.ToString()) : ""),
+
+                Id = product.Id,
+                ProductName = product.ProductName,
+                Description = product.Description,
+                ProductModel = product.ProductModel,
+                //ProductImage = await _imageBL.GetImageThumbnail(product.Images.First().Id.ToString()),
+                TypeId = product.TypeId,
+                Price = product.Price,
+                IsStatus = product.IsStatus.ToString(),
+                Availability = await AvailabilityProducts(product.Id),
+                AttributesProducts = await GetAttributsProducts(product.Id),
+                Images = await _imageBL.GetListImagesProductIdAsync(product.Id),
+                ShareLink = _util.url1 + "/en/Home/share?id=" + product.Id,
+                //storeUrl + "/en/Home/share?id=" + item.products_id + "&name=" + (item.ProductNames != null ? item.ProductNames[lange].Replace(" ", "").Trim() : ""),
+                IsBest = Convert.ToInt16(product.IsBest),
+                IsFeature = product.IsFeature,
+
+                IsSpecial = product.IsSpecial,
+                SpecialPrice = product.IsSpecial == false ? 0 : special.SpecialPrice,
+
+                IsSale = product.IsSale,
+                DiscountPrice = (flash != null ? flash.DiscountPrice : 0),
+                StartDate = (flash != null ? flash.StartDate : null),
+                EndDate = (flash != null ? flash.EndDate : null),
+
+
+                IsFavorite = await IsFavourite(customerId, product.Id),
+                NumLike = await GetFavourite(customerId, product.Id),
+                IsReview = await IsReview(customerId, product.Id),
+                Reviews = await GetReviews(product.Id),
+                Rate = await Rate(product.Id),
+
+                StoreId = product.StoreId,
+                StoreName = product.StoreId == null ? null : store.FullName,
+                StoreImage = product.StoreId == null ? null : store.Avater
+
+            };
+        }
         public async Task<List<ProductVM>> GetProductsCatId(int catId)
         {
             var products = await GetProducts();
@@ -492,8 +548,8 @@ namespace BusinessLogic.ApiClasses
                         productPrice -= attrProduct.AttributePrice;
                     }
                 }
-                var inStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(prodId, attrProduct.OptionId);
-                var OutStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(prodId, attrProduct.OptionId);
+                var inStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(prodId, id);
+                var OutStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(prodId, id);
                 stock = inStockList.Sum(r => r.Stock) - OutStockList.Sum(r => r.Stock);
             }
             return productPrice + "  _  " + stock;
@@ -527,58 +583,7 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Option.DeleteOption(option);
             await _repositoryManager.SaveAsync();
         }
-        //test not finish
-        public async Task<decimal> getOptionsOrdersTotalPrice(int productId, int orderId)
-        {
-            decimal tot = 0;
-            var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, orderId,false);
-            if (orderProduct != null)
-            {
-                tot = orderProduct.FinalPrice;
-                var special = await IsOffer(productId);
-                if (special != null && special.Id != 0)
-                {
-                    tot = special.SpecialPrice;
-                }
-                var orderAttributProducts = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(orderId, productId);
-                if (orderAttributProducts.Count() > 0)
-                {
-                    foreach (var item in orderAttributProducts)
-                    {
-                        var option = await _repositoryManager.Option.GetOptionId(item.ProductAttribut.OptionId, false);
-                        var values = orderAttributProducts.Where(r => r.ProductAttribut.OptionId == option.Id).ToList();
-                        if (values.Count() > 0)
-                        {
-                            foreach (var itemValue in values)
-                            {
-                                var value = await _repositoryManager.Value.GetValueId(itemValue.ProductAttribut.ValueId, false);
-                                if (value != null)
-                                {
-                                    var valueDto = _mapper.Map<ValueDto>(value);
-                                    valueDto.OptionValueName = (option.OptionType == "color" ? value.ValueHexModel : value.OptionValueName);
-                                }
-
-                                if (itemValue.ProductAttribut.PricePrefix == "+")
-                                {
-                                    tot += Convert.ToDecimal(itemValue.ProductAttribut.AttributePrice);
-                                }
-
-                                if (itemValue.ProductAttribut.PricePrefix == "-")
-                                {
-                                    if (tot != 0)
-                                    {
-                                        tot -= Convert.ToDecimal(itemValue.ProductAttribut.AttributePrice);
-                                    }
-                                }
-                            }
-                            _mapper.Map<OptionDto>(option);
-                        }
-                    }
-                }
-            }
-            return tot;
-        }
-        public async Task<decimal> getOptionsOrdersTotalPriceTest(int productId, int orderId)
+        public async Task<decimal> GetOptionsOrdersTotalPrice(int productId, int orderId)
         {
             decimal total = 0;
             var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(productId, orderId , false);
@@ -604,18 +609,18 @@ namespace BusinessLogic.ApiClasses
                     foreach (var item in orderAttributProducts)
                     {
                         var attr = item.ProductAttribut;
-                        var attributProduct = await _repositoryManager.Attribute.GetProductOptionValue(productId, attr.OptionId, attr.ValueId);
+                        var attributProduct = await _repositoryManager.Attribute.GetAttributeId(item.ProductAttributId.Value , true);
 
-                        if (attr.PricePrefix == "+")
+                        if (attributProduct.PricePrefix == "+")
                         {
-                            total += Convert.ToDecimal(item.ProductAttribut.AttributePrice);
+                            total += Convert.ToDecimal(attributProduct.AttributePrice);
                         }
 
-                        if (attr.PricePrefix == "-")
+                        if (attributProduct.PricePrefix == "-")
                         {
                             if (total != 0)
                             {
-                                total -= Convert.ToDecimal(item.ProductAttribut.AttributePrice);
+                                total -= Convert.ToDecimal(attributProduct.AttributePrice);
                             }
                         }
                     }
@@ -623,28 +628,6 @@ namespace BusinessLogic.ApiClasses
             }
             return total;
         }
-        //public async Task<List<OptionDto>> GetOptionsCart(int cartId)
-        //{
-        //    var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId);
-        //    var optionDto = new List<OptionDto>();
-        //    if (cartAttributeProducts.Count() > 0)
-        //    {
-        //        foreach (var item in cartAttributeProducts)
-        //        {
-        //            var option = await _repositoryManager.Option.GetAllOptions();
-        //            var productAttribut = await _repositoryManager.Attribute.GetProductOptionValue(item.Cart.ProductId, item.AttributesProduct.OptionId, item.AttributesProduct.ValueId);
-        //            if (productAttribut != null)
-        //            {
-        //                var value = await _repositoryManager.Value.GetValueId(item.AttributesProduct.ValueId, false);
-        //                var attributeDto = _mapper.Map<AttributeDto>(productAttribut);
-        //                attributeDto.AttributePrice = (productAttribut.PricePrefix == "+" ? productAttribut.AttributePrice : -productAttribut.AttributePrice);
-        //            }
-        //            optionDto = _mapper.Map<List<OptionDto>>(option);
-        //        }
-        //    }
-
-        //    return optionDto;
-        //}
         //Value------------------------------------------------
         public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
         {

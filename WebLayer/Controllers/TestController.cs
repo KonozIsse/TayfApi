@@ -45,22 +45,16 @@ namespace WebLayer.Controllers
         [HttpPost("add2")]
         public async Task<IActionResult> addAdd (int id , CreateCartDto create)
         {
-            await _cartBL.AddProductToCart(id , create);
+            await _cartBL.AddCart(id , create);
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update(int id , int st )
+        public async Task<IActionResult> update(int id , UpdateOderDto st )
         {
-            await _orderBL.UpdateStatusOrder(id , st);
+          //  await _orderBL.EditOrder(id , st);
             return NoContent();
-        } 
-        [HttpPut("update1")]
-        public async Task<IActionResult> update1(int id )
-        {
-            await _orderBL.OrderCancal(id );
-            return NoContent();
-        } 
+        }
         [HttpDelete("delete")]
         public async Task<IActionResult> delete(int id )
         {
@@ -68,9 +62,9 @@ namespace WebLayer.Controllers
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id)
+        public async Task<IActionResult> get(int id , int ut )
         {
-            var langs = await _orderBL.GetHistoryOrder( id );
+            var langs = await _productBL.GetProduct( id , ut );
             return Ok(langs);
         }
     }
