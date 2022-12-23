@@ -21,7 +21,7 @@ namespace Repository
         public async Task<Banner> GetBannerByType(int langId, string type ,bool trackChanges)
          => await FindByCondition(c => c.LangId.Equals(langId) && c.Type == type, trackChanges).FirstOrDefaultAsync();
         public async Task<List<Banner>> GetAllBanner(bool trackChanges)
-         => await FindAll(trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).ToListAsync();
+         => await FindAll(trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<Banner> GetBannerById(int id, bool trackChanges)
             => await FindByCondition(c => c.Id.Equals(id) , trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).FirstOrDefaultAsync();
         public async Task<Banner> GetBannerId(int id, bool trackChanges)
@@ -46,7 +46,7 @@ namespace Repository
 
         }
         public List<Service> GetAllServices(bool trackChanges)
-          =>  FindAll(trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).ToList();
+          =>  FindAll(trackChanges).OrderByDescending(e => e.CreatedAt).Include(x => x.Image).Include(x => x.Image.ImageSettings).ToList();
 
         public async Task<Service> GetServiceById(int id, bool trackChanges, bool includeOtherModels = true)
         {
@@ -68,10 +68,10 @@ namespace Repository
         }
         public List<Sliders> GetSlidersForWeb()
         =>  FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Web, false)
-                .Include(x => x.Image).Include(x => x.Image.ImageSettings).ToList();
+                .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToList();
         public List<Sliders> GetSlidersForMobile()
       =>  FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Mobile, false)
-                .Include(x => x.Image).Include(x => x.Image.ImageSettings).ToList();
+                .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToList();
         public async Task<Sliders> GetSlideById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
         public void DeleteSlider(Sliders sliders) => Delete(sliders);

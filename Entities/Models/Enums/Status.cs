@@ -8,7 +8,7 @@ namespace Entities.Models.Enums
 {
     public enum Status
     {
-        Active = 1 ,
-        NotActive = 2 
+        NotActive,
+        Active
     }
 }

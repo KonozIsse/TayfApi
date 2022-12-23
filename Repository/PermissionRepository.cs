@@ -17,9 +17,12 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<Permission>> GetPermissions (int roleId)
-        => await FindByCondition(c => c.RoleId == roleId && c.Link.Show == true, false).Include(r => r.Link).ToListAsync();
-
+        public async Task<IEnumerable<Permission>> GetPermissionsShowRole (int roleId)
+        => await FindByCondition(c => c.RoleId == roleId && c.Link.Show == true, false).Include(r => r.Link).ToListAsync();   
+        public async Task<IEnumerable<Permission>> GetPermissionsRole (int roleId , bool trackChanges)
+        => await FindByCondition(c => c.RoleId == roleId , trackChanges).ToListAsync();
+        public void AddPermission(Permission permission) => Create(permission);
+        public void DeletePermission(Permission permission) => Delete(permission);
     }
     public class LinkRepository : RepositoryBase<Link>, ILinkRepository
     {

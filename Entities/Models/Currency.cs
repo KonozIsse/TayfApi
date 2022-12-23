@@ -4,7 +4,8 @@ namespace Entities.Models
     public class Currency : BaseEntity
     {
         [StringLength(50)]
-        public string Name { get; set; }
+        public string Name { get; set; }  
+        public string NameAr { get; set; }
         public string Position { get; set; }
         public string Symbol { get; set; }
         [StringLength(1)]

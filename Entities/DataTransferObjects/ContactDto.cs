@@ -10,6 +10,7 @@ namespace Entities.DataTransferObjects
     public class ContactDto
     {
         public int Id { get; set; }
+        public DateTime CreatedAt { get; set; }
         public Status IsStatus { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

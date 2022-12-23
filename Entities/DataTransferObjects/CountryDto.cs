@@ -20,6 +20,8 @@ namespace Entities.DataTransferObjects
     }
     public class CreateCountryDto
     {
+        public Dictionary<string, string> CountryNames { get; set; }
+        public string CountryNameAr { get; set; }
         public string CountryName { get; set; }
         public string CountryCode2 { get; set; }
         public string CountryCode3 { get; set; }
@@ -28,5 +30,6 @@ namespace Entities.DataTransferObjects
     }
     public class UpdateCountryDto: CreateCountryDto
     {
+        public int Id { get; set; }
     }
 }

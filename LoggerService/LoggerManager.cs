@@ -19,10 +19,12 @@ namespace LoggerService
         {
             logger.Debug(message);
         }
-        public void LogError(string message)
+        public void LogError(string message, Exception exp)
         {
-            logger.Error(message);
+            logger.Error(message , exp);
         }
+
+
         public void LogInfo(string message)
         {
             logger.Info(message);

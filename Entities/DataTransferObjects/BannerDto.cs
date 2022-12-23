@@ -22,9 +22,11 @@ namespace Entities.DataTransferObjects
         public int? LangId { get; set; }
         public int? VendorId { get; set; }
         public int ImgId { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     public class UpdateBannerDto
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
         public int? LangId { get; set; }

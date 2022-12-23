@@ -16,13 +16,28 @@ namespace Repository
         public ImageRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         {
         }
-
+        public async Task<Image> GetImage(int id , bool trackChanges)
+         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<List<Image>> GetProductImages(int productId)
           => await FindByCondition(c => c.ProductId == productId ,false).ToListAsync();
-        public async Task<List<Image>> GetImages(ImageCategory category)
-        => await FindByCondition(c => c.Category == category, false).OrderByDescending(r => r.CreatedAt).ToListAsync();
-        public async Task<List<Image>> GetImageCategoryByVendor(int vendorId, ImageCategory category)
-        => await FindByCondition(c=>c.VendId == vendorId && c.Category == category, false).OrderByDescending(r => r.CreatedAt).ToListAsync();
+        public async Task<List<Image>> GetImages(string category)
+        {
+            var images = FindAll(false);
+            if(category != null && category != "")
+            {
+                images.Where(c => c.Category.Equals(category));
+            }
+            return await images.OrderByDescending(c => c.CreatedAt).ToListAsync();
+        }
+        public async Task<List<Image>> GetImagesVendor(int vendorId, string category)
+        {
+            var images = FindByCondition(c=>c.VendId == vendorId , false);
+            if (category != null && category != "")
+            {
+                images.Where(c => c.Category.Equals(category));
+            }
+            return await images.OrderByDescending(c => c.CreatedAt).ToListAsync();
+        }
         public void AddImage (Image image) => Create(image);
         public void DeleteImage(Image image) => Delete(image);
 

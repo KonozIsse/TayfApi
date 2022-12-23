@@ -14,11 +14,13 @@ namespace Entities.DataTransferObjects
         public Status IsStatus { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public int? ImgId { get; set; }
+        public int? ImgId { get; set; } 
+        public DateTime CreatedAt { get; set; }
     } 
    
     public class UpdateServiceDto
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public int? ImgId { get; set; }

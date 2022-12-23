@@ -18,8 +18,8 @@ namespace Repository
         }
         public async Task<IEnumerable<ImageSetting>> GetImageSettings(int imageId)
         => await FindByCondition(y => y.ImgId == imageId, false).ToListAsync();
-        public async Task<ImageSetting> GetImageSettingId(int id)
-         => await FindByCondition(y => y.Id == id, false).FirstOrDefaultAsync();
+        public async Task<ImageSetting> GetImageSettingId(int id , bool trackChanges)
+         => await FindByCondition(y => y.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<ImageSetting> GetByType(int imageId, string ImageType = null )
         {
             var query = FindByCondition(y => y.ImgId == imageId, false);

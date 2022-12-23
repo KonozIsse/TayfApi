@@ -12,6 +12,7 @@ namespace Contracts
         Task<Order> GetOrderId(int id, bool trackChanges);
         Task<Order> GetActiveOrderId(int id, bool trackChanges);
         Task<List<Order>> GetAllOrders();
+        Task<List<Order>> GetsAllTransactionOrders();
         Task<List<Order>> GetOrdersToCustomer(int customerId);
         Task<List<Order>> GetOrdersToStore(int storeId);
         Task<Order> GetOrderDetailsByCustomer(int id, int customerId);

@@ -17,11 +17,14 @@ namespace Entities.DataTransferObjects
         public string Name { get; set; }
         public short? IsDefault { get; set; }
        public int? ImgId { get; set; }
+        public short Sort { get; set; }
     }
 
     public class UpdateLanguageDto
     {
+        public int Id { get; set; }
         public string Code { get; set; }
+        public Dictionary<string, string> LangNames { get; set; }
         public string Name { get; set; }
         public string Direction { get; set; }
         public int? ImgId { get; set; }

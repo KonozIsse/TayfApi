@@ -19,8 +19,8 @@ namespace Repository
         }
         public async Task<List<Product>> GetAllAcceptedProducts()
           => await FindByCondition(c =>  c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
-            .Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(e => e.WishLists)
-            .Include(c => c.Reviews).Include(c => c.AttributesProducts).Include(i=>i.Images).Include(c=>c.Store)
+            .Include(c=>c.Category).Include(c=>c.Store).Include(s => s.SpecialProducts).Include(c => c.ProductSales)
+            .Include(c => c.Reviews).Include(c => c.AttributesProducts).Include(i=>i.Images).Include(e => e.WishLists)
             .OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<Product> GetProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
@@ -31,18 +31,14 @@ namespace Repository
             .Include(c=>c.Category).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
             .Include(c=>c.Reviews).Include(e=>e.WishLists).Include(c=>c.AttributesProducts).FirstOrDefaultAsync();
          public async Task<List<Product>> GetProductsCatId(int categoryId)
-       => await FindByCondition(c => c.CategoryId == categoryId  , false).ToListAsync();
-        public List<Product> GetAllProducts()
-       => FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToList();
-        public async Task<List<int>> GetProductsCategoryId(int categoryId)
-        => await FindByCondition(c => c.CategoryId == categoryId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).Select(c => c.Id).ToListAsync();
+       => await FindByCondition(c => c.CategoryId == categoryId && c.IsStatus == Status.Active, false).ToListAsync();
 
         public async Task<List<Product>> GetProductsTOStoreId(int storeId)
-        => await FindByCondition(c => c.StoreId == storeId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        => await FindByCondition(c => c.StoreId == storeId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.Id).ToListAsync();
         public async Task<Product> GetProductStore( int productId ,int storeId )
        => await FindByCondition(c => c.Id == productId && c.StoreId == storeId && c.IsStatus == Status.Active, false).FirstOrDefaultAsync();
-        public async Task<List<Product>> GetAllProductLikeCustomersId(int customerId)
-        => await FindByCondition(c => c.WishLists.Any(c => c.CustomerId == customerId), false).ToListAsync();
+        public async Task<List<Product>> GetProducts()
+        => await FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c=>c.Id).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)
          => await FindByCondition(c => c.Id == id && c.IsAcceptAdmin == true, false).FirstOrDefaultAsync();
         public async Task<List<Product>> GetFeartureProducts(int pageSize)
@@ -71,16 +67,27 @@ namespace Repository
 
         public async Task<List<Product>> SearshProductByCategoryAndStore(int storeId, string search, int categoryId)
         {
-            var list = FindByCondition(c => categoryId == 0 || c.Category.MainCategoryId == categoryId
-            || (c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 1)
+            var list = FindByCondition(c => 
+            (c.Category.MainCategoryId == categoryId ||c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 0)
 
-            && storeId == 0 || c.StoreId == storeId && c.Store.Status == Status.Active
+            &&( storeId == 0 || c.StoreId == storeId && c.Store.Status == Status.Active)
             && c.IsAcceptAdmin == true && c.IsStatus == Status.Active
 
             && ((!String.IsNullOrEmpty(c.Category.CategoryName) && c.Category.CategoryName.Contains(search)) || String.IsNullOrEmpty(search))
 
             || ((!String.IsNullOrEmpty(c.ProductName) && c.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
             return await list.ToListAsync();
+        }
+        public async Task<List<Product>> GetProductByCategoryAndStoreIdForCP(int storeId, string search, int categoryId)
+        {
+            var list =  FindByCondition(r => r.CategoryId == categoryId && r.IsStatus == Status.Active &&
+                    ((!String.IsNullOrEmpty(r.ProductName)  && r.ProductName.Contains(search)) || String.IsNullOrEmpty(search)),false);
+            
+            if (storeId != 0)
+            {
+                list = list.Where(r=>r.Store != null && r.Store.Status == Status.Active && r.StoreId == storeId) ;
+            }
+            return await list.OrderByDescending(r => r.Id).ToListAsync();
         }
         public void AddProductOnCategory(int categoryId, Product product)
         {

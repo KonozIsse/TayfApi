@@ -4,13 +4,14 @@ namespace Entities.Models
     using System.ComponentModel.DataAnnotations.Schema;
     public class Category : BaseEntity
     {
-        public string CategoryName { get; set; }
+        public string CategoryName { get; set; } 
+        public string CategoryNameAr { get; set; }
         public int MainCategoryId { get; set; }
        
         [ForeignKey(nameof(Images))]
         public int? ImgId { get; set; }
         public Image Images { get; set; }
         public List<Product> Products { get; set; } 
-        //public List<User> Store { get; set; }
+        public List<User> Store { get; set; }
     }
 }

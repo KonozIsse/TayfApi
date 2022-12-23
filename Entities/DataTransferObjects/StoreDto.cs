@@ -13,63 +13,54 @@ namespace Entities.DataTransferObjects
     public class StoreDto
     {
         public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Avater { get; set; }
         public int? CountryId { get; set; }
-       // public List<OrderDto> Orders { get; set; }
-
+        // public List<OrderDto> Orders { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     public class CreateStoreDto
     {
         public string FirstName { get; set; }
-        public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public Status Status { get; set; }
         public string Url { get; set; }
         public string Lang { get; set; }
-        public int? ImageId { get; set; }
+        public string Avater { get; set; }
         public int? CountryId { get; set; }
     }
     public class UpdateStoreDto 
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public int Id { get; set; }
+        public string NameStore { get; set; }
         public string PhoneNumber { get; set; }
         public Status Status { get; set; }
         public string Url { get; set; }
-        public int? ImageId { get; set; }
+        public string Avater { get; set; }
         public int? CountryId { get; set; }
     }
-    public class CreateCustomerDto
+ 
+    public class CreateAdminDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
-        public string Avater { get; set; }
-        public string Password { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }
+        public Status Status { get; set; }
         public string Lang { get; set; }
-        public TypeRegister TypeRegister { get; set; }
-        public bool? IsSubscribe { get; set; }
-        public string SocialImage { get; set; }
-        public string SocialId { get; set; }
-        public int? CountryId { get; set; }
+        public int CountryId { get; set; }
+        public int RoleId { get; set; } 
     }
-    public class UpdateUserDto : CreateCustomerDto
+    public class UpdateAdminDto : CreateAdminDto
     {
+        public int Id { get; set; }
+        public string OldPassword { get; set; }
     }
-    public class CodeDto
-    {
-        public string PhoneNumber { get; set; }
-        public int? CountryId { get; set; }
-        public int? VerifiedCode { get; set; }
-    }
-
     public class UserDto
     {
         public int Id { get; set; }
@@ -105,7 +96,7 @@ namespace Entities.DataTransferObjects
         public string ConfirmPassword { get; set; }
 
         public string Email { get; set; }
-        public string Token { get; set; }
+        public string Code { get; set; }
     }
     public class UserForAuthenticationDto
     {

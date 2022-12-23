@@ -29,7 +29,6 @@ namespace EmailService
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            //emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message.Content };
 
 
@@ -42,7 +41,7 @@ namespace EmailService
             {
                 try
                 {
-                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
+                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, false);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
                     client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
 
@@ -91,9 +90,5 @@ namespace EmailService
                 }
             }
         }
-
-       
     }
-
-
 }

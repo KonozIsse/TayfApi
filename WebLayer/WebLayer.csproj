@@ -1,18 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ApplicationIcon />
-    <OutputType>Exe</OutputType>
-    <StartupObject />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ApplicationIcon />
+		<OutputType>Exe</OutputType>
+		<StartupObject />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Migrations\**" />
-    <Content Remove="Migrations\**" />
-    <EmbeddedResource Remove="Migrations\**" />
-    <None Remove="Migrations\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Migrations\**" />
+		<Compile Remove="Services\**" />
+		<Content Remove="Migrations\**" />
+		<Content Remove="Services\**" />
+		<EmbeddedResource Remove="Migrations\**" />
+		<EmbeddedResource Remove="Services\**" />
+		<None Remove="Migrations\**" />
+		<None Remove="Services\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="LibLog" Version="5.0.8">
@@ -53,39 +57,35 @@
 
 
 	<ItemGroup>
-    <ProjectReference Include="..\Business\BusinessLogic.csproj" />
-    <ProjectReference Include="..\EmailService\EmailService.csproj" />
-    <ProjectReference Include="..\Entities\Entities.csproj" />
-    <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
-    <ProjectReference Include="..\Repository\Repository.csproj" />
-  </ItemGroup>
+		<ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+		<ProjectReference Include="..\EmailService\EmailService.csproj" />
+		<ProjectReference Include="..\Entities\Entities.csproj" />
+		<ProjectReference Include="..\LoggerService\LoggerService.csproj" />
+		<ProjectReference Include="..\Repository\Repository.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="OrderDetailsds.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>OrderDetailsds.xsd</DependentUpon>
-    </Compile>
-    <Compile Update="BlogForTrainingDataSet3.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>BlogForTrainingDataSet3.xsd</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="OrderDetailsds.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>OrderDetailsds.xsd</DependentUpon>
+		</Compile>
+		<Compile Update="BlogForTrainingDataSet3.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>BlogForTrainingDataSet3.xsd</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="BlogForTrainingDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>Summaryds.Designer.cs</LastGenOutput>
-    </None>
-    <None Update="BlogForTrainingDataSet3.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>BlogForTrainingDataSet3.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="BlogForTrainingDataSet.xsd">
+			<Generator>MSDataSetGenerator</Generator>
+			<LastGenOutput>Summaryds.Designer.cs</LastGenOutput>
+		</None>
+		<None Update="BlogForTrainingDataSet3.xsd">
+			<Generator>MSDataSetGenerator</Generator>
+			<LastGenOutput>BlogForTrainingDataSet3.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
 
 </Project>

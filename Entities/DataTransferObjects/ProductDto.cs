@@ -2,12 +2,6 @@
 using Entities.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
 
 namespace Entities.DataTransferObjects
 {
@@ -25,6 +19,7 @@ namespace Entities.DataTransferObjects
         public int? StoreId { get; set; }
         public int? AdminId { get; set; }
         public int TypeId { get; set; }
+        public bool? IsAcceptAdmin { get; set; }
         public string StoreName { get; set; }
         public string StoreImage { get; set; }
         public string ShareLink { get; set; }
@@ -35,6 +30,9 @@ namespace Entities.DataTransferObjects
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public DateTime CreatedAt { get; set; } 
+        public DateTime? UpdatedAt { get; set; }
         public List<WishListDto> WishLists { get; set; }
         public List<ReviewDto> Reviews { get; set; }
         public List<SpecialDto> SpecialProducts { get; set; }
@@ -44,7 +42,10 @@ namespace Entities.DataTransferObjects
     }
     public class CreateProductDto
     {
+        public Dictionary<string, string> ProductNames { get; set; }
+        public Dictionary<string, string> ProductDescriptions { get; set; }
         public string ProductName { get; set; }
+        public Status IsStatus { get; set; }
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
@@ -54,7 +55,7 @@ namespace Entities.DataTransferObjects
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public List<CreateImageDto> Images { get; set; }
+        public List<string> imagesProduct { get; set; }
         public bool IsSale { get; set; }
         public List<CreateSaleDto> ProductSales { get; set; }
         public bool IsSpecial { get; set; }
@@ -62,6 +63,7 @@ namespace Entities.DataTransferObjects
     }
     public class UpdateProductDto : CreateProductDto
     {
+        public int Id { get; set; }
     }
     public class ProductPageDto
     {

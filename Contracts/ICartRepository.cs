@@ -18,5 +18,6 @@ namespace Contracts
         void AddCart(Cart cart);
         void DeleteCart(Cart cart);
         int GetCart(int custmer);
+        int CartCount();
     }
 }

@@ -21,7 +21,7 @@ namespace Repository
         public async Task<List<Country>> GetCountriesCountZones(bool trackChanges)
         => await FindByCondition(c => c.Zones.Count() > 0, trackChanges).Include(x => x.Zones).ToListAsync();
         public async Task<List<Country>> GetCountries()
-        => await FindAll(false).Include(x => x.Zones).ToListAsync();
+        => await FindAll(false).Include(x => x.Zones).Include(c=>c.Image).ToListAsync();
         public async Task<Country> GetcountryById(int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id , trackChanges).FirstOrDefaultAsync();
         public bool ExistCountry(string countryName, int code)
@@ -37,6 +37,8 @@ namespace Repository
         {
 
         }
+        public bool ExistZone(string name, string code)
+        => FindByCondition(x => x.ZoneName == name && x.ZoneCode == code, false).Count() > 0;
         public async Task<List<Zone>> GetZonesByCountryId(int countryId)
         => await FindByCondition(c => c.CountryId == countryId, false).ToListAsync();
         public async Task<Zone> GetZoneId (int id, bool trackChanges)

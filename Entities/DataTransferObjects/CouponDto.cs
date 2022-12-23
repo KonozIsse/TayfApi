@@ -36,5 +36,6 @@ namespace Entities.DataTransferObjects
     }
     public class UpdateCouponDto: CreateCouponDto
     {
+        public int Id { get; set; }
     }
 }

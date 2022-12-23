@@ -10,7 +10,7 @@ namespace Contracts
     public interface ISettingRepository
     {
         Task<IEnumerable<Setting>> GetAllSettings(bool trackChanges);
-        Setting GetSettingByValue(string key);
+        Task<Setting> GetSettingByValue(string key);
         Task<IEnumerable<Setting>> GetMediaSetting();
          string GetPeriod();
     } 
@@ -25,7 +25,7 @@ namespace Contracts
     {
         Task<List<MailList>> GetMailLists();
         Task<MailList> GetMailListById(int id, bool trackChanges);
-        Task<MailList> GetMailListEmail(string email);
+        Task<List<MailList>> GetMailListEmail(string search);
         void SendUserEmail(MailList sendEmail);
         void RemoveMailList(MailList email);
     }

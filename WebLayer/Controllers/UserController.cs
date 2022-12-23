@@ -1,5 +1,4 @@
-﻿using BusinessLogic;
-using BusinessLogic.ApiClasses;
+﻿
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.Models.Enums;
@@ -16,16 +15,10 @@ namespace WebLayer.Controllers
     [ApiController]
     public class UserController : MyBaseController
     {
-        protected readonly NewsBL _newsBL;
-        protected readonly HomeBL _homeBL; 
-        protected readonly ProductBL _productBL;
-        protected readonly UserBL _userBL;
-        public UserController(IServiceProvider serviceProvider , NewsBL newsBL, HomeBL homeBL , UserBL userBL , ProductBL productBL) : base(serviceProvider)
+        
+        public UserController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _newsBL = newsBL;
-            _homeBL = homeBL;
-            _productBL = productBL;
-            _userBL = userBL;
+            
         }
         [HttpGet]
         [Route("user-details")]

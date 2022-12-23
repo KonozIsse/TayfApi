@@ -11,8 +11,6 @@ namespace Entities.Models
         public string Title { get; set; }
         public string Decription { get; set; }
         public string Url { get; set; }
-        public DateTime AddDate { get; set; }
-        public DateTime? LastUpdateDate { get; set; }
         public short IsFeature { get; set; }
         public int? IsViewed { get; set; }
         public int CountComment { get; set; }

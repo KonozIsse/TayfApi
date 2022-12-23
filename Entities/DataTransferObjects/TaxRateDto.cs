@@ -15,23 +15,28 @@ namespace Entities.DataTransferObjects
         public Status IsStatus { get; set; }
         public decimal Tax_Rate { get; set; }
         public int TaxClassId { get; set; }
-        public int ZoneId { get; set; }
+        public int ZoneId { get; set; } 
+        public int? StoreId { get; set; }
     }
     public class CreateTaxRateDto
     {
         public decimal Tax_Rate { get; set; }
+        public string Description { get; set; }
         public int TaxClassId { get; set; }
         public int ZoneId { get; set; }
     }
     public class UpdateTaxRateDto : CreateTaxRateDto
     {
+        public int Id { get; set; }
     } 
     public class TaxClassDto
     {
         public int Id { get; set; }
         public Status IsStatus { get; set; }
         public string Title { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } 
+        public DateTime CreateAt { get; set; }
+        public int? StoreId { get; set; }
     }
     public class CreateTaxClassDto
     {
@@ -40,5 +45,6 @@ namespace Entities.DataTransferObjects
     } 
     public class UpdateTaxClassDto: CreateTaxClassDto
     {
+        public int Id { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,6 +12,7 @@ namespace Entities.DataTransferObjects
     public class ReviewDto
     {
         public int  Id { get; set; }
+        public Status IsStatus { get; set; }
         public string Text { get; set; }
         public double Rating { get; set; }
         public int ProductId { get; set; }

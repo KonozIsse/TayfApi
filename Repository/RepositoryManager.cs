@@ -56,7 +56,8 @@ namespace Repository
         private IDeviceRepository _deviceRepository;
         private IReviewRepository _reviewRepository;
         private IZoneRepository _zoneRepository; 
-        private IUnitRepository _unitRepository; 
+        private IUnitRepository _unitRepository;    
+        private IRoleRepository _roleRepository; 
         
 
         public RepositoryManager(RepositoryContext repositoryContext)
@@ -478,7 +479,17 @@ namespace Repository
                     _productTypeRepository = new ProductTypeRepository(_repositoryContext);
                 return _productTypeRepository;
             }
-        }
+        } 
+
+        public IRoleRepository Role 
+        {
+            get
+            {
+                if (_roleRepository == null)
+                    _roleRepository = new RoleRepository(_repositoryContext);
+                return _roleRepository;
+            }
+        } 
         public Task SaveAsync() => _repositoryContext.SaveChangesAsync();
     }
 }

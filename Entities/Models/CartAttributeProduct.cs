@@ -9,9 +9,9 @@ namespace Entities.Models
 {
     public class CartAttributeProduct : BaseEntity
     {
-        //[ForeignKey(nameof(Cart))]
+        [ForeignKey(nameof(Cart))]
         public int? CartId { get; set; }
-       // public Cart Cart { get; set; }
+        public Cart Cart { get; set; }
 
         [ForeignKey(nameof(AttributesProduct))]
         public int AttributesProductId { get; set; }

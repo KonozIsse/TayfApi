@@ -19,12 +19,9 @@ namespace Repository
         public async Task<Review> GetReviewId(int id , bool trackChanges)
        => await FindByCondition(c => c.Id == id , trackChanges).FirstOrDefaultAsync();
 
-        public async Task<PagedList<Review>> GetReviewsByProductId(int productId , PostsParameters postsParameters)
-        {
-            var review = await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active,false)
-                .Include(u => u.Customer).OrderByDescending(r => r.Rating).ToListAsync();
-            return PagedList<Review>.ToPagedList(review, postsParameters.PageNumber, postsParameters.PageSize);
-        }
+        public async Task<List<Review>> GetReviews()
+       =>await FindAll(false).ToListAsync();
+        
         public async Task<IEnumerable<Review>> Last3Reviews(int productId)
          => await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active, false)
                 .Include(u => u.Customer).OrderByDescending(r => r.Rating).Take(3).ToListAsync();

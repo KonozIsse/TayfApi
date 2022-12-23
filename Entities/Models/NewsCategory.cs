@@ -9,8 +9,6 @@ namespace Entities.Models
     {
         public string CategoryName { get; set; }
         public int MainCategoryId { get; set; }
-        public DateTime AddDate { get; set; }
-        public DateTime? LastUpdateDate { get; set; }
         [ForeignKey(nameof(Image))]
         public int? ImgId { get; set; }
         public Image Image { get; set; }

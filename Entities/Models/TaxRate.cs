@@ -8,6 +8,8 @@ namespace Entities.Models
     public class TaxRate : BaseEntity
     {
         public decimal Tax_Rate { get; set; }
+        public string Description { get; set; }
+        public int? StoreId { get; set; }
         [ForeignKey(nameof(TaxClass))]
         public int TaxClassId { get; set; }
         public TaxClass TaxClass { get; set; }

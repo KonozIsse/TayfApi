@@ -9,6 +9,7 @@ namespace Entities.Models
         [Required]
         [StringLength(64)]
         public string Title { get; set; }
+        public string TitleAr { get; set; }
         [Required]
         [StringLength(191)]
         public string Url { get; set; }

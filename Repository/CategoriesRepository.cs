@@ -19,56 +19,35 @@ namespace Repository
         }
         public async Task<Category> GetCategoryById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
-        public async Task<Category> GetCategoryIdMainId(int id, int mainId , bool trackChanges)
-        => await FindByCondition(c => c.Id == id && c.MainCategoryId == mainId, trackChanges).SingleOrDefaultAsync();
         public async Task<IEnumerable<Category>> GetAllCategories(bool trackChanges)
         => await FindByCondition(c => c.IsStatus == Status.Active, trackChanges).ToListAsync();
         public async Task<IEnumerable<Category>> GetSubCategoriesByMainId(int id, bool trackChanges)
          => await FindByCondition(c => c.MainCategoryId == id && c.IsStatus == Status.Active, trackChanges).ToListAsync();
-        public async Task<IEnumerable<Category>> GetMainCategories(bool trackChanges)
-        => await FindByCondition(c => c.MainCategoryId == 0 && c.IsStatus == Status.Active, trackChanges).ToListAsync();
+        public async Task<IEnumerable<Category>> GetSubCategoriesMainIDCP (int mainId)
+        => await FindByCondition(c => c.MainCategoryId == mainId , false).OrderByDescending(x => x.CreatedAt).ToListAsync();
+        public async Task<IEnumerable<Category>> GetSubActiveCategories(bool trackChanges)
+      => await FindByCondition(c => c.MainCategoryId != 0 && c.IsStatus == Status.Active, trackChanges).ToListAsync();
         public async Task<IEnumerable<Category>> GetSubCategories(bool trackChanges)
-        => await FindByCondition(c => c.MainCategoryId != 0 && c.IsStatus == Status.Active, trackChanges).ToListAsync();
-        public async Task<IEnumerable<Category>> SearchSubCategories(int categoryId, string search)
+        => await FindByCondition(c => c.MainCategoryId == 0 && c.IsStatus == Status.Active, trackChanges).ToListAsync();
+        public async Task<IEnumerable<Category>> SubCategoriesMainId()
+        => await FindByCondition(c => c.MainCategoryId == 0 , false).ToListAsync();
+        public async Task<IEnumerable<Category>> SearchMainCategoriesStoreId(int storeId , string search)
         {
-            var query = FindByCondition(c => c.MainCategoryId == categoryId && c.IsStatus == Status.Active, false);
+            var query = FindByCondition(c => c.Id != 1 && c.IsStatus == Status.Active
+           && c.Products.Any(x=>x.IsStatus == Status.Active && x.StoreId == storeId) , false);
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(x => x.CategoryName.Contains(search));
             }
-            return await query.ToListAsync();
+            return await query.OrderByDescending(c=>c.CreatedAt).ToListAsync();
         }
-        public async Task<IEnumerable<Category>> SearchMainCategoriesStoreId(int storeId ,int categoryId, string search)
+        public async Task<IEnumerable<Category>> SearchMainCategoriesCP(string search)
         {
-            var query = FindByCondition(c => c.Id == categoryId || c.MainCategoryId == categoryId && c.IsStatus == Status.Active
-           && c.Products.Any(x=>x.IsStatus == Status.Active)/* && c.CategoriesStores.Any(x=>x.VendorId== storeId)*/, false);
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(x => x.CategoryName.Contains(search));
-            }
-            return await query.ToListAsync();
-        }
-        public async Task<IEnumerable<Category>> SearchMainCategories(string search)
-        {
-            var query = FindByCondition(c => c.MainCategoryId == 1 && c.IsStatus == Status.Active, false);
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(x => x.CategoryName.Contains(search));
-            }
-            return await query.ToListAsync();
+            var query = FindByCondition(c => c.MainCategoryId == 0 && c.CategoryName.Contains(search), false);
+            return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
         }
         public void CreateMainCategory(Category category) => Create(category);
-        public void CreateSubCategory(int mainId, Category subCategory)
-        {
-            subCategory.MainCategoryId = mainId;
-            Create(subCategory);
-        }
         public void DeleteCategory(Category category) => Delete(category);
-        public async Task DeleteSupCategories(List<int> Ids)
-        {
-            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
-            DeleteRange(result);
-        }
         public async Task<Category> GetCategoryToPrductId (int productId)
         => await FindByCondition(c => c.Products.Any(x=>x.Id == productId), false).SingleOrDefaultAsync();
       

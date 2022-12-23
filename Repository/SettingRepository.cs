@@ -15,12 +15,12 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<Setting>> GetAllSettings(bool trackChanges)=> await FindAll(trackChanges).ToListAsync();
-        public Setting GetSettingByValue(string key)   
-          =>  FindByCondition(c => c.Key == key, false).FirstOrDefault();
+        public async Task<IEnumerable<Setting>> GetAllSettings(bool trackChanges) => await FindAll(trackChanges).ToListAsync();
+        public async Task<Setting> GetSettingByValue(string key)
+          => await FindByCondition(c => c.Key == key, false).FirstOrDefaultAsync();
         public async Task<IEnumerable<Setting>> GetMediaSetting()
-         => await FindByCondition(x => x.Id == 88|| x.Id == 89 || x.Id == 90|| x.Id == 91 || x.Id == 92 || x.Id == 93, false).ToListAsync();
-        public string GetPeriod() => FindByCondition(r => r.Key == "Refund_Money_Days",false).SingleOrDefault().Value;
+         => await FindByCondition(x => x.Id == 88 || x.Id == 89 || x.Id == 90 || x.Id == 91 || x.Id == 92 || x.Id == 93, false).ToListAsync();
+        public string GetPeriod() => FindByCondition(r => r.Key == "Refund_Money_Days", false).SingleOrDefault().Value;
     }
     public class MessageTemplateRepository : RepositoryBase<MessageTemplate>, IMessageTemplateRepository
     {
@@ -47,8 +47,8 @@ namespace Repository
          => await FindAll(false).ToListAsync();
         public async Task<MailList> GetMailListById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
-        public async Task<MailList> GetMailListEmail(string email)
-        => await FindByCondition(c => c.Email == email, false).FirstOrDefaultAsync();
+        public async Task<List<MailList>> GetMailListEmail(string search)
+        => await FindByCondition(c => c.Email.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public void SendUserEmail(MailList sendEmail) => Create(sendEmail);
         public void RemoveMailList(MailList email) => Delete(email);
     }

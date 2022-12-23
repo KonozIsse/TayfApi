@@ -13,7 +13,7 @@ namespace Contracts
         Task<IEnumerable<Notification>> GetNotifications(bool trackChanges);
         Task<IEnumerable<Notification>> GetNewNotifications(bool trackChanges);
         Task<List<Notification>> GetNotificationsToUserId(int userId, bool trackChanges);
-        Task<PagedList<Notification>> GetPaginationNotifications(PostsParameters postsParameters, bool trackChanges);
+        Task<List<Notification>> GetNotificationsPage(int PageId, int rows);
         Task<Notification> FindNotificationId(int id, bool trackChanges);
         void CreateNotification(Notification notification);
         void DeleteNotification(Notification notification);

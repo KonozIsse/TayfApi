@@ -19,6 +19,8 @@ namespace Repository
         }
         public async Task<IEnumerable<TaxClass>> GetTaxClasses()
           => await FindAll(false).ToListAsync();
+        public bool ExistTax(string name)
+          => FindByCondition(c=>c.Title == name ,false).Count() > 0;
         public async Task<TaxClass> GetTaxClassId(int id, bool trackChanges)
          => await FindByCondition(r => r.Id == id, trackChanges).FirstOrDefaultAsync();
         public void AddTaxClass(TaxClass taxClass) => Create(taxClass);

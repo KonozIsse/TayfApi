@@ -8,6 +8,8 @@ namespace Entities.Models
     {
         public string CouponName { get; set; }
         public string Description { get; set; }
+        public string CouponNameAr { get; set; }
+        public string DescriptionAr { get; set; }
         [Required]
         [StringLength(191)]
         public string CouponCode { get; set; }
@@ -25,7 +27,5 @@ namespace Entities.Models
         public int? AdminId { get; set; }
         public User Admin { get; set; }
         public string Product { get; set; }
-        public List<UserCoupon> UserCoupons { get; set; }
-        public List<Order> Orders { get; set; }
     }
 }

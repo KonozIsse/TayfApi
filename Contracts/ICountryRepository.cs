@@ -19,6 +19,7 @@ namespace Contracts
     }
     public interface IZoneRepository
     {
+        bool ExistZone(string name, string code);
         Task<List<Zone>> GetZonesByCountryId(int countryId);
         Task<Zone> GetZoneIdCountryId(int id, int countryId, bool trackChanges);
         Task<Zone> GetZoneId(int id, bool trackChanges);

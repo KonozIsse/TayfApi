@@ -12,6 +12,7 @@ namespace Contracts
         Task<ProductOptionValue> GetValueId(int id, bool trackChanges);
          Task<List<ProductOptionValue>> GetValuesOPtionId(int optionId);
         Task<ProductOptionValue> GetOptionValue(int optionId);
+        Task<List<ProductOptionValue>> GetValues();
          void CreateValue(ProductOptionValue value) ;
          void DeleteValue(ProductOptionValue value) ;
     }

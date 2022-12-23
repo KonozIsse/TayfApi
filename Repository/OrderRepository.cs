@@ -24,7 +24,9 @@ namespace Repository
         public async Task<List<Order>> GetAllOrders()
          => await FindAll(false).OrderByDescending(r => r.CreatedAt).ToListAsync();
         public async Task<List<Order>> GetOrdersToStore(int storeId)
-       => await FindByCondition(c => c.StoreId == storeId, false).ToListAsync();
+       => await FindByCondition(c => c.StoreId == storeId, false).ToListAsync(); 
+        public async Task<List<Order>> GetsAllTransactionOrders()
+       => await FindByCondition(c => c.TransactionId != null, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<List<Order>> GetOrdersToCustomer(int customerId)
         => await FindByCondition(c => c.CustomerId == customerId, false).ToListAsync();
         public async Task<Order> GetOrderDetailsByCustomer(int id, int customerId)

@@ -6,8 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
-    <PackageReference Include="Microsoft.ReportingServices.ReportViewerControl.WebForms" Version="150.1484.0" />
-    <PackageReference Include="Microsoft.ReportViewer.WebForms" Version="10.0.40219.1" />
   </ItemGroup>
 
   <ItemGroup>

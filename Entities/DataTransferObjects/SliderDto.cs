@@ -16,6 +16,7 @@ namespace Entities.DataTransferObjects
         public string Decription { get; set; }
         public string Url { get; set; }
         public int? LangId { get; set; }
+        public DateTime CreateAt { get; set; }
     }
     public class CreateSliderDto
     {
@@ -23,9 +24,10 @@ namespace Entities.DataTransferObjects
         public string Title { get; set; }
         public string Decription { get; set; }
         public string Url { get; set; }
+        public int? LangId { get; set; }
     }
     public class UpdateSliderDto : CreateSliderDto
     {
-      
+        public int Id { get; set; }
     }
 }

@@ -21,17 +21,13 @@ namespace WebLayer.Controllers
     [ApiController]
     public class AuthenticationController : MyBaseController
     {
-        private readonly UserBL _userBL;
-        public AuthenticationController(IServiceProvider serviceProvider, UserBL userBL) : base(serviceProvider)
+        public AuthenticationController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _userBL = userBL;
         }
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromForm] CreateCustomerDto userForRegistration)
         {
             var user = _mapper.Map<User>(userForRegistration);
-            user.UserName = userForRegistration.FirstName + userForRegistration.LastName;
-            user.RoleId = 2;
             var result = await _userManager.CreateAsync(user, userForRegistration.Password);
             if (!result.Succeeded)
             {
@@ -139,7 +135,7 @@ namespace WebLayer.Controllers
             var user = await _userManager.FindByEmailAsync(resetPasswordModel.Email);
             if (user == null)
                 return Ok(_locService.GetLocalizedStringValue("user is not found !"));
-            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.Password);
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Code, resetPasswordModel.Password);
             if (!resetPassResult.Succeeded)
             {
                 foreach (var error in resetPassResult.Errors)

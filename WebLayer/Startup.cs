@@ -1,4 +1,4 @@
-using WebLayer.Extensions;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -34,14 +34,13 @@ using ResourcesLib;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Entities.Models.CorePushModels;
-using System.Collections.Specialized;
-using System.Threading.Tasks;
-using Quartz.Impl;
-using Quartz.Impl.Matchers;
-using WebLayer.Services;
-using WebLayer.Services.Jobs;
-using BusinessLogic.ApiClasses;
+using LoggerService;
+using Repository;
 using BusinessLogic;
+using BusinessLogic.StartUp;
+using BusinessLogic.Services;
+using BusinessLogic.Services.Jobs;
+using BusinessLogic.ApiClasses;
 
 namespace WebLayer
 {
@@ -59,23 +58,11 @@ namespace WebLayer
         {
             services.ConfigureCors();
             services.ConfigureIISIntegration();
-            services.ConfigureLoggerService();
             services.AddControllers().AddJsonOptions(
                 options =>
-                options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
+              options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
             services.AddControllers();
             //--------------------------------
-
-            services.AddScoped<NewsBL>();
-            services.AddScoped<HomeBL>();
-            services.AddScoped<ImageBL>();
-            services.AddScoped<ProductBL>();
-            services.AddScoped<CartBL>();
-            services.AddScoped<OrderBL>();
-            services.AddScoped<UserBL>();
-            services.AddScoped<LocationTaxBL>();
-            services.AddScoped<ImageUploadServices>();
-            services.AddScoped<Util>();
 
            // services.Scan(scan => scan
            //.FromAssemblyOf<BaseClassBL>()
@@ -86,19 +73,20 @@ namespace WebLayer
             services.AddSingleton<LocService>();
             services.AddHttpClient<FcmSender>();
             services.AddHttpClient<ApnSender>();
-            services.ConfigureRepositoryManager();
             //services.AddAutoMapper(typeof(Startup));
             services.AddSingleton(provider => new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new MappingProfile(provider.GetService<IHttpContextAccessor>()));
+               cfg.AddProfile(new MappingProfile(provider.GetService<IHttpContextAccessor>()));
             }).CreateMapper());
-
-            services.ConfigureSqlContext(Configuration);
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.AddHttpContextAccessor();
-            services.ConfigureAuthenticationManagerService();
+            services.ConfigureAuthenticationManagerService(); 
+            services.ConfigureServices(); 
+            services.ConfigureSqlContext(Configuration);
+
             //------------------------------
+           
 
             services.AddSwaggerGen(c =>
             {
@@ -152,7 +140,6 @@ namespace WebLayer
             //////Localization//////////////////
 
             services.AddLocalization();
-            //services.AddLocalization(op => op.ResourcesPath = "Resources");
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -220,8 +207,7 @@ namespace WebLayer
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller= Home}/{action=Index}/{id?}"
-                    );
+                    pattern: "{controller= Home}/{action=Index}/{id?}");
             });
             app.UseSwagger();
             app.UseSwaggerUI(s =>
@@ -233,40 +219,5 @@ namespace WebLayer
                }
 
     }
-//    public class TimeSpanToStringConverter : JsonConverter<TimeSpan>
-//    {
-//        private readonly string format = @"h\:mm";
-//        public override TimeSpan Read(ref Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
-//        {
-//            var value = reader.GetString();
-//            return TimeSpan.ParseExact(value, format, CultureInfo.InvariantCulture);
-//        }
-
-//        public override void Write(Utf8JsonWriter writer, TimeSpan value, System.Text.Json.JsonSerializerOptions options)
-//        {
-//            writer.WriteStringValue(value.ToString(format));
-//        }
-//    }
-//    public class LocService
-//    {
-//        private readonly IStringLocalizer _localizer;
-
-//        public LocService(IStringLocalizerFactory factory)
-//        {
-//            var type = typeof(SharedResource);
-//            var assemblyName = new AssemblyName(type.GetTypeInfo().Assembly.FullName);
-//            _localizer = factory.Create("SharedResource", assemblyName.Name);
-//        }
-
-//        public LocalizedString GetLocalizedString(string key)
-//        {
-//            return _localizer[key];
-//        }
-
-//        public string GetLocalizedStringValue(string key)
-//        {
-//            return _localizer[key].Value;
-//        }
-//    }
 }
  

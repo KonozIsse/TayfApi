@@ -7,6 +7,7 @@ namespace Entities.Models
     {
         [Required]
         public string ZoneName { get; set; }
+        public string ZoneNameAr { get; set; }
         public string ZoneCode { get; set; }
         [ForeignKey(nameof(Country))]
         public int CountryId { get; set; }

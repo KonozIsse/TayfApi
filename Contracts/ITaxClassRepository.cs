@@ -10,6 +10,7 @@ namespace Contracts
     public interface ITaxClassRepository
     {
         Task<IEnumerable<TaxClass>> GetTaxClasses();
+        bool ExistTax(string name);
         Task<TaxClass> GetTaxClassId(int id, bool trackChanges);
         void AddTaxClass(TaxClass taxClass);
         void DeleteTaxClass(TaxClass taxClass);

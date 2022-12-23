@@ -9,10 +9,11 @@ namespace Contracts
 {
     public interface ITaxRateRepository
     {
-        Task<IEnumerable<TaxRate>> GetTaxRates();
+        Task<IEnumerable<TaxRate>> GetTaxRates(string seach);
         Task<TaxRate> GetTaxRateId(int id, bool trackChanges);
         Task<TaxRate> GetTaxRateIdByZoneId(int zoneId, bool trackChanges);
         void AddTaxRate(TaxRate taxClass);
         void DeleteTaxRate(TaxRate taxClass);
+        bool ExistTaxRates(int zoneId);
     }
 }

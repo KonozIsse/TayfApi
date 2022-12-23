@@ -22,6 +22,7 @@ namespace Entities
         {
 
         }
+
         public DbSet<Address> Addresses { get; set; }
         public DbSet<ProductAttribut> AttributesProducts { get; set; }
         public DbSet<Banner> Banners { get; set; }
@@ -53,6 +54,8 @@ namespace Entities
         public DbSet<PaymentMethods> PaymentMethods { get; set; }
         public DbSet<PaymentMethodDetail> PaymentMethodDetail { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<ProductOptionValue> ProductOptionValues { get; set; } 
+        public DbSet<ProductOption> ProductOptions { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<ProductSales> ProductSales { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
@@ -65,7 +68,6 @@ namespace Entities
         public DbSet<SpecialProducts> SpecialProducts { get; set; }
         public DbSet<TaxClass> TaxClasses { get; set; }
         public DbSet<TaxRate> TaxRates { get; set; }
-        public DbSet<UserCoupon> UserCoupons { get; set; } 
         public DbSet<Unit> Units { get; set; } 
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Zone> Zones { get; set; }
@@ -148,10 +150,14 @@ namespace Entities
                           .WithOne(user => user.User).HasForeignKey(con => con.UserId);
 
 
+            //modelBuilder.Entity<Product>().HasMany(store => store.Carts)
+            //             .WithOne(order => order.Product).HasForeignKey(con => con.ProductId);
+            
             modelBuilder.Entity<User>().HasMany(store => store.StoreOrders)
                          .WithOne(order => order.Store).HasForeignKey(con => con.StoreId);
+
             modelBuilder.Entity<User>().HasMany(customer => customer.CustomerOrders)
-                         .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId);
+                         .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId); 
 
             ConfigureDeleteBehavior(modelBuilder);
 

@@ -5,6 +5,7 @@ namespace Entities.Models
     public class Country : BaseEntity
     {
         public string CountryName { get; set; }
+        public string CountryNameAr { get; set; }
         public string CountryCode2 { get; set; }
         public string CountryCode3 { get; set; }
         public int? MobileCode { get; set; }

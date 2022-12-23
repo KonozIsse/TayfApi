@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using Microsoft.ReportingServices.ReportProcessing.ReportObjectModel;
 
 namespace Repository
 {
@@ -24,8 +23,10 @@ namespace Repository
        => await FindByCondition(c => c.Id == deviceId && c.UserId == userId, trackChanges).SingleOrDefaultAsync();
         public async Task<List<Device>> GetDevicesUserId (int userId, bool trackChanges)
         => await FindByCondition(r => r.UserId == userId, trackChanges).ToListAsync();
+        public async Task<Device> GetDeviceUserId(int userId)
+       => await FindByCondition(r => r.UserId == userId, false).SingleOrDefaultAsync();
         public string GetTokenUser (int userId)
-         =>  FindByCondition(r => r.UserId == userId, false).OrderByDescending(r => r.Id).FirstOrDefault().DeviceToken;
+         =>  FindByCondition(r => r.UserId == userId, false).First().DeviceToken;
         public void AddDevice(Device device) => Create(device);
         public void DeleteDevice(Device device) => Delete(device);
     }

@@ -31,16 +31,16 @@ namespace Entities.Models
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        //[ForeignKey(nameof(Image))]
-        //public int? ImageId { get; set; }
-        //public Image Image { get; set; }
+        [ForeignKey(nameof(Image))]
+        public int? ImageId { get; set; }
+        public Image Image { get; set; }
 
         [ForeignKey(nameof(DefaultAddress))]
         public int? DefaultAddressId { get; set; }
         public Address DefaultAddress { get; set; }
 
         [ForeignKey(nameof(Country))]
-        public int? CountryId { get; set; }
+        public int CountryId { get; set; }
         public Country Country { get; set; }
 
         [ForeignKey(nameof(Role))]

@@ -12,6 +12,7 @@ namespace Contracts
         Task<Device> CheckDevice(string token, bool trackChanges);
         Task<List<Device>> GetDevicesUserId(int userId, bool trackChanges);
         Task<Device> GetDeviceUser(int deviceId, int userId, bool trackChanges);
+        Task<Device> GetDeviceUserId(int userId);
         string GetTokenUser(int userId);
         void AddDevice(Device device);
         void DeleteDevice(Device device);

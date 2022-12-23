@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Entities.Models
 {
-    public class BussnessResultModel<T>
+    public class BussnessResultModel
     {
-        public BussnessResultModel(T data, string message = "", bool success = true)
+        public BussnessResultModel(object data, string message = "", bool success = true)
         {
             Success = success;
             Data = data;
@@ -16,7 +16,7 @@ namespace Entities.Models
         }
 
         public bool Success { get; set; }
-        public T Data { get; set; }
+        public object Data { get; set; }
         public string Message  { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace Contracts
     {
         Task<List<News>> SearchNews(int vendorId, string search);
         Task<List<News>> GetWithComments();
-        Task<News> GetBlogById(int id, bool trackChanges);
+        Task<News> GetBlogById(int id, bool trackChanges, bool Included = false);
         void CreateBlog(News blog);
         void DeleteBlog(News blog);
     }

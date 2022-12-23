@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Twilio.TwiML.Voice;
 
 namespace WebLayer.Controllers
 {
@@ -37,34 +38,43 @@ namespace WebLayer.Controllers
             _cartBL = cartBL;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> add( CreateOrderDto create)
+        public async Task<IActionResult> add(int id, CreateCartDto create  )
         {
-            await _orderBL.AddOrder(create);
+             await _cartBL.AddCart(id ,create);
+            
             return StatusCode(201);
         }
         [HttpPost("add2")]
-        public async Task<IActionResult> addAdd (int id , CreateCartDto create)
+        public async Task<IActionResult> add2(int id ,CreateOrderDto create)
         {
-            await _cartBL.AddCart(id , create);
+            await _orderBL.AddOrder( id ,create);
+            
             return StatusCode(201);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update(int id , UpdateOderDto st )
+        public async Task<IActionResult> update(int id , string k )
         {
-          //  await _orderBL.EditOrder(id , st);
+            await _orderBL.UpdateOrderAfterPay(id ,k);
+            return NoContent();
+        }
+        [HttpPut("update1")]
+        public async Task<IActionResult> update1(int id)
+        {
+            await _orderBL.ShippedOrder(id);
             return NoContent();
         }
         [HttpDelete("delete")]
         public async Task<IActionResult> delete(int id )
         {
-            await _orderBL.DeleteOrder(id);
+             await _orderBL.DeleteOrder(id);
+           
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(int id , int ut )
+        public async Task<IActionResult> get(string s )
         {
-            var langs = await _productBL.GetProduct( id , ut );
+            var langs = await  _userBL.GetCustomerTotal(s);
             return Ok(langs);
         }
     }

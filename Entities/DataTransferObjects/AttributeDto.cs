@@ -25,6 +25,7 @@ namespace Entities.DataTransferObjects
     }
     public class UpdateAttributeDto : CreateAttributeDto
     {
+        public int Id { get; set; }
     }
   
     public class OptionDto
@@ -39,6 +40,10 @@ namespace Entities.DataTransferObjects
     {
         public string OptionName { get; set; }
         public string OptionType { get; set; }
+    } 
+    public class UpdateOptionDto : CreateOptionDto
+    {
+        public int Id { get; set; }
     }
     public class ValueDto
     {
@@ -54,6 +59,7 @@ namespace Entities.DataTransferObjects
     }
     public class UpdateValueDto : CreateValueDto
     {
+        public int Id { get; set; }
     }
 
     public class ValueVM

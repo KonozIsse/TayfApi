@@ -11,7 +11,7 @@ namespace Contracts
     public interface IReviewRepository
     {
         Task<Review> GetReviewId(int id, bool trackChanges);
-       Task<PagedList<Review>> GetReviewsByProductId(int productId, PostsParameters postsParameters);
+        Task<List<Review>> GetReviews();
         Task<IEnumerable<Review>> Last3Reviews(int productId);
         Task<IEnumerable<Review>> GetReviewsProductId(int productId);
         Task<Review> GetReviewProductIdToCustomerId(int productId, int customerId);

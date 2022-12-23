@@ -6,10 +6,12 @@ namespace Entities.Models
     public class Product : BaseEntity
     {
         public string ProductName { get; set; }
+        public string ProductNameAr { get; set; }
+        public string Description { get; set; }
+        public string DescriptionAr { get; set; }
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
-        public string Description { get; set; }
         public decimal Rate { get; set; }
         public int CountReviews { get; set; }
         public int NumLike { get; set; }
@@ -38,6 +40,7 @@ namespace Entities.Models
         public List<ProductAttribut> AttributesProducts { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }
         public List<Image> Images { get; set; }
+        public List<Cart> Carts { get; set; }
 
     }
 }
