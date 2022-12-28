@@ -13,6 +13,7 @@ namespace Entities.Models.Enum
         CompleteOrder,
         RejectOrder,
         ReceiveOrder,
-        CancelOrder
+        CancelOrder,
+        DeactiveAccount
     }
 }

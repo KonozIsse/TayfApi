@@ -21,7 +21,7 @@ namespace Repository
         public async Task<List<Address>> GetAllAddressesByCustomerId(int customerId)
          => await FindByCondition(c => c.UserId == customerId, false).Include(c=>c.User).Include(c=>c.Country).OrderByDescending(x => x.Id).ToListAsync();
         public async Task<Address> GetAddressIdByCustomerId(int id ,int customerId , bool trackChanges)
-          => await FindByCondition(c => c.Id == id && c.UserId == customerId&& c.IsDefault == true, trackChanges).SingleOrDefaultAsync();
+          => await FindByCondition(c => c.Id == id && c.UserId == customerId && c.IsDefault == true, trackChanges).SingleOrDefaultAsync();
         public async Task<Address> GetAddressCustomer( int customerId)
         => await FindByCondition(c => c.UserId == customerId && c.IsDefault == true, false).SingleOrDefaultAsync();
         public void AddAddress(Address address) => Create(address);

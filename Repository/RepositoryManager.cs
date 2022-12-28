@@ -58,6 +58,7 @@ namespace Repository
         private IZoneRepository _zoneRepository; 
         private IUnitRepository _unitRepository;    
         private IRoleRepository _roleRepository; 
+         private IClaimRepository _claimRepository; 
         
 
         public RepositoryManager(RepositoryContext repositoryContext)
@@ -489,7 +490,18 @@ namespace Repository
                     _roleRepository = new RoleRepository(_repositoryContext);
                 return _roleRepository;
             }
-        } 
+        }  
+
+        public IClaimRepository Claim
+        {
+            get
+            {
+                if (_claimRepository == null)
+                    _claimRepository = new ClaimRepository(_repositoryContext);
+                return _claimRepository;
+            }
+        }
+
         public Task SaveAsync() => _repositoryContext.SaveChangesAsync();
     }
 }

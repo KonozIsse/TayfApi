@@ -53,15 +53,15 @@ namespace WebLayer.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> update(int id , string k )
+        public async Task<IActionResult> update(int id)
         {
-            await _orderBL.UpdateOrderAfterPay(id ,k);
+            await _userBL.ActiveCustomer(id );
             return NoContent();
         }
         [HttpPut("update1")]
         public async Task<IActionResult> update1(int id)
         {
-            await _orderBL.ShippedOrder(id);
+            await _userBL.DeactiveCustomer(id);
             return NoContent();
         }
         [HttpDelete("delete")]
@@ -72,9 +72,9 @@ namespace WebLayer.Controllers
             return NoContent();
         }  
         [HttpGet("get")]
-        public async Task<IActionResult> get(string s )
+        public async Task<IActionResult> get(int s )
         {
-            var langs = await  _userBL.GetCustomerTotal(s);
+            var langs = await  _orderBL.InvoiceOrder(s);
             return Ok(langs);
         }
     }

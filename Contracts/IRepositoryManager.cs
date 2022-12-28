@@ -55,6 +55,8 @@ namespace Contracts
         IUnitRepository Unit { get; }
         IZoneRepository Zone { get; }
         IRoleRepository Role { get; }
+        IClaimRepository Claim { get; }
+
         Task SaveAsync();
     }
 }

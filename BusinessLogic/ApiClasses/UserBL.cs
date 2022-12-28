@@ -21,6 +21,7 @@ using MailKit.Security;
 using MailKit.Net.Smtp;
 using EmailService;
 using Microsoft.Extensions.Hosting;
+using Entities.Models.Enum;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -240,13 +241,6 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<User>> GetCustomers()
         {
             return await _repositoryManager.User.GetCustomers(false);
-        }
-     
-        public async Task<List<CustomerTotal>> GetVendorTotal(string search)
-        {
-            var stores =  await _repositoryManager.User.GetVendorTotal(search,false);
-            var storesDto = _mapper.Map<List<CustomerTotal>>(stores);
-            return storesDto;
         }
         public async Task EditEmail(int userId, string email)
         {
@@ -561,34 +555,53 @@ namespace BusinessLogic.ApiClasses
             {
                 customer.Status = Status.NotActive;
                 await _userManager.AddClaimAsync(customer, new Claim("DeActivated", "true"));
+                
+                var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.DeactiveAccount);
+                Notification notification = new()
+                {
+                    Body = action.Template,
+                    UserId = id,
+                    NotificationActionId = action.Id,
+                    Status = NotificationStatus.New,
+                    Subject = action.Subject,
+                    IsRead = false
+                };
+                _repositoryManager.Notification.CreateNotification(notification);
                 await _repositoryManager.SaveAsync();
+
+                var devices = await _repositoryManager.Device.GetDevicesUserId(id, false);
+                foreach(var device in devices)
+                {
+                    _repositoryManager.Device.DeleteDevice(device);
+                    await _repositoryManager.SaveAsync();
+                }
+
                 return new BussnessResultModel(customer, _locService.GetLocalizedStringValue("successDeactive"));
             }
             else
             {
-                return new BussnessResultModel(null, "correctLink", false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         } 
-        public async Task<BussnessResultModel> ActiveCustomer( int id)
-        {
-            var customer = await _repositoryManager.User.GetCustomerId(id, true);
-            if (customer != null)
-            {
-                customer.Status = Status.Active;
-                //var db = new RepositoryContext();
-                //var claim = db.UserClaims.FirstOrDefault(c => c.UserId == id && c.ClaimType == "DeActivated");
-                //if (claim != null)
-                //{
-                //    db.UserClaims.Remove(claim);
-                //}
-                await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(customer, _locService.GetLocalizedStringValue("successDeactive"));
-            }
-            else
-            {
-                return new BussnessResultModel(null, "correctLink", false);
-            }
-        }
+        //public async Task<BussnessResultModel> ActiveCustomer( int id)
+        //{
+        //    var customer = await _repositoryManager.User.GetCustomerId(id, true);
+        //    if (customer != null)
+        //    {
+        //        customer.Status = Status.Active;
+        //        var claim = _repositoryManager.Claim.FirstOrDefault(c => c.UserId == id && c.ClaimType == "DeActivated");
+        //        if (claim != null)
+        //        {
+        //            _repositoryManager.Claim.DeleteClaim(claim); 
+        //        }
+        //        await _repositoryManager.SaveAsync();
+        //        return new BussnessResultModel(customer, _locService.GetLocalizedStringValue("successDeactive"));
+        //    }
+        //    else
+        //    {
+        //        return new BussnessResultModel(null, "correctLink", false);
+        //    }
+        //}
         public async Task<User> FacebookUser(string socialId)
         {
             return await _repositoryManager.User.GetFacebookRegisterUser(socialId);
@@ -627,26 +640,56 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.User.GetAppleRegisterUser(socialId);
         }
-        public async Task<List<CustomerTotal>> GetCustomerTotal(string search)
+        public async Task<List<UserTotal>> GetCustomerTotal(string search)
         {
             var customers = await _repositoryManager.User.GetCustomerTotal(search, false);
-            var customerTotal = new List<CustomerTotal>();
+            if(customers == null)
+            {
+                return null;
+            }
+            var customerTotal = new List<UserTotal>();
             foreach (var x in customers)
             {
                 x.CustomerOrders = await _repositoryManager.Order.GetsAllTransactionOrders();
                 var order = x.CustomerOrders.Where(c=>c.CustomerId == x.Id);
 
-                customerTotal.Add(new CustomerTotal
+                customerTotal.Add(new UserTotal
                 {
                     Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     Email = x.Email,
                     PhoneNumber = x.PhoneNumber,
+                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss tt"),
                     Total = Convert.ToInt32(order.Sum(c => c.OrderPrice)),
                 });
             }
-            return customerTotal;
+            var descTotal = customerTotal.OrderByDescending(c => c.Total).ToList();
+            return descTotal;
+        }
+        public async Task<List<UserTotal>> GetVendorTotal(string search)
+        {
+            var stores = await _repositoryManager.User.GetVendorTotal(search, false);
+            if (stores == null)
+            {
+                return null;
+            }
+            var storesTotal = new List<UserTotal>();
+            foreach (var x in stores)
+            {
+                x.StoreOrders = await _repositoryManager.Order.GetsAllTransactionOrders();
+                var order = x.StoreOrders.Where(c => c.StoreId == x.Id);
+
+                storesTotal.Add(new UserTotal
+                {
+                    FirstName = x.FirstName,
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    Total = Convert.ToInt32(order.Sum(c => c.OrderPrice)),
+                });
+            }
+            var descTotal = storesTotal.OrderByDescending(c => c.Total).ToList();
+            return descTotal;
         }
 
         //Device------------------------------------------------

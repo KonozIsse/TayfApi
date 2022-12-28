@@ -279,9 +279,9 @@ namespace BusinessLogic.ApiClasses
             };
             _repositoryManager.Notification.CreateNotification(notification);
             //send email 
-           // string msgEm1 = await InvoiceOrder(id);
+            string msgEm1 = await InvoiceOrder(id);
             var temp = await _repositoryManager.MessageTemplate.GetTemplateById(4, false); //shipped email
-            var msgem = /*msgEm1 +*/ temp.Message+ "<br><br> The E-Tayf account team <br> Thank You";
+            var msgem = msgEm1 + temp.Message+ "<br><br> The E-Tayf account team <br> Thank You";
             var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
             try
             {
@@ -679,14 +679,14 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> InvoiceOrder(int id)
         {
             decimal sub = 0;
-            var newOrder = await _repositoryManager.Order.GetOrderId(id , false);
-         
+            var newOrder = await _repositoryManager.Order.GetOrderId(id, false);
+            var MyOrders = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
 
-            var user = await _repositoryManager.User.GetUserId(newOrder.CustomerId , false);
-            var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(newOrder.DeliveryTimeId , false);
+            var user = await _repositoryManager.User.GetUserId(newOrder.CustomerId, false);
+            var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(newOrder.DeliveryTimeId, false);
 
             string sts = "";
-            var state = newOrder.OrderStatus;
+            var state = await _repositoryManager.OrderStatus.GetOrderStatusById(newOrder.OrderStatusId, false);
             if (state != null)
             {
                 sts = state.StatusName;
@@ -695,25 +695,25 @@ namespace BusinessLogic.ApiClasses
             string address2 = "";
             string city1 = "";
             string street = "";
-            var c2 = await _repositoryManager.Address.GetAddressIdByCustomerId(newOrder.AddressId, newOrder.CustomerId , false);
+            var c2 = await _repositoryManager.Address.GetAddressIdByCustomerId(newOrder.AddressId, newOrder.CustomerId, false);
             if (c2 != null)
             {
                 street = c2.Street;
                 address1 = c2.Address1;
                 address2 = c2.Address2;
                 //decimal tax = 0;
-                var city = await _repositoryManager.Zone.GetZoneId(c2.ZoneId , false);
+                var city = await _repositoryManager.Zone.GetZoneId(c2.ZoneId, false);
                 if (city != null)
                 {
                     city1 = city.ZoneName;
                 }
             }
-            //var l = await _repositoryManager.Setting.GetSettingByValue("website_logo");
-            //var logo =  await _imageBL.GetImageOriginal(l.Value);
+            var l = await _repositoryManager.Setting.GetSettingByValue("website_logo");
+           // var logo = await _imageBL.GetImageOriginal(l.Value);
             var all = "";
             var bb3 = "";
             var m3 = "";
-            var img = "<div style='text-align: center;'><img style='width: 25%;/></div><hr>";//
+            var img = "<div style='text-align: center;'><img style='width: 25%;/></div><hr>";//'src='" + logo +"'
             var bdy1 = "<table style='width: -webkit-fill-available;'><tbody style='display: contents;'>" +
                            "<tr><td style='color: #212121;line-height: 1.8;font-size: 20px;font-weight: 500;'>Name</td><td><span style='color: #471267 ;font-size: 20px;'> " + user.FirstName + " " + user.LastName + " </span><br /></td><td style='color: #212121;line-height: 1.8;font-size: 20px;font-weight: 500;'>Order date</td><td style='padding-right: 5%;'>" + "<span style='color: #471267 ;font-size: 20px;' > " + newOrder.CreatedAt.AddHours(3).ToString("MM/dd/yyyy") + " </span><br />" +
                            "<span style='color: #471267 ;font-size: 10px;'> " + newOrder.CreatedAt.AddHours(3).ToString("hh:mm tt") + " </span></td></tr><tr>" +
@@ -732,11 +732,11 @@ namespace BusinessLogic.ApiClasses
                            + "<br><hr><table style='text-align: left !important;width: 100% !important;max-width: 100% !important;' class='invoice-table shop_table shop_table_responsive cart woocommerce-cart-form__contents'><thead><tr><th style = 'color: #492f91;font-size: 20px;'>Description</th>" +
                           "<th style = 'color: #492f91;font-size: 20px;'>Price</th>" +
                           "<th style = 'color: #492f91;font-size: 20px;'>Qty.</th><th style = 'color: #492f91;font-size: 20px;'>Total</th></tr></thead><tbody>";
-             var MyOrders = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
+
             foreach (var item in MyOrders)
             {
                 string menuTxt = "";
-                var menu = item.Product;
+                var menu = await _repositoryManager.Product.GetProductById(item.ProductId,false);
                 if (menu != null)
                 {
                     menuTxt = menu.ProductName;
@@ -748,18 +748,21 @@ namespace BusinessLogic.ApiClasses
                 sub = sub + (item.FinalPrice * item.Qty);
                 m3 = m3 + bb3;
             }
-
-
+            var cop = " ";
+            var copoun = await _repositoryManager.Coupon.GetCouponCodeNotFinished(newOrder.CodeCoupon);
+            if(copoun != null)
+            {
+                cop = copoun.CouponCode ;
+            }
             var t = "</tbody><br><br><tfoot style='width: 100%;display: inherit; '><tr><td colspan = '3' style='color: #492f91;font-size: 20px;'>SubTotal</td><td style = 'color: #000;font-size: 17px;'> QAR "
                 + sub.ToString("0.00") + " </td></tr><tr><td colspan = '3' style='color: #492f91;font-size: 20px;'>Discount </td><td style = 'color: #000;font-size: 17px;' >"
-                + newOrder.Coupon.CouponAmount + "</td></tr><tr><td colspan = '3' style='color: #492f91;font-size: 20px;'>Total</td><td style = 'color: #000;font-size: 17px;' > QAR "
+                + cop + "</td></tr><tr><td colspan = '3' style='color: #492f91;font-size: 20px;'>Total</td><td style = 'color: #000;font-size: 17px;' > QAR "
                 + newOrder.OrderPrice.ToString("0.00") + " </td></tr></tfoot></table>";
 
             all = img + bdy1 + m3 + t;
             return all;
         }
-
-       //Coupon------------------------------------------------
+        //Coupon------------------------------------------------
         public async Task AddCoupon(CreateCouponDto createDto)
         {
             var coupon = _mapper.Map<Coupon>(createDto);

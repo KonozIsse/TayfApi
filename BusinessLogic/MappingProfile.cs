@@ -108,7 +108,6 @@ namespace BusinessLogic
             CreateMap<AvaterDto, User>().ReverseMap();
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             CreateMap<UserForRegistrationDto, User>().ReverseMap();
-            CreateMap<CustomerTotal, User>().ReverseMap(); 
             //AdminMap
             CreateMap<CreateAdminDto, User>().ReverseMap();
             CreateMap<UpdateAdminDto, User>().ReverseMap();
