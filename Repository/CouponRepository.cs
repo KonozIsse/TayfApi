@@ -26,6 +26,8 @@ namespace Repository
         => await FindByCondition(x => x.CouponCode == code && x.ExpiryDate > EasternStandardTime(), false).FirstOrDefaultAsync();
         public async Task<Coupon> GetCouponIdNotFinished(int id)
        => await FindByCondition(x => x.Id == id && x.ExpiryDate > EasternStandardTime(), false).FirstOrDefaultAsync();
+        public async Task<Coupon> GetCouponCode(string code)
+       => await FindByCondition(x => x.CouponCode == code , false).FirstOrDefaultAsync();
         public void AddCoupon(Coupon coupon) => Create(coupon);
         public void DeleteCoupon(Coupon coupon) => Delete(coupon);
     }

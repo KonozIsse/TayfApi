@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.Models.Enum
 {
-  //[EnumBindResource(typeof(ResourcesLib.EnumResources.NotificationKey))]
+  [EnumBindResource(typeof(ResourcesLib.EnumResources.NotificationKey))]
     public enum NotificationKey
     {
         ShippedOrder = 1,

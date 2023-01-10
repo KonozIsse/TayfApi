@@ -19,7 +19,7 @@ namespace Contracts
         Task<List<User>> GetCustomers(bool trackChanges);
         Task<User> VerifiedCodeUser(int id, int code, bool trackChanges);
         Task<User> GetSocialRegister(string socialId);
-        bool GetCustomerEmail(string email);
+        bool GetEmail(string email);
         Task<User> GetNormalRegisterUser(string email);
         Task<User> GetFacebookRegisterUser(string socialId);
         Task<User> GetGoogleRegisterUser(string socialId);
@@ -27,7 +27,8 @@ namespace Contracts
         Task<User> getLoginUser(string email, string password);
         Task<User> GetUserDefaultAddress(int userId, int defaultAddressId);
         Task<User> CheckUserPass(int user, string password);
-        void AddUser(User user);
+        Task<User> GetCustomerEmail(string email, bool trackChanges);
+        Task<User> GetActiveCustomerId(int id, bool trackChanges);
         void DeleteUser(User user);
         // Admin --------------------------------------------------
         Task<IEnumerable<User>> GetAdminsStors(bool trackChanges);

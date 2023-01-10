@@ -14,6 +14,7 @@ namespace Contracts
         Task<Coupon> GetCouponId(int id, bool trackChanges);
         Task<Coupon> GetCouponCodeNotFinished(string code);
         Task<Coupon> GetCouponIdNotFinished(int id);
+        Task<Coupon> GetCouponCode(string code);
         void AddCoupon(Coupon coupon);
         void DeleteCoupon(Coupon coupon);
     }

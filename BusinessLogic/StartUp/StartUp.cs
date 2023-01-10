@@ -1,27 +1,26 @@
-﻿using BusinessLogic.ApiClasses
-    ;
-using BusinessLogic;
+﻿using BusinessLogic.ApiClasses;
 using Contracts;
 using Entities;
 using Entities.Models;
 using LoggerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
-using System;
 using System.Text;
 using EmailService;
-
+using BusinessLogic.Services;
+using Microsoft.AspNetCore.Localization;
+using Quartz;
+using BusinessLogic.Services.Jobs;
+using Entities.Models.CorePushModels;
 namespace BusinessLogic.StartUp
 {
     public static class StartUp
-
     {
         public static void ConfigureCors(this IServiceCollection services) =>
                      services.AddCors(options =>
@@ -66,7 +65,7 @@ namespace BusinessLogic.StartUp
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
                 o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 10;
+                o.Password.RequiredLength = 12;
                 o.User.RequireUniqueEmail = true;
             });
             builder = new IdentityBuilder(builder.UserType, typeof(Role),
@@ -75,15 +74,8 @@ namespace BusinessLogic.StartUp
             .AddDefaultTokenProviders();
             services.AddIdentity<User, Role>();
         }
-        public static void ConfigureSqlContext(this IServiceCollection services,
-                  IConfiguration configuration) =>
-                   services.AddDbContext<RepositoryContext>(opts =>
-                  opts.UseSqlServer(configuration.GetConnectionString("sqlConnection"), b =>
-                          b.MigrationsAssembly("WebLayer")));
-        public static void ConfigureServices(this IServiceCollection services)
+        public static void ConfigureBusinessLogic(this IServiceCollection services)
         {
-            services.AddScoped<ILoggerManager, LoggerManager>();
-            services.AddScoped<IRepositoryManager, RepositoryManager>();
             services.AddScoped<HomeBL>();
             services.AddScoped<ImageBL>();
             services.AddScoped<ProductBL>();
@@ -94,12 +86,67 @@ namespace BusinessLogic.StartUp
             services.AddScoped<Util>();
             services.AddScoped<LocationTaxBL>();
             services.AddScoped<NewsBL>();
-        } 
+        }
         public static void ConfigureEmailConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            var emailConfig = configuration.GetSection("EmailSettings").Get<EmailConfiguration>();
+            var emailConfig = configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
             services.AddScoped<IEmailSender, EmailSender>();
+        } 
+        public static void ConfigureSqlConnection(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(
+               configuration.GetConnectionString("SqlConnection"),
+                  x => x.MigrationsAssembly("Tayf")));
         }
+        public static void ConfigureFcmNotification(this IServiceCollection services, IConfiguration configuration)
+        {
+            var appSettingsSection = configuration.GetSection("NotificationSettings");
+            services.Configure<FcmNotificationSetting>(appSettingsSection);
+        }
+        public static void ConfigureLocService(this IServiceCollection services)
+        {
+            services.AddSingleton<LocService>();
+            services.AddLocalization();
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture(culture: "ar", uiCulture: "ar");
+                options.AddSupportedCultures("ar", "en");
+                options.AddSupportedUICultures("ar", "en");
+                options.FallBackToParentCultures = true;
+                options.ApplyCurrentCultureToResponseHeaders = true;
+            });
+        } 
+        public static void ConfigureAddQuartz(this IServiceCollection services)
+        {
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                q.UseSimpleTypeLoader();
+                q.UseInMemoryStore();
+                q.UseTimeZoneConverter();
+
+                var NotifyjobKey = new JobKey("NotificationJob");
+                q.AddJob<NotificationJob>(opts => opts.WithIdentity(NotifyjobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(NotifyjobKey)
+                    .WithIdentity("NotificationJob-trigger")
+                    .WithCronSchedule("0/5 * * * * ?"));
+            });
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        } 
+        public static void ConfigureNotificationService(this IServiceCollection services)=>
+             services.AddScoped<INotificationService, NotificationService>();
+        
+        public static void ConfigureLoggerService(this IServiceCollection services) =>
+                   services.AddScoped<ILoggerManager, LoggerManager>();
+        public static void ConfigureRepositoryManager(this IServiceCollection services)=>
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
+        public static void ConfigureLangaugeService(this IServiceCollection services) =>
+           services.AddScoped<ILanguageService, LangaugeService>(); 
+        public static void ConfigureSMSService(this IServiceCollection services) =>
+           services.AddScoped<ISMSService, SMSService>();
+        public static void ConfigurePaymentService(this IServiceCollection services) =>
+           services.AddScoped<PaymentService>();
     }
 }

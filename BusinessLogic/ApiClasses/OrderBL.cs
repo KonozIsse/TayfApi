@@ -1,24 +1,15 @@
-﻿using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
+﻿
 using AutoMapper;
-using BusinessLogic.ViewModel;
 using Contracts;
 using Entities;
 using Entities.DataTransferObjects;
+using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enum;
-using Entities.Models.Enums;
+using Entities.ViewModel;
 using MailKit.Search;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Twilio.Jwt.AccessToken;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -30,8 +21,13 @@ namespace BusinessLogic.ApiClasses
         protected readonly LocationTaxBL _locationTaxBL;
         protected readonly ImageBL _imageBL;
         protected readonly ProductBL _productBL;
-        protected readonly IEmailSender _emailSender;
-        public OrderBL(IRepositoryManager repositoryManager, IMapper mapper, CartBL cartBL, LocationTaxBL locationTaxBL, ImageBL imageBL, ProductBL productBL, IEmailSender emailSender)
+        protected readonly IEmailSender _emailSender; 
+        protected readonly LocService _locService;
+        protected readonly Util _util;
+        protected readonly SignInManager<User> _signInManager; 
+       // protected readonly LoggerManager _logger;
+        public OrderBL(IRepositoryManager repositoryManager, IMapper mapper, CartBL cartBL, LocationTaxBL locationTaxBL
+            , ImageBL imageBL, ProductBL productBL, IEmailSender emailSender, Util util , LocService locService , SignInManager<User> signInManager/*, LoggerManager logger*/ )
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
@@ -40,6 +36,10 @@ namespace BusinessLogic.ApiClasses
             _imageBL = imageBL;
             _productBL = productBL;
             _emailSender = emailSender;
+            _util = util;
+            _locService = locService;
+            _signInManager = signInManager;
+           // _logger = logger;
         }
         //Order------------------------------------------------
 
@@ -50,6 +50,10 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<Order>> GetsAllOrders()
         {
             return await _repositoryManager.Order.GetsAllTransactionOrders();
+        }
+        public async Task<Order> GetByHashedCsp( string ssp)
+        {
+            return await _repositoryManager.Order.GetByHashedCsp(ssp);
         }
         public async Task<List<Order>> GetPendOrdersByVendorId(int vendorId)
         {
@@ -82,333 +86,293 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<Order>> GetOrders()
         {
             return await _repositoryManager.Order.GetAllOrders();
-        } 
+        }
+        public async Task<Order> GetOrderId(int id )
+        {
+            return await _repositoryManager.Order.GetOrderId(id,false);
+        }
         public async Task<Order> OrderByIdAndStatus(int orderId, int statusId)
         {
             return await _repositoryManager.Order.GetOrderIdAndStatusId(orderId , statusId);
         }
-        public async Task AddOrder(int customerId ,CreateOrderDto createOrderDto)
+        public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
         {
             decimal total = 0;
-           
-            var tax = await _locationTaxBL.GetTax(customerId);
-
             var order = _mapper.Map<Order>(createOrderDto);
-            
-            order.CustomerId = customerId;
-            order.OrderStatusId = 1;
-            order.CurrencyId = 5;
-            order.PaymentMethodsId = 6;
-            order.IsSeen = 0;
-            order.TotalTax = tax;
-            order.CodeCoupon = createOrderDto.CouponCode;
-
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            if (carts != null)
+            if (createOrderDto != null)
             {
-                var orderProducts = new List<OrderProduct>();
-                foreach (var cart in carts)
+                var tax = await _locationTaxBL.GetTax(customerId);
+                order.CustomerId = customerId;
+                order.OrderStatusId = 1;
+                order.CurrencyId = 5;
+                order.PaymentMethodsId = 6;
+                order.IsSeen = 0;
+                order.TotalTax = tax;
+                order.CodeCoupon = createOrderDto.CouponCode;
+                var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+                if (createOrderDto.AddressId == 0)
                 {
-                    order.StoreId = cart.StoreId;
-                    var orderAttributs = new List<OrderAttributProduct>();
-                    var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
-                    if (cartAttributeProducts != null)
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("EnterField"), false);
+                }
+                if (createOrderDto.DeliveryTimeId == 0)
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ChooseTime"), false);
+                }
+                if (carts.Count == 0 && carts == null)
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("cartIsEmpty"), false);
+                }
+                else
+                {
+                    var orderProducts = new List<OrderProduct>();
+                    foreach (var cart in carts)
                     {
-                        foreach (var cartAttribute in cartAttributeProducts)
+                        order.StoreId = cart.StoreId;
+                        var orderAttributs = new List<OrderAttributProduct>();
+                        var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
+                        if (cartAttributeProducts != null)
                         {
-                            orderAttributs.Add(new OrderAttributProduct
+                            foreach (var cartAttribute in cartAttributeProducts)
                             {
-                                ProductAttributId = cartAttribute.AttributesProductId
-                            });
+                                var inventoryAttribut = await _repositoryManager.Inventory.GetStockProductAttribut(cart.ProdId, cartAttribute.AttributesProductId);
+                                if (inventoryAttribut == null)
+                                {
+                                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
+                                }
+                                orderAttributs.Add(new OrderAttributProduct
+                                {
+                                    ProductAttributId = cartAttribute.AttributesProductId
+                                });
+                            }
+                        }
+                        var inventory = await _repositoryManager.Inventory.GetStockProduct(cart.ProdId);
+                        if (inventory == null)
+                        {
+                            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
+                        }
+                        orderProducts.Add(new OrderProduct
+                        {
+                            ProductId = cart.ProdId,
+                            Qty = cart.Qty,
+                            FinalPrice = cart.FinalPrice,
+                            OrderAttributesProducts = orderAttributs
+                        });
+
+                        total += orderProducts.First().FinalPrice;
+
+                    }
+                    order.OrderProducts = orderProducts;
+
+                    if (createOrderDto.CouponCode != null)
+                    {
+                        var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+                        if (coupon.CouponAmount > 0 && coupon.CouponAmount > total)
+                        {
+                            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CodeGrater"), false);
+                        }
+                        if (coupon != null)
+                        {
+                            if (coupon.DiscountType == "fixed_cart")
+                            {
+                                if (total > coupon.CouponAmount)
+                                {
+                                    total = total - Convert.ToDecimal(coupon.CouponAmount);
+                                }
+                            }
+                            else if (coupon.DiscountType == "percent")
+                            {
+                                if (total > 0)
+                                {
+                                    total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
+                                }
+                            }
+                            else if (coupon.DiscountType == "fixed_product")
+                            {
+                                total = 0;
+                                foreach (var item in carts)
+                                {
+                                    if (coupon.Product.Contains(item.ProdId.ToString()))
+                                    {
+                                        var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
+                                        total += newTotal;
+                                    }
+                                    else
+                                    {
+                                        total += Convert.ToDecimal(item.FinalPrice);
+                                    }
+                                }
+                            }
+                            else if (coupon.DiscountType == "percent_product")
+                            {
+                                total = 0;
+                                foreach (var item in carts)
+                                {
+                                    if (coupon.Product.Contains(item.ProdId.ToString()))
+                                    {
+                                        decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
+                                        total = total + newval;
+                                    }
+                                    else
+                                    {
+                                        total = total + Convert.ToDecimal(item.FinalPrice);
+                                    }
+                                }
+                            }
                         }
                     }
-                    orderProducts.Add(new OrderProduct
-                    {
-                        ProductId = cart.ProdId,
-                        Qty = cart.Qty,
-                        FinalPrice = cart.FinalPrice,
-                        OrderAttributesProducts = orderAttributs
-                    });
-                    total += orderProducts.First().FinalPrice;
                 }
-                order.OrderProducts = orderProducts;
-
-                if (createOrderDto.CouponCode != null)
+                if (tax != 0)
                 {
-                    var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
-                    if (coupon != null)
-                    {
-                        if (coupon.DiscountType == "fixed_cart")
-                        {
-                            if (total > coupon.CouponAmount)
-                            {
-                                total = total - Convert.ToDecimal(coupon.CouponAmount);
-                            }
-                        }
-                        else if (coupon.DiscountType == "percent")
-                        {
-                            if (total > 0)
-                            {
-                                total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
-                            }
-                        }
-                        else if (coupon.DiscountType == "fixed_product")
-                        {
-                            total = 0;
-                            foreach (var item in carts)
-                            {
-                                if (coupon.Product.Contains(item.ProdId.ToString()))
-                                {
-                                    var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
-                                    total += newTotal;
-                                }
-                                else
-                                {
-                                    total += Convert.ToDecimal(item.FinalPrice);
-                                }
-                            }
-                        }
-                        else if (coupon.DiscountType == "percent_product")
-                        {
-                            total = 0;
-                            foreach (var item in carts)
-                            {
-                                if (coupon.Product.Contains(item.ProdId.ToString()))
-                                {
-                                    decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
-                                    total = total + newval;
-                                }
-                                else
-                                {
-                                    total = total + Convert.ToDecimal(item.FinalPrice);
-                                }
-                            }
-                        }
-                    }
+                    total = total + ((total * tax) / 100);
                 }
-            }
-            if (tax != 0)
-            {
-                total = total + ((total * tax) / 100);
-            }
-            order.OrderPrice = total;
-            _repositoryManager.Order.CreateOrder(order);
-            try
-            {
+                order.OrderPrice = total;
+                order.HashedCtpAndPayment = _util.ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+                _repositoryManager.Order.CreateOrder(order);
                 await _repositoryManager.SaveAsync();
             }
-            catch (Exception) { }
+            await _cartBL.DeleteByStore(order.StoreId, customerId);
+            return new BussnessResultModel(total, _locService.GetLocalizedStringValue("PendOrdMsg"));
         }
-        public async Task<List<HistoryOrderDto>> GetHistoryOrder(int customerId)
+        public async Task<List<OrderDto>> GetHistoryOrder(int customerId , Currency currency )
         {
-            var model = new List<HistoryOrderDto>();
+            var model = new List<OrderDto>();
             var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
             foreach (var order in orders)
             {
                 if (order.StoreId != 0)
                 {
+                    order.CustomerId = customerId;
                     var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
-                    int count = orderProducts.Count();
-                    var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-
-                    string state = "";
+                    var customer = await _repositoryManager.User.GetCustomerId(customerId, false);
                     var orderStatus = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                    if (orderStatus != null)
-                    {
-                        state = orderStatus.StatusName;
-                    }
-                    model.Add(new HistoryOrderDto
+                   
+                    model.Add(new OrderDto
                     {
                         Id = order.Id,
                         IsStatus = order.IsStatus,
                         OrderPrice = Convert.ToDecimal(order.OrderPrice),
-                        Symbol = "QAR", //currency.Symbol,
-                        pcount = count,
-                        FullName = customer.FullName,
+                        Currency = currency.Symbol,
+                        CountProduct = orderProducts.Count(),
+                        CustomerName = customer.FullName,
                         OrderStatusId = order.OrderStatusId,
-                        StatusName = state
+                        OrderStatusName = orderStatus.StatusName,
+                        CreatedAt = order.CreatedAt,
+                        UpdatedAt = order.UpdatedAt.Value
                     });
+                }
+            }
+            return model.OrderByDescending(c=>c.CreatedAt).ToList();
+        }
+        public async Task<ExceptionModel<List<InvoiceOrderVM>>> GetInvoiceOrder(int customerId, string lang)
+        {
+            var model = new List<InvoiceOrderVM>();
+            var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
+            if (orders == null)
+            {
+                return new ExceptionModel<List<InvoiceOrderVM>>(null, _locService.GetLocalizedStringValue("Error"), false);
+            }
+            foreach (var order in orders)
+            {
+                var orderProducts = await GetOrderProducts(order.Id, lang);
+                var copune = await _repositoryManager.Coupon.GetCouponCode(order.CodeCoupon);
+                model.Add(new InvoiceOrderVM
+                {
+                    Id = order.Id,
+                    TotalTax = order.TotalTax,
+                    CouponAmount = copune == null ? 0 : copune.CouponAmount,
+                    CouponCode = order.CodeCoupon ?? null,
+                    OrderPrice = order.OrderPrice,
+                    CreateAt = order.CreatedAt,
+                    Customer = await _repositoryManager.User.GetCustomerId(customerId, false),
+                    Address = await _locationTaxBL.GetAddressIdCustomerId(order.AddressId, customerId) ?? null,
+                    Time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false) ?? null,
+                    OrderProducts = orderProducts
+                });
+            }
+            return new ExceptionModel<List<InvoiceOrderVM>>(model);
+        }
+        public async Task<List<OrderProductsDto>> GetOrderProducts( int orderId,  string lang)
+        {
+            var model = new List<OrderProductsDto>();
+            var order = await _repositoryManager.Order.GetOrderId(orderId,false);
+            if (order != null)
+            {
+                var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
+                if (orderProducts.Count() > 0)
+                {
+                    foreach (var orderProduct in orderProducts)
+                    {
+                        var product = await _repositoryManager.Product.GetProductById(orderProduct.ProductId, false);
+                        model.Add(new OrderProductsDto
+                        {
+                            OrderId = order.Id,
+                            Qty = orderProduct.Qty,
+                            Options = await _productBL.GetOptions(product.Id),
+                            ProductId = product.Id,
+                            ProductName = lang == "en" ? product.ProductName : product.ProductNameAr,
+                            ProductModel = product.ProductModel,
+                            //ProductImage = ,
+                            CreatedAt = product.CreatedAt,
+                            ProductPrice = product.Price,
+                        }) ;
+                    }
                 }
             }
             return model;
         }
-        public async Task UpdateTotalOrderPrice(int id, decimal totalPrice)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderPrice = totalPrice;
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task OrderPending(int id)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 1;
-            await _repositoryManager.SaveAsync();
-        }
-        public async Task<BussnessResultModel> OrderComplete(int id)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            if(order == null)
-            {
-                return new BussnessResultModel(null, "correctLink", false);
-            }
-            if(order.OrderStatusId == 2)
-            {
-                return new BussnessResultModel(null, "AlreadyComp", false);
-            }
-            if ( order.OrderStatusId != 6)
-            {
-                return new BussnessResultModel(null, ""/* _locService.GetLocalizedStringValue("OrderNottPaid")*/, false);
-            }
-            if (order.OrderStatusId == 6)
-            {
-                order.OrderStatusId = 2;
-            }
-            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CompleteOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
-            action.Template = action.Template.Replace("{userName}", store.FirstName);
-            Notification notification = new()
-            {
-                Body = action.Template,
-                UserId = order.CustomerId,
-                NotificationActionId = action.Id,
-                Status = NotificationStatus.New,
-                Subject = action.Subject,
-                IsRead = false
-            };
-            _repositoryManager.Notification.CreateNotification(notification);
-            //send email 
-            string msgEm1 = await InvoiceOrder(id);
-            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(4, false); //shipped email
-            var msgem = msgEm1 + temp.Message+ "<br><br> The E-Tayf account team <br> Thank You";
-            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-            try
-            {
-                var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
-                _emailSender.SendEmail(message);
-            }
-            catch (Exception exp)
-            {
-              //  _logger.LogError($"COULD NOT SEND EMAIL: " + exp.Message, exp);
-            }
-            await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(order, "OrdeCompleted");
-        }
-        public async Task OrderCancal(int id)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 5;
-            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CancelOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
-            action.Template = action.Template.Replace("{userName}", store.FirstName);
-            Notification notification = new()
-            {
-                Body = action.Template,
-                UserId = order.CustomerId,
-                NotificationActionId = action.Id,
-                Status = NotificationStatus.New,
-                Subject = action.Subject,
-                IsRead = false
-            };
-            _repositoryManager.Notification.CreateNotification(notification);
-            await _repositoryManager.SaveAsync();
-
-        }
-        public async Task<BussnessResultModel> OrderReject(int id)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            if(order == null)
-            {
-                return new BussnessResultModel(null, "AlreadyCancel", false);
-            }
-            if(order.OrderStatusId == 3)
-            {
-                return new BussnessResultModel(null, "AlreadyCancel", false);
-            }
-            if (order.OrderStatusId != 1)
-            {
-                var period =  _repositoryManager.Setting.GetPeriod();
-                //if order shipped or recieved and allowed period for refund ended
-                if ((order.OrderStatusId == 5 || order.OrderStatusId == 6) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < EasternTime))
-                {
-                    return new BussnessResultModel(null, "e: You Cann't Reject Order After period about " + period + " days from order", false);
-                }
-            }
-            order.OrderStatusId = 4;
-            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.RejectOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
-            action.Template = action.Template.Replace("{userName}", store.FirstName);
-            Notification notification = new()
-            {
-                Body = action.Template,
-                UserId = order.CustomerId,
-                NotificationActionId = action.Id,
-                Status = NotificationStatus.New,
-                Subject = action.Subject,
-                IsRead = false
-            };
-            _repositoryManager.Notification.CreateNotification(notification);
-            //string msgEm1 = await InvoiceOrder(id);
-             var temp = await _repositoryManager.MessageTemplate.GetTemplateById(5,false); 
-            var msgem = temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
-            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-            try
-            {
-                var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
-                 _emailSender.SendEmail(message);
-            }
-            catch (Exception exp)
-            {
-                //  _logger.LogError("could not send a rejection email to customer, order id =" + id, exp);
-            }
-            await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(order, "OrderRejected");
-        } 
-        public async Task OrderReceived(int id)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 5;
-            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ReceiveOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
-            action.Template = action.Template.Replace("{userName}", store.FirstName);
-            Notification notification = new()
-            {
-                Body = action.Template,
-                UserId = order.CustomerId,
-                NotificationActionId = action.Id,
-                Status = NotificationStatus.New,
-                Subject = action.Subject,
-                IsRead = false
-            };
-            _repositoryManager.Notification.CreateNotification(notification);
-            await _repositoryManager.SaveAsync();
-        } 
-        public async Task<BussnessResultModel> ShippedOrder(int id)
+        public async Task UpdateTotalOrderPrice(int id,int customerId, decimal totalPrice)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
             if (order == null)
             {
-                return new BussnessResultModel(null , "correctLink", false);
+                // return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            if (order.OrderStatusId != 5 || String.IsNullOrEmpty(order.TransactionId))
+            order.OrderPrice = totalPrice;
+            order.CustomerId = customerId;
+            order.HashedCtpAndPayment = _util.ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+            await _repositoryManager.SaveAsync();
+        }
+        public async Task<BussnessResultModel> OrderPending(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            if(order == null)
             {
-                return new BussnessResultModel(null, "notPaid", false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            if (order.OrderStatusId == 5)
+            order.OrderStatusId = 1;
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(order, _locService.GetLocalizedStringValue("ChangeToPending"));
+        }
+        public async Task<BussnessResultModel> OrderComplete(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            if (order == null)
             {
-                order.OrderStatusId = 6;
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
+            if (order.OrderStatusId == 2)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("AlreadyComp"), false);
+            }
+            if (order.OrderStatusId != 6)
+            {
+                return new BussnessResultModel(null,  _locService.GetLocalizedStringValue("OrderNottPaid"), false);
+            }
+            var period = _repositoryManager.Setting.GetPeriod();
+            if (order.OrderStatusId == 6 && order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) <= DateTime.UtcNow)
+            {
+                order.OrderStatusId = 2;
             }
             var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
             foreach (var OrdPro in orderProducts)
             {
                 var date = DateTime.UtcNow;
-                var attributs = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(OrdPro.Id , false);
+                var attributs = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(OrdPro.Id, false);
                 if (attributs != null)
                 {
                     foreach (var attr in attributs)
                     {
-                       
+
                         var inventory = new Inventory
                         {
                             StockType = "out",
@@ -439,6 +403,199 @@ namespace BusinessLogic.ApiClasses
                     _repositoryManager.Inventory.AddInventory(inventory1);
                 }
             }
+
+            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CompleteOrder);
+            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            action.Template = action.Template.Replace("{userName}", store.FirstName);
+            Notification notification = new()
+            {
+                Body = action.Template,
+                UserId = order.CustomerId,
+                NotificationActionId = action.Id,
+                Status = NotificationStatus.New,
+                Subject = action.Subject,
+                IsRead = false
+            };
+            _repositoryManager.Notification.CreateNotification(notification);
+            //send email 
+            string msgEm1 = await InvoiceOrder(id);
+            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(4, false); //shipped email
+            var msgem = msgEm1 + temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
+            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            try
+            {
+                var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
+                _emailSender.SendEmail(message);
+            }
+            catch (Exception exp)
+            {
+               //  _logger.LogError($"COULD NOT SEND EMAIL: " + exp.Message, exp);
+            }
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(order, _locService.GetLocalizedStringValue("OrdeCompleted"));
+        }
+        public async Task OrderCancal(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            order.OrderStatusId = 5;
+            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CancelOrder);
+            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            action.Template = action.Template.Replace("{userName}", store.FirstName);
+            Notification notification = new()
+            {
+                Body = action.Template,
+                UserId = order.CustomerId,
+                NotificationActionId = action.Id,
+                Status = NotificationStatus.New,
+                Subject = action.Subject,
+                IsRead = false
+            };
+            _repositoryManager.Notification.CreateNotification(notification);
+            await _repositoryManager.SaveAsync();
+
+        }
+        public async Task<BussnessResultModel> OrderReject(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            if (order == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            if (order.OrderStatusId == 3)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("AlreadyCancel"), false);
+            }
+            if (order.OrderStatusId != 1)
+            {
+                var period = _repositoryManager.Setting.GetPeriod();
+                //if order shipped or recieved and allowed period for refund ended
+                if ((order.OrderStatusId == 5 || order.OrderStatusId == 6) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < _util.EasternTime))
+                {
+                    return new BussnessResultModel(null, "e: You Cann't Reject Order After period about " + period + " days from order", false);
+                }
+            }
+            order.OrderStatusId = 4;
+            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.RejectOrder);
+            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            action.Template = action.Template.Replace("{userName}", store.FirstName);
+            Notification notification = new()
+            {
+                Body = action.Template,
+                UserId = order.CustomerId,
+                NotificationActionId = action.Id,
+                Status = NotificationStatus.New,
+                Subject = action.Subject,
+                IsRead = false
+            };
+            _repositoryManager.Notification.CreateNotification(notification);
+            string msgEm1 = await InvoiceOrder(id);
+            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(5, false);
+            var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
+            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            try
+            {
+                var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
+                _emailSender.SendEmail(message);
+            }
+            catch (Exception exp)
+            {
+                //  _logger.LogError("could not send a rejection email to customer, order id =" + id, exp);
+            }
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(order, _locService.GetLocalizedStringValue("OrderRejected"));
+        }
+        public async Task OrderReceived(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            if (order == null)
+            {
+               // return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            order.OrderStatusId = 5;
+
+            var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
+            foreach (var OrdPro in orderProducts)
+            {
+                var date = DateTime.UtcNow;
+                var attributs = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(OrdPro.Id, false);
+                if (attributs != null)
+                {
+                    foreach (var attr in attributs)
+                    {
+
+                        var inventory = new Inventory
+                        {
+                            StockType = "out",
+                            Stock = OrdPro.Qty,
+                            TotalPurchasedPrice = OrdPro.FinalPrice,
+                            PurchaseCode = id.ToString(),
+                            ProductId = OrdPro.ProductId,
+                            AttributesProductId = attr.ProductAttributId,
+                            AddedDate = date.Millisecond,
+                            VendorId = order.StoreId
+                        };
+                        _repositoryManager.Inventory.AddInventory(inventory);
+                    }
+                }
+                else
+                {
+                    var inventory1 = new Inventory
+                    {
+                        StockType = "out",
+                        Stock = OrdPro.Qty,
+                        TotalPurchasedPrice = OrdPro.FinalPrice,
+                        PurchaseCode = id.ToString(),
+                        ProductId = OrdPro.ProductId,
+                        AttributesProductId = null,
+                        AddedDate = date.Millisecond,
+                        VendorId = order.StoreId
+                    };
+                    _repositoryManager.Inventory.AddInventory(inventory1);
+                }
+            }
+
+            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ReceiveOrder);
+            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            action.Template = action.Template.Replace("{userName}", store.FirstName);
+            Notification notification = new()
+            {
+                Body = action.Template,
+                UserId = order.CustomerId,
+                NotificationActionId = action.Id,
+                Status = NotificationStatus.New,
+                Subject = action.Subject,
+                IsRead = false
+            };
+            _repositoryManager.Notification.CreateNotification(notification);
+            await _repositoryManager.SaveAsync();
+
+            //send email 
+            string msgEm1 = await InvoiceOrder(id);
+            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(6, false); //recived email
+            var msgem = msgEm1 + temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
+            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
+            _emailSender.SendEmail(message);
+            if (customer != null)
+            {
+                await _signInManager.PasswordSignInAsync(customer.Email, customer.PasswordHash, true, false);
+            }
+        }
+        public async Task<BussnessResultModel> ShippedOrder(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            if (order == null)
+            {
+                return new BussnessResultModel(null,_locService.GetLocalizedStringValue("correctLink") , false);
+            }
+            if (order.OrderStatusId != 5 || String.IsNullOrEmpty(order.TransactionId))
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notPaid"), false);
+            }
+            if (order.OrderStatusId == 5)
+            {
+                order.OrderStatusId = 6;
+            }
            
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ShippedOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
@@ -453,11 +610,11 @@ namespace BusinessLogic.ApiClasses
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);
-           // string msgEm1 = await InvoiceOrder(id);
+             string msgEm1 = await InvoiceOrder(id);
 
             //send email
             var temp = await _repositoryManager.MessageTemplate.GetTemplateById(3, false);
-            var msgem = temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
+            var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
             var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
             try
             {
@@ -466,27 +623,35 @@ namespace BusinessLogic.ApiClasses
             }
             catch (Exception exp)
             {
-               // _logger.LogError($"COULD NOT SEND EMAIL: " + exp.Message, exp);
+                 //_logger.LogError($"COULD NOT SEND EMAIL: " + exp.Message, exp);
             }
             await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(order, "Toshipped");
+            return new BussnessResultModel(order,  _locService.GetLocalizedStringValue("Toshipped"));
         }
-        public async Task UpdateOrderAfterPay(int id, string PaymentsId)
+        public async Task UpdateOrderAfterPay(int id, string PaymentsId , string payment)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
             if (order.OrderStatusId == 1)
             {
                 order.OrderStatusId = 5; //recieved order
-                order.DatePurchased = EasternTime;
+                order.DatePurchased = _util.EasternTime;
                 order.TransactionId = PaymentsId;
-                order.UpdatedAt = EasternTime;
-                order.PaymentMethodsId = 6;// "Qatar Charity";
+                order.PaymentMethodsId = Convert.ToInt32(payment);// "Qatar Charity";
                 await _repositoryManager.SaveAsync();
             }
         }
-        public async Task<Order> GetOrderId(int orderId)
+      
+        public async Task GetFailOrder(int orderId)
         {
-            return await _repositoryManager.Order.GetOrderId(orderId, false);
+            var order = await _repositoryManager.Order.GetOrderId(orderId, false);
+            if (order != null)
+            {
+                var user = await _repositoryManager.User.GetUserId(order.CustomerId,false);
+                if (user != null)
+                {
+                     await _signInManager.PasswordSignInAsync(user.Email, user.PasswordHash, true,false);
+                }
+            }
         }
         public async Task<BussnessResultModel> DeleteOrder(int orderId)
         {
@@ -495,14 +660,14 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, "Cann't Delete This Order", false);
             }
-            if(order != null)
+            if (order != null)
             {
                 var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
-                foreach(var orderProduct in orderProducts)
+                foreach (var orderProduct in orderProducts)
                 {
                     _repositoryManager.OrderProducts.DeleteOrderProduct(orderProduct);
                     var attributes = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(orderProduct.Id, false);
-                    if(attributes != null)
+                    if (attributes != null)
                     {
                         foreach (var attribut in attributes)
                         {
@@ -515,10 +680,10 @@ namespace BusinessLogic.ApiClasses
             }
             else
             {
-               return new BussnessResultModel(null, "correctLink", false);
+                return new BussnessResultModel(null, "correctLink", false);
             }
             await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(order , "successDelete");
+            return new BussnessResultModel(order, "successDelete");
         }
         public async Task UpdateStatusOrder(int id, int adminId, int vendorId = 0)
         {
@@ -534,12 +699,12 @@ namespace BusinessLogic.ApiClasses
                 {
                     foreach (var option in orderAttributesProducts)
                     {
-                        attribute = option.ProductAttributId.Value ;
+                        attribute = option.ProductAttributId.Value;
                         inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
                     }
                 }
-              
-                inventory.AddedDate = EasternTime.Millisecond;
+
+                inventory.AddedDate = _util.EasternTime.Millisecond;
                 inventory.AdminId = adminId;
                 if (vendorId != 0)
                 {
@@ -550,46 +715,31 @@ namespace BusinessLogic.ApiClasses
                 inventory.TotalPurchasedPrice = item.FinalPrice;
                 inventory.PurchaseCode = item.OrderId.ToString();
                 inventory.StockType = "out";
-               // inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
+                // inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
                 _repositoryManager.Inventory.AddInventory(inventory);
-                
+
             }
             await _repositoryManager.SaveAsync();
         }
-        public async Task<List<OrderFilterDto>> GetOrdersByFilter(int customerId,List<Order> orders , string lange)
+        public async Task<List<OrderDto>> GetAllOrders()
         {
-            var products = new List<ProductDto>();
-            var ordersDto = new List<OrderFilterDto>();
+            var ordersDto = new List<OrderDto>();
+            var orders = await _repositoryManager.Order.GetAllOrders();
             foreach (var order in orders)
             {
-                order.CustomerId = customerId;
                 var store = await _repositoryManager.User.GetStoreId(order.StoreId);
                 if (store != null)
                 {
-                    var productsStore = products.Where(r => r.StoreId == store.Id).ToList();
-                    int CountproductsStore = productsStore.Count();
-
-                    var nameTime = "";
-                    if (order.DeliveryTimeId != 0)
-                    {
-                        var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
-                        if (time != null)
-                        {
-                            nameTime = time.Time;
-                        }
-                    }
-                    string stat = "";
+                    var products = await _repositoryManager.Product.GetProductsTOStoreId(store.Id);
+                    var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
+                      
                     var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                    if (states != null)
-                    {
-                        stat = states.StatusName;
-                    }
-                    var customer = await _repositoryManager.User.GetCustomerId(customerId, false);
+                    var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
 
-                    ordersDto.Add(new OrderFilterDto
+                    ordersDto.Add(new OrderDto
                     {
                     Id = order.Id,
-                    CustomerId = customerId,
+                    CustomerId = order.CustomerId,
                     CustomerName = customer.FullName,
                     Currency = order.Currency.Symbol,
                     CustomerEmail = (customer != null ? customer.Email : ""),
@@ -601,78 +751,23 @@ namespace BusinessLogic.ApiClasses
                     AddressId = order.AddressId,
                     CreatedAt = Convert.ToDateTime(order.CreatedAt),
                     DatePurchased = (!String.IsNullOrEmpty(order.DatePurchased.ToString()) ? order.DatePurchased.Value.AddHours(3).ToString("dd/MM/yyyy HH:mm:ss tt") : ""),
-                    DeliveryTimeName = nameTime,
+                    DeliveryTimeName = time.Time??null,
                     DeliveryTimeId = order.DeliveryTimeId,
                     TotalTax = order.TotalTax,
                     OrderStatusId = order.OrderStatusId,
-                    OrderStatusName = stat,
+                    OrderStatusName = states.StatusName??null,
                     Notes = order.Notes,
-                    CountProduct = CountproductsStore,
+                    CountProduct = products.Count(),
                     OrderPrice = order.OrderPrice
                 });
              }
             }
             return ordersDto;
         }
-        public async Task<OrderFilterDto> GetOrdersById(int customerId, int orderId, string lange)
-        {
-            var products = new List<ProductDto>();
-            var ordersDto = new OrderFilterDto();
-            var order = await GetOrderId(orderId);
-                order.CustomerId = customerId;
-                var store = await _repositoryManager.User.GetStoreId(order.StoreId);
-                if (store != null)
-                {
-                    var productsStore = products.Where(r => r.StoreId == store.Id).ToList();
-                    int CountproductsStore = productsStore.Count();
-
-                    var nameTime = "";
-                    if (order.DeliveryTimeId != 0)
-                    {
-                        var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
-                        if (time != null)
-                        {
-                            nameTime = time.Time;
-                        }
-                    }
-                    string stat = "";
-                    var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                    if (states != null)
-                    {
-                        stat = states.StatusName;
-                    }
-                    var customer = await _repositoryManager.User.GetCustomerId(customerId, false);
-
-                    ordersDto = new OrderFilterDto
-                    {
-                        Id = order.Id,
-                        CustomerId = customerId,
-                        CustomerName = customer.FullName,
-                        Currency = order.Currency.Symbol,
-                        CustomerEmail = (customer != null ? customer.Email : ""),
-                        CustomerPhone = (customer != null ? customer.PhoneNumber : ""),
-                        StoreId = store.Id,
-                        StoreName = (store != null ? store.FullName : ""),
-                        StoreEmail = store.Email,
-                        StorePhone = store.PhoneNumber,
-                        AddressId = order.AddressId,
-                        CreatedAt = Convert.ToDateTime(order.CreatedAt),
-                        DatePurchased = (!String.IsNullOrEmpty(order.DatePurchased.ToString()) ? order.DatePurchased.Value.AddHours(3).ToString("dd/MM/yyyy HH:mm:ss tt") : ""),
-                        DeliveryTimeName = nameTime,
-                        DeliveryTimeId = order.DeliveryTimeId,
-                        TotalTax = order.TotalTax,
-                        OrderStatusId = order.OrderStatusId,
-                        OrderStatusName = stat,
-                        Notes = order.Notes,
-                        CountProduct = CountproductsStore,
-                        OrderPrice = order.OrderPrice
-                    };
-                }
-            return ordersDto;
-        }
-        public async Task<List<OrderDto>> GetOrderCustomer(int CustomerId, string lange)
+        public async Task<List<OrderDto>> GetOrderCustomer(int CustomerId, int storeId = 0)
         {
             var orders = await _repositoryManager.Order.GetOrdersToCustomer(CustomerId);
+            if(storeId != 0) { orders.Where(c => c.StoreId == storeId); }
             var ordersDto = _mapper.Map<List<OrderDto>>(orders);
            return ordersDto;
         }
@@ -709,7 +804,7 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             var l = await _repositoryManager.Setting.GetSettingByValue("website_logo");
-           // var logo = await _imageBL.GetImageOriginal(l.Value);
+            // var logo = await _imageBL.GetImageOriginal(l.Value);
             var all = "";
             var bb3 = "";
             var m3 = "";
@@ -736,7 +831,7 @@ namespace BusinessLogic.ApiClasses
             foreach (var item in MyOrders)
             {
                 string menuTxt = "";
-                var menu = await _repositoryManager.Product.GetProductById(item.ProductId,false);
+                var menu = await _repositoryManager.Product.GetProductById(item.ProductId, false);
                 if (menu != null)
                 {
                     menuTxt = menu.ProductName;
@@ -750,9 +845,9 @@ namespace BusinessLogic.ApiClasses
             }
             var cop = " ";
             var copoun = await _repositoryManager.Coupon.GetCouponCodeNotFinished(newOrder.CodeCoupon);
-            if(copoun != null)
+            if (copoun != null)
             {
-                cop = copoun.CouponCode ;
+                cop = copoun.CouponCode;
             }
             var t = "</tbody><br><br><tfoot style='width: 100%;display: inherit; '><tr><td colspan = '3' style='color: #492f91;font-size: 20px;'>SubTotal</td><td style = 'color: #000;font-size: 17px;'> QAR "
                 + sub.ToString("0.00") + " </td></tr><tr><td colspan = '3' style='color: #492f91;font-size: 20px;'>Discount </td><td style = 'color: #000;font-size: 17px;' >"
@@ -762,11 +857,24 @@ namespace BusinessLogic.ApiClasses
             all = img + bdy1 + m3 + t;
             return all;
         }
+
         //Coupon------------------------------------------------
-        public async Task AddCoupon(CreateCouponDto createDto)
+        public async Task<BussnessResultModel> AddCoupon(CreateCouponDto createDto, int storeId = 0 ,int adminId = 0)
         {
+            var IsExists = _repositoryManager.Coupon.CheckExistCoupon(createDto.CouponCode);
+            if (IsExists)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"), false);
+            }
             var coupon = _mapper.Map<Coupon>(createDto);
-            //coupon.StoreId = 1;
+            coupon.StoreId = storeId == 0 ? null : storeId;
+            coupon.AdminId = adminId == 0 ? null : adminId;
+           
+            
+            if ((createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product") && (createDto.Products == null || createDto.Products.Count() == 0))
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue(" Please Choose Products"),false);
+            }
             if ((createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product"))
             {
                 if (createDto.Products != null && createDto.Products.Count() > 0)
@@ -776,17 +884,28 @@ namespace BusinessLogic.ApiClasses
             }
             _repositoryManager.Coupon.AddCoupon(coupon);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successAdd"));
         }
-        public async Task DeleteCoupon(int id)
+        public async Task<BussnessResultModel> DeleteCoupon(int id)
         {
-            var cart = await _repositoryManager.Coupon.GetCouponId(id, false);
-            _repositoryManager.Coupon.DeleteCoupon(cart);
+            var coupon = await _repositoryManager.Coupon.GetCouponId(id, false);
+            if (coupon == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            _repositoryManager.Coupon.DeleteCoupon(coupon);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task UpdateCoupon(UpdateCouponDto updateDto)
+        public async Task<BussnessResultModel> UpdateCoupon(UpdateCouponDto updateDto, int storeId = 0, int adminId = 0)
         {
             var coupon = await _repositoryManager.Coupon.GetCouponId(updateDto.Id, true);
-            //coupon.StoreId = 1;
+            if(coupon == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"),false);
+            }
+            coupon.StoreId = storeId == 0 ? null : storeId;
+            coupon.AdminId = adminId == 0 ? null : adminId;
             if ((updateDto.DiscountType == "fixed_product" || updateDto.DiscountType == "percent_product"))
             {
                 if (updateDto.Products != null && updateDto.Products.Count() > 0)
@@ -796,12 +915,9 @@ namespace BusinessLogic.ApiClasses
             }
             _mapper.Map(updateDto, coupon);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successSave"));
         }
 
-        public bool CheckCodeCoupon(string code)
-        {
-            return _repositoryManager.Coupon.CheckExistCoupon(code);
-        }
         public async Task<IEnumerable<Coupon>> GetCoupons()
         {
             return await _repositoryManager.Coupon.GetCoupons();
@@ -815,11 +931,20 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.OrderStatus.GetOrderStatusesList(false);
         }
-        public async Task EditOrderStatus(UpdateOrderStatusDto update)
+        public async Task<BussnessResultModel> EditOrderStatus(UpdateOrderStatusDto update)
         {
             var status =  await _repositoryManager.OrderStatus.GetOrderStatusById(update.Id , true);
+            if(status == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink") , false); 
+            }
+            if (update.StatusesNames == null)
+            {
+                return new BussnessResultModel(status, _locService.GetLocalizedStringValue("enterallfiled") , false); 
+            }
             _mapper.Map(update, status);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(status, _locService.GetLocalizedStringValue("successSave"));
         }
         //Payment------------------------------------------------
         public async Task<List<PaymentMethods>> GetPayments()
@@ -850,27 +975,6 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Unit.GetUnitsByVendor(vendorId);
         }
-        //-----------------------------------------------
-        public DateTime EasternTime
-        {
-            get
-            {
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
-            }
-        }
-        protected static string ComputeSha256Hash(string rawData)
-        {
-            using (SHA256 Sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = Sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                var builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
+      
     }
 }

@@ -19,12 +19,13 @@ namespace Entities.DataTransferObjects
         public int CustomerId { get; set; } 
         public string CustomerName { get; set; } 
         public string CustomerImage { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     public class CreateReviewDto
     {
         public string Text { get; set; }
+        public string CustomerName { get; set; }
         public double Rating { get; set; }
-        public int CustomerId { get; set; }
     } 
     public class UpdateReviewDto : CreateReviewDto
     {

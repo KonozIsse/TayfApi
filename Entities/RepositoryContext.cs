@@ -22,6 +22,11 @@ namespace Entities
         {
 
         }
+
+        public RepositoryContext()
+        {
+        }
+
         public DbSet<Address> Addresses { get; set; }
         public DbSet<ProductAttribut> AttributesProducts { get; set; }
         public DbSet<Banner> Banners { get; set; }

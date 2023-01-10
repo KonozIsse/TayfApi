@@ -19,8 +19,8 @@ namespace Repository
         }
         public async Task<List<Product>> GetAllAcceptedProducts()
           => await FindByCondition(c =>  c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
-            .Include(c=>c.Category).Include(c=>c.Store).Include(s => s.SpecialProducts).Include(c => c.ProductSales)
-            .Include(c => c.Reviews).Include(c => c.AttributesProducts).Include(i=>i.Images).Include(e => e.WishLists)
+            .Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(e => e.WishLists)
+            .Include(c => c.Reviews).Include(c => c.AttributesProducts).Include(i=>i.Images).Include(c=>c.Store)
             .OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<Product> GetProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
@@ -28,10 +28,10 @@ namespace Repository
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();  
         public async Task<Product> GetAcceptAdminActiveProduct(int id)
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
-            .Include(c=>c.Category).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
+            .Include(c=>c.ProductCategories).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
             .Include(c=>c.Reviews).Include(e=>e.WishLists).Include(c=>c.AttributesProducts).FirstOrDefaultAsync();
          public async Task<List<Product>> GetProductsCatId(int categoryId)
-       => await FindByCondition(c => c.CategoryId == categoryId && c.IsStatus == Status.Active, false).ToListAsync();
+       => await FindByCondition(c => c.ProductCategories.Any(n=>n.CategoryId == categoryId) && c.IsStatus == Status.Active, false).ToListAsync();
 
         public async Task<List<Product>> GetProductsTOStoreId(int storeId)
         => await FindByCondition(c => c.StoreId == storeId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.Id).ToListAsync();
@@ -67,39 +67,34 @@ namespace Repository
 
         public async Task<List<Product>> SearshProductByCategoryAndStore(int storeId, string search, int categoryId)
         {
-            var list = FindByCondition(c => 
-            (c.Category.MainCategoryId == categoryId ||c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 0)
+            var list = FindByCondition(c =>
+            //(c.Category.MainCategoryId == categoryId || c.CategoryId == categoryId && c.Category.IsStatus == Status.Active && c.Category.MainCategoryId != 0)
 
-            &&( storeId == 0 || c.StoreId == storeId && c.Store.Status == Status.Active)
-            && c.IsAcceptAdmin == true && c.IsStatus == Status.Active
+            //&& (storeId == 0 || c.StoreId == storeId && c.Store.Status == Status.Active)&& 
+            c.IsAcceptAdmin == true && c.IsStatus == Status.Active
 
-            && ((!String.IsNullOrEmpty(c.Category.CategoryName) && c.Category.CategoryName.Contains(search)) || String.IsNullOrEmpty(search))
+           // && ((!String.IsNullOrEmpty(c.Category.CategoryName) && c.Category.CategoryName.Contains(search)) || String.IsNullOrEmpty(search))
 
             || ((!String.IsNullOrEmpty(c.ProductName) && c.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
             return await list.ToListAsync();
         }
-        public async Task<List<Product>> GetProductByCategoryAndStoreIdForCP(int storeId, string search, int categoryId)
+       
+        public async Task<PagedList<Product>> GetProductsCP(int? storeId, string search, PostsParameters postsParameters)
         {
-            var list =  FindByCondition(r => r.CategoryId == categoryId && r.IsStatus == Status.Active &&
-                    ((!String.IsNullOrEmpty(r.ProductName)  && r.ProductName.Contains(search)) || String.IsNullOrEmpty(search)),false);
-            
+            var list = FindByCondition(r =>
+                    ((!String.IsNullOrEmpty(r.ProductName) && r.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
+
             if (storeId != 0)
             {
-                list = list.Where(r=>r.Store != null && r.Store.Status == Status.Active && r.StoreId == storeId) ;
+                list = list.Where(r => r.Store != null && r.Store.Status == Status.Active && r.StoreId == storeId);
             }
-            return await list.OrderByDescending(r => r.Id).ToListAsync();
+            await list.Include(c => c.ProductCategories).OrderByDescending(r => r.Id).ToListAsync();
+
+            return PagedList<Product>.ToPagedList(list, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public void AddProductOnCategory(int categoryId, Product product)
-        {
-            product.CategoryId = categoryId;
-            Create(product);
-        }
+        public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);
-        public async Task DeleteListProduct(List<int> Ids)
-        {
-            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
-            DeleteRange(result);
-        }
+       
     }
 
     public class ProductTypeRepository : RepositoryBase<ProductType>, IProductTypeRepository

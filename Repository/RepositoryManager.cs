@@ -57,9 +57,8 @@ namespace Repository
         private IReviewRepository _reviewRepository;
         private IZoneRepository _zoneRepository; 
         private IUnitRepository _unitRepository;    
-        private IRoleRepository _roleRepository; 
-         private IClaimRepository _claimRepository; 
-        
+        private IRoleRepository _roleRepository;
+        private IProductCategoryRepository _productCategoryRepository;
 
         public RepositoryManager(RepositoryContext repositoryContext)
         {
@@ -490,15 +489,15 @@ namespace Repository
                     _roleRepository = new RoleRepository(_repositoryContext);
                 return _roleRepository;
             }
-        }  
+        }
 
-        public IClaimRepository Claim
+        public IProductCategoryRepository ProductCategory
         {
             get
             {
-                if (_claimRepository == null)
-                    _claimRepository = new ClaimRepository(_repositoryContext);
-                return _claimRepository;
+                if (_productCategoryRepository == null)
+                    _productCategoryRepository = new ProductCategoryRepository(_repositoryContext);
+                return _productCategoryRepository;
             }
         }
 

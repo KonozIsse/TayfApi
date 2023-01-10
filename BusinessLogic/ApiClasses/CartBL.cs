@@ -1,21 +1,12 @@
 ﻿
 using AutoMapper;
-using BusinessLogic.ViewModel;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.Cms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
+using Entities.ViewModel;
+using System.Web.Mvc;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -25,12 +16,14 @@ namespace BusinessLogic.ApiClasses
         protected readonly IMapper _mapper;
         private readonly LocService _locService;
         private readonly LocationTaxBL _locationTaxBL;
-        public CartBL( IRepositoryManager repositoryManager, IMapper mapper, LocService locService, LocationTaxBL locationTaxBL)
+        private readonly Util _util;
+        public CartBL( IRepositoryManager repositoryManager, IMapper mapper, LocService locService, LocationTaxBL locationTaxBL, Util util)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _locService = locService;
             _locationTaxBL = locationTaxBL;
+            _util = util;
         }
         //Cart------------------------------------------------
         public int CartCount()
@@ -55,7 +48,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<decimal> GetTotalCartsCustomer(int customerId)
         {
             decimal total = 0;
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            var carts = await _repositoryManager.Cart.CartsNotActiveCustomer(customerId);
             if (carts.Count() > 0)
             {
                 total = Convert.ToDecimal(carts.Sum(t => t.FinalPrice));
@@ -71,6 +64,28 @@ namespace BusinessLogic.ApiClasses
                 total = Convert.ToDecimal(carts.Sum(t => t.FinalPrice));
             }
             return total;
+        
+        }
+        public async Task<IEnumerable<StoreDto>> GetCartsCustomerId(int customer)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customer);
+            var store = await _repositoryManager.User.GetStore(carts.First().StoreId, false);
+            var storeGrouped = carts.GroupBy(c => c.Store).Select(x => new
+            {
+                CountCart = carts.Count(),
+                TotalPrice = x.Sum(c => c.FinalPrice)
+            });
+            var storeList = storeGrouped.Select(x =>
+                new StoreDto
+                {
+                    Id = store.Id,
+                    FirstName = store.FirstName,
+                    Avater = store.Avater,
+                    AdressInfo = store.AdressInfo,
+                    CountCart = x.CountCart,
+                    TotalPrice = x.TotalPrice,
+                });
+            return storeList;
         }
         public async Task ChangeActiveStatusCart(int id)
         {
@@ -116,8 +131,8 @@ namespace BusinessLogic.ApiClasses
             if (cart == null)
             {
                 var addCart = _mapper.Map<Cart>(createDto);
+                addCart.IsStatus = Status.NotActive;
                 addCart.CustomerId = customerId;
-                addCart.ProdId = createDto.ProductId;
                 addCart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
                 addCart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
                 _repositoryManager.Cart.AddCart(addCart);
@@ -130,6 +145,66 @@ namespace BusinessLogic.ApiClasses
                 _mapper.Map(createDto, cart);
             }
             await _repositoryManager.SaveAsync();
+        }
+        public  decimal UpdateCart( int id,int CustomerID, int Quantity = 1)
+        {
+            var cart = _repositoryManager.Cart.GetCartId(id, true).Result;
+            var update = new CreateCartDto
+            {
+                Id = id,
+                ProductId = cart.ProdId,
+                Qty = Quantity,
+                CartAttributeProducts = null
+            };
+            return UpdateTotalCart(CustomerID, update).Result;
+        }
+        public async Task<decimal> UpdateTotalCart(int customerId, CreateCartDto createDto)
+        {
+            var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
+            var productPrice = product.Price;
+            var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(createDto.ProductId);
+            if (special != null)
+            {
+                productPrice = special.SpecialPrice;
+            }
+            var flash = await _repositoryManager.Sales.GetFlashProductId(createDto.ProductId);
+            if (flash != null)
+            {
+                productPrice = flash.DiscountPrice;
+            }
+            var cartAttributesDto = createDto.CartAttributeProducts;
+            if (cartAttributesDto != null)
+            {
+                foreach (var cartAttributDto in cartAttributesDto)
+                {
+                    var attributes = await _repositoryManager.Attribute.GetAttributesProductId(createDto.ProductId);
+                    var attribut = attributes.Where(c => c.Id == cartAttributDto.AttributesProductId).FirstOrDefault();
+                    if (attribut != null && attribut.AttributePrice != 0)
+                    {
+                        if (attribut.PricePrefix == "+")
+                        {
+                            productPrice += attribut.AttributePrice;
+                        }
+                        if (attribut.PricePrefix == "-" && productPrice != 0)
+                        {
+                            productPrice -= attribut.AttributePrice;
+                        }
+                    }
+                }
+            }
+            var cart = await _repositoryManager.Cart.GetCartId(createDto.Id, true);
+            if (cart != null)
+            {
+                cart.CustomerId = customerId;
+                cart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
+                createDto.Qty = cart.Qty + createDto.Qty;
+                cart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
+                _mapper.Map(createDto, cart);
+                await _repositoryManager.SaveAsync();
+            }
+            decimal allTotal = cart.FinalPrice ;
+
+            return allTotal;
         }
         public async Task<string> AddProductToCart(int customerId, CreateCartDto createDto)
         {
@@ -460,22 +535,130 @@ namespace BusinessLogic.ApiClasses
                 }
             }
         }
-        public async Task DeleteCart(int cartId)
+        public async Task<BussnessResultModel> DeleteCart(int cartId)
         {
             var cart = await _repositoryManager.Cart.GetCartId(cartId, false);
-            if (cart != null)
+            if (cart == null)
             {
-                var cartAttributes = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId);
-                if (cartAttributes != null)
+                return new BussnessResultModel(null, "Please make sure the link is correct", false);
+            }
+            var cartAttributes = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId);
+            if (cartAttributes != null)
+            {
+                foreach (var cartAttribut in cartAttributes)
                 {
-                    foreach (var cartAttribut in cartAttributes)
+                    _repositoryManager.CartAttributeProduct.DeleteCartAttributeProduct(cartAttribut);
+                }
+            }
+            _repositoryManager.Cart.DeleteCart(cart);
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(cart , _locService.GetLocalizedStringValue("successDelete"));
+        }
+        public async Task AddCookie(int customerId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+            try
+            {
+                for (int i = 0; i < carts.Count; i++)
+                {
+                    var create = new CreateCartDto
                     {
-                        _repositoryManager.CartAttributeProduct.DeleteCartAttributeProduct(cartAttribut);
+                        ProductId = carts[i].ProdId,
+                        Qty = carts[i].Qty,
+                        Id = carts[i].Id,
+                        CartAttributeProducts = null
+                    };
+                    await AddCart(customerId, create);
+                    await ChangeActiveStatusCart(carts[i].Id);
+                }
+            }
+            catch { }
+        }
+        public async Task<List<CartVM>> GetCarts (int storeId, int userId, Currency curr)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(userId);
+            if (storeId != 0)
+            {
+                carts = carts.Where(r => r.StoreId == storeId).ToList();
+            }
+            var cartVM = new List<CartVM>();
+            foreach (var cart in carts)
+            {
+                if (cart.StoreId != 0)
+                {
+                    var product = await _repositoryManager.Product.GetProductById(cart.ProdId, false);
+                    var store = await _repositoryManager.User.GetStore(cart.StoreId, false);
+                    var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(cart.ProdId);
+                   // var attr = await _productBL.GetOptions(cart.ProdId);
+                    var flash = await _repositoryManager.Sales.GetFlashProductId(cart.ProdId);
+                    if (product != null)
+                    {
+                        var offer_price = special == null ? 0 : special.SpecialPrice;
+                        cartVM.Add(new CartVM
+                        {
+                            Id = cart.Id,
+                            Qty = cart.Qty,
+                            StoreId = cart.StoreId,
+                            FinalPrice = cart.FinalPrice,
+                            //Attributes = attr ?? null,
+                            ShareLink = _util.url1 + "/share.html?id=" + cart.ProdId,
+                            ProductId = cart.ProdId,
+                            ProductName = product.ProductName,
+                            //ProductImage = await _imageBL.GetImageOriginal(product.Images.First().ToString()),
+                            IsFeature = product.IsFeature,
+                            SpecialPrice = offer_price,
+                            StoreName = store.FirstName,
+                            IsSpecial = (special == null ? false : true),
+                            ProductDescription = product.Description,
+                            CreatedAt = product.CreatedAt.ToString(),
+                            UpdatedAt = product.UpdatedAt.ToString() ?? null,
+                            ProductModel = product.ProductModel,
+                            ProductPrice = (flash != null ? flash.DiscountPrice : product.Price),
+                            ProductStatus = Convert.ToInt16(product.IsStatus)
+                        });
                     }
                 }
-                _repositoryManager.Cart.DeleteCart(cart);
             }
-            await _repositoryManager.SaveAsync();
+            return cartVM;
+        }
+        public async Task<CheckoutVM> CheckoutCart(int storeId, int CustomerId, Currency code, string coupon = null)
+        {
+            var usr = await _repositoryManager.User.GetActiveUserId(CustomerId, false);
+            var model = new CheckoutVM
+            {
+                FirstName = usr.FirstName,
+                LastName = usr.LastName,
+                Phone = usr.PhoneNumber,
+                DisCount = GetValueCodeCoupon(CustomerId, coupon, code).Result ?? null,
+                Payment = await _repositoryManager.PaymentMethods.GetPaymentMethods() ?? null,
+                Countries = await _locationTaxBL.GetCountriesForWeb() ?? null,
+                Cart = await GetCarts(storeId, CustomerId, code) ?? null,
+                Tax = await _locationTaxBL.GetTax(CustomerId) == 0 ? 0 : await _locationTaxBL.GetTax(CustomerId),
+                Times = await _repositoryManager.DeliveryTime.GetAllDeliveryTimes() ?? null,
+                Coupon = coupon ?? null,
+                Total = await GetTotalCart(storeId, CustomerId, coupon) == 0 ? 0 : await GetTotalCart(storeId, CustomerId, coupon),
+                Address = await _locationTaxBL.GetDefaultAddress(CustomerId),
+            };
+            return model;
+        }
+
+
+        public async Task<BussnessResultModel> DeleteByStore(int storeId, int userId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToStoreCustomer(storeId,userId);
+            if(carts == null)
+            {
+                return new BussnessResultModel(null, "Please make sure the link", false);
+            }
+            else
+            {
+                foreach (var cart in carts)
+                {
+                    _repositoryManager.Cart.DeleteCart(cart);
+                    await _repositoryManager.SaveAsync();
+                }
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("successDelete"), false);
+            }
         }
     }
 }

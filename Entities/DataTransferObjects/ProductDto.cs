@@ -11,6 +11,7 @@ namespace Entities.DataTransferObjects
         public Status IsStatus { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
+        public string ImageProduct { get; set; }
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
@@ -42,16 +43,15 @@ namespace Entities.DataTransferObjects
     }
     public class CreateProductDto
     {
-        public Dictionary<string, string> ProductNames { get; set; }
-        public Dictionary<string, string> ProductDescriptions { get; set; }
         public string ProductName { get; set; }
+        public string ProductNameAr { get; set; }
         public Status IsStatus { get; set; }
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
-        public int TypeId { get; set; } 
-        public int? StoreId { get; set; }
-        public int? AdminId { get; set; }
+        public string DescriptionAr { get; set; }
+        public int TypeId { get; set; }
+        public int? StoreId { get; set; } 
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
@@ -60,6 +60,7 @@ namespace Entities.DataTransferObjects
         public List<CreateSaleDto> ProductSales { get; set; }
         public bool IsSpecial { get; set; }
         public List<CreateSpecialDto> SpecialProducts { get; set; }
+        public List<CategoriesProductDto> ProductCategories { get; set; }
     }
     public class UpdateProductDto : CreateProductDto
     {

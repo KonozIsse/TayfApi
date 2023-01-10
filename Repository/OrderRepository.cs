@@ -19,8 +19,8 @@ namespace Repository
         }
         public async Task<Order> GetOrderId(int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
-        public async Task<Order> GetActiveOrderId(int id, bool trackChanges)
-         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).SingleOrDefaultAsync();
+        public async Task<Order> GetLastOrderCustomer(int customerId, bool trackChanges)
+         => await FindByCondition(c => c.CustomerId == customerId , trackChanges).OrderByDescending(c=>c.Id).SingleOrDefaultAsync();
         public async Task<List<Order>> GetAllOrders()
          => await FindAll(false).OrderByDescending(r => r.CreatedAt).ToListAsync();
         public async Task<List<Order>> GetOrdersToStore(int storeId)

@@ -13,8 +13,6 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public Status IsStatus { get; set; }
-        public Dictionary<string, string> NewsTitles { get; set; }
-        public Dictionary<string, string> NewsDescriptions { get; set; }
         public string Title { get; set; }
         public string Decription { get; set; }
         public string Url { get; set; }
@@ -29,8 +27,8 @@ namespace Entities.DataTransferObjects
 }
     public class CreateNewsDto
     {
-        public Dictionary<string, string> NewsTitles { get; set; }
-        public Dictionary<string, string> NewsDescriptions { get; set; }
+        public string TitleAr { get; set; }
+        public string DecriptionAr { get; set; }
         public string Title { get; set; }
         public string Decription { get; set; }
         public Status IsStatus { get; set; }
@@ -40,17 +38,18 @@ namespace Entities.DataTransferObjects
     {
         public int NewsId { get; set; }
     } 
-    public class CreateCommentsDto
+    public class CreateCommentDto
     {
-        public string Text { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Comment { get; set; }
     }
     public class CommentsDto
     {
         public int Id { get; set; }
-        public string Text { get; set; }
+        public string Comment { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public int UserId { get; set; }
         public int NewsId { get; set; }
         public DateTime CreatedAt { get; set; }
     }

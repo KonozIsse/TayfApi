@@ -12,33 +12,28 @@ using AutoMapper;
 using Contracts;
 using System.Drawing.Imaging;
 using System.Drawing;
-using System.IO;
 using System.Net.Security;
 using System.Net;
-using System.Net.Http;
-using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Image = Entities.Models.Image;
-using Org.BouncyCastle.Crypto;
-
+using BussnessResultModel = Entities.Exception.BussnessResultModel;
 namespace BusinessLogic.ApiClasses
 {
     public class ImageBL
     {
-        protected static readonly IConfiguration Configuration;
+        protected readonly IConfiguration Configuration;
         protected readonly IRepositoryManager _repositoryManager;
         protected readonly IMapper _mapper;  
         protected readonly ImageUploadServices _imageUploadServices;
         private readonly LocService _locService;
-        string url;
-        protected static readonly string urlImg = Configuration.GetSection("ImagesUrl").ToString();
 
-        public ImageBL(IRepositoryManager repositoryManager, IMapper mapper, ImageUploadServices imageUploadServices, LocService locService)
+        public ImageBL(IRepositoryManager repositoryManager, IMapper mapper, ImageUploadServices imageUploadServices, LocService locService, IConfiguration configuration)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _imageUploadServices = imageUploadServices;
             _locService = locService;
+            Configuration = configuration;
         }
         public List<string> GetImagesCategoriesConstants()
         {
@@ -89,17 +84,14 @@ namespace BusinessLogic.ApiClasses
                 Bitmap sourceImage = new Bitmap(bitfile);
                 var name = _imageUploadServices.Upload(file/*, "original/" + name*/);
                 image.Name = name;
-                image.AdminId = 1;
 
                 var set = await  _repositoryManager.Setting.GetAllSettings(false);
-                var thh = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_height").FirstOrDefault().Value);
-                var thw = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_width").FirstOrDefault().Value);
-                var mh = Convert.ToInt32(set.Where(x => x.Key == "Medium_height").FirstOrDefault().Value);
-                var mw = Convert.ToInt32(set.Where(x => x.Key == "Medium_width").FirstOrDefault().Value);
-                var lh = Convert.ToInt32(set.Where(x => x.Key == "Large_height").FirstOrDefault().Value);
-                var lw = Convert.ToInt32(set.Where(x => x.Key == "Large_width").FirstOrDefault().Value);
-
-                //var t = _cpBl.SaveThumImg(d);
+                var thh = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_height").First().Value);
+                var thw = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_width").First().Value);
+                var mh = Convert.ToInt32(set.Where(x => x.Key == "Medium_height").First().Value);
+                var mw = Convert.ToInt32(set.Where(x => x.Key == "Medium_width").First().Value);
+                var lh = Convert.ToInt32(set.Where(x => x.Key == "Large_height").First().Value);
+                var lw = Convert.ToInt32(set.Where(x => x.Key == "Large_width").First().Value);
 
                 _repositoryManager.Image.AddImage(image);
                 await _repositoryManager.SaveAsync();
@@ -247,7 +239,7 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
         } 
-        public async Task DeleteImage(int id)
+        public async Task<BussnessResultModel> DeleteImage(int id)
         {
             var image = await _repositoryManager.Image.GetImage(id, false);
             if(image != null)
@@ -258,12 +250,16 @@ namespace BusinessLogic.ApiClasses
                     foreach (var setting in settings)
                     {
                         _repositoryManager.ImageSetting.DeleteImageSetting(setting);
-                        _imageUploadServices.DeleteImage(setting.Path);
                     }
 
                 }
                 _repositoryManager.Image.DeleteImage(image);
                 await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(image , _locService.GetLocalizedStringValue("successDelete"));
+            }
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
         public async Task AddImageSetting(CreateImageSettingDto settingDto)
@@ -289,6 +285,7 @@ namespace BusinessLogic.ApiClasses
                     delegate { return true; }
                 );
                 //Sending request to find web api REST service resource GetAllEmployees using HttpClient  
+                string urlImg = Configuration.GetSection("ImagesUrl").Value;
                 var Res = client.GetAsync(urlImg + name);
 
                 //Checking the response is successful or not which is sent using HttpClient  
@@ -350,7 +347,7 @@ namespace BusinessLogic.ApiClasses
 
                 if (imageMedium != null)
                 {
-                    image = url + imageMedium.Path;
+                    image = /*url +*/ imageMedium.Path;
                 }
             }
             return image;
@@ -374,7 +371,7 @@ namespace BusinessLogic.ApiClasses
 
                 if (imageThumbnail != null)
                 {
-                    image = url + imageThumbnail.Path;
+                    image = /*url +*/ imageThumbnail.Path;
                 }
             }
             return image;

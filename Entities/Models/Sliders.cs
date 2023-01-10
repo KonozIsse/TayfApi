@@ -17,9 +17,7 @@ namespace Entities.Models
         public SlidersImageType Type { get; set; }
         public DateTime? AddDate { get; set; }
         public DateTime? EndDate { get; set; }
-        [ForeignKey(nameof(Language))]
-        public int? LangId { get; set; }
-        public Language Language { get; set; }
+
         [ForeignKey(nameof(Vendor))]
         public int? VendorId { get; set; }
         public User Vendor { get; set; }

@@ -12,8 +12,8 @@ namespace Contracts
         Task<List<Country>> GetCountriesCountZones(bool trackChanges);
         Task<List<Country>> GetCountries();
         Task<Country> GetcountryById(int id, bool trackChanges);
-        bool ExistCountry(string countryName, int code);
-        Task<Country> GetCountryByCode(int code, bool trackChanges);
+        bool ExistCountry(string countryName, string code);
+        Task<Country> GetCountryByCode(string code, bool trackChanges);
         void AddCountry(Country country);
         void DeleteCountry(Country country);
     }

@@ -6,6 +6,7 @@ namespace Entities.Models
     public class Product : BaseEntity
     {
         public string ProductName { get; set; }
+        public string ImageProduct { get; set; }
         public string ProductNameAr { get; set; }
         public string Description { get; set; }
         public string DescriptionAr { get; set; }
@@ -29,10 +30,7 @@ namespace Entities.Models
         [ForeignKey(nameof(ProductType))]
         public int TypeId { get; set; }
         public ProductType ProductType { get; set; }
-
-        [ForeignKey(nameof(Category))]
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public List<ProductCategory> ProductCategories { get; set; }
         public List<WishList> WishLists { get; set; }
         public List<Review> Reviews { get; set; }
         public List<SpecialProducts> SpecialProducts { get; set; } 

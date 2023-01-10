@@ -11,9 +11,11 @@ namespace Contracts
     {
         Task<Cart> GetCustomerProduct(int productId, int customerId, bool trackChanges);
         Task<List<Cart>> GetCartsToCustomerId(int customerId);
+        Task<List<Cart>> GetCartsActiveCustomerId(int customerId);
         Task<List<Cart>> GetCartsToStoreId(int storeId);
         Task<List<Cart>> CartsNotActiveCustomer(int customerId);
         Task<Cart> GetCartId(int id, bool trackChanges);
+        Task<List<Cart>> GetCartsToStoreCustomer(int storeId, int customerId);
         Task<List<Cart>> GetCarts();
         void AddCart(Cart cart);
         void DeleteCart(Cart cart);

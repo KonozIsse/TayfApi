@@ -1,6 +1,9 @@
-﻿using Contracts;
-using Entities.Models;
+﻿
+
+using Contracts;
+using Entities;
 using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,13 +21,15 @@ namespace BusinessLogic
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
         private User _user;
-        public AuthenticationManager(UserManager<User> userManager, IConfiguration configuration)
+        public AuthenticationManager(UserManager<User> userManager, IConfiguration
+       configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
         }
         public async Task<bool> ValidateUser(UserForAuthenticationDto userForAuth)
         {
+            
             _user = await _userManager.FindByNameAsync(userForAuth.UserName);
             return (_user != null && (true || await _userManager.CheckPasswordAsync(_user,userForAuth.Password)));
         }
@@ -34,11 +39,10 @@ namespace BusinessLogic
             var claims = await GetClaims();
             var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
             return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-        }
+        } 
         private SigningCredentials GetSigningCredentials()
         {
-            var password = Environment.GetEnvironmentVariable("SECRET");
-            var key = Encoding.UTF8.GetBytes(password);
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"));
             var secret = new SymmetricSecurityKey(key);
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }

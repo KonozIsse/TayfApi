@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.Models.Enum
 {
-  //  [EnumBindResource(typeof(ResourcesLib.EnumResources.NotificationStatus))]
+   [EnumBindResource(typeof(ResourcesLib.EnumResources.NotificationStatus))]
     public enum NotificationStatus
     {
         New = 1,

@@ -33,8 +33,10 @@ namespace Repository
         => await FindByCondition(r => r.ProductId == productId && r.StockType == "in", false).ToListAsync();
         public async Task<List<Inventory>> GetOptionsByProductIdOutStock(int productId)
         => await FindByCondition(r => r.ProductId == productId && r.StockType == "out", false).ToListAsync();
-        public int getInventorySingleProduct(int productId)
-         => FindByCondition(r => r.ProductId == productId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefault().ProductId;
+        public async Task<Inventory> GetStockProduct(int productId)
+         => await FindByCondition(r => r.ProductId == productId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefaultAsync(); 
+        public async Task<Inventory> GetStockProductAttribut(int productId , int attributeId)
+         => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == attributeId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefaultAsync();
         public int GetInventorySingleStock(int productId)
         => FindByCondition(r => r.ProductId == productId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefault().Stock;
         public void AddInventory(Inventory inventory) => Create(inventory);

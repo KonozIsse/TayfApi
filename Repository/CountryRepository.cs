@@ -24,9 +24,9 @@ namespace Repository
         => await FindAll(false).Include(x => x.Zones).Include(c=>c.Image).ToListAsync();
         public async Task<Country> GetcountryById(int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id , trackChanges).FirstOrDefaultAsync();
-        public bool ExistCountry(string countryName, int code)
+        public bool ExistCountry(string countryName, string code)
          => FindByCondition(x => x.CountryName == countryName && x.MobileCode == code,false).Count() > 0;
-        public async Task<Country> GetCountryByCode(int code, bool trackChanges)
+        public async Task<Country> GetCountryByCode(string code, bool trackChanges)
          => await FindByCondition(c => c.MobileCode == code, trackChanges).FirstOrDefaultAsync();
         public void AddCountry(Country country) => Create(country);
         public void DeleteCountry(Country country) => Delete(country);
@@ -45,7 +45,7 @@ namespace Repository
          => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Zone> GetZoneIdCountryId(int id,int countryId , bool trackChanges)
        => await FindByCondition(c => c.Id == id&& c.CountryId == countryId, trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Zone>> GetAllZones() => await FindAll(false).ToListAsync();
+        public async Task<List<Zone>> GetAllZones() => await FindAll(false).Include(c=>c.Country).ToListAsync();
 
         public void AddZone(int countryId, Zone zone) 
         { 

@@ -10,6 +10,7 @@ namespace Entities.Models
     public class Link : BaseEntity
     {
         public string TitleLink { get; set; }
+        public string TitleLinkAr { get; set; }
         public string LinkUrl { get; set; }
         public string Icon { get; set; }
         public int ParentLinkId { get; set; }

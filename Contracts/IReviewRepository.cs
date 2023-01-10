@@ -14,8 +14,9 @@ namespace Contracts
         Task<List<Review>> GetReviews();
         Task<IEnumerable<Review>> Last3Reviews(int productId);
         Task<IEnumerable<Review>> GetReviewsProductId(int productId);
-        Task<Review> GetReviewProductIdToCustomerId(int productId, int customerId);
+        Task<Review> GetReviewProductIdToCustomerId(int productId, int customerId, bool trackChanges);
         Task<Review> GetActiveReviewProductCustomer(int productId, int customerId, bool trackChanges);
+        Task<IEnumerable<Review>> GetReviewsActiveProductId(int productId);
         int GetReviewsCount(int productId);
         bool IsReview(int productId, int customerId);
         void DeleteReview(Review review);

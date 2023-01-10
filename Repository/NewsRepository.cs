@@ -22,7 +22,9 @@ namespace Repository
          ( c.Title.Contains(search) || c.Decription.Contains(search)), false)
             .Include(r => r.Image).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<List<News>> GetWithComments()
-        => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(r => r.Image).ThenInclude(c=>c.ImageSettings).Include(r => r.Comments).ToListAsync();
+        => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(r => r.Image)
+            .ThenInclude(c=>c.ImageSettings)
+            .Include(r => r.Comments).ToListAsync();
       
         public async Task<News> GetBlogById(int id, bool trackChanges, bool Included = false)
         {
@@ -49,7 +51,7 @@ namespace Repository
         public async Task<CommentNews> GetCommentIdNewsId(int id,int blog , bool trackChanges)
          => await FindByCondition(c => c.Id == id && c.NewsId == blog, trackChanges).FirstOrDefaultAsync();
         public async Task<List<CommentNews>> SearchCommets(int newId, string search)
-       => await FindByCondition(c => c.NewsId == newId && c.Text.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+       => await FindByCondition(c => c.NewsId == newId && c.Comment.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public int GetCountComments(int blog)
          =>FindByCondition(c => c.NewsId == blog, false).Count();
         public void CreateCommentNews(int newsId, CommentNews commentNews)

@@ -10,6 +10,8 @@ namespace Entities.Models
         [StringLength(64)]
         public string Title { get; set; }
         public string Decription { get; set; }
+        public string TitleAr { get; set; }
+        public string DecriptionAr { get; set; }
         public string Url { get; set; }
         public short IsFeature { get; set; }
         public int? IsViewed { get; set; }

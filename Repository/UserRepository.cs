@@ -32,7 +32,7 @@ namespace Repository
         => await FindByCondition(c => c.Id.Equals(userId) && c.DefaultAddressId == defaultAddressId, false).SingleOrDefaultAsync();
         public async Task<User> VerifiedCodeUser(int id, int code ,bool trackChanges)
          => await FindByCondition(c => c.Id.Equals(id) && c.VerifiedCode == code, trackChanges).SingleOrDefaultAsync();
-        public bool GetCustomerEmail(string email)
+        public bool GetEmail(string email)
          => FindByCondition(c => c.Email == email ,false).Count()>0;
         public async Task<User> GetSocialRegister(string socialId)
           => await FindByCondition(c => c.Status == Status.Active && c.SocialId == socialId, false).SingleOrDefaultAsync();
@@ -50,7 +50,10 @@ namespace Repository
         => await FindByCondition(c => c.Id == user && c.PasswordHash == password && c.Status == Status.Active, false).SingleOrDefaultAsync();
         public void AddUser(User user) => Create(user);
         public void DeleteUser(User user) => Delete(user);
-        
+        public async Task<User> GetCustomerEmail(string email,bool trackChanges)
+        => await FindByCondition(c => c.Email == email && c.RoleId == 2 && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
+        public async Task<User> GetActiveCustomerId(int id, bool trackChanges)
+        => await FindByCondition(c => c.Id == id && c.RoleId == 2 && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
         // Admin 1-------------------------------------------------
         public async Task<IEnumerable<User>> GetAdminsStors (bool trackChanges)
          => await FindByCondition(c => c.RoleId != 2, trackChanges).ToListAsync();

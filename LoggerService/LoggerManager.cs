@@ -1,5 +1,5 @@
-﻿using Contracts;
-using Entities;
+﻿
+using Contracts;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -12,19 +12,17 @@ namespace LoggerService
     public class LoggerManager : ILoggerManager
     {
         public static ILogger logger = LogManager.GetCurrentClassLogger();
-        public LoggerManager()
-        {
-        }
+       
         public void LogDebug(string message)
         {
             logger.Debug(message);
         }
+
+        [Obsolete]
         public void LogError(string message, Exception exp)
         {
             logger.Error(message , exp);
         }
-
-
         public void LogInfo(string message)
         {
             logger.Info(message);

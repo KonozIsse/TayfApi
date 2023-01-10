@@ -26,6 +26,7 @@ namespace Contracts
         Task<List<MailList>> GetMailLists();
         Task<MailList> GetMailListById(int id, bool trackChanges);
         Task<List<MailList>> GetMailListEmail(string search);
+        Task<MailList> GetEmail(string email);
         void SendUserEmail(MailList sendEmail);
         void RemoveMailList(MailList email);
     }

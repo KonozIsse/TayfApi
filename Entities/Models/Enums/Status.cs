@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.Models.Enums
 {
+    [EnumBindResource(typeof(ResourcesLib.EnumResources.Status))]
     public enum Status
     {
         NotActive,

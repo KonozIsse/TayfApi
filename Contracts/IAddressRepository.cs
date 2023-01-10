@@ -13,6 +13,7 @@ namespace Contracts
         Task<List<Address>> GetAllAddressesByCustomerId(int customerId);
         Task<Address> GetAddressIdByCustomerId(int id, int customerId , bool trackChanges);
         Task<Address> GetAddressCustomer(int customerId);
+         Task<Address> GetDefaultAddressCustomer(int customerId);
         void AddAddress(Address address);
         void DeleteAddress(Address address);
     }

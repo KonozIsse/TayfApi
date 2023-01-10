@@ -55,7 +55,7 @@ namespace BusinessLogic
             CreateMap<CreateNewsDto, News>().ReverseMap();
             CreateMap<UpdateNewsDto, News>().ReverseMap();
             //MapCommentNews
-            CreateMap<CreateCommentsDto, CommentNews>().ReverseMap();
+            CreateMap<CreateCommentDto, CommentNews>().ReverseMap();
             CreateMap<CommentsDto, CommentNews>().ReverseMap();
             //MapProduct
             CreateMap<ProductDto, Product>().ReverseMap();
@@ -107,7 +107,7 @@ namespace BusinessLogic
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<AvaterDto, User>().ReverseMap();
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
-            CreateMap<UserForRegistrationDto, User>().ReverseMap();
+            CreateMap<UserForRegistrationDto, User>().ReverseMap(); 
             //AdminMap
             CreateMap<CreateAdminDto, User>().ReverseMap();
             CreateMap<UpdateAdminDto, User>().ReverseMap();

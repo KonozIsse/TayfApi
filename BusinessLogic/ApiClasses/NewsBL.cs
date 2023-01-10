@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
@@ -8,10 +9,11 @@ using Newtonsoft.Json;
 using Repository;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BussnessResultModel = Entities.Exception.BussnessResultModel;
 namespace BusinessLogic.ApiClasses
 {//BusinessException
     public class NewsBL
@@ -26,74 +28,76 @@ namespace BusinessLogic.ApiClasses
             _locService = locService;
         }
         //News------------------------------------------------
-        public async Task<List<NewsDto>> GetNews()
+        public async Task<List<NewsDto>> GetNews(string lang= "en")
         {
             var news = await _repositoryManager.News.GetWithComments();
             var list = new List<NewsDto>();
             news.ForEach(x => list.Add(new NewsDto
             {
                 Id = x.Id,
-                IsStatus = x.IsStatus,
-                Title = x.Title == null ? "" : x.Title,
+                Url = x.Url,
+                CountComment = x.Comments.Count(),
+                Title = lang == "en" ? x.Title : x.TitleAr,
+                Decription = lang == "en" ? x.Decription : x.DecriptionAr,
+                CreatedAt = x.CreatedAt,
                 // ImageId = Convert.ToInt32((x.ImgId == 0 || x.Image == null ) ? "" :
                 //(x.Image.ImageSettings.Count() > 0 ? urlImg + x.Image.ImageSettings
-                //  .FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path : "")),
-                Decription = String.IsNullOrEmpty(x.Decription) ? "" : x.Decription,
-                Url = x.Url,
-                CountComment = x.Comments.Count() 
-            })); 
+                //  .FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path : ""))
+            }));; 
             return list;
         }
-        public async Task<List<NewsDto>> GetListNews()
-        {
-            var blogs = await _repositoryManager.News.GetWithComments();  
-            var newsDto = _mapper.Map<List<NewsDto>>(blogs);
-            foreach (var blog in blogs)
-            {
-               var blogDto =  newsDto.FirstOrDefault();
-                blogDto.CountComment = blog.Comments.Count();
-               // blogDto.ImageId = Convert.ToInt32(_imageApi.GetImageMedium( blog.ImgId.ToString()));
-               // blog.VendorId = GetCurrentUserId();
-            }
-            return newsDto;
-        }
-        public async Task<NewsDto> GetBlog(int blogId)
+        public async Task<NewsDto> GetBlog(int blogId, string lang = "en")
         {
             var blog = await _repositoryManager.News.GetBlogById(blogId , false, true);  
             var newsDto = _mapper.Map<NewsDto>(blog);
+            newsDto.Title = lang == "en" ? blog.Title : blog.TitleAr;
+            newsDto.Decription = lang == "en" ? blog.Decription : blog.DecriptionAr;
             newsDto.CountComment = blog.Comments.Count() == 0 ? 0 : blog.Comments.Count();
             return newsDto;
         }
-        public async Task AddNews (CreateNewsDto createNewsDto)
+        public async Task<BussnessResultModel> AddNews (int storeId,CreateNewsDto create)
         {
-            var blog = _mapper.Map<News>(createNewsDto);
+            if (create.TitleAr == null || create.TitleAr == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"),false);
+            }
+            if (create.ImageId == 0)
+            { 
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"),false);
+            }
+            var blog = _mapper.Map<News>(create);
             blog.IsFeature = 1;
             blog.IsViewed = 0;
-            //blog.VendorId = GetCurrentUserId();
+            blog.VendorId = storeId == 0 ? null : storeId;
             _repositoryManager.News.CreateBlog(blog);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(blog, _locService.GetLocalizedStringValue("successAdd"));
         }
-        public async Task<BussnessResultModel> EditNews (UpdateNewsDto updateNewsDto)
+        public async Task<BussnessResultModel> EditNews (int storeId,UpdateNewsDto updateDto)
         {
-            var blog = await _repositoryManager.News.GetBlogById(updateNewsDto.NewsId, true);
+            var blog = await _repositoryManager.News.GetBlogById(updateDto.NewsId, true);
             if(blog == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            blog.Id = updateNewsDto.NewsId;
+            if (updateDto.DecriptionAr == null || updateDto.TitleAr == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
+            }
+            blog.Id = updateDto.NewsId;
             blog.IsFeature = 1;
             blog.IsViewed = 0;
-            //blog.VendorId = GetCurrentUserId();
-            if (updateNewsDto.ImageId != 0)
+            blog.VendorId = storeId == 0 ? null : storeId;
+            if (updateDto.ImageId != 0)
             {
-                blog.ImgId = updateNewsDto.ImageId;
+                blog.ImgId = updateDto.ImageId;
             }
-            _mapper.Map(updateNewsDto, blog);
+            _mapper.Map(updateDto, blog);
 
             await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(blog, _locService.GetLocalizedStringValue("successSave"));
+            return new BussnessResultModel(blog, _locService.GetLocalizedStringValue("successSave")); 
         }
-        public async Task DeleteNews(int newsId)
+        public async Task<BussnessResultModel> DeleteNews(int newsId)
         {
             var blog = await _repositoryManager.News.GetBlogById(newsId, false);
             if (blog != null)
@@ -107,13 +111,18 @@ namespace BusinessLogic.ApiClasses
                     }
                 }
                 _repositoryManager.News.DeleteBlog(blog);
+                await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(blog, _locService.GetLocalizedStringValue("successDelete"));
             }
-            await _repositoryManager.SaveAsync();
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
         }
         public async Task<List<NewsDto>> SearchBlog(int vendorId, string search)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(vendorId, search);
-           searchBlog.Where(c=>c.VendorId == vendorId );
+            if (vendorId != 0) { searchBlog.Where(c => c.VendorId == vendorId); }
             var newsDto = _mapper.Map<List<NewsDto>>(searchBlog);
             return newsDto;
         }
@@ -122,28 +131,43 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.CommentNews.GetCommentId(commentId);
         }
-        public async Task DeleteNewsComments(int id , int newsId)
+        public async Task<BussnessResultModel> DeleteNewsComments(int id )
         {
-            var blog = await _repositoryManager.News.GetBlogById(newsId, true);
-            if (blog != null)
+            var comment = await _repositoryManager.CommentNews.GetCommentId(id);
+            if (comment == null)
             {
-                blog.CountComment--;
-                var commentNews = await _repositoryManager.CommentNews.GetCommentIdNewsId(id, newsId, false);
-                if(commentNews != null)
-                {
-                    _repositoryManager.CommentNews.DeleteCommentNews(commentNews);
-                }
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false);
             }
+
+            var blog = await _repositoryManager.News.GetBlogById(comment.NewsId, true);
+             blog.CountComment--;
+            _repositoryManager.CommentNews.DeleteCommentNews(comment);
+
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(comment, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task AddNewsComments(int newsId ,CreateCommentsDto createCommentsDto)
+        public async Task<BussnessResultModel> AddNewsComments(int newsId,int userId , CreateCommentDto createCommentsDto)
         {
-            var blog = await _repositoryManager.News.GetBlogById(newsId, true);
-            blog.CountComment++;
-            var commentNews = _mapper.Map<CommentNews>(createCommentsDto);
-           // commentNews.UserId = userId;
-            _repositoryManager.CommentNews.CreateCommentNews(newsId, commentNews);
-            await _repositoryManager.SaveAsync();
+            if(userId != 0)
+            {
+                var blog = await _repositoryManager.News.GetBlogById(newsId, true);
+                if (blog == null)
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+                }
+                blog.CountComment++;
+                var commentNews = _mapper.Map<CommentNews>(createCommentsDto);
+                    commentNews.CustomerId = userId;
+                _repositoryManager.CommentNews.CreateCommentNews(newsId, commentNews);
+                await _repositoryManager.SaveAsync();
+                
+                return new BussnessResultModel(commentNews, _locService.GetLocalizedStringValue("CommentAdded"));
+            }
+           
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("goLogin"),false);
+            }
         }
         public async Task<List<CommentsDto>> SearchCommetsNews(int newId, string search)
         {
@@ -151,14 +175,6 @@ namespace BusinessLogic.ApiClasses
             var commentsDtos = _mapper.Map<List<CommentsDto>>(searchComments);
             return commentsDtos;
         }
-        //Notification------------------------------------------------
-        public async Task<List<Notification>> GetNotifications(int PageId, int rows)
-        {
-            return await _repositoryManager.Notification.GetNotificationsPage(PageId,rows);
-        } 
-        public int GetNotificationsCount()
-        {
-            return  _repositoryManager.Notification.GetNotificationsCount();
-        }
+      
     }
 }

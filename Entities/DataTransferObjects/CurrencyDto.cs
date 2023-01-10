@@ -21,9 +21,9 @@ namespace Entities.DataTransferObjects
     }
     public class CreateCurrencyDto
     {
-        public Dictionary<string, string> CurrencyNames { get; set; }
         public Status IsStatus { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } 
+        public string NameAr { get; set; }
         public string Position { get; set; }
         public string Symbol { get; set; }
         public string DecimalPlaces { get; set; }

@@ -1,18 +1,11 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Exception;
 using Entities.Models;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Org.BouncyCastle.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Formats.Asn1;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Zone = Entities.Models.Zone;
+using BussnessResultModel = Entities.Exception.BussnessResultModel;
+using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -22,8 +15,6 @@ namespace BusinessLogic.ApiClasses
         protected readonly IMapper _mapper;
         private readonly ImageBL _imageBL;
         private readonly LocService _locService;
-        private readonly Language _language ;
-        
         public LocationTaxBL(IRepositoryManager repositoryManager, IMapper mapper, ImageBL imageBL, LocService locService)
         {
             _repositoryManager = repositoryManager;
@@ -32,15 +23,8 @@ namespace BusinessLogic.ApiClasses
             _locService = locService;
         }
         //Address------------------------------------------------
-        public async Task<Address> GetAddressId(int id)
-        {
-            return await _repositoryManager.Address.GetAddress(id, false);
-        }
-        public async Task<Address> GetAddressUser(int id, int user)
-        {
-            return await _repositoryManager.Address.GetAddressIdByCustomerId(id, user, false);
-        }
-        public async Task CreateAddress(int userId, CreateAddressDto create)
+       
+        public async Task<BussnessResultModel> CreateAddress(int userId, CreateAddressDto create)
         {
             var address = _mapper.Map<Address>(create);
             address.UserId = userId;
@@ -54,6 +38,7 @@ namespace BusinessLogic.ApiClasses
                 await AddDefultAddress(address.Id, userId);
             }
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(address, _locService.GetLocalizedStringValue("successAdd"));
         }
         public async Task<BussnessResultModel> DeleteAddress(int id, int customerId)
         {
@@ -79,10 +64,23 @@ namespace BusinessLogic.ApiClasses
                 user.DefaultAddressId = defaultAddressId;
                 await _repositoryManager.SaveAsync();
             }
+        } 
+        public async Task EditDefultAddress(int defaultAddressId, int userId)
+        {
+            var user = await _repositoryManager.User.GetUserId(userId, true);
+            if (user != null)
+            {
+                user.DefaultAddressId = defaultAddressId;
+                await _repositoryManager.SaveAsync();
+            }
         }
-        public async Task EditAddress(int userId ,UpdateAddressDto update)
+        public async Task<BussnessResultModel> EditAddress(int userId ,UpdateAddressDto update)
         {
             var address = await _repositoryManager.Address.GetAddressIdByCustomerId(update.Id, userId, true);
+            if(address == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
             address.UserId = userId;
             _mapper.Map(update, address);
             if (update.IsDefault == true)
@@ -90,13 +88,24 @@ namespace BusinessLogic.ApiClasses
                 await AddDefultAddress(update.Id, userId);
             }
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(address, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task<AddressDto> DefaultAddress(int customerId)
+        public async Task<AddressDto> GetDefaultAddress(int customerId)
+        {
+            var address = await _repositoryManager.Address.GetDefaultAddressCustomer(customerId);
+            if(address == null)
+            {
+                return null;
+            }
+            var addressDto = _mapper.Map<AddressDto>(address);
+            return addressDto;
+        } 
+        public async Task<AddressDto> GetAddressCustomer (int customerId)
         {
             var address = await _repositoryManager.Address.GetAddressCustomer(customerId);
             if(address == null)
             {
-                return null;
+                address =  null;
             }
             var addressDto = _mapper.Map<AddressDto>(address);
             return addressDto;
@@ -113,64 +122,94 @@ namespace BusinessLogic.ApiClasses
             addressDto.Select(c => c.CustomerName = address.User.FullName);
             return addressDto;
         }
+        public async Task<AddressDto> GetAddressIdCustomerId (int id ,int customerId)
+        {
+            var addresses = await _repositoryManager.Address.GetAddressIdByCustomerId(id, customerId, false);
+            if (addresses == null)
+            {
+                return null;
+            }
+            var addressDto = _mapper.Map<AddressDto>(addresses);
+            return addressDto;
+        }
         //Country------------------------------------------------
 
-        public async Task AddCountry(CreateCountryDto createCountryDto)
+        public async Task<BussnessResultModel> AddCountry(CreateCountryDto create)
         {
-            var country = _mapper.Map<Country>(createCountryDto);
+            
+            var IsExists = _repositoryManager.Country.ExistCountry(create.CountryName, create.MobileCode);
+            if (IsExists)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"),false); 
+            }
+            var country = _mapper.Map<Country>(create);
+            if (create.CountryName == null)
+            {
+                return new BussnessResultModel(country, _locService.GetLocalizedStringValue("enterallfiled"), false);
+            }
+            if (create.ImageId == 0)
+            {
+                return new BussnessResultModel(country, _locService.GetLocalizedStringValue("correctImage"), false);
+            }
             _repositoryManager.Country.AddCountry(country);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(country, _locService.GetLocalizedStringValue("successAdd"));
         }
-        public async Task DeleteCountry(int id)
+        public async Task<BussnessResultModel> DeleteCountry(int id)
         {
             var country = await _repositoryManager.Country.GetcountryById(id, false);
-            if(country != null)
+            if (country == null)
             {
-                var zones = await _repositoryManager.Zone.GetZonesByCountryId(id);
-                if(zones != null)
-                {
-                    foreach (var zone in zones)
-                    {
-                        _repositoryManager.Zone.DeleteZone(zone);
-                    }
-                }
-                _repositoryManager.Country.DeleteCountry(country);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false);
             }
+            var zones = await _repositoryManager.Zone.GetZonesByCountryId(id);
+            if (zones != null)
+            {
+                foreach (var zone in zones)
+                {
+                    _repositoryManager.Zone.DeleteZone(zone);
+                }
+            }
+            _repositoryManager.Country.DeleteCountry(country);
+
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(country, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task EditCountry(UpdateCountryDto updateDto)
+        public async Task<BussnessResultModel> EditCountry(UpdateCountryDto updateDto)
         {
             var country = await _repositoryManager.Country.GetcountryById(updateDto.Id, true);
-            if(country != null)
+            if(country == null)
             {
-                _mapper.Map(updateDto, country);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
+            if (updateDto.CountryNameAr == null)
+            {
+                return new BussnessResultModel(country, _locService.GetLocalizedStringValue("enterallfiled"), false);
+            }
+            _mapper.Map(updateDto, country);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(country, _locService.GetLocalizedStringValue("successSave"));
         }
-        public bool CheckCountryExist(string countryName, int countryCode)
-        {
-            return _repositoryManager.Country.ExistCountry(countryName, countryCode);
-        }
-        public async Task<Country> GetCountryCode(int code)
+        public async Task<Country> GetCountryCode(string code)
         {
             return await _repositoryManager.Country.GetCountryByCode(code, false);
         }
-        public async Task<List<CountryDto>> GetCountriesForWeb()
+        public async Task<List<CountryDto>> GetCountriesForWeb(string lang = "en")
         {
             var countries = await _repositoryManager.Country.GetCountries();
             var countriesDto = _mapper.Map<List<CountryDto>>(countries);
 
-            var country = countries.First();
-            var countryDto = countriesDto.First();
-            countryDto.ImageId = Convert.ToInt32(await _imageBL.GetImageOriginal(country.ImgId.ToString()));
-            countryDto.CountryName = _language.Code == "en" ? country.CountryName : country.CountryNameAr;
+            //var country = countries.First();
+            //var countryDto = countriesDto.First();
+            //countryDto.ImageId = Convert.ToInt32(await _imageBL.GetImageOriginal(country.ImgId.ToString()));
+            //countryDto.CountryName = lang == "en" ? country.CountryName : country.CountryNameAr;
             return countriesDto;
         } 
-        public async Task<CountryDto> GetCountry(int id)
+        public async Task<CountryDto> GetCountry(int id, string lang = "en")
         {
             var country = await _repositoryManager.Country.GetcountryById(id , false);
             var countryDto = _mapper.Map<CountryDto>(country);
-            countryDto.CountryName = _language.Code == "en" ? country.CountryName : country.CountryNameAr;
+            countryDto.CountryName = lang == "en" ? country.CountryName : country.CountryNameAr;
             return countryDto;
         }
         //Zone------------------------------------------------
@@ -182,61 +221,84 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Zone.GetAllZones();
         }
-        public async Task<List<ZoneDto>> GetZonesByCountryId(int countryId)
+        public async Task<List<ZoneDto>> GetZonesByCountryId(int countryId, string lang = "en")
         {
             var zones = await _repositoryManager.Zone.GetZonesByCountryId(countryId);
             var zonesDto = _mapper.Map<List<ZoneDto>>(zones);
             var zone = zones.First();
             var zoneDto = zonesDto.First();
-            zoneDto.ZoneName = _language.Code == "en" ? zone.ZoneName : zone.ZoneNameAr;
+            zoneDto.ZoneName = lang == "en" ? zone.ZoneName : zone.ZoneNameAr;
             return zonesDto;
         }
-        public async Task AddZone(CreateZoneDto createZoneDto)
+        public async Task<BussnessResultModel> AddZone(CreateZoneDto create)
         {
-            var zone = _mapper.Map<Zone>(createZoneDto);
-            _repositoryManager.Zone.AddZone(createZoneDto.CountryId, zone);
+            var IsExists = _repositoryManager.Zone.ExistZone(create.ZoneName, create.ZoneCode);
+            if (IsExists)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"), false); 
+            }
+
+            var zone = _mapper.Map<Zone>(create);
+            if (String.IsNullOrEmpty(create.ZoneName) || create.ZoneName.Contains("    "))
+            {
+                return new BussnessResultModel(zone, _locService.GetLocalizedStringValue("enterallfiled"), false);
+            }
+            _repositoryManager.Zone.AddZone(create.CountryId, zone);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(zone, _locService.GetLocalizedStringValue("successAdd"));
         }
-        public async Task DeleteZone(int id)
+        public async Task<BussnessResultModel> DeleteZone(int id)
         {
             var zone = await _repositoryManager.Zone.GetZoneId(id, false);
+            if (zone == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
             _repositoryManager.Zone.DeleteZone(zone);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(zone, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task EditZone (UpdateZoneDto updateDto)
+        public async Task<BussnessResultModel> EditZone (UpdateZoneDto updateDto)
         {
             var zone = await _repositoryManager.Zone.GetZoneId(updateDto.Id, true);
+            if (zone == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            if (String.IsNullOrEmpty(updateDto.ZoneName) || updateDto.ZoneName.Contains("    "))
+            {
+                return new BussnessResultModel(zone, _locService.GetLocalizedStringValue("enterallfiled"), false); 
+            }
             _mapper.Map(updateDto, zone);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(zone, _locService.GetLocalizedStringValue("successSave"));
         }
         //TaxClass------------------------------------------------
         public bool CheckTaxesExist(string name)
         {
             return _repositoryManager.TaxClass.ExistTax(name);
         }
-        public async Task<List<TaxClassDto>> GetTaxes()
+        public async Task<List<TaxClassDto>> GetTaxes(string lang = "en")
         {
             var taxes = await _repositoryManager.TaxClass.GetTaxClasses();
             var taxesDto = _mapper.Map<List<TaxClassDto>>(taxes);
             var taxe = taxes.First();
             var taxeDto = taxesDto.First();
-            taxeDto.Title = _language.Code == "en" ? taxe.Title : taxe.TitleAr;
-            taxeDto.Description = _language.Code == "en" ? taxe.Description : taxe.DescriptionAr;
+            taxeDto.Title = lang == "en" ? taxe.Title : taxe.TitleAr;
+            taxeDto.Description = lang == "en" ? taxe.Description : taxe.DescriptionAr;
             return taxesDto;
         }
-        public async Task AddTaxClass(CreateTaxClassDto createTaxClassDto)
+        public async Task AddTaxClass(int storeId ,CreateTaxClassDto createTaxClassDto)
         {
             var taxClass = _mapper.Map<TaxClass>(createTaxClassDto);
-            //if(storeId != 0)
-            //{
-            //    taxClass.StoreId = storeId;
-            //}
+            taxClass.StoreId = storeId == 0 ? null : storeId;
             _repositoryManager.TaxClass.AddTaxClass(taxClass);
             await _repositoryManager.SaveAsync();
         }
-        public async Task EditTaxClass( UpdateTaxClassDto updateDto)
+        public async Task EditTaxClass(int storeId, UpdateTaxClassDto updateDto)
         {
             var taxClass = await _repositoryManager.TaxClass.GetTaxClassId(updateDto.Id, true);
+            taxClass.StoreId = storeId == 0 ? null : storeId;
             _mapper.Map(updateDto, taxClass);
             await _repositoryManager.SaveAsync();
         }
@@ -262,17 +324,19 @@ namespace BusinessLogic.ApiClasses
         {
           return await _repositoryManager.TaxRate.GetTaxRateId(id, false);
         }
-        public async Task AddTaxRate(CreateTaxRateDto createTaxRateDto)
+        public async Task AddTaxRate(int storeId, CreateTaxRateDto createTaxRateDto)
         {
             var taxRate = _mapper.Map<TaxRate>(createTaxRateDto);
+            taxRate.StoreId = storeId == 0 ? null : storeId;
             _repositoryManager.TaxRate.AddTaxRate(taxRate);
             await _repositoryManager.SaveAsync();
         }
-        public async Task EditTaxRate(UpdateTaxRateDto updateDto)
+        public async Task EditTaxRate(int storeId, UpdateTaxRateDto updateDto)
         {
             var taxRate = await _repositoryManager.TaxRate.GetTaxRateId(updateDto.Id, true);
             if (taxRate != null)
             {
+                taxRate.StoreId = storeId == 0 ? null : storeId;
                 _mapper.Map(updateDto, taxRate);
                 await _repositoryManager.SaveAsync();
             }
@@ -317,11 +381,13 @@ namespace BusinessLogic.ApiClasses
             var settingDtos = _mapper.Map<List<SettingDto>>(settings);
             return settingDtos;
         }
-        public async Task EditSetting(UpdateSettingDto updateSettingDto)
+        public async Task EditSetting(UpdateSettingDto updateSettingDto, int storeId = 0, int admin = 0)
         {
             var settings = await _repositoryManager.Setting.GetAllSettings(true);
             foreach(var setting in settings)
             {
+                setting.VendorId = storeId == 0 ? null : storeId;
+                setting.AdminId = admin == 0 ? null : admin;
                 _mapper.Map(updateSettingDto, setting);
             }
             await _repositoryManager.SaveAsync();

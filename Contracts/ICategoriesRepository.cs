@@ -20,6 +20,5 @@ namespace Contracts
         Task<IEnumerable<Category>> SearchMainCategoriesCP(string search);
         void CreateMainCategory(Category category);
         void DeleteCategory(Category category);
-        Task<Category> GetCategoryToPrductId(int productId);
     }
 }

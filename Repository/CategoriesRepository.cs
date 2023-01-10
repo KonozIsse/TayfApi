@@ -34,7 +34,7 @@ namespace Repository
         public async Task<IEnumerable<Category>> SearchMainCategoriesStoreId(int storeId , string search)
         {
             var query = FindByCondition(c => c.Id != 1 && c.IsStatus == Status.Active
-           && c.Products.Any(x=>x.IsStatus == Status.Active && x.StoreId == storeId) , false);
+           /*&& c.Products.Any(x=>x.IsStatus == Status.Active && x.StoreId == storeId) */, false);
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(x => x.CategoryName.Contains(search));
@@ -48,8 +48,7 @@ namespace Repository
         }
         public void CreateMainCategory(Category category) => Create(category);
         public void DeleteCategory(Category category) => Delete(category);
-        public async Task<Category> GetCategoryToPrductId (int productId)
-        => await FindByCondition(c => c.Products.Any(x=>x.Id == productId), false).SingleOrDefaultAsync();
+       
       
 
     }

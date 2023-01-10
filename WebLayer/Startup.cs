@@ -2,12 +2,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -19,28 +16,16 @@ using Contracts;
 using Quartz;
 using CorePush.Google;
 using CorePush.Apple;
-using Entities.Models;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Globalization;
 using Microsoft.OpenApi.Any;
-using Microsoft.Extensions.Localization;
-using System.Reflection;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Localization;
-using System.Threading;
-using ResourcesLib;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Entities.Models.CorePushModels;
-using LoggerService;
-using Repository;
 using BusinessLogic;
 using BusinessLogic.StartUp;
 using BusinessLogic.Services;
 using BusinessLogic.Services.Jobs;
-using BusinessLogic.ApiClasses;
 
 namespace WebLayer
 {
@@ -69,8 +54,7 @@ namespace WebLayer
            //.AddClasses(classes => classes.InNamespaces("BusinessLogic"))
            //.AsSelf()
            //.WithTransientLifetime());
-            //-------------------------------------
-            services.AddSingleton<LocService>();
+            //-------------------------------------=
             services.AddHttpClient<FcmSender>();
             services.AddHttpClient<ApnSender>();
             //services.AddAutoMapper(typeof(Startup));
@@ -82,11 +66,21 @@ namespace WebLayer
             services.ConfigureIdentity();
             services.AddHttpContextAccessor();
             services.ConfigureAuthenticationManagerService(); 
-            services.ConfigureServices(); 
-            services.ConfigureSqlContext(Configuration);
-
+            services.ConfigureBusinessLogic(); 
+            services.ConfigureSqlConnection(Configuration);
+            services.ConfigureEmailConfiguration(Configuration);
+            services.ConfigureFcmNotification(Configuration);
+            services.ConfigureJWT(Configuration);
+            services.ConfigureAddQuartz();
+            services.ConfigureLoggerService();
+            services.ConfigureRepositoryManager(); 
+            services.ConfigureNotificationService();
+            services.ConfigureLocService();
+            services.ConfigureLangaugeService();
+            services.ConfigureSMSService();
+            services.ConfigurePaymentService();
             //------------------------------
-           
+
 
             services.AddSwaggerGen(c =>
             {
@@ -127,33 +121,9 @@ namespace WebLayer
                     }
                  });
             });
-            services.ConfigureJWT(Configuration);
+            
 
-            var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
-            services.AddSingleton(emailConfig);
-            services.AddScoped<IEmailSender, EmailSender>();
-
-
-            var appSettingsSection = Configuration.GetSection("FcmNotification");
-            services.Configure<FcmNotificationSetting>(appSettingsSection);
-
-            //////Localization//////////////////
-
-            services.AddLocalization();
-
-            services.Configure<RequestLocalizationOptions>(options =>
-            {
-                options.DefaultRequestCulture = new RequestCulture(culture: "ar", uiCulture: "ar");
-                options.AddSupportedCultures("ar", "en");
-                options.AddSupportedUICultures("ar", "en");
-                //-------------------------------------
-                options.FallBackToParentCultures = true;
-
-                options.ApplyCurrentCultureToResponseHeaders = true;
-
-            });
-
-            services.AddScoped<INotificationService, NotificationService>();
+           
 
             services.Configure<QuartzOptions>(options =>
             {
@@ -161,23 +131,7 @@ namespace WebLayer
                 options.Scheduling.OverWriteExistingData = true;
             });
 
-            services.AddQuartz(q =>
-            {
-                q.UseMicrosoftDependencyInjectionJobFactory();
-                q.UseSimpleTypeLoader();
-                q.UseInMemoryStore();
-                q.UseTimeZoneConverter();
-
-                var NotifyjobKey = new JobKey("NotificationJob");
-                q.AddJob<NotificationJob>(opts => opts.WithIdentity(NotifyjobKey));
-                q.AddTrigger(opts => opts
-                   .ForJob(NotifyjobKey)
-                   .WithIdentity("NotificationJob-trigger")
-                   .WithCronSchedule("0/5 * * * * ?"));
-
-
-            });
-            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        
 
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env )

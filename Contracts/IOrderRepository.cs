@@ -10,7 +10,7 @@ namespace Contracts
     public interface IOrderRepository
     {
         Task<Order> GetOrderId(int id, bool trackChanges);
-        Task<Order> GetActiveOrderId(int id, bool trackChanges);
+        Task<Order> GetLastOrderCustomer(int customerId, bool trackChanges);
         Task<List<Order>> GetAllOrders();
         Task<List<Order>> GetsAllTransactionOrders();
         Task<List<Order>> GetOrdersToCustomer(int customerId);

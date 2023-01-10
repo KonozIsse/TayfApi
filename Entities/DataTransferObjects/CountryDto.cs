@@ -15,17 +15,16 @@ namespace Entities.DataTransferObjects
         public string CountryName { get; set; }
         public string CountryCode2 { get; set; }
         public string CountryCode3 { get; set; }
-        public int? MobileCode { get; set; }
+        public string MobileCode { get; set; }
         public int ImageId { get; set; }
     }
     public class CreateCountryDto
     {
-        public Dictionary<string, string> CountryNames { get; set; }
         public string CountryNameAr { get; set; }
         public string CountryName { get; set; }
         public string CountryCode2 { get; set; }
         public string CountryCode3 { get; set; }
-        public int? MobileCode { get; set; }
+        public string MobileCode { get; set; }
         public int ImageId { get; set; }
     }
     public class UpdateCountryDto: CreateCountryDto

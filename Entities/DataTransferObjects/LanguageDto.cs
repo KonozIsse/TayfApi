@@ -24,8 +24,8 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public string Code { get; set; }
-        public Dictionary<string, string> LangNames { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } 
+        public string NameAr { get; set; }
         public string Direction { get; set; }
         public int? ImgId { get; set; }
     }

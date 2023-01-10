@@ -26,11 +26,10 @@ namespace Contracts
         Task<List<Product>> GetLatestPage(int pageSize);
         Task<List<Product>> SpecialsPage(int pageSize);
         Task<List<Product>> DailyDeals();
-        Task<List<Product>> GetProductByCategoryAndStoreIdForCP(int storeId, string search, int categoryId);
+        Task<PagedList<Product>> GetProductsCP(int? storeId, string search, PostsParameters postsParameters);
         Task<List<Product>> SearshProductByCategoryAndStore(int storeId, string search, int categoryId);
-        void AddProductOnCategory(int categoryId, Product product);
+        void AddProduct(Product product);
         void DeleteProduct(Product product);
-        Task DeleteListProduct(List<int> Ids);
     }
     public interface IProductTypeRepository
     {

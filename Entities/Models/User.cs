@@ -19,12 +19,13 @@ namespace Entities.Models
         public string Lang { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public bool? IsMobileVerified { get; set; }
-        public int? CodeMobileCountry { get; set; }
+        public string CodeMobileCountry { get; set; }
         public bool? IsSubscribe { get; set; }
         public int? VerifiedCode { get; set; }
         public int? ResetPasswordCode { get; set; }
         public string Url { get; set; }
         public string SocialImage { get; set; }
+        public string AdressInfo { get; set; }
         public string SocialId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
@@ -40,7 +41,7 @@ namespace Entities.Models
         public Address DefaultAddress { get; set; }
 
         [ForeignKey(nameof(Country))]
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         public Country Country { get; set; }
 
         [ForeignKey(nameof(Role))]

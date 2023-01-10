@@ -8,7 +8,7 @@ namespace Entities.Models
         public string CountryNameAr { get; set; }
         public string CountryCode2 { get; set; }
         public string CountryCode3 { get; set; }
-        public int? MobileCode { get; set; }
+        public string MobileCode { get; set; }
         [ForeignKey(nameof(Image))]
         public int? ImgId { get; set; }
         public Image Image { get; set; }

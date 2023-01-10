@@ -17,14 +17,17 @@ namespace Repository
 
         }
         public async Task<Cart> GetCustomerProduct(int productId, int customerId , bool trackChanges)
-        => await FindByCondition(x => x.CustomerId == customerId// && x.ProdId == productId
-        && x.IsStatus == Status.Active ,trackChanges).FirstOrDefaultAsync();
+        => await FindByCondition(x => x.CustomerId == customerId && x.ProdId == productId,trackChanges).FirstOrDefaultAsync();
+        public async Task<List<Cart>> GetCartsActiveCustomerId(int customerId)
+        => await FindByCondition(x => x.CustomerId == customerId && x.IsStatus == Status.Active, false).ToListAsync();
         public async Task<List<Cart>> CartsNotActiveCustomer(int customerId)
          => await FindByCondition(x => x.CustomerId == customerId && x.IsStatus == Status.NotActive, false).ToListAsync();
          public async Task<List<Cart>> GetCartsToCustomerId(int customerId)
-         => await FindByCondition(x => x.CustomerId == customerId && x.IsStatus == Status.Active, false).ToListAsync();
+         => await FindByCondition(x => x.CustomerId == customerId , false).ToListAsync();
         public async Task<List<Cart>> GetCartsToStoreId(int storeId)
         => await FindByCondition(x => x.StoreId == storeId && x.IsStatus == Status.Active, false).ToListAsync();
+        public async Task<List<Cart>> GetCartsToStoreCustomer(int storeId , int customerId)
+        => await FindByCondition(x => x.StoreId == storeId && x.CustomerId == customerId, false).ToListAsync();
         public async Task<Cart> GetCartId(int id , bool trackChanges)
         => await FindByCondition(x => x.Id == id  , trackChanges).FirstOrDefaultAsync();
         public async Task<List<Cart>> GetCarts()
@@ -38,5 +41,6 @@ namespace Repository
             return FindAll(false).ToList().GroupBy(x => x.ProdId).Select(x => x.First()).Count();
         }
 
+       
     }
 }
