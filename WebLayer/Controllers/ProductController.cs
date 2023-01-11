@@ -13,7 +13,6 @@ namespace WebLayer.Controllers
     [Authorize]
     public class ProductController : MyBaseController
     {
-       
         public ProductController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
            
@@ -21,138 +20,39 @@ namespace WebLayer.Controllers
         [HttpGet("allProductsCP")]
         public async Task<IActionResult> GetProductsCP(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _productBL.GetProductsCP(GetCurrentUserId(), search, GetLanguage(), postsParameters);
+            var result = await _productBL.GetProductsCP(GetStoreId(), search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-        [HttpPost("createProduct")]
-        public async Task<IActionResult> CreateProduct(CreateProductDto create )
+        [HttpGet("all")]
+        public async Task<IActionResult> GetProducts(string search)
         {
-            var result = await _productBL.AddProduct(create);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-               return BadRequest(result.Message);
-            }
+            var result = await _productBL.GetProductsHome(GetStoreId(), search, GetLanguage());
+            return Ok(result);
         }
-        [HttpPut("updateProduct")]
-        public async Task<IActionResult> UpdateProduct( UpdateProductDto update)
+        [HttpGet("popular")]
+        public async Task<IActionResult> PopularProducts()
         {
-            var result = await _productBL.EditProduct(update);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
+            var result = await _productBL.PopularsPage();
+            return Ok(result);
         }
-        [HttpPut("acceptProduct")]
-        public async Task<IActionResult> AcceptProduct(int productId)
+        [HttpGet("topRated")]
+        public async Task<IActionResult> TopRatedProducts()
         {
-            var result = await _productBL.ApproveProduct(productId);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
+            var result = await _productBL.TopRatedPage();
+            return Ok(result);
         }
-        [HttpDelete("removeProduct")]
-        public async Task<IActionResult> RemoveProduct(int id)
+      
+        [HttpGet("productId")]
+        public async Task<IActionResult> GetDetailProduct(int productId)
         {
-            var result = await _productBL.RemoveProduct(id);
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-            else
-            {
-                return Ok(result.Message);
-            }
-        }
-        [HttpPost("addAttribute")]
-        public async Task<IActionResult> AddAttributeProduct(int productId, CreateAttributeDto item)
-        {
-            var result = await _productBL.AddAttribute(productId, item);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
-        }
-        [HttpPut("updateAttribute")]
-        public async Task<IActionResult> UpdateAttributeProduct(UpdateAttributeDto item)
-        {
-            var result = await _productBL.UpdateAttribute(item);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
-        } 
-        [HttpDelete("deleteAttribute")]
-        public async Task<IActionResult> DeleteAttributeProduct(int id )
-        {
-            var result = await _productBL.DeleteAttribute(id);
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-            else
-            {
-                return Ok(result.Message);
-            }
-        } 
-        [HttpPut("editImage")]
-        public async Task<IActionResult> EditImageProduct(int id , string image)
-        {
-            var result = await _imageBL.EditImage(id, image);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
-        } 
-        [HttpDelete("deleteImage")]
-        public async Task<IActionResult> DeleteImageProduct(int id )
-        {
-            var result = await _imageBL.DeleteImage(id);
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-            else
-            {
-                return Ok(result.Message);
-            }
-        }
-        //--------------------------------------------------------------------------
-        [HttpGet("product/id")]
-        public async Task<IActionResult> GetProductsCP(int productId)
-        {
-            var result = await _productBL.GetDetailProduct(productId,GetCurrentUserId(), GetLanguage());
+            var result = await _productBL.GetDetailProduct(productId,GetCustomerId(), GetLanguage());
             return Ok(result);
         } 
         [HttpPost("addReview")]
         public async Task<IActionResult> CreateReviewProduct(int productId ,CreateReviewDto create )
         {
-            var result = await _productBL.AddReview(productId, GetCurrentUserId(), create);
+            var result = await _productBL.AddReview(productId, GetCustomerId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -161,6 +61,7 @@ namespace WebLayer.Controllers
             {
                return BadRequest(result.Message);
             }
-        }
+        } 
+       
     }
 }

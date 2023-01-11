@@ -31,6 +31,6 @@ namespace Repository
         public async Task<ProductCategory> GetProductCategoryId(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<ProductCategory> GetCategoryToPrductId(int productId)
-       => await FindByCondition(c => c.ProductId == productId, false).SingleOrDefaultAsync();
+       => await FindByCondition(c => c.ProductId == productId, false).Include(c=>c.Category).SingleOrDefaultAsync();
     }
 }

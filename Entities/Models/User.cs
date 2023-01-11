@@ -14,9 +14,6 @@ namespace Entities.Models
         public string FullName { get { return $"{FirstName} {LastName}"; } }
         public string Avater { get; set; }
         public Status Status { get; set; }
-        [Required(AllowEmptyStrings = true)]
-        [StringLength(10)]
-        public string Lang { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public bool? IsMobileVerified { get; set; }
         public string CodeMobileCountry { get; set; }
@@ -32,9 +29,6 @@ namespace Entities.Models
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        [ForeignKey(nameof(Image))]
-        public int? ImageId { get; set; }
-        public Image Image { get; set; }
 
         [ForeignKey(nameof(DefaultAddress))]
         public int? DefaultAddressId { get; set; }

@@ -217,9 +217,9 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Contact.GetContactById(id, false);
         }
-        public async Task<List<ContactDto>> GetAllContacts(int rows, int pageId = 1)
+        public async Task<List<ContactDto>> GetAllContacts(string search, int rows, int pageId = 1)
         {
-            var contacts = await _repositoryManager.Contact.GetContacts(rows ,pageId);
+            var contacts = await _repositoryManager.Contact.GetContacts(search,rows, pageId);
             if(contacts == null)
             {
                 return null;

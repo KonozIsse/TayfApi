@@ -8,7 +8,7 @@ namespace Entities.Models.Enums
 {
     public enum ImageCategory
     {
-        Services =1 ,
+        Services = 1 ,
         Sliders = 2,
         Banners =3,
         Stores,

@@ -23,10 +23,6 @@ namespace Entities
 
         }
 
-        public RepositoryContext()
-        {
-        }
-
         public DbSet<Address> Addresses { get; set; }
         public DbSet<ProductAttribut> AttributesProducts { get; set; }
         public DbSet<Banner> Banners { get; set; }
@@ -58,6 +54,7 @@ namespace Entities
         public DbSet<PaymentMethods> PaymentMethods { get; set; }
         public DbSet<PaymentMethodDetail> PaymentMethodDetail { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductOptionValue> ProductOptionValues { get; set; } 
         public DbSet<ProductOption> ProductOptions { get; set; }
         public DbSet<Permission> Permissions { get; set; }

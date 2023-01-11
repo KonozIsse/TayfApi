@@ -43,8 +43,8 @@ namespace BusinessLogic.ApiClasses
         {
             var customer = await _repositoryManager.User.GetCustomerId(avaterDto.CustomerId, true);
             var fileName = avaterDto.Avater;
-            var pic = _imageUploadServices.Upload(fileName);
-            customer.Avater = pic;
+            //var pic = _imageUploadServices.Upload(fileName);
+            //customer.Avater = pic;
             var oldLink = customer.Avater;
             await _repositoryManager.SaveAsync();
             if (!string.IsNullOrEmpty(oldLink))
@@ -52,7 +52,7 @@ namespace BusinessLogic.ApiClasses
                 _imageUploadServices.DeleteImage(oldLink);
             }
         }
-        public async Task<int> AddImage (CreateImageDto imageDto)
+        public async Task<int> AddImageProduct (CreateImageDto imageDto)
         {
             var image = _mapper.Map<Image>(imageDto);
             _repositoryManager.Image.AddImage(image);
@@ -63,27 +63,30 @@ namespace BusinessLogic.ApiClasses
             catch { }
             return image.Id;
         }
-        public async Task<BussnessResultModel> AddImage1 (CreateImageDto create)
+        public async Task<BussnessResultModel> CreateImages (/*int? adminId,*/ int? storeId, CreateImageDto create)
         {
-            var image = _mapper.Map<Image>(create);
+            
             foreach (var file in create.files)
             {
                 //check size of image category
                 System.Drawing.Image bitfile = System.Drawing.Image.FromStream(file.OpenReadStream());
 
-                if ((create.Category == ImageCategory.Banners && (bitfile.Width != 1140 || bitfile.Height != 240)) ||
-                   (create.Category == ImageCategory.Categories && (bitfile.Width != 250 || bitfile.Height != 200)) ||
-                   (create.Category == ImageCategory.Sliders && (bitfile.Width != 1400 || bitfile.Height != 600)) ||
-                   (create.Category == ImageCategory.Products && (bitfile.Width != 1000 || bitfile.Height != 600)) ||
-                   (create.Category == ImageCategory.Services && (bitfile.Width != 200 || bitfile.Height != 200)) ||
-                   (create.Category == ImageCategory.Blogs && (bitfile.Width != 250 || bitfile.Height != 250)) ||
-                   (create.Category == ImageCategory.Stores && (bitfile.Width != 250 || bitfile.Height != 200)))
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
-                }
+                //if ((create.Category == ImageCategory.Banners && (bitfile.Width != 1140 || bitfile.Height != 240)) ||
+                //   (create.Category == ImageCategory.Categories && (bitfile.Width != 250 || bitfile.Height != 200)) ||
+                //   (create.Category == ImageCategory.Sliders && (bitfile.Width != 1400 || bitfile.Height != 600)) ||
+                //   (create.Category == ImageCategory.Products && (bitfile.Width != 1000 || bitfile.Height != 600)) ||
+                //   (create.Category == ImageCategory.Services && (bitfile.Width != 200 || bitfile.Height != 200)) ||
+                //   (create.Category == ImageCategory.Blogs && (bitfile.Width != 250 || bitfile.Height != 250)) ||
+                //   (create.Category == ImageCategory.Stores && (bitfile.Width != 250 || bitfile.Height != 200)))
+                //{
+                //    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
+                //}
+                var image = _mapper.Map<Image>(create);
                 Bitmap sourceImage = new Bitmap(bitfile);
-                var name = _imageUploadServices.Upload(file/*, "original/" + name*/);
+                var name =  _imageUploadServices.Upload(file/*, "original/" + name*/);
+
                 image.Name = name;
+                image.VendId = storeId;
 
                 var set = await  _repositoryManager.Setting.GetAllSettings(false);
                 var thh = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_height").First().Value);
@@ -204,7 +207,7 @@ namespace BusinessLogic.ApiClasses
                 await AddImageSetting(imgCat4);
                
             }
-            return new BussnessResultModel(image, _locService.GetLocalizedStringValue("successSave"));
+            return new BussnessResultModel(create, _locService.GetLocalizedStringValue("successSave"));
         } 
         public async Task<BussnessResultModel> EditImage(int id , string img)
         {

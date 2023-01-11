@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using BusinessLogic.ApiClasses;
 using BusinessLogic;
 
-namespace WebLayer.Controllers
+namespace ControlPanel.Controllers
 {
 
     public class MyBaseController : ControllerBase

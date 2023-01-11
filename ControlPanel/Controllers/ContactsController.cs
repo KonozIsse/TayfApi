@@ -1,0 +1,34 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+
+namespace ControlPanel.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ContactsController : MyBaseController
+    {
+        public ContactsController(IServiceProvider provider) : base(provider)
+        {
+        }
+        [HttpGet("getAll")]
+        public async Task<IActionResult> GetAllContacts(string search,int pageId)
+        {
+            var result = await _homeBL.GetAllContacts(search, 50, pageId);
+            return Ok(result);
+        }
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteContact(int id)
+        {
+            var result = await _homeBL.DeleteContact(id);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            else
+            {
+                return Ok(result.Message);
+            }
+        }
+    }
+}

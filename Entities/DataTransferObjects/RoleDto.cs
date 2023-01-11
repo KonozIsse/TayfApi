@@ -12,7 +12,6 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool? IsVendorLink { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }
         public Status IsStatus { get; set; } 
@@ -22,6 +21,10 @@ namespace Entities.DataTransferObjects
         public string Name { get; set; }
         public bool? IsVendorLink { get; set; }
         public Status IsStatus { get; set; }
+    }
+    public class RoleLinksDto
+    {
+        public int LinkId { get; set; }
     }
     public class UpdateRoleDto : CreateRoleDto
     {

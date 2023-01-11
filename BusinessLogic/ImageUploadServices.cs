@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using BusinessLogic.ApiClasses;
 using Contracts;
+using Entities.Models.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -14,14 +15,14 @@ namespace BusinessLogic
 {
     public  class ImageUploadServices
     {
-        private static IWebHostEnvironment _webHostEnvironment;
-       private static ILoggerManager _logger;
-        private static IConfiguration Configuration;
-        //private static readonly string _filesRootPath = Configuration.GetSection("filesRootPath").ToString();
-        public  ImageUploadServices (IWebHostEnvironment webHostEnvironment , ILoggerManager logger)
+        protected readonly IWebHostEnvironment _webHostEnvironment;
+        protected readonly ILoggerManager _logger;
+        protected readonly  IConfiguration Configuration;
+        public  ImageUploadServices (IWebHostEnvironment webHostEnvironment , ILoggerManager logger, IConfiguration configuration)
         {
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
+            Configuration = configuration;
         }
         
         public string Upload(IFormFile obj)
@@ -30,17 +31,18 @@ namespace BusinessLogic
             {
                 try
                 {
+                    //string _filesRootPath = Configuration.GetSection("filesRootPath").Value;
+                    // var fullFileName = Path.Combine("/" + _filesRootPath + "/" + fileName);
                     var fileName = Guid.NewGuid() + Path.GetExtension(obj.FileName);
-                    //var fullFileName = Path.Combine("/" + _filesRootPath + "/" + fileName);
-                    if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+                    if (!Directory.Exists(_webHostEnvironment.WebRootPath + "\\img\\"))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+                        Directory.CreateDirectory(_webHostEnvironment.WebRootPath + "\\img\\");
                     }
-                    using (var stream = System.IO.File.Create(Path.GetDirectoryName(fileName)))
+                    using (var stream = System.IO.File.Create(_webHostEnvironment.WebRootPath + "\\img\\" + fileName))
                     {
                         obj.CopyTo(stream);
                         stream.Flush();
-                        return "/" + fileName;
+                        return  fileName;
                     }
                 }
                 catch (Exception ex)

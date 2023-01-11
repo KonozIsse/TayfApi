@@ -48,15 +48,17 @@ namespace BusinessLogic.ApiClasses
             _sms = sms;
         }
         //Role------------------------------------------------
-        public async Task<List<Role>> GetTypesStoreAdmin()
+        public async Task<List<RoleDto>> GetTypesStoreAdmin()
         {
-            return await _repositoryManager.Role.GetRolesAdminStore();
+            var roles = await _repositoryManager.Role.GetRolesAdminStore();
+            var rolesDto = _mapper.Map<List<RoleDto>>(roles);
+            return rolesDto;
         } 
         public async Task<Role> GetRoleId(int roleId)
         {
             return await _repositoryManager.Role.GetRoleId(roleId , false);
         }
-        public async Task<BussnessResultModel> SaveRole(int roleId, int[] linkIds)
+        public async Task<BussnessResultModel> SaveRole(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
             var permissions = await _repositoryManager.Permission.GetPermissionsRole(roleId, true);
             if (permissions != null)
@@ -66,9 +68,9 @@ namespace BusinessLogic.ApiClasses
                     _repositoryManager.Permission.DeletePermission(permission);
                 }
 
-                foreach (int linkId in linkIds)
+                foreach (var item in RoleLinksDto)
                 {
-                    _repositoryManager.Permission.AddPermission(new Permission { RoleId = roleId, LinkId = linkId });
+                    _repositoryManager.Permission.AddPermission(new Permission { RoleId = roleId, LinkId = item.LinkId });
                 }
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(permissions, _locService.GetLocalizedStringValue("successSave"));
@@ -119,6 +121,21 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
+        }
+        public async Task<BussnessResultModel> EditPermissionRoleId(int id , List<RoleLinksDto> RoleLinksDto)
+        {
+            var role = await _repositoryManager.Role.GetRoleId(id, false);
+            if(role == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"), false);
+            }
+            var links = await _repositoryManager.Link.GetLinks();
+            links.Where(r => r.IsVendorLink == true && role.IsVendorLink == true);
+            var permissions = await _repositoryManager.Permission.GetPermissionsRole(id,true);
+             permissions = permissions.Where(r => r.Link.Show == true).ToList();
+            _mapper.Map(RoleLinksDto, permissions);
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(permissions);
         }
         public async Task<BussnessResultModel> DeleteRole(int id)
         {
@@ -172,7 +189,7 @@ namespace BusinessLogic.ApiClasses
            // storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
             return storeDto;
         }
-        public async Task<BussnessResultModel> AddStore(CreateStoreDto create)
+        public async Task<BussnessResultModel> AddStore(CreateStoreDto create,string lang)
         {
             var store = _mapper.Map<User>(create);
             store.LastName = "Store";
@@ -199,7 +216,7 @@ namespace BusinessLogic.ApiClasses
                 string errors = "";
                 foreach (var x in result.Errors)
                      errors += x + ", ";
-                if (store.Lang == "en")
+                if (lang == "en")
                 {
                     return new BussnessResultModel(null, errors, false) ;
                 }
@@ -586,7 +603,6 @@ namespace BusinessLogic.ApiClasses
                     user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
                     user.TypeRegister = TypeRegister.Normal;
                     user.IsSubscribe = userRegister.IsSubscribe == "0" ? false : true;
-                    user.Lang = lang;
                     user.IsMobileVerified = false;
                     user.RoleId = 2;
                     user.UserName = userRegister.FirstName + userRegister.LastName;
@@ -647,7 +663,7 @@ namespace BusinessLogic.ApiClasses
                         string errors = "";
                         foreach (var x in result.Errors)
                             errors += x + ", ";
-                        if (user.Lang == "en")
+                        if (lang == "en")
                         {
                             return new BussnessResultModel(null, errors, false);
                         }
@@ -745,7 +761,7 @@ namespace BusinessLogic.ApiClasses
 
             return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successSave"));
         } 
-        public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister ,int zoneId , string street , string zip  , string lang  = "en")
+        public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister ,int zoneId , string street , string zip, string lang)
         {
             var IsExists = _repositoryManager.User.GetEmail(userRegister.Email);
             if (IsExists)
@@ -762,7 +778,6 @@ namespace BusinessLogic.ApiClasses
                 var user = _mapper.Map<User>(userRegister);
                 user.PhoneNumber = userRegister.PhoneNumber;
                 user.UserName = userRegister.Email;
-                user.Lang = lang;
                 user.IsMobileVerified = false;
                 user.TypeRegister = TypeRegister.Normal;
                 user.PasswordHash = userRegister.Password;

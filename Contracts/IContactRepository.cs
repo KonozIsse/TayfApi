@@ -12,7 +12,7 @@ namespace Contracts
     {
         Task<Contact> GetContactById(int id, bool trackChanges);
         int GetCountContacts();
-        Task<List<Contact>> GetContacts(int rows, int pageId = 1);
+        Task<List<Contact>> GetContacts(string search, int rows, int pageId = 1);
         void CreateContact(Contact contact);
         void DeleteContact(Contact contact);
     }
