@@ -119,12 +119,12 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
-        public async Task<List<NewsDto>> SearchBlog(int vendorId, string search)
+        public async Task<PagedList<NewsDto>> SearchBlog(int vendorId, string search, PostsParameters postsParameters)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(vendorId, search);
             if (vendorId != 0) { searchBlog.Where(c => c.VendorId == vendorId); }
             var newsDto = _mapper.Map<List<NewsDto>>(searchBlog);
-            return newsDto;
+            return PagedList<NewsDto>.ToPagedList(newsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         //CommentNews------------------------------------------------
         public async Task<CommentNews> GetCommentId (int commentId)
@@ -169,11 +169,11 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("goLogin"),false);
             }
         }
-        public async Task<List<CommentsDto>> SearchCommetsNews(int newId, string search)
+        public async Task<PagedList<CommentsDto>> SearchCommetsNews(int newId, string search, PostsParameters postsParameters)
         {
             var searchComments = await _repositoryManager.CommentNews.SearchCommets(newId, search);
             var commentsDtos = _mapper.Map<List<CommentsDto>>(searchComments);
-            return commentsDtos;
+            return PagedList<CommentsDto>.ToPagedList(commentsDtos, postsParameters.PageNumber, postsParameters.PageSize);
         }
       
     }

@@ -78,8 +78,8 @@ namespace Repository
             || ((!String.IsNullOrEmpty(c.ProductName) && c.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
             return await list.ToListAsync();
         }
-       
-        public async Task<PagedList<Product>> GetProductsCP(int? storeId, string search, PostsParameters postsParameters)
+
+        public async Task<List<Product>> GetProductsCP(int? storeId, string search)
         {
             var list = FindByCondition(r =>
                     ((!String.IsNullOrEmpty(r.ProductName) && r.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
@@ -88,9 +88,7 @@ namespace Repository
             {
                 list = list.Where(r => r.Store != null && r.Store.Status == Status.Active && r.StoreId == storeId);
             }
-            await list.Include(c => c.ProductCategories).OrderByDescending(r => r.Id).ToListAsync();
-
-            return PagedList<Product>.ToPagedList(list, postsParameters.PageNumber, postsParameters.PageSize);
+            return await list.Include(c => c.ProductCategories).OrderByDescending(r => r.Id).ToListAsync();
         }
         public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);

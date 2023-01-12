@@ -45,7 +45,14 @@ namespace Entities.DataTransferObjects
         public string Avater { get; set; }
         public string AdressInfo { get; set; }
     }
- 
+    public class AdminDto
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string RoleName { get; set; }
+        public Status Status { get; set; }
+    }
     public class CreateAdminDto
     {
         public string FirstName { get; set; }

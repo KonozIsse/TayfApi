@@ -27,7 +27,7 @@ namespace Repository
             {
                 images.Where(c => c.Category.Equals(category));
             }
-            return await images.OrderByDescending(c => c.CreatedAt).ToListAsync();
+            return await images.OrderByDescending(c => c.CreatedAt).Include(c=>c.ImageSettings).ToListAsync();
         }
         public async Task<List<Image>> GetImagesVendor(int vendorId, string category)
         {
@@ -36,7 +36,7 @@ namespace Repository
             {
                 images.Where(c => c.Category.Equals(category));
             }
-            return await images.OrderByDescending(c => c.CreatedAt).ToListAsync();
+            return await images.OrderByDescending(c => c.CreatedAt).Include(c => c.ImageSettings).ToListAsync();
         }
         public void AddImage (Image image) => Create(image);
         public void DeleteImage(Image image) => Delete(image);

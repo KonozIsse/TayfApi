@@ -17,7 +17,7 @@ namespace ControlPanel.Controllers
         {
            
         }
-        [HttpGet("allProductsCP")]
+        [HttpGet("allCP")]
         public async Task<IActionResult> GetProductsCP(string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _productBL.GetProductsCP(GetStoreId(), search, GetLanguage(), postsParameters);

@@ -15,7 +15,7 @@ namespace Contracts
         Task<IEnumerable<Category>> GetSubActiveCategories(bool trackChanges);
         Task<IEnumerable<Category>> GetSubCategoriesByMainId(int id, bool trackChanges);
         Task<IEnumerable<Category>> GetSubCategoriesMainIDCP(int mainId);
-        Task<IEnumerable<Category>> SearchMainCategoriesStoreId(int storeId, string search);
+        Task<IEnumerable<Category>> SearchSubCategories(int mainId, string search);
         Task<IEnumerable<Category>> SubCategoriesMainId();
         Task<IEnumerable<Category>> SearchMainCategoriesCP(string search);
         void CreateMainCategory(Category category);

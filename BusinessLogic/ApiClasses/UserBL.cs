@@ -130,10 +130,16 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"), false);
             }
             var links = await _repositoryManager.Link.GetLinks();
-            links.Where(r => r.IsVendorLink == true && role.IsVendorLink == true);
-            var permissions = await _repositoryManager.Permission.GetPermissionsRole(id,true);
-             permissions = permissions.Where(r => r.Link.Show == true).ToList();
-            _mapper.Map(RoleLinksDto, permissions);
+            links.Where(r =>  r.IsVendorLink == true && role.IsVendorLink == true);
+            
+            var linkIdsDto = RoleLinksDto.Select(x => x.Id).ToList();
+            var permissions = await _repositoryManager.Permission.GetLinksRole(id, linkIdsDto, true);
+            permissions = permissions.Where(r => links.Any(c => c.Show == true)).ToList();
+            foreach (var item in permissions)
+            {
+                var postDto = RoleLinksDto.FirstOrDefault(x => x.Id == item.Id);
+                _mapper.Map(postDto, item);
+            }
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(permissions);
         }
@@ -276,9 +282,23 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.User.GetActiveUserId(id, false);
         }
-        public async Task<IEnumerable<User>> GetAdminsStors()
+        public async Task<IEnumerable<AdminDto>> GetAdminsStores()
         {
-            return await _repositoryManager.User.GetAdminsStors(false);
+            var admins = await _repositoryManager.User.GetAdminsStors(false);
+            var adminsDto = new List<AdminDto>();// _mapper.Map<List<AdminDto>>(admins);
+            foreach (var admin in admins)
+            {
+                var role = await _repositoryManager.Role.GetRoleId(admin.RoleId, false);
+                adminsDto.Add(new AdminDto
+                {
+                    Id = admin.Id,
+                    FullName = admin.FirstName,
+                    Email = admin.Email,
+                    RoleName = role.Name,
+                    Status = admin.Status,
+                });
+            }
+            return adminsDto;
         }
         public async Task<List<User>> GetCustomers()
         {
@@ -395,7 +415,7 @@ namespace BusinessLogic.ApiClasses
             var result = await _userManager.ChangePasswordAsync(user , OldPassword, NewPassword);
             if (!result.Succeeded)
             {
-                return new BussnessResultModel(null, " ", false);
+                return new BussnessResultModel(null, "fail", false);
             }
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(result);
@@ -467,7 +487,6 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("passwnotequal"), false);
             }
         }
-
         public async Task<BussnessResultModel> UpdateCustomerCP(UpdateCustomerDto updateDto)
         {
             var user = await _repositoryManager.User.GetUserId(updateDto.Id, true);

@@ -31,6 +31,7 @@ namespace Entities.DataTransferObjects
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
         public int CategoryId { get; set; }
+        public List<ProductCategoryDto> CategoriesName { get; set; }
         public string CategoryName { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }

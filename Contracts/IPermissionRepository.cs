@@ -11,6 +11,7 @@ namespace Contracts
     {
         Task<IEnumerable<Permission>> GetPermissionsShowRole(int roleId);
         Task<IEnumerable<Permission>> GetPermissionsRole(int roleId, bool trackChanges);
+        Task<IEnumerable<Permission>> GetLinksRole(int roleId, List<int> Ids, bool trackChanges);
         void AddPermission(Permission permission);
         void DeletePermission(Permission permission);
     }

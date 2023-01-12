@@ -1,11 +1,5 @@
 ﻿using Entities.DataTransferObjects;
-using Entities.Models;
-using Entities.RequestFeatures;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Twilio.TwiML.Voice;
-
 namespace ControlPanel.Controllers
 {
     [Route("api/[controller]")]
@@ -18,7 +12,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetAdminsStors()
         {
-            var result = await _userBL.GetAdminsStors();
+            var result = await _userBL.GetAdminsStores();
             return Ok(result);
         }
         [HttpPost("register")]
@@ -75,7 +69,7 @@ namespace ControlPanel.Controllers
         }
         
         [HttpPost("createRole")]
-        public async Task<IActionResult> AddLinksRole(CreateRoleDto create)
+        public async Task<IActionResult> AddRole(CreateRoleDto create)
         {
             var result = await _userBL.AddRole(create);
             if (result.Success)
@@ -93,8 +87,8 @@ namespace ControlPanel.Controllers
             var result = await _userBL.GetTypesStoreAdmin();
             return Ok(result);
         }
-        [HttpPut("editType")]
-        public async Task<IActionResult> EditTypeRole(UpdateRoleDto update)
+        [HttpPut("editRole")]
+        public async Task<IActionResult> EditRole(UpdateRoleDto update)
         {
             var result = await _userBL.EditRole(update);
             if (result.Success)

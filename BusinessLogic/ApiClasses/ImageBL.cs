@@ -17,6 +17,9 @@ using System.Net;
 using Microsoft.Extensions.Configuration;
 using Image = Entities.Models.Image;
 using BussnessResultModel = Entities.Exception.BussnessResultModel;
+using Entities.RequestFeatures;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace BusinessLogic.ApiClasses
 {
     public class ImageBL
@@ -223,24 +226,32 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink") , false);
             }
         }
-        public async Task DeleteImageIds(string Ids)
+        public async Task<BussnessResultModel> DeleteImageIds(string Ids)
         {
             char[] delimiters = new char[] { ',' };
             string[] stringArray = Ids.Split(delimiters);
             int[] intArray = Array.ConvertAll(stringArray, s => int.Parse(s));
-
-            foreach (var c in intArray)
+            try
             {
-                var cats = await _repositoryManager.ImageSetting.GetImageSettings(c);
-                foreach (var t in cats)
+                foreach (var c in intArray)
                 {
-                    _repositoryManager.ImageSetting.DeleteImageSetting(t);
-                    _imageUploadServices.DeleteImage(t.Path);
+                    var cats = await _repositoryManager.ImageSetting.GetImageSettings(c);
+                    foreach (var t in cats)
+                    {
+                        _repositoryManager.ImageSetting.DeleteImageSetting(t);
+                        _imageUploadServices.DeleteImage(t.Path);
+                    }
+                    var image = await _repositoryManager.Image.GetImage(c, false);
+                    _repositoryManager.Image.DeleteImage(image);
                 }
-                var image = await _repositoryManager.Image.GetImage(c, false);
-                _repositoryManager.Image.DeleteImage(image);
+                await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(Ids ,_locService.GetLocalizedStringValue("successDelete"));
             }
-            await _repositoryManager.SaveAsync();
+            catch
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false); 
+            }
+            
         } 
         public async Task<BussnessResultModel> DeleteImage(int id)
         {
@@ -271,9 +282,13 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.ImageSetting.AddImageSetting(imageSetting);
             await _repositoryManager.SaveAsync();
         }  
-        public async Task EditImageSetting(UpdateImageSettingDto update)
+        public async Task<BussnessResultModel> EditImageSetting(UpdateImageSettingDto update)
         {
             var itemFromDB = await _repositoryManager.ImageSetting.GetImageSettingId(update.Id , true);
+            if(itemFromDB == null)
+            {
+                return new BussnessResultModel(null , _locService.GetLocalizedStringValue("is null"),false);
+            }
             string folder = "";
             if (update.ImageType == ImageType.THUMBNAIL) folder = "thumb";
             else if (update.ImageType == ImageType.MEDIUM) folder = "medium";
@@ -288,8 +303,8 @@ namespace BusinessLogic.ApiClasses
                     delegate { return true; }
                 );
                 //Sending request to find web api REST service resource GetAllEmployees using HttpClient  
-                string urlImg = Configuration.GetSection("ImagesUrl").Value;
-                var Res = client.GetAsync(urlImg + name);
+                //string urlImg = Configuration.GetSection("ImagesUrl").Value;
+                var Res = client.GetAsync("\\img\\" + name);
 
                 //Checking the response is successful or not which is sent using HttpClient  
                 var result = Res.Result;
@@ -330,6 +345,7 @@ namespace BusinessLogic.ApiClasses
                     await _repositoryManager.SaveAsync();
                 }
             }
+            return new BussnessResultModel(itemFromDB);
         }
         public async Task<string> GetImageMedium(string img)
         {
@@ -421,19 +437,21 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.ImageSetting.GetImagesStoreId(vendorId, category);
         } 
-        public async Task<IEnumerable<Image>> GetImages( string category , int vendorId = 0)
+        public async Task<PagedList<ImageDto>> GetImages( string category , int? vendorId, PostsParameters postsParameters)
         {
             var images =  await _repositoryManager.Image.GetImages(category);
             if (vendorId != 0)
             {
-                images =  await _repositoryManager.Image.GetImagesVendor(vendorId, category);
+                images =  await _repositoryManager.Image.GetImagesVendor(vendorId.Value, category);
             }
-            return images;
+           var imagesDto =  _mapper.Map<List<ImageDto>>(images);
+            return PagedList<ImageDto>.ToPagedList(imagesDto, postsParameters.PageNumber, postsParameters.PageSize); 
         }
-        public async Task<IEnumerable<ImageSetting>> GetImageSettingImg(  int imgId)
+        public async Task<List<ImageSettingDto>> GetImageSettingImg(int imgId)
         {
             var images =  await _repositoryManager.ImageSetting.GetImageSettings(imgId);
-            return images;
+            var imagesDto = _mapper.Map<List<ImageSettingDto>>(images);
+            return imagesDto;
         } 
         public async Task<ImageSetting> GetImageSetting(int settingId)
         {

@@ -13,7 +13,7 @@ namespace Entities.DataTransferObjects
     public class CategoryDto
     {
         public int Id { get; set; }
-        public int ImageId { get; set; }
+        public int? ImageId { get; set; }
         public Status IsStatus { get; set; }
         public string CategoryName { get; set; }
         public int? MainCategoryId { get; set; }
@@ -38,6 +38,7 @@ namespace Entities.DataTransferObjects
         public int? ImgId { get; set; }
         public Status IsStatus { get; set; }
     }
+
     public class UpdateCategoryDto : CreateCategoryDto
     {
         public int Id { get; set; }

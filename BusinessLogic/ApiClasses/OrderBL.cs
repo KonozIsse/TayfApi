@@ -6,9 +6,11 @@ using Entities.DataTransferObjects;
 using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enum;
+using Entities.RequestFeatures;
 using Entities.ViewModel;
 using MailKit.Search;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Twilio.Jwt.AccessToken;
 
 namespace BusinessLogic.ApiClasses
@@ -918,9 +920,11 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successSave"));
         }
 
-        public async Task<IEnumerable<Coupon>> GetCoupons()
+        public async Task<PagedList<CouponDto>> GetAllCoupons(string search , [FromQuery] PostsParameters postsParameters)
         {
-            return await _repositoryManager.Coupon.GetCoupons();
+            var coupons = await _repositoryManager.Coupon.GetCoupons(search);
+            var couponsDto = _mapper.Map<List<CouponDto>>(coupons);
+            return PagedList<CouponDto>.ToPagedList(couponsDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
         public async Task<Coupon> GetCoupon(int id)
         {

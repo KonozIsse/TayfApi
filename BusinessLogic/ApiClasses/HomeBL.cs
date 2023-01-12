@@ -7,6 +7,8 @@ using AutoMapper;
 using Contracts;
 using BussnessResultModel = Entities.Exception.BussnessResultModel;
 using Entities.Exception;
+using Entities.RequestFeatures;
+using System.Xml.Linq;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -40,7 +42,7 @@ namespace BusinessLogic.ApiClasses
         {
             var navbarDto = new NavbarVM
             {
-                DefaultLanguage = await GetLanguage(),
+                DefaultLanguage = await GetDefaultLanguage(),
                 Languages = await GetAllLanguages(),
                 Currencies = await GetCurrencies()
             };
@@ -280,11 +282,11 @@ namespace BusinessLogic.ApiClasses
             var emailsDto = _mapper.Map<List<MailListDto>>(emails);
             return emailsDto;
         }  
-        public async Task<List<MailListDto>> GetMailLists(string search)
+        public async Task<PagedList<MailListDto>> GetMailLists(string search, PostsParameters postsParameters)
         {
             var emails = await _repositoryManager.MailList.GetMailListEmail(search);
             var emailsDto = _mapper.Map<List<MailListDto>>(emails);
-            return emailsDto;
+            return PagedList<MailListDto>.ToPagedList(emailsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task SendUserEmail( string email)
         {
@@ -312,29 +314,29 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(email, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Language------------------------------------------------
-        //public async Task<BussnessResultModel<List<LanguageDto>>> GetAllLanguagesk()
-        //{
-        //    //var hanNoPermission = false;
-        //    //if (!hanNoPermission)
-        //    //{
-        //    //    return new BussnessResultModel<List<LanguageDto>>(null, "no permission", false);
-        //    //}
-
-        //    var languages = await _repositoryManager.Language.ListLanguage(false);
-        //    if (languages == null)
-        //    {
-        //        return new BussnessResultModel<List<LanguageDto>>(null, _locService.GetLocalizedStringValue("NoLanguage"), false);
-        //    }
-        //    var languagesDto = _mapper.Map<List<LanguageDto>>(languages);
-        //    return new BussnessResultModel<List<LanguageDto>>(languagesDto);
-        //}
+       
+        public async Task<PagedList<LanguageDto>> GetLanguages(string search , string lang , PostsParameters postsParameters)
+        {
+            var languages = await _repositoryManager.Language.GetAllLanguage(search);
+            //var languagesDto = _mapper.Map<List<LanguageDto>>(languages);
+            var languagesDto = new List<LanguageDto>();
+            foreach(var language in languages)
+            {
+                languagesDto.Add(new LanguageDto
+                {
+                    Id = language.Id,
+                    Name = lang == "en" ? language.Name : language.NameAr,
+                });
+            }
+            return PagedList<LanguageDto>.ToPagedList(languagesDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
         public async Task<List<LanguageDto>> GetAllLanguages()
         {
             var languages = await _repositoryManager.Language.ListLanguage(false);
             var languagesDto = _mapper.Map<List<LanguageDto>>(languages);
             return languagesDto;
         }
-        public async Task<LanguageDto> GetLanguage()
+        public async Task<LanguageDto> GetDefaultLanguage()
         {
             var language = await _repositoryManager.Language.GetDefaultLanguage( false);
             var languagesDto = _mapper.Map<LanguageDto>(language);
@@ -387,7 +389,16 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
         }
         //Currency------------------------------------------------
-        public async Task<List<CurrencyDto>> GetCurrencies(string lang = "en")
+        public async Task<PagedList<CurrencyDto>> GetAllCurrencies(string lang , PostsParameters postsParameters)
+        {
+            var currencies = await _repositoryManager.Currency.GetAllCurrencies(false);
+            var currenciesDto = _mapper.Map<List<CurrencyDto>>(currencies);
+            var currency = currencies.First();
+            var currencyDto = currenciesDto.First();
+            currencyDto.Name = lang == "en" ? currency.Name : currency.NameAr;
+            return PagedList<CurrencyDto>.ToPagedList(currenciesDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task<List<CurrencyDto>> GetCurrencies(string lang = "")
         {
             var currencies = await _repositoryManager.Currency.GetAllCurrencies(false);
             var currenciesDto = _mapper.Map<List<CurrencyDto>>(currencies);

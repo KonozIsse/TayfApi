@@ -25,6 +25,15 @@ namespace Repository
         => await FindByCondition(c => c.IsDefault == 1, trackChanges).FirstOrDefaultAsync();
         public async Task<IEnumerable<Language>> ListLanguage(bool trackChanges)
         => await FindAll(trackChanges).ToListAsync();
+        public async Task<IEnumerable<Language>> GetAllLanguage(string search)
+        { 
+            var langs =  FindAll(false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                langs.Where(c => c.Name.Contains(search) || c.Code.Contains(search));
+            }
+            return await langs.ToListAsync();
+        }
         public bool IsExistLang(string code) => FindByCondition(c => c.Code == code, false).Count() > 0;
         public void DeleteLanguage(Language language) => Delete(language);
     }

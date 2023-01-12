@@ -21,6 +21,8 @@ namespace Repository
         => await FindByCondition(c => c.RoleId == roleId && c.Link.Show == true, false).Include(r => r.Link).ToListAsync();   
         public async Task<IEnumerable<Permission>> GetPermissionsRole (int roleId , bool trackChanges)
         => await FindByCondition(c => c.RoleId == roleId , trackChanges).ToListAsync();
+        public async Task<IEnumerable<Permission>> GetLinksRole(int roleId, List<int> Ids, bool trackChanges)
+        => await FindByCondition(c => c.RoleId == roleId && Ids.Contains(c.Id), trackChanges).ToListAsync();
         public void AddPermission(Permission permission) => Create(permission);
         public void DeletePermission(Permission permission) => Delete(permission);
     }

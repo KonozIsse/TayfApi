@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface ICouponRepository
     {
-        Task<IEnumerable<Coupon>> GetCoupons();
+        Task<IEnumerable<Coupon>> GetCoupons(string search);
         bool CheckExistCoupon(string code);
         Task<Coupon> GetCouponId(int id, bool trackChanges);
         Task<Coupon> GetCouponCodeNotFinished(string code);

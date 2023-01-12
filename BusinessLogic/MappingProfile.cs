@@ -117,6 +117,7 @@ namespace BusinessLogic
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             CreateMap<UserForRegistrationDto, User>().ReverseMap(); 
             //AdminMap
+            CreateMap<AdminDto, User>().ReverseMap();
             CreateMap<CreateAdminDto, User>().ReverseMap();
             CreateMap<UpdateAdminDto, User>().ReverseMap();
             //MapTaxRate
@@ -145,6 +146,7 @@ namespace BusinessLogic
             CreateMap<ImageDto, Image>().ReverseMap();
             CreateMap<CreateImageDto, Image>().ReverseMap();
             CreateMap<CreateImageProductDto, Image>().ReverseMap();
+            CreateMap<ImageProductDto, Image>().ReverseMap();
             //MapImageSetting
             CreateMap<ImageSettingDto, ImageSetting>().ReverseMap();
             CreateMap<CreateImageSettingDto, ImageSetting>().ReverseMap(); 

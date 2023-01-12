@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,16 @@ namespace Repository
         => await FindByCondition(c => c.Zones.Count() > 0, trackChanges).Include(x => x.Zones).ToListAsync();
         public async Task<List<Country>> GetCountries()
         => await FindAll(false).Include(x => x.Zones).Include(c=>c.Image).ToListAsync();
+        public async Task<IEnumerable<Country>> GetAllCountries(string search)
+        { 
+            var countries = FindAll(false);
+            if (!String.IsNullOrEmpty(search))
+            {
+                countries.Where(c=>c.CountryName.Contains(search) || c.CountryCode2.Contains(search)
+                || c.CountryCode3.Contains(search)).ToList();
+            }
+            return await countries.Include(x => x.Zones).Include(c => c.Image).ToListAsync();
+        }
         public async Task<Country> GetcountryById(int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id , trackChanges).FirstOrDefaultAsync();
         public bool ExistCountry(string countryName, string code)

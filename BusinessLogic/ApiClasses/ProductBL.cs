@@ -47,14 +47,23 @@ namespace BusinessLogic.ApiClasses
             categoryDto.CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr;
             return categoryDto;
         }
-        public async Task<List<CategoryDto>> GetSearchMainCategories(string search, string lang = "en")
+        public async Task<PagedList<CategoryDto>> GetSearchMainCategories(string search, string lang, PostsParameters postsParameters)
         {
             var categories = await _repositoryManager.Categories.SearchMainCategoriesCP(search);
-            var mainCategoryDto = _mapper.Map<List<CategoryDto>>(categories);
-            var category = categories.First();
-            var categoryDto = mainCategoryDto.First();
-            categoryDto.CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr;
-            return mainCategoryDto;
+            //var mainCategoryDto = _mapper.Map<List<CategoryDto>>(categories);
+            var mainCategoryDto = new List<CategoryDto>();
+            foreach(var category in categories)
+            {
+                mainCategoryDto.Add(new CategoryDto
+                {
+                    Id = category.Id,
+                    CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
+                    ImageId = category.ImgId,
+                    IsStatus = category.IsStatus,
+                    CreatedAt = category.CreatedAt
+                });
+            }
+            return PagedList<CategoryDto>.ToPagedList(mainCategoryDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<IEnumerable<CategoryDto>> SubCategoriesMainId(string lang ="en")
         {
@@ -113,14 +122,23 @@ namespace BusinessLogic.ApiClasses
             categoryDto.CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr;
             return categoriesDto;
         }
-        public async Task<List<CategoryDto>> GetSubCategoriesCP(int mainId, string lang = "en")
+        public async Task<PagedList<CategoryDto>> GetSubCategoriesCP(int mainId,string search , string lang , PostsParameters postsParameters)
         {
-            var categories = await _repositoryManager.Categories.GetSubCategoriesMainIDCP(mainId);
-            var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
-            var category = categories.First();
-            var categoryDto = categoriesDto.First();
-            categoryDto.CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr;
-            return categoriesDto;
+            var categories = await _repositoryManager.Categories.SearchSubCategories(mainId, search);
+            //var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
+            var categoriesDto = new List<CategoryDto>();
+            foreach (var category in categories)
+            {
+                categoriesDto.Add(new CategoryDto
+                {
+                    Id = category.Id,
+                    CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
+                    ImageId = category.ImgId,
+                    IsStatus = category.IsStatus,
+                    CreatedAt = category.CreatedAt
+                });
+            }
+            return PagedList<CategoryDto>.ToPagedList(categoriesDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
         public async Task<List<CategoryDto>> GetSubCategoriesForHome(int mainId, string lang = "en")
         {
@@ -677,13 +695,22 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<PagedList<ProductDto>> GetProductsCP(int? storeId , string search , string lang, PostsParameters postsParameters)
         {
-            var products = await _repositoryManager.Product.GetProductsCP(storeId, search, postsParameters);
+            var products = await _repositoryManager.Product.GetProductsCP(storeId, search);
             //var productsDto =_mapper.Map<IEnumerable<ProductDto>>(products);
             var productsDto = new List<ProductDto>();
             foreach (var item in products)
             {
-                var cat = await _repositoryManager.ProductCategory.GetCategoryToPrductId(item.Id);
-                var catName = lang == "en" ? cat.Category.CategoryName : cat.Category.CategoryNameAr;
+                var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProdId(item.Id,false);
+                var catsDto = new List<ProductCategoryDto>();
+                foreach (var cat in cats)
+                {
+                    var catName = lang == "en" ? cat.Category.CategoryName : cat.Category.CategoryNameAr;
+                    catsDto.Add(new ProductCategoryDto
+                    {
+                        CategoryId = cat.CategoryId,
+                        CategoryName = catName,
+                    });
+                }
                 productsDto.Add(new ProductDto
                 {
                     Id = item.Id,
@@ -691,11 +718,12 @@ namespace BusinessLogic.ApiClasses
                     Description = lang == "en" ? item.Description : item.DescriptionAr,
                     IsStatus = item.IsStatus,
                     ImageProduct = item.ImageProduct,
-                    CategoryName = catName,
+                    CategoriesName = catsDto,
                     IsAcceptAdmin = item.IsAcceptAdmin
                 });
+               
             }
-            return (PagedList<ProductDto>)productsDto;
+            return PagedList<ProductDto>.ToPagedList(productsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<ProductVM> GetDetailProduct(int productId, int? customerId , string lang )
         {
@@ -895,11 +923,11 @@ namespace BusinessLogic.ApiClasses
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
-        public async Task<List<ImageDto>> GetProductImages(int productId)
+        public async Task<List<ImageProductDto>> GetProductImages(int productId)
         {
             var images = await _repositoryManager.Image.GetProductImages(productId);
-            var imagesDto = new List<ImageDto>();
-            images.ForEach(async x1 => imagesDto.Add(new ImageDto
+            var imagesDto = new List<ImageProductDto>();
+            images.ForEach(async x1 => imagesDto.Add(new ImageProductDto
             {
                 Id = x1.Id,
                 ProductId = productId,
@@ -907,10 +935,10 @@ namespace BusinessLogic.ApiClasses
             }));
             return imagesDto;
         }
-        public async Task<ImageDto> GetProductImage(int imageId)
+        public async Task<ImageProductDto> GetProductImage(int imageId)
         {
             var image = await _repositoryManager.Image.GetImage(imageId , false);
-            return new ImageDto
+            return new ImageProductDto
             {
                 Id = imageId,
                 ProductId = image.ProductId,
@@ -1488,7 +1516,7 @@ namespace BusinessLogic.ApiClasses
             return await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
         }
      
-        public async Task AddInventory(CreateInventoryDto createDto)
+        public async Task<BussnessResultModel> AddInventory(CreateInventoryDto createDto)
         {
             var inventory = _mapper.Map<Inventory>(createDto);
 
@@ -1506,6 +1534,7 @@ namespace BusinessLogic.ApiClasses
                 _repositoryManager.Inventory.AddInventory(inventory);
             }
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(inventory, _locService.GetLocalizedStringValue("successAdd"));
         }
         public async Task DeleteInventory(int productId, int attr)
         {

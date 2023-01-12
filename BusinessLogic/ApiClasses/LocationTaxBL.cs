@@ -6,6 +6,7 @@ using Entities.Models;
 using Zone = Entities.Models.Zone;
 using BussnessResultModel = Entities.Exception.BussnessResultModel;
 using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
+using Entities.RequestFeatures;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -145,11 +146,11 @@ namespace BusinessLogic.ApiClasses
             var country = _mapper.Map<Country>(create);
             if (create.CountryName == null)
             {
-                return new BussnessResultModel(country, _locService.GetLocalizedStringValue("enterallfiled"), false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
             }
             if (create.ImageId == 0)
             {
-                return new BussnessResultModel(country, _locService.GetLocalizedStringValue("correctImage"), false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
             }
             _repositoryManager.Country.AddCountry(country);
             await _repositoryManager.SaveAsync();
@@ -184,7 +185,7 @@ namespace BusinessLogic.ApiClasses
             }
             if (updateDto.CountryNameAr == null)
             {
-                return new BussnessResultModel(country, _locService.GetLocalizedStringValue("enterallfiled"), false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
             }
             _mapper.Map(updateDto, country);
             await _repositoryManager.SaveAsync();
@@ -193,6 +194,23 @@ namespace BusinessLogic.ApiClasses
         public async Task<Country> GetCountryCode(string code)
         {
             return await _repositoryManager.Country.GetCountryByCode(code, false);
+        }
+        public async Task<PagedList<CountryDto>> GetAllCountries(string lang, string search, PostsParameters postsParameters)
+        {
+            var countries = await _repositoryManager.Country.GetAllCountries(search);
+            //var countriesDto = _mapper.Map<List<CountryDto>>(countries);
+            var countriesDto = new List<CountryDto>();
+            foreach (var category in countries)
+            {
+                countriesDto.Add(new CountryDto
+                {
+                    Id = category.Id,
+                    CountryName = lang == "en" ? category.CountryName : category.CountryNameAr,
+                    IsStatus = category.IsStatus,
+                    CountryCode3 = category.CountryCode3
+                });
+            }
+            return PagedList<CountryDto>.ToPagedList(countriesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<CountryDto>> GetCountriesForWeb(string lang = "en")
         {

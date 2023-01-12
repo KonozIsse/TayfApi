@@ -14,6 +14,7 @@ namespace Contracts
         Task<Country> GetcountryById(int id, bool trackChanges);
         bool ExistCountry(string countryName, string code);
         Task<Country> GetCountryByCode(string code, bool trackChanges);
+        Task<IEnumerable<Country>> GetAllCountries(string search);
         void AddCountry(Country country);
         void DeleteCountry(Country country);
     }

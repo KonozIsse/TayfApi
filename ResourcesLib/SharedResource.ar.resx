@@ -438,6 +438,9 @@
   <data name="cancel" xml:space="preserve">
     <value>إلغاء الأمر</value>
   </data>
+  <data name="CannotDeleteImage" xml:space="preserve">
+    <value>لا يمكن حذف صورة مستخدمة مسبقا</value>
+  </data>
   <data name="cart" xml:space="preserve">
     <value>عربة التسوق</value>
   </data>

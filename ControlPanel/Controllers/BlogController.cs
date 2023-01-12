@@ -1,6 +1,8 @@
 ﻿using Entities.DataTransferObjects;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.ComponentModel.Design;
 
 namespace ControlPanel.Controllers
@@ -13,15 +15,17 @@ namespace ControlPanel.Controllers
         {
         }
         [HttpGet("get")]
-        public async Task<IActionResult> GetBlogs(string search)
+        public async Task<IActionResult> GetBlogs(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _newsBL.SearchBlog(GetStoreId(), search);
+            var result = await _newsBL.SearchBlog(GetStoreId(), search, postsParameters);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
         [HttpGet("getCommments")]
-        public async Task<IActionResult> GetCommentsBlog(int id , string search)
+        public async Task<IActionResult> GetCommentsBlog(int id , string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _newsBL.SearchCommetsNews(id , search);
+            var result = await _newsBL.SearchCommetsNews(id , search, postsParameters);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
         [HttpPost("createBlog")]

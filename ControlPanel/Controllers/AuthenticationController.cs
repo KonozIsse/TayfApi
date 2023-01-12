@@ -19,28 +19,11 @@ namespace ControlPanel.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class AuthenticationCPController : MyBaseController
+    public class AuthenticationController : MyBaseController
     {
-        public AuthenticationCPController(IServiceProvider serviceProvider) : base(serviceProvider)
+        public AuthenticationController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
-        [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromForm] CreateCustomerDto userForRegistration)
-        {
-            var user = _mapper.Map<User>(userForRegistration);
-            var result = await _userManager.CreateAsync(user, userForRegistration.Password);
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.TryAddModelError(error.Code, error.Description);
-                }
-                return BadRequest(ModelState);
-            }
-            return StatusCode(201);
-        }
-
-
         [HttpPost("login")]
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
         {
@@ -96,20 +79,8 @@ namespace ControlPanel.Controllers
             }
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("TestSendEmail")]
-        public IActionResult TestSendEmail()
-        {
-            var rng = new Random();
-            var message = new Message(new string[] { "osama_rifag@hotmail.com", "ahmed.zaalan@gmail.com" }, "Test email", "This is the content from our email.");
-            _emailSender.SendEmail(message);
-            return Ok();
-        }
-
         [AllowAnonymous]
         [HttpPost]
-
         [Route("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgetPasswordDto forgotPasswordModel)
         {
@@ -147,18 +118,6 @@ namespace ControlPanel.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("create-role")]
-        public async Task<IActionResult> CreateRole(string name)
-        {
-          await  _roleManager.CreateAsync(new Role
-            {
-                Name = name,
-                NormalizedName = name.ToUpper()
-            }) ;
-            return Ok();
-        }
     }
 
 }

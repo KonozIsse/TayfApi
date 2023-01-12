@@ -1,13 +1,13 @@
 using AutoMapper;
 using BusinessLogic;
 using BusinessLogic.StartUp;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
 builder.Services.ConfigureEmailConfiguration(builder.Configuration);
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
@@ -28,7 +28,6 @@ builder.Services.ConfigureSMSService();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
 {
     c.MapType<TimeSpan>(() => new OpenApiSchema
@@ -81,28 +80,31 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
+app.UseCors("CorsPolicy");
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.All
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller= Home}/{action=Index}/{id?}");
+});
 
-app.UseCors("CorsPolicy");
-
+app.UseSwagger();
 app.UseSwaggerUI(s =>
 {
     s.SwaggerEndpoint("/swagger/v1/swagger.json", "Code Maze API v1");
     s.SwaggerEndpoint("/swagger/v2/swagger.json", "Code Maze API v2");
 });
-app.UseSwagger(options =>
-{
-    options.SerializeAsV2 = true;
-});
-
-
-
 app.Run();

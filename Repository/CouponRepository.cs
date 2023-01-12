@@ -16,8 +16,15 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<Coupon>> GetCoupons()
-         => await FindAll(false).ToListAsync();
+        public async Task<IEnumerable<Coupon>> GetCoupons(string search)
+        {
+            var coupoun = FindAll(false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                coupoun.Where(c => c.CouponCode.Contains(search));
+            }
+             return await coupoun.ToListAsync(); 
+        }
         public bool CheckExistCoupon(string code)
         => FindByCondition(x => x.CouponCode == code,false).Count() > 0;
         public async Task<Coupon> GetCouponId(int id , bool trackChanges)
