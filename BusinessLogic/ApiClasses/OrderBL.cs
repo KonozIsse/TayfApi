@@ -805,7 +805,7 @@ namespace BusinessLogic.ApiClasses
                     city1 = city.ZoneName;
                 }
             }
-            var l = await _repositoryManager.Setting.GetSettingByValue("website_logo");
+            var l = await _repositoryManager.Setting.GetSettingByValue("website_logo",false);
             // var logo = await _imageBL.GetImageOriginal(l.Value);
             var all = "";
             var bb3 = "";

@@ -16,10 +16,11 @@ namespace Repository
 
         }
         public async Task<IEnumerable<Setting>> GetAllSettings(bool trackChanges) => await FindAll(trackChanges).ToListAsync();
-        public async Task<Setting> GetSettingByValue(string key)
-          => await FindByCondition(c => c.Key == key, false).FirstOrDefaultAsync();
+        public async Task<Setting> GetSettingByValue(string key, bool trackChanges)
+          => await FindByCondition(c => c.Key == key, trackChanges).FirstOrDefaultAsync();
         public async Task<IEnumerable<Setting>> GetMediaSetting()
-         => await FindByCondition(x => x.Id == 88 || x.Id == 89 || x.Id == 90 || x.Id == 91 || x.Id == 92 || x.Id == 93, false).ToListAsync();
+         => await FindByCondition(x => x.Key == "Thumbnail_height" || x.Key == "Thumbnail_width" || x.Key == "Medium_height" ||
+         x.Key == "Medium_width" || x.Key == "Large_height" || x.Key == "Large_width", false).ToListAsync();
         public string GetPeriod() => FindByCondition(r => r.Key == "Refund_Money_Days", false).SingleOrDefault().Value;
     }
     public class MessageTemplateRepository : RepositoryBase<MessageTemplate>, IMessageTemplateRepository

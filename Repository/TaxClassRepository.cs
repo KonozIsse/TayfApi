@@ -17,8 +17,15 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<TaxClass>> GetTaxClasses()
-          => await FindAll(false).ToListAsync();
+        public async Task<IEnumerable<TaxClass>> GetTaxClasses(string search)
+        {
+            var taxes = FindAll(false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                taxes.Where(c => c.Title.Contains(search) || c.Description.Contains(search));
+            }
+            return await taxes.ToListAsync();
+        }
         public bool ExistTax(string name)
           => FindByCondition(c=>c.Title == name ,false).Count() > 0;
         public async Task<TaxClass> GetTaxClassId(int id, bool trackChanges)

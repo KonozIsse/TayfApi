@@ -27,6 +27,9 @@ namespace BusinessLogic
             CreateMap<UpdateLanguageDto, Language>().ReverseMap();
             //MapRole
             CreateMap<RoleLinksDto, Permission>().ReverseMap();
+            //MapNotification
+            CreateMap<NotificationDto, Notification>().ReverseMap();
+            CreateMap<CreateNotificationDto, Notification>().ReverseMap();
             //MapPermission
             CreateMap<RoleDto, Role>().ReverseMap();
             CreateMap<CreateRoleDto, Role>().ReverseMap(); 
@@ -113,7 +116,7 @@ namespace BusinessLogic
             //MapCustomer
             CreateMap<CreateCustomerDto, User>().ReverseMap();
             CreateMap<UserDto, User>().ReverseMap();
-            CreateMap<AvaterDto, User>().ReverseMap();
+            CreateMap<CustomerDto, User>().ReverseMap();
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             CreateMap<UserForRegistrationDto, User>().ReverseMap(); 
             //AdminMap
@@ -129,6 +132,7 @@ namespace BusinessLogic
             CreateMap<CreateTaxClassDto, TaxClass>().ReverseMap();
             CreateMap<UpdateTaxClassDto, TaxClass>().ReverseMap();
             //MapSetting
+            CreateMap<SettingMedieDto, Setting>().ReverseMap();
             CreateMap<SettingDto, Setting>().ReverseMap(); 
             CreateMap<UpdateSettingDto, Setting>().ReverseMap();
             //MapService

@@ -56,7 +56,15 @@ namespace Repository
          => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Zone> GetZoneIdCountryId(int id,int countryId , bool trackChanges)
        => await FindByCondition(c => c.Id == id&& c.CountryId == countryId, trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Zone>> GetAllZones() => await FindAll(false).Include(c=>c.Country).ToListAsync();
+        public async Task<List<Zone>> GetAllZones(string search)
+        {
+            var zones = FindAll(false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                zones.Where(c => c.ZoneName.Contains(search) || c.ZoneCode.Contains(search) || c.Country.CountryName.Contains(search));
+            }
+           return await zones.Include(c => c.Country).ToListAsync();
+        }
 
         public void AddZone(int countryId, Zone zone) 
         { 

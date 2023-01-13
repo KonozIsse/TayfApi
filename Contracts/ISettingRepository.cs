@@ -10,7 +10,7 @@ namespace Contracts
     public interface ISettingRepository
     {
         Task<IEnumerable<Setting>> GetAllSettings(bool trackChanges);
-        Task<Setting> GetSettingByValue(string key);
+        Task<Setting> GetSettingByValue(string key, bool trackChanges);
         Task<IEnumerable<Setting>> GetMediaSetting();
          string GetPeriod();
     } 

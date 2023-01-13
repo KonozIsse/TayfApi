@@ -17,7 +17,7 @@ namespace ControlPanel.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateInventory(CreateInventoryDto create)
         {
-            var result = await _productBL.AddInventory(create);
+            var result = await _productBL.AddInventory(GetAdminId(),GetStoreId(),create);
             if (result.Success)
             {
                 return Ok(result.Message);

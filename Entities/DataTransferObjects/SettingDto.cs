@@ -11,16 +11,16 @@ namespace Entities.DataTransferObjects
 {
     public class SettingDto
     {
-        public int Id { get; set; }
         public string Key { get; set; }
-        public Status IsStatus { get; set; }
         public string Value { get; set; }
-        public int? VendorId { get; set; }
-        public int? AdminId { get; set; }
     }
     public class UpdateSettingDto
     {
         public string Key { get; set; }
+        public string Value { get; set; }
+    } 
+    public class SettingMedieDto
+    {
         public string Value { get; set; }
     }
 }

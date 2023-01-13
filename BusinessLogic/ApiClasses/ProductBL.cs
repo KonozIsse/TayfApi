@@ -1242,11 +1242,11 @@ namespace BusinessLogic.ApiClasses
         {
             return await _repositoryManager.Option.GetAllOptions();
         }
-        public async Task<List<OptionDto>> GetProductOptions()
+        public async Task<PagedList<OptionDto>> GetProductOptions(PostsParameters postsParameters)
         {
-            var options = await GetAllOptions();
+            var options = await _repositoryManager.Option.GetAllOptions();
             var optionsDto = _mapper.Map<List<OptionDto>>(options);
-            return optionsDto;
+            return PagedList<OptionDto>.ToPagedList(optionsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         //Value------------------------------------------------
         public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
@@ -1271,27 +1271,27 @@ namespace BusinessLogic.ApiClasses
                 return valueDto;
             }
         }
-        public async Task<List<ValueDto>> GetListValues(int optionId)
+        public async Task<PagedList<ValueDto>> GetListValues(int optionId, PostsParameters postsParameters)
         {
             var value = await _repositoryManager.Value.GetValuesOPtionId(optionId);
-            if (value == null) { return null; }
-            else
-            {
-                var valueDto = _mapper.Map<List<ValueDto>>(value);
-                return valueDto;
-            }
+            if (value == null) { return null; } 
+            var valueDto = _mapper.Map<List<ValueDto>>(value);
+            return PagedList<ValueDto>.ToPagedList(valueDto, postsParameters.PageNumber, postsParameters.PageSize);
+            
         }
-        public async Task AddValue(int optionId ,CreateValueDto createValueDto , string ValueHexModel = "#000000")
+        public async Task<BussnessResultModel> AddValue(int optionId ,CreateValueDto createValueDto , string ValueHexModel = "#000000")
         {
             var option = await GetProductOption(optionId);
-            if (option != null)
+            if (option == null)
             {
-                var value = _mapper.Map<ProductOptionValue>(createValueDto);
-                value.OptionId = optionId;
-                value.ValueHexModel = (option.OptionType == "radio" ? "" : ValueHexModel);
-                _repositoryManager.Value.CreateValue(value);
-                await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"),false);
             }
+            var value = _mapper.Map<ProductOptionValue>(createValueDto);
+            value.OptionId = optionId;
+            value.ValueHexModel = (option.OptionType == "radio" ? "" : ValueHexModel);
+            _repositoryManager.Value.CreateValue(value);
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(value, _locService.GetLocalizedStringValue("successAdd"));
         }
         public async Task<BussnessResultModel> DeleteValueProduct(int valueId)
         {
@@ -1491,57 +1491,31 @@ namespace BusinessLogic.ApiClasses
         }
 
         //inventory------------------------------------------------
-        public async Task<List<Inventory>> GetInventoryInByProductAttr(int productId, string attribute)
-        {
-            return await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(productId, Convert.ToInt32(attribute));
-        }
-        public async Task<List<Inventory>> GetInventoryOutByProductAttr(int productId, string attribute)
-        {
-            return await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(productId, Convert.ToInt32(attribute));
-        }
-        public async Task<List<Inventory>> GetInStock(int productsId)
-        {
-            return await _repositoryManager.Inventory.GetOptionsByProductIdInStock(productsId);
-        }
-        public async Task<List<Inventory>> GetOutStock(int productsId)
-        {
-            return await _repositoryManager.Inventory.GetOptionsByProductIdOutStock(productsId);
-        }
-        public async Task<Inventory> GetInventoryByProduct(int productId)
-        {
-            return await _repositoryManager.Inventory.GetInventoryByProductId(productId);
-        }
-        public async Task<List<Inventory>> GetInventoryListByProduct(int productId)
-        {
-            return await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
-        }
-     
-        public async Task<BussnessResultModel> AddInventory(CreateInventoryDto createDto)
+       
+        public async Task<BussnessResultModel> AddInventory(int adminId , int storeId ,CreateInventoryDto createDto)
         {
             var inventory = _mapper.Map<Inventory>(createDto);
-
-            var item = await GetInStock(createDto.ProductId);
-            if (item != null)
+            var item = await _repositoryManager.Inventory.GetOptionsByProductIdInStock(createDto.ProductId);
+            if (item !=null)
             {
-                await DeleteInventory(createDto.ProductId, createDto.AttributesProductId.Value);
+               await DeleteInventory(createDto.ProductId, createDto.AttributesProductId);
             }
-            if (createDto.AdminId != null || createDto.VendorId != null)
-            {
-                var product = await _repositoryManager.Product.GetActiveProductById(createDto.ProductId, true);
-                product.Availability = product.Availability + createDto.Stock;
-                inventory.StockType = "in";
-                inventory.AddedDate = _util.EasternTime.Millisecond;
-                _repositoryManager.Inventory.AddInventory(inventory);
-            }
+            var product = await _repositoryManager.Product.GetProductById(createDto.ProductId, true);
+            product.Availability = product.Availability + createDto.Stock;
+            inventory.AdminId = adminId == null ? null : adminId;
+            inventory.VendorId = storeId == null ? null : storeId;
+            inventory.StockType = "in";
+            inventory.AddedDate = _util.EasternTime.Millisecond;
+            _repositoryManager.Inventory.AddInventory(inventory);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(inventory, _locService.GetLocalizedStringValue("successAdd"));
         }
-        public async Task DeleteInventory(int productId, int attr)
+        public async Task DeleteInventory(int productId, int? attr)
         {
-            var attrp = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(productId, attr);
-            if (attr == null)
+            var attrp = await _repositoryManager.Inventory.GetOptionsByProductIdInStock(productId);
+            if (attr != null)
             {
-                attrp = attrp.Where(r => r.AttributesProductId == null).ToList();
+                attrp = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(productId, attr.Value);
             }
             foreach (var t in attrp)
             {

@@ -24,7 +24,7 @@ namespace Contracts
         Task<List<Zone>> GetZonesByCountryId(int countryId);
         Task<Zone> GetZoneIdCountryId(int id, int countryId, bool trackChanges);
         Task<Zone> GetZoneId(int id, bool trackChanges);
-        Task<List<Zone>> GetAllZones();
+        Task<List<Zone>> GetAllZones(string search);
         void AddZone(int countryId ,Zone zone);
         void DeleteZone(Zone zone);
     }

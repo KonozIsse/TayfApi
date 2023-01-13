@@ -11,15 +11,12 @@ namespace Entities.DataTransferObjects
 {
     public class NotificationDto
     {
-        public int UserId { get; set; }
-        public Nullable<int> NotificationActionId { get; set; }
-        public NotificationStatus Status { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
         public string Body { get; set; }
-        public string BodyAr { get; set; }
-        public string SubjectAr { get; set; }
         public string Subject { get; set; }
-        public string Data { get; set; }
-        public Nullable<bool> IsRead { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public NotificationKey NotificationKey { get; set; }
     }
     public class CreateNotificationDto
     {
@@ -27,5 +24,6 @@ namespace Entities.DataTransferObjects
         public string BodyAr { get; set; }
         public string SubjectAr { get; set; }
         public string Subject { get; set; }
+        public List<int> IdUsers { get; set; } 
     }
 }

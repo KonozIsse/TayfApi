@@ -17,6 +17,15 @@ namespace Entities.DataTransferObjects
         public DateTime CreatedAt { get; set; }
         public int Total { get; set; }
     }
+    public class CustomerDto
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public Status Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
     public class CreateCustomerDto
     {
         public string FirstName { get; set; }

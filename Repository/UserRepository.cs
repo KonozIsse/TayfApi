@@ -22,12 +22,21 @@ namespace Repository
          => await FindByCondition(c => c.Id.Equals(userId) && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
         public async Task<User> GetCustomerId (int customerId, bool trackChanges)
         => await FindByCondition(c => c.Id == customerId && c.RoleId == 2, trackChanges).SingleOrDefaultAsync();
-        public async Task<List<User>> GetCustomerTotal (string search, bool trackChanges)
-        => await FindByCondition(c => c.RoleId == 2 && c.FirstName.Contains(search) || c.Email.Contains(search)|| c.PhoneNumber.Contains(search), trackChanges).ToListAsync(); 
+        public async Task<List<User>> GetCustomers( bool trackChanges)
+        => await FindByCondition(c => c.RoleId == 2, trackChanges).OrderByDescending(c => c.CreatedAt)
+            .Include(c => c.DefaultAddress).ToListAsync(); 
         public async Task<List<User>> GetVendorTotal (string search, bool trackChanges)
         => await FindByCondition(c => c.RoleId == 3 && c.FirstName.Contains(search) || c.Email.Contains(search)|| c.PhoneNumber.Contains(search), trackChanges).ToListAsync();
-        public async Task<List<User>> GetCustomers (bool trackChanges)
-         => await FindByCondition(c => c.RoleId == 2 , trackChanges).OrderByDescending(c=>c.CreatedAt).Include(c=>c.DefaultAddress).ToListAsync();
+        public async Task<List<User>> GetAllCustomers(string search, bool trackChanges)
+        {
+            var customers = FindByCondition(c => c.RoleId == 2, trackChanges);
+            if (!string.IsNullOrEmpty(search))
+            {
+                customers.Where(c => c.FirstName.Contains(search) || c.Email.Contains(search)
+                || c.PhoneNumber.Contains(search)|| c.DefaultAddress.AddressTitle.Contains(search));
+            }
+            return await customers.OrderByDescending(c => c.CreatedAt).Include(c => c.DefaultAddress).ToListAsync();
+        }
         public async Task<User> GetUserDefaultAddress(int userId, int defaultAddressId)
         => await FindByCondition(c => c.Id.Equals(userId) && c.DefaultAddressId == defaultAddressId, false).SingleOrDefaultAsync();
         public async Task<User> VerifiedCodeUser(int id, int code ,bool trackChanges)
@@ -62,8 +71,16 @@ namespace Repository
         // Store 3--------------------------------------------------
         public async Task<User> GetStore(int storeId, bool trackChanges)
         => await FindByCondition(c => c.Id == storeId && c.RoleId == 3 && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
-        public async Task<IEnumerable<User>> GetStores(bool trackChanges)
-        => await FindByCondition(c => c.RoleId == 3, trackChanges).Include(c=>c.Products).Include(c => c.Addresses).ToListAsync();
+        public async Task<IEnumerable<User>> GetSearchStores(string search)
+        {
+            var stores = FindByCondition(c => c.RoleId == 3, false);
+            if (string.IsNullOrEmpty(search))
+            {
+                stores.Where(c => c.FirstName.Contains(search));
+            }
+            return await stores.Include(c => c.Products).Include(c => c.Addresses).ToListAsync();
+        }
+
         public async Task<IEnumerable<User>> GetAllStores (bool trackChanges)
         => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, trackChanges)
             .Include(c=>c.Addresses).Include(c=>c.StoreOrders).OrderByDescending(c=>c.CreatedAt).ToListAsync();

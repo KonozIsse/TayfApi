@@ -19,7 +19,14 @@ namespace Repository
 
         }
         public async Task<IEnumerable<TaxRate>> GetTaxRates(string seach)
-         => await FindByCondition(c=>c.Zone.ZoneName.Contains(seach),false).OrderByDescending(x => x.CreatedAt).ToListAsync();
+        {
+            var taxes = FindAll(false);
+            if (!string.IsNullOrEmpty(seach))
+            {
+                taxes.Where(c => c.Zone.ZoneName.Contains(seach)|| c.Description.Contains(seach));
+            }
+           return await taxes.OrderByDescending(x => x.CreatedAt).Include(c=>c.TaxClass).Include(c=>c.Zone).ToListAsync();
+        }
         public async Task<TaxRate> GetTaxRateId(int id , bool trackChanges)
          => await FindByCondition(r => r.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<TaxRate> GetTaxRateIdByZoneId (int zoneId, bool trackChanges)

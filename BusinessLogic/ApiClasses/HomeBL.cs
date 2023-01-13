@@ -8,7 +8,7 @@ using Contracts;
 using BussnessResultModel = Entities.Exception.BussnessResultModel;
 using Entities.Exception;
 using Entities.RequestFeatures;
-using System.Xml.Linq;
+using Entities.Models.Enum;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -73,7 +73,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<string> GetLogo()
         {
-            var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo");
+            var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo", false);
             return await _imageBL.GetImageOriginal(logo.Value);
         }
         //Banner------------------------------------------------
@@ -465,54 +465,40 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(currency, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Notification------------------------------------------------
-        public int GetCountNotify(int userId)
-        {
-            return _repositoryManager.Notification.GetNotificationCountUser(userId);
-        }
-        public async Task ReadNotification(int userId)
-        {
-            var notifications = await _repositoryManager.Notification.GetNotificationsToUserId(userId, true);
-            for (int i = 0; i < notifications.Count(); i++)
-            {
-                notifications[i].IsRead = true;
-                await _repositoryManager.SaveAsync();
-            }
-        }
-        public async Task<BussnessResultModel> CreateNotification(CreateNotificationDto create, int[] user_ids = null)
+        
+        public async Task<BussnessResultModel> CreateNotification(CreateNotificationDto create)
         {
            var notification= _mapper.Map<Notification>(create);
-            var users =  await _userBL.GetCustomers();
-            if (user_ids.FirstOrDefault() == 0)
+            var users =  await _repositoryManager.User.GetCustomers(false);
+            var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.GeneralNotfication);
+            if (create.IdUsers.First() == 0)
             {
                 foreach (var u in users)
                 {
-                    if (u != null)
-                    {
-                        notification.UserId = u.Id;
-                        notification.IsRead = false;
-                        notification.NotificationActionId = 0;
-                        notification.Status = Entities.Models.Enum.NotificationStatus.New;
-                        _repositoryManager.Notification.CreateNotification(notification);
-                    }
-
+                    notification.UserId = u.Id;
+                    notification.IsRead = false;
+                    notification.NotificationActionId = action.Id;
+                    notification.Status = NotificationStatus.New;
+                    _repositoryManager.Notification.CreateNotification(notification);
                 }
             }
-            if (user_ids.Count() > 0 && users != null)
+            if (create.IdUsers.First() != 0 && users != null)
             {
-                foreach (var f in user_ids)
+                foreach (var f in create.IdUsers)
                 {
-                    var user = _userBL.GetUserById(f);
+                    var user = await _userBL.GetUserById(f);
                     if (user != null)
                     {
                         notification.UserId = f;
                         notification.IsRead = false;
-                        notification.NotificationActionId = 0;
-                        notification.Status = Entities.Models.Enum.NotificationStatus.New;
+                        notification.NotificationActionId = action.Id;
+                        notification.Status = NotificationStatus.New;
                         _repositoryManager.Notification.CreateNotification(notification);
                     }
                 }
             }
             await _repositoryManager.SaveAsync();
+
             return new BussnessResultModel(notification, _locService.GetLocalizedStringValue("successAdd"));
         } 
         public async Task<BussnessResultModel> DeleteNotification(int id)
@@ -526,19 +512,30 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(notification, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task<List<Notification>> GetNotifications(int PageId, int rows)
+        public async Task<List<NotificationDto>> GetNotifications(int PageId)
         {
-            return await _repositoryManager.Notification.GetNotificationsPage(PageId, rows);
-        }
-        public int GetNotificationsCount()
-        {
-            return _repositoryManager.Notification.GetNotificationsCount();
+            var notfis = await _repositoryManager.Notification.GetNotificationsPage(PageId,15);
+            //var dto = _mapper.Map<List<NotificationDto>>(notfis);
+            var dto =  new List<NotificationDto>();
+            foreach(var item in notfis)
+            {
+                dto.Add(new NotificationDto
+                {
+                    Id = item.Id,
+                    Name = item.User.FullName,
+                    Subject = item.Subject,
+                    Body = item.Body,
+                    NotificationKey = item.NotificationAction.NotificationKey,
+                    CreatedAt = item.CreatedAt
+                });
+            }
+            return dto;
         }
         //setting------------------------------------------------------
 
         public async Task<Setting> GetSettingKey(string name)
         {
-            return await _repositoryManager.Setting.GetSettingByValue(name);
+            return await _repositoryManager.Setting.GetSettingByValue(name,false);
         }
         public async Task<IEnumerable<Setting>> GetAllSettings()
         {

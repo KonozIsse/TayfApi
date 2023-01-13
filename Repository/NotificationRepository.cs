@@ -28,7 +28,8 @@ namespace Repository
         public async Task<List<Notification>> GetNotificationsPage(int PageId, int rows)
         {
             int SkipCount = rows * (PageId - 1);
-            return await FindAll(false).Skip(SkipCount).Take(rows).OrderByDescending(c => c.Id).ToListAsync();
+            return await FindAll(false).Skip(SkipCount).Take(rows)
+                .Include(c=>c.User).Include(c=>c.NotificationAction).OrderByDescending(c => c.Id).ToListAsync();
         }
         public async Task<Notification> FindNotificationId (int id, bool trackChanges)
         => await FindByCondition(c=>c.Id == id, trackChanges).FirstOrDefaultAsync();

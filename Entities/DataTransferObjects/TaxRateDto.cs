@@ -12,11 +12,10 @@ namespace Entities.DataTransferObjects
     public class TaxRateDto
     {
         public int Id { get; set; }
-        public Status IsStatus { get; set; }
         public decimal Tax_Rate { get; set; }
-        public int TaxClassId { get; set; }
-        public int ZoneId { get; set; } 
-        public int? StoreId { get; set; }
+        public string TaxClassTitle { get; set; }
+        public string ZoneName { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     public class CreateTaxRateDto
     {

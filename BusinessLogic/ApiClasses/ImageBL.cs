@@ -89,6 +89,7 @@ namespace BusinessLogic.ApiClasses
                 var name =  _imageUploadServices.Upload(file/*, "original/" + name*/);
 
                 image.Name = name;
+                image.IsStatus = Status.Active;
                 image.VendId = storeId;
 
                 var set = await  _repositoryManager.Setting.GetAllSettings(false);
@@ -239,7 +240,6 @@ namespace BusinessLogic.ApiClasses
                     foreach (var t in cats)
                     {
                         _repositoryManager.ImageSetting.DeleteImageSetting(t);
-                        _imageUploadServices.DeleteImage(t.Path);
                     }
                     var image = await _repositoryManager.Image.GetImage(c, false);
                     _repositoryManager.Image.DeleteImage(image);
@@ -267,6 +267,7 @@ namespace BusinessLogic.ApiClasses
                     }
 
                 }
+                image.IsStatus = Status.NotActive;
                 _repositoryManager.Image.DeleteImage(image);
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(image , _locService.GetLocalizedStringValue("successDelete"));
@@ -458,27 +459,32 @@ namespace BusinessLogic.ApiClasses
             var images =  await _repositoryManager.ImageSetting.GetImageSettingId(settingId , false);
             return images;
         }
-        public async Task EditMediaSetting(int thh, int thw, int mh, int mw, int lh, int lw)
+        public async Task<BussnessResultModel> EditMediaSetting(string thh, string thw, string mh, string mw, string lh, string lw)
         {
 
-            var settingImage = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_height");
-            settingImage.Value = thh + "";
-            var settingImage1 = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_width");
-            settingImage1.Value = thw + "";
-            var settingImage2 = await _repositoryManager.Setting.GetSettingByValue("Medium_height");
-            settingImage2.Value = mh + "";
-            var itemFromDB4 = await _repositoryManager.Setting.GetSettingByValue("Medium_width");
-            itemFromDB4.Value = mw + "";
-            var itemFromDB5 = await _repositoryManager.Setting.GetSettingByValue("Large_height");
-            itemFromDB5.Value = lh + "";
-            var itemFromDB6 = await _repositoryManager.Setting.GetSettingByValue("Large_width");
-            itemFromDB6.Value = lw + "";
+            var settingImage = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_height", true);
+            settingImage.Value = thh ;
+            var settingImage1 = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_width", true);
+            settingImage1.Value = thw;
+            var settingImage2 = await _repositoryManager.Setting.GetSettingByValue("Medium_height", true);
+            settingImage2.Value = mh;
+            var itemFromDB4 = await _repositoryManager.Setting.GetSettingByValue("Medium_width", true);
+            itemFromDB4.Value = mw ;
+            var itemFromDB5 = await _repositoryManager.Setting.GetSettingByValue("Large_height", true);
+            itemFromDB5.Value = lh ;
+            var itemFromDB6 = await _repositoryManager.Setting.GetSettingByValue("Large_width", true);
+            itemFromDB6.Value = lw ;
 
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(settingImage, _locService.GetLocalizedStringValue("successSave"))??
+                 new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"));
+
         } 
-        public async Task<IEnumerable<Setting>> GetMediaSetting()
+        public async Task<IEnumerable<SettingDto>> GetMediaSetting()
         {
-            return await _repositoryManager.Setting.GetMediaSetting();
+            var settings=  await _repositoryManager.Setting.GetMediaSetting();
+            var settingsDto = _mapper.Map<List<SettingDto>>(settings);
+            return settingsDto;
         }
     }
 }

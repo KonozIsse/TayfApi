@@ -14,6 +14,8 @@ namespace Entities.Models.Enum
         RejectOrder,
         ReceiveOrder,
         CancelOrder,
-        DeactiveAccount
+        DeactiveAccount,
+        DeleteAccount,
+        GeneralNotfication
     }
 }

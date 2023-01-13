@@ -8,23 +8,23 @@ namespace ControlPanel.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ZoneController : MyBaseController
+    public class TaxesController : MyBaseController
     {
-        public ZoneController(IServiceProvider provider) : base(provider)
+        public TaxesController(IServiceProvider provider) : base(provider)
         {
         }
         [HttpGet("get")]
-        public async Task<IActionResult> GetAllZones(string search, [FromQuery] PostsParameters postsParameters)
+        public async Task<IActionResult> GetTaxes(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _locationTaxBL.GetAllZones(search,GetLanguage(), postsParameters);
+            var result = await _locationTaxBL.GetTaxes(search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateZone(CreateZoneDto create)
+        public async Task<IActionResult> CreateTax(CreateTaxClassDto create)
         {
-            var result = await _locationTaxBL.AddZone(create);
+            var result = await _locationTaxBL.AddTaxClass(GetStoreId(),create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -35,9 +35,9 @@ namespace ControlPanel.Controllers
             }
         }
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateZone(UpdateZoneDto update)
+        public async Task<IActionResult> UpdateTax(UpdateTaxClassDto update)
         {
-            var result = await _locationTaxBL.EditZone(update);
+            var result = await _locationTaxBL.EditTaxClass(GetStoreId(),update);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -49,9 +49,9 @@ namespace ControlPanel.Controllers
         }
 
         [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteZone(int id)
+        public async Task<IActionResult> DeleteTax(int id)
         {
-            var result = await _locationTaxBL.DeleteZone(id);
+            var result = await _locationTaxBL.DeleteTaxClass(id);
             if (!result.Success)
             {
                 return BadRequest(result.Message);

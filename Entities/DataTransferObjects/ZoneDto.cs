@@ -16,13 +16,14 @@ namespace Entities.DataTransferObjects
         public string ZoneName { get; set; }
         public string ZoneCode { get; set; }
         public int CountryId { get; set; }
+        public string CountryName { get; set; }
     }
     public class CreateZoneDto
     {
         public string ZoneName { get; set; } 
         public string ZoneNameAr { get; set; }
         public string ZoneCode { get; set; }
-        public int CountryId { get; set; }
+        public int CountryId { get; set; } 
     }
     public class UpdateZoneDto : CreateZoneDto
     {

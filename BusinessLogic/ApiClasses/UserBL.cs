@@ -14,6 +14,8 @@ using Entities.Models.Enum;
 using Entities.Exception;
 using BusinessLogic.Services;
 using System.Web.Helpers;
+using Entities.RequestFeatures;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -158,15 +160,16 @@ namespace BusinessLogic.ApiClasses
             }
         }
         //Store------------------------------------------------
+        public async Task<PagedList<StoreDto>> GetAllStores(string search, PostsParameters postsParameters)
+        {
+            var stores = await _repositoryManager.User.GetSearchStores(search);
+            var StoreDto = _mapper.Map<List<StoreDto>>(stores);
+            return PagedList<StoreDto>.ToPagedList(StoreDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
         public async Task<List<StoreDto>> GetStores()
         {
             var stores = await _repositoryManager.User.GetAllStores(false);
             var storesDto = _mapper.Map<List<StoreDto>>(stores);
-           // var storeDto = storesDto.First();
-            //foreach (var store in stores)
-            //{
-            //    storeDto.Avater = await _imageBL.GetImageThumbnail(store.Avater);
-            //}
             return storesDto;
         } 
         public async Task<IEnumerable<User>> GetStoreList(int PageId = 1, int rows = 10)
@@ -300,13 +303,15 @@ namespace BusinessLogic.ApiClasses
             }
             return adminsDto;
         }
-        public async Task<List<User>> GetCustomers()
+        public async Task<PagedList<CustomerDto>> GetCustomers(string search, PostsParameters postsParameters)
         {
-            return await _repositoryManager.User.GetCustomers(false);
+            var customers = await _repositoryManager.User.GetAllCustomers(search ,false);
+            var customersDto = _mapper.Map<List<CustomerDto>>(customers);
+            return PagedList<CustomerDto>.ToPagedList(customersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<UserTotal>> GetCustomerTotal(string search)
         {
-            var customers = await _repositoryManager.User.GetCustomerTotal(search, false);
+            var customers = await _repositoryManager.User.GetAllCustomers(search, false);
             
             var customerTotal = new List<UserTotal>();
             foreach (var x in customers)
@@ -534,6 +539,66 @@ namespace BusinessLogic.ApiClasses
             _emailSender.SendEmail(message);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(user);
+        }
+        public async Task<BussnessResultModel> DeleteCustomer(int id)
+        {
+            var user = await _repositoryManager.User.GetCustomerId(id, false);
+            if(user != null)
+            {
+                var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(id);
+                if (addresses != null)
+                {
+                    foreach (var address in addresses)
+                    {
+                        _repositoryManager.Address.DeleteAddress(address);
+                    }
+                }
+                var orders = await _repositoryManager.Order.GetOrdersToCustomer(id);
+                if (orders != null)
+                {
+                    foreach (var order in orders)
+                    {
+                        _repositoryManager.Order.DeleteOrder(order);
+                    }
+                }
+                var devices = await _repositoryManager.Device.GetDevicesUserId(id, false);
+                if (devices != null)
+                {
+                    foreach (var device in devices)
+                    {
+                        _repositoryManager.Device.DeleteDevice(device);
+                    }
+                }
+                var notifications = await _repositoryManager.Notification.GetNotificationsToUserId(id, false);
+                if (notifications != null)
+                {
+                    foreach (var notify in notifications)
+                    {
+                        _repositoryManager.Notification.DeleteNotification(notify);
+                    }
+                }
+                _repositoryManager.User.DeleteUser(user);
+
+                var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.DeleteAccount);
+                action.Template = action.Template.Replace("{userName}", user.FullName);
+                Notification notification = new()
+                {
+                    Body = action.Template,
+                    UserId = id,
+                    NotificationActionId = action.Id,
+                    Status = NotificationStatus.New,
+                    Subject = action.Subject,
+                    IsRead = false
+                };
+                _repositoryManager.Notification.CreateNotification(notification);
+
+                await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successDelete") );
+            }
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
         }
         public async Task<BussnessResultModel> RemoveUserData(int id)
         {

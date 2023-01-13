@@ -24,8 +24,6 @@ namespace Entities.DataTransferObjects
     public class CreateInventoryDto
     {
         public int Stock { get; set; }
-        public int? VendorId { get; set; }
-        public int? AdminId { get; set; }
         public int ProductId { get; set; }
         public decimal TotalPurchasedPrice { get; set; }
         public string PurchaseCode { get; set; }

@@ -8,23 +8,23 @@ namespace ControlPanel.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ZoneController : MyBaseController
+    public class ManageVendorsController : MyBaseController
     {
-        public ZoneController(IServiceProvider provider) : base(provider)
+        public ManageVendorsController(IServiceProvider provider) : base(provider)
         {
         }
         [HttpGet("get")]
-        public async Task<IActionResult> GetAllZones(string search, [FromQuery] PostsParameters postsParameters)
+        public async Task<IActionResult> GetAllStores(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _locationTaxBL.GetAllZones(search,GetLanguage(), postsParameters);
+            var result = await _userBL.GetAllStores(search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateZone(CreateZoneDto create)
+        public async Task<IActionResult> CreateStore(CreateStoreDto create)
         {
-            var result = await _locationTaxBL.AddZone(create);
+            var result = await _userBL.AddStore(create,GetLanguage());
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -35,9 +35,9 @@ namespace ControlPanel.Controllers
             }
         }
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateZone(UpdateZoneDto update)
+        public async Task<IActionResult> UpdateStore(UpdateStoreDto update)
         {
-            var result = await _locationTaxBL.EditZone(update);
+            var result = await _userBL.UpdateStore(update);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -49,9 +49,9 @@ namespace ControlPanel.Controllers
         }
 
         [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteZone(int id)
+        public async Task<IActionResult> DeleteStore(int id)
         {
-            var result = await _locationTaxBL.DeleteZone(id);
+            var result = await _userBL.DeleteStore(id);
             if (!result.Success)
             {
                 return BadRequest(result.Message);
