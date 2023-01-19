@@ -76,27 +76,20 @@ namespace ControlPanel.Controllers
             return user;
 
         }
-        [NonAction]
-        public int GetCustomerId()
-        {
-            var user = GetCurrentUser();
-            user.RoleId = 2;
-            return user.Id;
-        }
+       
         [NonAction]
         public int GetStoreId()
         {
             var user = GetCurrentUser();
-            user.RoleId = 3;
             return user.Id;
         }
         [NonAction]
-        public int GetAdminId()
+        public int GetCurrentUserId()
         {
             var user = GetCurrentUser();
-            user.RoleId = 1;
             return user.Id;
         }
+     
         [NonAction]
         public Currency GetCurrentCurrency()
         {

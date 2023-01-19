@@ -6,6 +6,7 @@ using Entities.DataTransferObjects;
 using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enum;
+using Entities.Models.Enums;
 using Entities.RequestFeatures;
 using Entities.ViewModel;
 using MailKit.Search;
@@ -45,58 +46,7 @@ namespace BusinessLogic.ApiClasses
         }
         //Order------------------------------------------------
 
-        public async Task<List<Order>> GetPendOrders()
-        {
-            return await _repositoryManager.Order.GetPendingOrders();
-        }
-        public async Task<List<Order>> GetsAllOrders()
-        {
-            return await _repositoryManager.Order.GetsAllTransactionOrders();
-        }
-        public async Task<Order> GetByHashedCsp( string ssp)
-        {
-            return await _repositoryManager.Order.GetByHashedCsp(ssp);
-        }
-        public async Task<List<Order>> GetPendOrdersByVendorId(int vendorId)
-        {
-            return await _repositoryManager.Order.GetPendOrdersByStore(vendorId);
-        }
-        public async Task<List<Order>> GetCompOrders()
-        {
-            return await _repositoryManager.Order.GetCompleteOrders();
-        }
-        public async Task<List<Order>> GetCompOrdersByVendorId(int vendorId)
-        {
-            return await _repositoryManager.Order.GetCompleteOrdersByStore(vendorId);
-        }
-        public async Task<List<Order>> GetCancelOrders()
-        {
-            return await _repositoryManager.Order.GetCancelOrders();
-        }
-        public async Task<List<Order>> GetCancelOrdersByVendorId(int vendorId)
-        {
-            return await _repositoryManager.Order.GetCancelOrdersByStore(vendorId);
-        }
-        public int GetAllOrdersCount()
-        {
-            return  _repositoryManager.Order.GetAllOrdersCount();
-        }
-        public int GetVendorOrdersCount(int vendorId)
-        {
-            return _repositoryManager.Order.GetOrdersByVendor(vendorId);
-        }
-        public async Task<List<Order>> GetOrders()
-        {
-            return await _repositoryManager.Order.GetAllOrders();
-        }
-        public async Task<Order> GetOrderId(int id )
-        {
-            return await _repositoryManager.Order.GetOrderId(id,false);
-        }
-        public async Task<Order> OrderByIdAndStatus(int orderId, int statusId)
-        {
-            return await _repositoryManager.Order.GetOrderIdAndStatusId(orderId , statusId);
-        }
+       
         public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
         {
             decimal total = 0;
@@ -657,7 +607,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> DeleteOrder(int orderId)
         {
-            var order = await GetOrderId(orderId);
+            var order = await _repositoryManager.Order.GetOrderId(orderId, false);
             if (order.OrderStatusId != 1)
             {
                 return new BussnessResultModel(null, "Cann't Delete This Order", false);
@@ -723,10 +673,36 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
         }
-        public async Task<List<OrderDto>> GetAllOrders()
+        public async Task<OrderDto> GetOrder(int id)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id , false);
+            var orderDto = _mapper.Map<OrderDto>(order);
+            var store = await _repositoryManager.User.GetStoreId(order.StoreId);
+            if (store != null)
+            {
+                var products = await _repositoryManager.Product.GetProductsTOStoreId(store.Id);
+                var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
+                var currency = await _repositoryManager.Currency.GetCurrency(order.CurrencyId, false);
+                var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
+                var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+
+                orderDto.CustomerName = customer.FullName;
+                orderDto.Currency = currency.Symbol;
+                orderDto.CustomerEmail = customer.Email;
+                orderDto.CustomerPhone = customer.PhoneNumber;
+                orderDto.StoreName = (store.FullName);
+                orderDto.StoreEmail = store.Email;
+                orderDto.StorePhone = store.PhoneNumber;
+                orderDto.DeliveryTimeName = time.Time ?? null;
+                orderDto.OrderStatusName = states.StatusName ?? null;
+                orderDto.CountProduct = products.Count();
+            }
+            return orderDto;
+        }
+        public async Task<PagedList<OrderDto>> GetAllOrders( string search ,PostsParameters postsParameters)
         {
             var ordersDto = new List<OrderDto>();
-            var orders = await _repositoryManager.Order.GetAllOrders();
+            var orders = await _repositoryManager.Order.GetAllOrders(search);
             foreach (var order in orders)
             {
                 var store = await _repositoryManager.User.GetStoreId(order.StoreId);
@@ -734,20 +710,18 @@ namespace BusinessLogic.ApiClasses
                 {
                     var products = await _repositoryManager.Product.GetProductsTOStoreId(store.Id);
                     var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
-                      
+                    var currency = await _repositoryManager.Currency.GetCurrency(order.CurrencyId, false);
                     var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
                     var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
 
                     ordersDto.Add(new OrderDto
                     {
                     Id = order.Id,
-                    CustomerId = order.CustomerId,
                     CustomerName = customer.FullName,
-                    Currency = order.Currency.Symbol,
-                    CustomerEmail = (customer != null ? customer.Email : ""),
-                    CustomerPhone = (customer != null ? customer.PhoneNumber : ""),
-                    StoreId = store.Id,
-                    StoreName = (store != null ? store.FullName : ""),
+                    Currency = currency.Symbol,
+                    CustomerEmail = customer.Email,
+                    CustomerPhone =  customer.PhoneNumber,
+                    StoreName = ( store.FullName),
                     StoreEmail = store.Email,
                     StorePhone = store.PhoneNumber,
                     AddressId = order.AddressId,
@@ -764,7 +738,7 @@ namespace BusinessLogic.ApiClasses
                 });
              }
             }
-            return ordersDto;
+            return PagedList<OrderDto>.ToPagedList(ordersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<OrderDto>> GetOrderCustomer(int CustomerId, int storeId = 0)
         {
@@ -861,7 +835,7 @@ namespace BusinessLogic.ApiClasses
         }
 
         //Coupon------------------------------------------------
-        public async Task<BussnessResultModel> AddCoupon(CreateCouponDto createDto, int storeId = 0 ,int adminId = 0)
+        public async Task<BussnessResultModel> AddCoupon(CreateCouponDto createDto, int userId)
         {
             var IsExists = _repositoryManager.Coupon.CheckExistCoupon(createDto.CouponCode);
             if (IsExists)
@@ -869,10 +843,18 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"), false);
             }
             var coupon = _mapper.Map<Coupon>(createDto);
-            coupon.StoreId = storeId == 0 ? null : storeId;
-            coupon.AdminId = adminId == 0 ? null : adminId;
-           
-            
+
+            var user = await _repositoryManager.User.GetUserId(userId, false);
+            if (user.UserType == UserType.Admin)
+            {
+                coupon.AdminId = userId;
+            }
+            else
+            {
+                coupon.StoreId = userId;
+            }
+
+
             if ((createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product") && (createDto.Products == null || createDto.Products.Count() == 0))
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue(" Please Choose Products"),false);
@@ -899,15 +881,22 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task<BussnessResultModel> UpdateCoupon(UpdateCouponDto updateDto, int storeId = 0, int adminId = 0)
+        public async Task<BussnessResultModel> UpdateCoupon(UpdateCouponDto updateDto, int userId )
         {
             var coupon = await _repositoryManager.Coupon.GetCouponId(updateDto.Id, true);
             if(coupon == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"),false);
             }
-            coupon.StoreId = storeId == 0 ? null : storeId;
-            coupon.AdminId = adminId == 0 ? null : adminId;
+            var user = await _repositoryManager.User.GetUserId(userId, false);
+            if (user.UserType == UserType.Admin)
+            {
+                coupon.AdminId = userId;
+            }
+            else
+            {
+                coupon.StoreId = userId;
+            }
             if ((updateDto.DiscountType == "fixed_product" || updateDto.DiscountType == "percent_product"))
             {
                 if (updateDto.Products != null && updateDto.Products.Count() > 0)
@@ -926,14 +915,22 @@ namespace BusinessLogic.ApiClasses
             var couponsDto = _mapper.Map<List<CouponDto>>(coupons);
             return PagedList<CouponDto>.ToPagedList(couponsDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
-        public async Task<Coupon> GetCoupon(int id)
-        {
-            return await _repositoryManager.Coupon.GetCouponId(id , false);
-        }
+       
         //OrderStatus------------------------------------------------
-        public async Task<List<OrderStatus>> GetOrderStatus()
+        public async Task<PagedList<OrderStatusDto>> GetOrderStatus(string lang  , PostsParameters postsParameters)
         {
-            return await _repositoryManager.OrderStatus.GetOrderStatusesList(false);
+            var orderStatuses = await _repositoryManager.OrderStatus.GetOrderStatusesList(false);
+            var model = new List<OrderStatusDto>();
+            foreach(var status in orderStatuses)
+            {
+                model.Add(new OrderStatusDto
+                {
+                    Id = status.Id,
+                    StatusName = lang == "en" ? status.StatusName : status.StatusNameAr,
+                    option = lang == "en" ? (status.Option == 1 ? "Yes" : "No") : (status.Option == 1 ? "نعم" : "لا")
+                });
+            }
+            return PagedList<OrderStatusDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> EditOrderStatus(UpdateOrderStatusDto update)
         {
@@ -942,7 +939,7 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink") , false); 
             }
-            if (update.StatusesNames == null)
+            if (update.StatusName == null)
             {
                 return new BussnessResultModel(status, _locService.GetLocalizedStringValue("enterallfiled") , false); 
             }
@@ -951,9 +948,11 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(status, _locService.GetLocalizedStringValue("successSave"));
         }
         //Payment------------------------------------------------
-        public async Task<List<PaymentMethods>> GetPayments()
+        public async Task<PagedList<PaymentDto>> GetAllPayments(string search, PostsParameters postsParameters)
         {
-            return await _repositoryManager.PaymentMethods.GetPaymentMethods();
+            var payments =  await _repositoryManager.PaymentMethods.GetPaymentMethods(search);
+            var paymentsDto = _mapper.Map<List<PaymentDto>>(payments);
+            return PagedList<PaymentDto>.ToPagedList(paymentsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<PaymentMethods>> GetPaymentsByVendor(int vendorId)
         {

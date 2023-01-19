@@ -630,7 +630,7 @@ namespace BusinessLogic.ApiClasses
                 LastName = usr.LastName,
                 Phone = usr.PhoneNumber,
                 DisCount = GetValueCodeCoupon(CustomerId, coupon, code).Result ?? null,
-                Payment = await _repositoryManager.PaymentMethods.GetPaymentMethods() ?? null,
+                Payment = await _repositoryManager.PaymentMethods.GetPaymentMethods("") ?? null,
                 Countries = await _locationTaxBL.GetCountriesForWeb() ?? null,
                 Cart = await GetCarts(storeId, CustomerId, code) ?? null,
                 Tax = await _locationTaxBL.GetTax(CustomerId) == 0 ? 0 : await _locationTaxBL.GetTax(CustomerId),

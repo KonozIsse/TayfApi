@@ -7,6 +7,7 @@ using Entities.Models.Enums;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Repository
 {
@@ -16,8 +17,15 @@ namespace Repository
         {
 
         }
-        public async Task<List<PaymentMethods>> GetPaymentMethods()
-         => await FindByCondition(r => r.IsStatus == Status.Active, false).ToListAsync();
+        public async Task<List<PaymentMethods>> GetPaymentMethods(string search)
+        {
+            var payments = FindByCondition(r => r.IsStatus == Status.Active, false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                payments.Where(c => c.PaymentMethod.Contains(search));
+            }
+            return await payments.ToListAsync();
+        }
         public async Task<List<PaymentMethods>> GetPaymentsByVendor(int vendorId)
          => await FindByCondition(r => r.IsStatus == Status.Active && r.StoreId == vendorId, false).ToListAsync();
     }

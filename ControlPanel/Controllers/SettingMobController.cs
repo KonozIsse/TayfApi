@@ -1,6 +1,6 @@
 ﻿using Entities.DataTransferObjects;
 using Entities.RequestFeatures;
-using Entities.Models.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -8,23 +8,23 @@ namespace ControlPanel.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CouponsController : MyBaseController
+    public class SettingMobController : MyBaseController
     {
-        public CouponsController(IServiceProvider provider) : base(provider)
+        public SettingMobController(IServiceProvider provider) : base(provider)
         {
         }
         [HttpGet("get")]
-        public async Task<IActionResult> GetAllCoupons(string search, [FromQuery] PostsParameters postsParameters)
+        public async Task<IActionResult> GetSliderMobile([FromQuery] PostsParameters postsParameters)
         {
-            var result = await _orderBL.GetAllCoupons(search,postsParameters);
+            var result = _homeBL.GetSliderMobile(GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-
         [HttpPost("create")]
-        public async Task<IActionResult> CreateCoupon(CreateCouponDto create)
+        public async Task<IActionResult> CreateSlider(CreateSliderDto create)
         {
-            var result = await _orderBL.AddCoupon(create, GetCurrentUserId());
+           
+            var result = await _homeBL.AddSliderMobile(GetStoreId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -35,9 +35,9 @@ namespace ControlPanel.Controllers
             }
         }
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateCoupon(UpdateCouponDto update)
+        public async Task<IActionResult> UpdateSlider(UpdateSliderDto update)
         {
-            var result = await _orderBL.UpdateCoupon(update, GetCurrentUserId());
+            var result = await _homeBL.UpdateSlider(GetStoreId(), update);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -49,9 +49,9 @@ namespace ControlPanel.Controllers
         }
 
         [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteCoupon(int id)
+        public async Task<IActionResult> DeleteSlide(int id)
         {
-            var result = await _orderBL.DeleteCoupon(id);
+            var result = await _homeBL.DeleteSlide(id);
             if (!result.Success)
             {
                 return BadRequest(result.Message);

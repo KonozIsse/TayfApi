@@ -36,8 +36,15 @@ namespace Repository
         }
         public async Task<StaticPages> GetPage(int id, bool trackChanges)
          => await FindByCondition(c => c.Id.Equals(id), trackChanges).FirstOrDefaultAsync();
-        public async Task<IEnumerable<StaticPages>> GetAllPages(bool trackChanges)
-        => await FindAll(trackChanges).ToListAsync();
+        public async Task<IEnumerable<StaticPages>> GetAllPages(string search ,bool trackChanges)
+        {
+            var pages = FindAll(trackChanges);
+            if (!string.IsNullOrEmpty(search))
+            {
+                pages.Where(c => c.Title.Contains(search));
+            }
+            return await pages.ToListAsync();
+        }
     }
     public class ServicesRepository : RepositoryBase<Service>, IServicesRepository
     {
@@ -66,9 +73,11 @@ namespace Repository
         {
 
         }
-        public List<Sliders> GetSlidersForWeb()
-        =>  FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Web, false)
-                .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToList();
+        public List<Sliders> GetSlidersForWeb(string search)
+        {
+            var sliders = FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Web, false);
+           return  sliders.Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToList();
+        }
         public List<Sliders> GetSlidersForMobile()
       =>  FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Mobile, false)
                 .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToList();

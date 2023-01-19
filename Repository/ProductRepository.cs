@@ -38,7 +38,7 @@ namespace Repository
         public async Task<Product> GetProductStore( int productId ,int storeId )
        => await FindByCondition(c => c.Id == productId && c.StoreId == storeId && c.IsStatus == Status.Active, false).FirstOrDefaultAsync();
         public async Task<List<Product>> GetProducts()
-        => await FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c=>c.Id).ToListAsync();
+        => await FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)
          => await FindByCondition(c => c.Id == id && c.IsAcceptAdmin == true, false).FirstOrDefaultAsync();
         public async Task<List<Product>> GetFeartureProducts(int pageSize)
@@ -92,8 +92,16 @@ namespace Repository
         }
         public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);
-       
-    }
+        public int CountProducts(int? storeId)
+        {
+            var products = FindAll(false);
+            if (storeId != 0)
+            {
+                products = products.Where(r => r.Store.Status == Status.Active && r.StoreId == storeId);
+            }
+            return products.Count();
+        }
+}
 
     public class ProductTypeRepository : RepositoryBase<ProductType>, IProductTypeRepository
     {

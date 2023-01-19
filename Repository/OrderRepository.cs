@@ -21,8 +21,16 @@ namespace Repository
          => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
         public async Task<Order> GetLastOrderCustomer(int customerId, bool trackChanges)
          => await FindByCondition(c => c.CustomerId == customerId , trackChanges).OrderByDescending(c=>c.Id).SingleOrDefaultAsync();
-        public async Task<List<Order>> GetAllOrders()
-         => await FindAll(false).OrderByDescending(r => r.CreatedAt).ToListAsync();
+        public async Task<List<Order>> GetAllOrders(string search = "")
+        {
+            var orders = FindAll(false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                orders.Where(c => c.Customer.FullName.Contains(search) || c.Store.FirstName.Contains(search)
+                || c.OrderStatus.StatusName.Contains(search) || c.Id.ToString().Contains(search));
+            }
+            return await orders.Include(c => c.Customer).Include(c => c.OrderStatus).OrderByDescending(r => r.CreatedAt).ToListAsync();
+        }
         public async Task<List<Order>> GetOrdersToStore(int storeId)
        => await FindByCondition(c => c.StoreId == storeId, false).ToListAsync(); 
         public async Task<List<Order>> GetsAllTransactionOrders()
@@ -55,8 +63,8 @@ namespace Repository
          => await FindByCondition(c => c.OrderStatusId == 1 && c.CustomerId == customerId, false).ToListAsync();
         public async Task<List<Order>> GetCompletedOrdersByCustomer(int customerId)
          => await FindByCondition(c => c.OrderStatusId == 2 && c.CustomerId == customerId, false).ToListAsync();
-        public async Task<Order> OrderIdByPandingStatus(int id)
-         => await FindByCondition(c => c.Id == id && c.OrderStatusId == 1, false).SingleOrDefaultAsync();
+        public async Task<List<Order>> GetOrdersPanding()
+         => await FindByCondition(c => c.OrderStatusId == 1, false).ToListAsync();
         public async Task<Order> GetOrderIdAndStatusId(int id, int status)
          => await FindByCondition(c => c.Id == id && c.OrderStatusId == status, false).SingleOrDefaultAsync();
         public int GetOrdersByVendor(int vendorId) => FindByCondition(c => c.StoreId == vendorId, false).Count();

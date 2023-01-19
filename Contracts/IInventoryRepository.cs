@@ -21,6 +21,7 @@ namespace Contracts
         Task<Inventory> GetStockProductAttribut(int productId, int attributeId);
         Task<Inventory> GetStockProduct(int productId);
         void AddInventory(Inventory inventory);
-        void DeleteInventory(Inventory inventory);
+        void DeleteInventory(Inventory inventory); 
+        int CountOutStock(int? storeId);
     }
 }

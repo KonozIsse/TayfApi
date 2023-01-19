@@ -17,7 +17,7 @@ namespace Contracts
     public interface IStaticPagesRepository
     {
         Task<StaticPages> GetPage(int id, bool trackChanges);
-        Task<IEnumerable<StaticPages>> GetAllPages(bool trackChanges);
+        Task<IEnumerable<StaticPages>> GetAllPages(string search ,bool trackChanges);
     } 
     public interface IServicesRepository
     {
@@ -27,7 +27,7 @@ namespace Contracts
     }
     public interface ISliderRepository
     {
-        List<Sliders> GetSlidersForWeb();
+        List<Sliders> GetSlidersForWeb(string search);
         List<Sliders> GetSlidersForMobile();
         Task<Sliders> GetSlideById(int id, bool trackChanges);
         void AddSlider(Sliders sliders);

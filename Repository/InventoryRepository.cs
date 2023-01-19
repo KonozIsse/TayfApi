@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Entities.Models.Enums;
 
 namespace Repository
 {
@@ -41,5 +42,15 @@ namespace Repository
         => FindByCondition(r => r.ProductId == productId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefault().Stock;
         public void AddInventory(Inventory inventory) => Create(inventory);
         public void DeleteInventory(Inventory inventory) => Delete(inventory);// delete inventory if was exsit in stock
+        public int CountOutStock(int? storeId)
+        {
+            var products = FindByCondition(c=>c.StockType == "out",false);
+            if (storeId != 0)
+            {
+                products = products.Where(r => r.Vendor.Status == Status.Active && r.VendorId == storeId);
+            }
+            return products.Count();
+        }
     }
 }
+

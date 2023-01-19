@@ -1316,10 +1316,6 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(value, _locService.GetLocalizedStringValue("successSave"));
         }
         //Review------------------------------------------------
-        public int ReviewsCount(int productId)
-        {
-            return _repositoryManager.Review.GetReviewsCount(productId);
-        }
        
         public async Task<BussnessResultModel> AddReview(int productId,int customerId, CreateReviewDto createReviewDto)
         {
@@ -1352,17 +1348,27 @@ namespace BusinessLogic.ApiClasses
             }
             
         }
-        public async Task ActiveReview(int id)
+        public async Task<BussnessResultModel> ActiveReview(int id)
         {
             var review = await _repositoryManager.Review.GetReviewId(id, true);
+            if(review == null)
+            {
+                return new BussnessResultModel(null,_locService.GetLocalizedStringValue("correctLink"), false);
+            }
             review.IsStatus = Status.Active;
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(review, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task DeactiveReview(int id)
+        public async Task<BussnessResultModel> DeactiveReview(int id)
         {
             var review = await _repositoryManager.Review.GetReviewId(id, true);
+            if (review == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
             review.IsStatus = Status.NotActive;
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(review, _locService.GetLocalizedStringValue("successSave"));
         }
         public async Task<bool> IsReview(int productId, int customerId)
         {
@@ -1410,20 +1416,24 @@ namespace BusinessLogic.ApiClasses
             var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
             return reviewsDto;
         } 
-        public async Task<List<ReviewDto>> GetActiveReviews(int productId)
+        public async Task<PagedList<ReviewDto>> GetAllReviews(string lang , PostsParameters postsParameters)
         {
-            var reviews = await _repositoryManager.Review.GetReviewsActiveProductId(productId);
-            var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
-            return reviewsDto;
+            var reviews = await _repositoryManager.Review.GetReviews();
+            var reviewsDto = new List<ReviewDto>();
+            foreach(var review in reviews)
+            {
+                reviewsDto.Add(new ReviewDto
+                {
+                    Id = review.Id,
+                    ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr,
+                    Text = review.Text,
+                    IsStatus = review.IsStatus,
+                    CreatedAt = review.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
+                });
+            }
+            return PagedList<ReviewDto>.ToPagedList(reviewsDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
-        public async Task<List<Review>> GetListReviews()
-        {
-            return await _repositoryManager.Review.GetReviews();
-        }
-        public async Task<Review> FindReview(int id)
-        {
-           return await _repositoryManager.Review.GetReviewId(id , false);
-        }
+      
         public async Task<decimal> Rate(int productId)
         {
             var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
@@ -1485,10 +1495,7 @@ namespace BusinessLogic.ApiClasses
             }
             return favId;
         }
-        public int GetWishList(int customerId)
-        {
-            return _repositoryManager.WishList.GetCountLikesByCustomersId(customerId);
-        }
+       
 
         //inventory------------------------------------------------
        

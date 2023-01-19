@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entities.DataTransferObjects
+namespace Entities.Models.Enums
 {
-    public class PaymentSetting
+    public enum UserType
     {
-        public string Url { get; set; }
+        Admin = 1,
+        Store,
+        Customer
     }
 }

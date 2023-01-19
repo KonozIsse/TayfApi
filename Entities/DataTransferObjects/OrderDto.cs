@@ -20,13 +20,8 @@ namespace Entities.DataTransferObjects
         public DateTime? UpdatedAt { get; set; }
         public string DatePurchased { get; set; }
         public decimal OrderPrice { get; set; }
-        public string TransactionId { get; set; }
-        public string HashedCtpAndPayment { get; set; }
         public string Notes { get; set; }
-        public int? ShippingMethodId { get; set; }
         public int DeliveryTimeId { get; set; }
-        public int? CouponId { get; set; }
-        public int PaymentMethodsId { get; set; }
         public int AddressId { get; set; }
         public int CustomerId { get; set; }
         public int OrderStatusId { get; set; }
@@ -90,5 +85,13 @@ namespace Entities.DataTransferObjects
         public DateTime CreatedAt { get; set; }
         public string ProductName { get; set; }
         public List<OptionDto> Options { get; set; }
+    }
+    public class GoalCompletion
+
+    {
+        public int CartPercentage { get; set; }
+        public int CompleteOrders { get; set; }
+        public int PendingOrders { get; set; } 
+        public int CanceledOrders { get; set; }
     }
 }

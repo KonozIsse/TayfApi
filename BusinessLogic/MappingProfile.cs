@@ -25,12 +25,14 @@ namespace BusinessLogic
             //MapLanguage
             CreateMap<LanguageDto, Language>().ReverseMap();
             CreateMap<UpdateLanguageDto, Language>().ReverseMap();
+            //MapPaymentMethods
+            CreateMap<PaymentDto, PaymentMethods>().ReverseMap();
             //MapRole
             CreateMap<RoleLinksDto, Permission>().ReverseMap();
             //MapNotification
             CreateMap<NotificationDto, Notification>().ReverseMap();
             CreateMap<CreateNotificationDto, Notification>().ReverseMap();
-            //MapPermission
+            //MapRole
             CreateMap<RoleDto, Role>().ReverseMap();
             CreateMap<CreateRoleDto, Role>().ReverseMap(); 
             CreateMap<UpdateRoleDto, Role>().ReverseMap();
@@ -73,6 +75,7 @@ namespace BusinessLogic
             CreateMap<ProductPageDto, Product>().ReverseMap();
             CreateMap<CategoriesProductDto, ProductCategory>().ReverseMap();
             CreateMap<ProductCategoryDto, ProductCategory>().ReverseMap();
+            CreateMap<RecentProductDto, Product>().ReverseMap();
             //MapProductSales
             CreateMap<SaleDto, ProductSales>().ReverseMap();
             CreateMap<CreateSaleDto, ProductSales>().ReverseMap();

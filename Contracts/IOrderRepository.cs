@@ -11,7 +11,7 @@ namespace Contracts
     {
         Task<Order> GetOrderId(int id, bool trackChanges);
         Task<Order> GetLastOrderCustomer(int customerId, bool trackChanges);
-        Task<List<Order>> GetAllOrders();
+        Task<List<Order>> GetAllOrders(string search = "");
         Task<List<Order>> GetsAllTransactionOrders();
         Task<List<Order>> GetOrdersToCustomer(int customerId);
         Task<List<Order>> GetOrdersToStore(int storeId);
@@ -28,7 +28,7 @@ namespace Contracts
         Task<List<Order>> GetCancelOrdersByStore(int vendorId);
         Task<List<Order>> GetPendingOrdersByCustomer(int customerId);
         Task<List<Order>> GetCompletedOrdersByCustomer(int customerId);
-        Task<Order> OrderIdByPandingStatus(int id);
+        Task<List<Order>> GetOrdersPanding();
         Task<Order> GetOrderIdAndStatusId(int id, int status);
         int GetOrdersByVendor(int vendorId);
         bool GetOrderByStore(int storeId);

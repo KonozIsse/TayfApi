@@ -30,6 +30,7 @@ namespace Contracts
         Task<List<Product>> SearshProductByCategoryAndStore(int storeId, string search, int categoryId);
         void AddProduct(Product product);
         void DeleteProduct(Product product);
+        int CountProducts(int? storeId);
     }
     public interface IProductTypeRepository
     {

@@ -8,10 +8,13 @@ namespace Entities.DataTransferObjects
 {
     public class OrderStatusDto
     {
+        public int Id { get; set; }
+        public string StatusName { get; set; } 
+        public string option { get; set; }
     }
     public class UpdateOrderStatusDto
     {
         public int Id { get; set; }
-        public Dictionary<string, string> StatusesNames { get; set; }
+        public string StatusName { get; set; }
     }
 }

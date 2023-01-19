@@ -15,6 +15,7 @@ namespace Entities.Models
         public string Avater { get; set; }
         public Status Status { get; set; }
         public TypeRegister TypeRegister { get; set; }
+        public UserType UserType { get; set; }
         public bool? IsMobileVerified { get; set; }
         public string CodeMobileCountry { get; set; }
         public bool? IsSubscribe { get; set; }

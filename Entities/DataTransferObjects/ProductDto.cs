@@ -42,6 +42,13 @@ namespace Entities.DataTransferObjects
         public List<AttributeDto> AttributesProducts { get; set; }
         public List<ImageDto> Images { get; set; }
     }
+    public class RecentProductDto
+    {
+        public int Id { get; set; }
+        public string ProductName { get; set; }
+        public string ImageProduct { get; set; }
+        public decimal Price { get; set; }
+    }
     public class CreateProductDto
     {
         public string ProductName { get; set; }

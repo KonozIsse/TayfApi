@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface IPaymentMethodsRepository
     {
-        Task<List<PaymentMethods>> GetPaymentMethods();
+        Task<List<PaymentMethods>> GetPaymentMethods(string search);
         Task<List<PaymentMethods>> GetPaymentsByVendor(int vendorId);
     }
 }

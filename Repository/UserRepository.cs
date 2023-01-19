@@ -88,7 +88,8 @@ namespace Repository
        => await FindByCondition(c =>c.Id == id && c.RoleId == 3 && c.Status == Status.Active, false)
             .Include(c=>c.Products).Include(c=>c.Addresses).FirstOrDefaultAsync();
         public async Task<IEnumerable<User>> Get10Stores()
-        => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, false).OrderBy(r => r.Id).Take(10).ToListAsync();
+        => await FindByCondition(c => c.RoleId == 3 && c.Status == Status.Active, false)
+            .OrderByDescending(r => r.CreatedAt).Take(10).ToListAsync();
         public async Task<IEnumerable<User>> GetStoreList(int PageId = 1, int rows = 10)
         {
             int SkipCount = rows * (PageId - 1);
