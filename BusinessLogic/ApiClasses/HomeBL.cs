@@ -76,20 +76,27 @@ namespace BusinessLogic.ApiClasses
             };
             return model;
         }
-        public async Task<HomeCPVM> GetHomeCP(int? storeId)
+        public async Task<HomeCPVM> GetHomeCP(int userId)
         {
             var orders = await _repositoryManager.Order.GetAllOrders();
-           if(storeId != 0)
-            {
-                orders = orders.Where(c => c.StoreId == storeId).ToList();
-            }
+            var products = await _repositoryManager.Product.GetAllProducts();
+            var stocks = await _repositoryManager.Inventory.GetAllOutStock();
             var ordersTransaction = orders.Where(c => c.TransactionId != null);
             var countCustomers = await _repositoryManager.User.GetCustomers(false);
+
+            var store = await _repositoryManager.User.GetUserId(userId, false);
+            if (store.UserType == UserType.Store)
+            {
+                orders = orders.Where(c => c.StoreId == userId).ToList();
+                products = products.Where(c => c.StoreId == userId).ToList();
+                stocks = stocks.Where(c => c.VendorId == userId).ToList();
+            }
+
             var model = new HomeCPVM
             {
                 TotalOrders = orders.Count(),
-                TotalProducts =  _repositoryManager.Product.CountProducts(storeId),
-                TotalOutStock =  _repositoryManager.Inventory.CountOutStock(storeId),
+                TotalProducts = products.Count(),
+                TotalOutStock = stocks.Count(),
                 TotalPurchased = ordersTransaction.Sum(c => c.OrderPrice),
                 TotalTransactions = orders.Sum(c => c.OrderPrice),
                 TotalCustomerRegistrations = countCustomers.Count(),
@@ -104,8 +111,7 @@ namespace BusinessLogic.ApiClasses
         } 
         public async Task<List<RecentProductDto>> GetRecentProducts(int? storeId)
         {
-            var products = storeId == 0 ? await _repositoryManager.Product.GetProductsCP(0 , "") 
-                : await _repositoryManager.Product.GetProductsCP(storeId, "");
+            var products = await _repositoryManager.Product.GetProductsCP("");
             var productsDto = _mapper.Map<List<RecentProductDto>>(products);
             return productsDto.Take(15).ToList();
         }
@@ -473,14 +479,10 @@ namespace BusinessLogic.ApiClasses
             if (language != null)
             {
                 language.IsDefault = 1;
+                await _repositoryManager.SaveAsync();
             }
-            else
-            {
-                language.IsDefault = 0;
-            }
-            
-            await _repositoryManager.SaveAsync();
         }
+       
         //Currency------------------------------------------------
         public async Task<PagedList<CurrencyDto>> GetAllCurrencies(string lang , PostsParameters postsParameters)
         {
@@ -557,8 +559,17 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(currency, _locService.GetLocalizedStringValue("successDelete"));
         }
+        public async Task ChangeCurrency(int id)
+        {
+            var currency = await _repositoryManager.Currency.GetCurrency(id, true);
+            if (currency != null)
+            {
+                currency.IsDefault = 1;
+                await _repositoryManager.SaveAsync();
+            }
+        }
         //Notification------------------------------------------------
-        
+
         public async Task<BussnessResultModel> CreateNotification(CreateNotificationDto create)
         {
            
@@ -580,7 +591,7 @@ namespace BusinessLogic.ApiClasses
             {
                 foreach (var f in create.IdUsers)
                 {
-                    var user = await _userBL.GetUserById(f);
+                    var user = await _repositoryManager.User.GetActiveUserId(f, false);;
                     if (user != null)
                     {
                         var notification = _mapper.Map<Notification>(create);

@@ -72,16 +72,7 @@ namespace ControlPanel.Controllers
         {
             var userName = User.Identity.Name;
             var user = _userManager.FindByNameAsync(userName).Result;
-            user.RoleId = 2;
             return user;
-
-        }
-       
-        [NonAction]
-        public int GetStoreId()
-        {
-            var user = GetCurrentUser();
-            return user.Id;
         }
         [NonAction]
         public int GetCurrentUserId()

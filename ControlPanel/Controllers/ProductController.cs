@@ -20,7 +20,7 @@ namespace ControlPanel.Controllers
         [HttpGet("allCP")]
         public async Task<IActionResult> GetProductsCP(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _productBL.GetProductsCP(GetStoreId(), search, GetLanguage(), postsParameters);
+            var result = await _productBL.GetProductsCP(GetCurrentUserId(), search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

@@ -37,8 +37,10 @@ namespace Repository
         => await FindByCondition(c => c.StoreId == storeId && c.IsStatus == Status.Active, false).OrderByDescending(c => c.Id).ToListAsync();
         public async Task<Product> GetProductStore( int productId ,int storeId )
        => await FindByCondition(c => c.Id == productId && c.StoreId == storeId && c.IsStatus == Status.Active, false).FirstOrDefaultAsync();
-        public async Task<List<Product>> GetProducts()
+        public async Task<List<Product>> GetActiveProducts()
         => await FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+        public async Task<List<Product>> GetAllProducts()
+       => await FindAll(false).OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)
          => await FindByCondition(c => c.Id == id && c.IsAcceptAdmin == true, false).FirstOrDefaultAsync();
         public async Task<List<Product>> GetFeartureProducts(int pageSize)
@@ -79,28 +81,16 @@ namespace Repository
             return await list.ToListAsync();
         }
 
-        public async Task<List<Product>> GetProductsCP(int? storeId, string search)
+        public async Task<List<Product>> GetProductsCP(string search)
         {
             var list = FindByCondition(r =>
                     ((!String.IsNullOrEmpty(r.ProductName) && r.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
 
-            if (storeId != 0)
-            {
-                list = list.Where(r => r.Store != null && r.Store.Status == Status.Active && r.StoreId == storeId);
-            }
             return await list.Include(c => c.ProductCategories).OrderByDescending(r => r.Id).ToListAsync();
         }
         public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);
-        public int CountProducts(int? storeId)
-        {
-            var products = FindAll(false);
-            if (storeId != 0)
-            {
-                products = products.Where(r => r.Store.Status == Status.Active && r.StoreId == storeId);
-            }
-            return products.Count();
-        }
+      
 }
 
     public class ProductTypeRepository : RepositoryBase<ProductType>, IProductTypeRepository

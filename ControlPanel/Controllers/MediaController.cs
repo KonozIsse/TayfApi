@@ -20,7 +20,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get/category")]
         public async Task<IActionResult> GetImages(string category, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _imageBL.GetImages(category ,GetStoreId(), postsParameters);
+            var result = await _imageBL.GetImages(category , GetCurrentUserId(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         } 
@@ -33,7 +33,7 @@ namespace ControlPanel.Controllers
         [HttpPost("addImages")]
         public async Task<IActionResult> CreateImages([FromForm] CreateImageDto create)
         {
-            var result = await _imageBL.CreateImages(GetStoreId(), create);
+            var result = await _imageBL.CreateImages(GetCurrentUserId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);

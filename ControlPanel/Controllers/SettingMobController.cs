@@ -24,7 +24,7 @@ namespace ControlPanel.Controllers
         public async Task<IActionResult> CreateSlider(CreateSliderDto create)
         {
            
-            var result = await _homeBL.AddSliderMobile(GetStoreId(), create);
+            var result = await _homeBL.AddSliderMobile(GetCurrentUserId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -37,7 +37,7 @@ namespace ControlPanel.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateSlider(UpdateSliderDto update)
         {
-            var result = await _homeBL.UpdateSlider(GetStoreId(), update);
+            var result = await _homeBL.UpdateSlider(GetCurrentUserId(), update);
             if (result.Success)
             {
                 return Ok(result.Message);

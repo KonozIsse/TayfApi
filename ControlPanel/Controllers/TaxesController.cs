@@ -24,7 +24,7 @@ namespace ControlPanel.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateTax(CreateTaxClassDto create)
         {
-            var result = await _locationTaxBL.AddTaxClass(GetStoreId(),create);
+            var result = await _locationTaxBL.AddTaxClass(GetCurrentUserId(),create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -37,7 +37,7 @@ namespace ControlPanel.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateTax(UpdateTaxClassDto update)
         {
-            var result = await _locationTaxBL.EditTaxClass(GetStoreId(),update);
+            var result = await _locationTaxBL.EditTaxClass(GetCurrentUserId(),update);
             if (result.Success)
             {
                 return Ok(result.Message);

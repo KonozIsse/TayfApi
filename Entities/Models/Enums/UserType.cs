@@ -9,7 +9,7 @@ namespace Entities.Models.Enums
     public enum UserType
     {
         Admin = 1,
-        Store,
-        Customer
+        Customer,
+        Store
     }
 }

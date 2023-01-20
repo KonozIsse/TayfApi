@@ -11,7 +11,8 @@ namespace Contracts
     public interface IProductRepository
     {
         Task<List<Product>> GetAllAcceptedProducts();
-        Task<List<Product>> GetProducts();
+        Task<List<Product>> GetActiveProducts();
+        Task<List<Product>> GetAllProducts();
         Task<Product> GetProductById(int id, bool trackChanges);
         Task<Product> GetActiveProductById(int id, bool trackChanges);
         Task<Product> GetAcceptAdminActiveProduct(int id);
@@ -26,11 +27,10 @@ namespace Contracts
         Task<List<Product>> GetLatestPage(int pageSize);
         Task<List<Product>> SpecialsPage(int pageSize);
         Task<List<Product>> DailyDeals();
-        Task<List<Product>> GetProductsCP(int? storeId, string search);
+        Task<List<Product>> GetProductsCP( string search);
         Task<List<Product>> SearshProductByCategoryAndStore(int storeId, string search, int categoryId);
         void AddProduct(Product product);
         void DeleteProduct(Product product);
-        int CountProducts(int? storeId);
     }
     public interface IProductTypeRepository
     {

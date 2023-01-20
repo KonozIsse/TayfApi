@@ -16,7 +16,7 @@ namespace ControlPanel.Controllers
         [HttpGet("getTotal-products/orders")]
         public async Task<IActionResult> GetTotalOrdersProducts()
         {
-            var result = await _homeBL.GetHomeCP(GetStoreId());
+            var result = await _homeBL.GetHomeCP(GetCurrentUserId());
             return Ok(result);
         } 
         [HttpGet("getNewCustomers")]
@@ -28,13 +28,13 @@ namespace ControlPanel.Controllers
         [HttpGet("getRecentProducts")]
         public async Task<IActionResult> GetRecentProducts()
         {
-            var result = await _homeBL.GetRecentProducts(GetStoreId());
+            var result = await _homeBL.GetRecentProducts(GetCurrentUserId());
             return Ok(result);
         } 
         [HttpGet("getNewOrders")]
         public async Task<IActionResult> GetNewOrders()
         {
-            var result = await _homeBL.GetOrders(GetStoreId());
+            var result = await _homeBL.GetOrders(GetCurrentUserId());
             return Ok(result);
         } 
         [HttpGet("getNewStores")]

@@ -68,7 +68,7 @@ namespace BusinessLogic.ApiClasses
             var blog = _mapper.Map<News>(create);
             blog.IsFeature = 1;
             blog.IsViewed = 0;
-            blog.VendorId = storeId == 0 ? null : storeId;
+            blog.VendorId = storeId ;
             _repositoryManager.News.CreateBlog(blog);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(blog, _locService.GetLocalizedStringValue("successAdd"));
@@ -87,7 +87,7 @@ namespace BusinessLogic.ApiClasses
             blog.Id = updateDto.NewsId;
             blog.IsFeature = 1;
             blog.IsViewed = 0;
-            blog.VendorId = storeId == 0 ? null : storeId;
+            blog.VendorId = storeId ;
             if (updateDto.ImageId != 0)
             {
                 blog.ImgId = updateDto.ImageId;

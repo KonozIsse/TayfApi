@@ -17,11 +17,10 @@ namespace Contracts
         Task<IEnumerable<Inventory>> GetAllInventory();
         Task<IEnumerable<Inventory>> AllInventoryByVendor(int vendorId);
         Task<List<Inventory>> GetOptionsByProductIdInStock(int productId);
-        Task<List<Inventory>> GetOptionsByProductIdOutStock(int productId);
+        Task<List<Inventory>> GetAllOutStock();
         Task<Inventory> GetStockProductAttribut(int productId, int attributeId);
         Task<Inventory> GetStockProduct(int productId);
         void AddInventory(Inventory inventory);
         void DeleteInventory(Inventory inventory); 
-        int CountOutStock(int? storeId);
     }
 }

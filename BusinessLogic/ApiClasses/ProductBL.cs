@@ -10,6 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Entities.RequestFeatures;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
+using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
+using MailKit.Search;
+using System.Collections;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -254,18 +258,6 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             return model;
-        }
-        public async Task<List<Product>> GetProductsByVendor(int storeId)
-        {
-            return await _repositoryManager.Product.GetProductsTOStoreId(storeId);
-        } 
-        public async Task<List<Product>> GetAllProducts()
-        {
-            return await _repositoryManager.Product.GetProducts();
-        }  
-        public async Task<Product> GetProductId(int id)
-        {
-            return await _repositoryManager.Product.GetProductById(id , false);
         }
         public async Task<BussnessResultModel> AddProduct(CreateProductDto createProductDto)
         {
@@ -693,10 +685,15 @@ namespace BusinessLogic.ApiClasses
                 return new List<ProductVM>();
             }
         }
-        public async Task<PagedList<ProductDto>> GetProductsCP(int? storeId , string search , string lang, PostsParameters postsParameters)
+        public async Task<PagedList<ProductDto>> GetProductsCP(int userId , string search , string lang, PostsParameters postsParameters)
         {
-            var products = await _repositoryManager.Product.GetProductsCP(storeId, search);
+            var products = await _repositoryManager.Product.GetProductsCP(search);
             //var productsDto =_mapper.Map<IEnumerable<ProductDto>>(products);
+            var store = await _repositoryManager.User.GetUserId(userId, false);
+            if (store.UserType == UserType.Store)
+            {
+                products = products.Where(c => c.StoreId == userId).ToList();
+            }
             var productsDto = new List<ProductDto>();
             foreach (var item in products)
             {
@@ -718,8 +715,7 @@ namespace BusinessLogic.ApiClasses
                     Description = lang == "en" ? item.Description : item.DescriptionAr,
                     IsStatus = item.IsStatus,
                     ImageProduct = item.ImageProduct,
-                    CategoriesName = catsDto,
-                    IsAcceptAdmin = item.IsAcceptAdmin
+                    CategoriesName = catsDto
                 });
                
             }
@@ -845,12 +841,7 @@ namespace BusinessLogic.ApiClasses
 
             return productsCatId;
         }
-        public async Task<List<ProductDto>> GetProductsDto()
-        {
-            var products = await _repositoryManager.Product.GetProducts();
-            var productsDto = _mapper.Map<List<ProductDto>>(products) ;
-            return productsDto;
-        }
+       
         public async Task<List<ProductVM>> GetSpecialsProd(int customerId = 0 , string lang = "",Currency currency =null )
         {
             var products = await GetProducts(customerId, lang);
@@ -1499,7 +1490,7 @@ namespace BusinessLogic.ApiClasses
 
         //inventory------------------------------------------------
        
-        public async Task<BussnessResultModel> AddInventory(int adminId , int storeId ,CreateInventoryDto createDto)
+        public async Task<BussnessResultModel> AddInventory(int userId, CreateInventoryDto createDto)
         {
             var inventory = _mapper.Map<Inventory>(createDto);
             var item = await _repositoryManager.Inventory.GetOptionsByProductIdInStock(createDto.ProductId);
@@ -1509,8 +1500,15 @@ namespace BusinessLogic.ApiClasses
             }
             var product = await _repositoryManager.Product.GetProductById(createDto.ProductId, true);
             product.Availability = product.Availability + createDto.Stock;
-            inventory.AdminId = adminId == null ? null : adminId;
-            inventory.VendorId = storeId == null ? null : storeId;
+            var user = await _repositoryManager.User.GetUserId(userId, false);
+            if (user.UserType == UserType.Admin)
+            {
+                inventory.AdminId = userId;
+            }
+            else
+            {
+                inventory.VendorId = userId;
+            }
             inventory.StockType = "in";
             inventory.AddedDate = _util.EasternTime.Millisecond;
             _repositoryManager.Inventory.AddInventory(inventory);

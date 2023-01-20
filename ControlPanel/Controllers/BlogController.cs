@@ -17,7 +17,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetBlogs(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _newsBL.SearchBlog(GetStoreId(), search, postsParameters);
+            var result = await _newsBL.SearchBlog(GetCurrentUserId(), search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
@@ -31,8 +31,7 @@ namespace ControlPanel.Controllers
         [HttpPost("createBlog")]
         public async Task<IActionResult> CreateBlog(CreateNewsDto create)
         {
-            var storeId = GetStoreId() == 0 ? 0 : GetStoreId();
-            var result = await _newsBL.AddNews(storeId, create);
+            var result = await _newsBL.AddNews(GetCurrentUserId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -45,8 +44,7 @@ namespace ControlPanel.Controllers
         [HttpPut("editBlog")]
         public async Task<IActionResult> EditBlog(UpdateNewsDto update)
         {
-            var storeId = GetStoreId() == 0 ? 0 : GetStoreId();
-            var result = await _newsBL.EditNews(storeId, update);
+            var result = await _newsBL.EditNews(GetCurrentUserId(), update);
             if (result.Success)
             {
                 return Ok(result.Message);

@@ -32,8 +32,8 @@ namespace Repository
         => await FindByCondition(r => r.VendorId == vendorId , false).ToListAsync();
         public async Task<List<Inventory>> GetOptionsByProductIdInStock(int productId)
         => await FindByCondition(r => r.ProductId == productId && r.StockType == "in", false).ToListAsync();
-        public async Task<List<Inventory>> GetOptionsByProductIdOutStock(int productId)
-        => await FindByCondition(r => r.ProductId == productId && r.StockType == "out", false).ToListAsync();
+        public async Task<List<Inventory>> GetAllOutStock()
+        => await FindByCondition(r =>  r.StockType == "out", false).ToListAsync();
         public async Task<Inventory> GetStockProduct(int productId)
          => await FindByCondition(r => r.ProductId == productId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefaultAsync(); 
         public async Task<Inventory> GetStockProductAttribut(int productId , int attributeId)
@@ -42,15 +42,7 @@ namespace Repository
         => FindByCondition(r => r.ProductId == productId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefault().Stock;
         public void AddInventory(Inventory inventory) => Create(inventory);
         public void DeleteInventory(Inventory inventory) => Delete(inventory);// delete inventory if was exsit in stock
-        public int CountOutStock(int? storeId)
-        {
-            var products = FindByCondition(c=>c.StockType == "out",false);
-            if (storeId != 0)
-            {
-                products = products.Where(r => r.Vendor.Status == Status.Active && r.VendorId == storeId);
-            }
-            return products.Count();
-        }
+       
     }
 }
 

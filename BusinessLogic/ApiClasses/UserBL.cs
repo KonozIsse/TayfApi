@@ -209,6 +209,7 @@ namespace BusinessLogic.ApiClasses
             store.IsMobileVerified = false;
             store.Status = Status.Active;
             store.TypeRegister = TypeRegister.Normal;
+            store.UserType = UserType.Store;
             var result = await _userManager.CreateAsync(store, create.Password);
             if (create.Avater == null)
             {
@@ -280,10 +281,6 @@ namespace BusinessLogic.ApiClasses
             customer.IsSubscribe = newsletter == "0" ? false : true;
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(customer, _locService.GetLocalizedStringValue("successSave"));
-        }
-        public async Task<User> GetUserById(int id)
-        {
-            return await _repositoryManager.User.GetActiveUserId(id, false);
         }
         public async Task<IEnumerable<AdminDto>> GetAdminsStores()
         {
@@ -686,6 +683,7 @@ namespace BusinessLogic.ApiClasses
 
                     user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
                     user.TypeRegister = TypeRegister.Normal;
+                    user.UserType = UserType.Customer;
                     user.IsSubscribe = userRegister.IsSubscribe == "0" ? false : true;
                     user.IsMobileVerified = false;
                     user.RoleId = 2;
@@ -864,6 +862,7 @@ namespace BusinessLogic.ApiClasses
                 user.UserName = userRegister.Email;
                 user.IsMobileVerified = false;
                 user.TypeRegister = TypeRegister.Normal;
+                user.UserType = UserType.Admin;
                 user.PasswordHash = userRegister.Password;
                 user.VerifiedCode = Convert.ToInt32(_util.GenerateRandomNo()) + Convert.ToInt32(_util.GenerateRandomNo2());
                 var country = await _repositoryManager.Country.GetcountryById(userRegister.CountryId.Value, false);
@@ -979,10 +978,6 @@ namespace BusinessLogic.ApiClasses
             return await _authManager.CreateToken();
         }
        
-        public async Task<User> GetAdminAndStoreEmail(string email)
-        {
-            return await _repositoryManager.User.GetAdminAndStoreEmail(email);
-        } 
 
         //Device------------------------------------------------
         public async Task AddDevice(CreateDeviceDto createDto)
