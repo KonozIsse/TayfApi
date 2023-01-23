@@ -101,11 +101,7 @@ namespace BusinessLogic
             //MapReview
             CreateMap<ReviewDto, Review>().ReverseMap();
             CreateMap<CreateReviewDto, Review>().ReverseMap(); 
-            CreateMap<UpdateReviewDto, Review>().ReverseMap();
-            //MapWishList
-            CreateMap<CreateLikeDto, WishList>().ReverseMap();
-            CreateMap<WishListDto, WishList>().ReverseMap();
-            //MapOrder
+           //MapOrder
             CreateMap<CreateOrderDto, Order>().ReverseMap();
             CreateMap<UpdateOderDto, Order>().ReverseMap();
             CreateMap<OrderDto, Order>().ReverseMap();

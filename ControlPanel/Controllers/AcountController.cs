@@ -19,9 +19,9 @@ namespace ControlPanel.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class AuthenticationController : MyBaseController
+    public class AcountController : MyBaseController
     {
-        public AuthenticationController(IServiceProvider serviceProvider) : base(serviceProvider)
+        public AcountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
         [HttpPost("login")]

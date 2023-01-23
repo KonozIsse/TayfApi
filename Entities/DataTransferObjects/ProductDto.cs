@@ -35,7 +35,6 @@ namespace Entities.DataTransferObjects
         public string CategoryName { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }
-        public List<WishListDto> WishLists { get; set; }
         public List<ReviewDto> Reviews { get; set; }
         public List<SpecialDto> SpecialProducts { get; set; }
         public List<SaleDto> ProductSales { get; set; }
@@ -59,6 +58,7 @@ namespace Entities.DataTransferObjects
         public string Description { get; set; }
         public string DescriptionAr { get; set; }
         public int TypeId { get; set; }
+        public int Availability { get; set; }
         public int? StoreId { get; set; } 
         public short IsFeature { get; set; }
         public short IsBest { get; set; }

@@ -83,10 +83,12 @@ namespace Repository
 
         public async Task<List<Product>> GetProductsCP(string search)
         {
-            var list = FindByCondition(r =>
-                    ((!String.IsNullOrEmpty(r.ProductName) && r.ProductName.Contains(search)) || String.IsNullOrEmpty(search)), false);
-
-            return await list.Include(c => c.ProductCategories).OrderByDescending(r => r.Id).ToListAsync();
+            var list = FindAll(false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                list.Where(r => r.ProductName.Contains(search));
+            }
+            return await list.Include(c => c.ProductCategories).Include(c=>c.WishLists).OrderByDescending(r => r.Id).ToListAsync();
         }
         public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);

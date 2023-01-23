@@ -8,12 +8,6 @@ using Microsoft.CodeAnalysis;
 using Entities.Exception;
 using Microsoft.Extensions.Configuration;
 using Entities.RequestFeatures;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
-using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
-using MailKit.Search;
-using System.Collections;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -259,27 +253,28 @@ namespace BusinessLogic.ApiClasses
             }
             return model;
         }
-        public async Task<BussnessResultModel> AddProduct(CreateProductDto createProductDto)
+        public async Task<BussnessResultModel> AddProduct(int userId , CreateProductDto createProductDto)
         {
             var product = _mapper.Map<Product>(createProductDto);
             if (createProductDto.DescriptionAr == null || createProductDto.ProductNameAr == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
             }
+            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if(user.UserType == UserType.Admin)
+            {
+                product.AdminId = userId;
+                product.IsAcceptAdmin = true;
+            }
             if (createProductDto.StoreId != null)
             {
                 product.StoreId = createProductDto.StoreId;
                 product.IsAcceptAdmin = false;
             }
-            else
-            {
-                product.IsAcceptAdmin = true;
-            }
             _repositoryManager.Product.AddProduct(product);
             await _repositoryManager.SaveAsync();
             if (createProductDto.ProductCategories != null)
             {
-                //await AddCategoriesProduct(product.Id, createProductDto.ProductCategories);
                 product.ProductCategories.AddRange(_mapper.Map<List<ProductCategory>>(createProductDto.ProductCategories));
             }
             else
@@ -307,7 +302,7 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(product, _locService.GetLocalizedStringValue("enterPrice"), false);
             }
-            if (product.IsSale == true)
+            if (createProductDto.IsSale == true)
             {
                 var craete = createProductDto.ProductSales.First();
                
@@ -318,7 +313,7 @@ namespace BusinessLogic.ApiClasses
                 }
                 _repositoryManager.Sales.AddFlashSale(sale);
             }
-            if (product.IsSpecial == true)
+            if (createProductDto.IsSpecial == true)
             {
                 var special = _mapper.Map<SpecialProducts>(createProductDto.SpecialProducts.First());
                 if (_util.EasternTime > createProductDto.SpecialProducts.First().EndDate)
@@ -327,24 +322,31 @@ namespace BusinessLogic.ApiClasses
                 }
                 _repositoryManager.SpecialProducts.AddSpecialProduct(special);
             }
-            if (product.Availability != 0)
+            if (createProductDto.Availability != 0)
             {
-                var createInventory = new CreateInventoryDto();
-                var inventory = _mapper.Map<Inventory>(createInventory);
-                inventory.Stock = product.Availability;
-                inventory.StockType = "in";
-                inventory.AddedDate = _util.EasternTime.Millisecond;
-                inventory.VendorId = product.StoreId == 0 ? 0 : product.StoreId;
+                var inventory = new Inventory
+                {
+                    Stock = product.Availability,
+                    ProductId = product.Id,
+                    StockType = "in",
+                    AddedDate = _util.EasternTime.Millisecond,
+                    VendorId = product.StoreId == 0 ? 0 : product.StoreId
+                };
                _repositoryManager.Inventory.AddInventory(inventory);
             }
             return new BussnessResultModel(product , _locService.GetLocalizedStringValue("successAdd"));
         }
-        public async Task<BussnessResultModel> EditProduct(UpdateProductDto updateDto)
+        public async Task<BussnessResultModel> EditProduct(int userId, UpdateProductDto updateDto)
         {
             var product = await _repositoryManager.Product.GetProductById(updateDto.Id, true);
             if(product == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
+            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (user.UserType == UserType.Admin)
+            {
+                product.AdminId = userId;
             }
             product.StoreId = updateDto.StoreId;
             if (updateDto.DescriptionAr == null || updateDto.ProductNameAr == null)
@@ -381,7 +383,7 @@ namespace BusinessLogic.ApiClasses
             {
                  return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
             }
-            if (product.IsSale == true )
+            if (updateDto.IsSale == true )
             {
                 var sale = updateDto.ProductSales.First();
                 if (sale.StartDate > sale.EndDate)
@@ -409,7 +411,7 @@ namespace BusinessLogic.ApiClasses
                     _repositoryManager.Sales.DeleteFlashSale(salesProduct);
                 }
             }
-            if (product.IsSpecial == true )
+            if (updateDto.IsSpecial == true )
             {
                 if (_util.EasternTime > updateDto.SpecialProducts.First().EndDate)
                 {
@@ -456,14 +458,7 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(product, _locService.GetLocalizedStringValue("approveProduct"));
         }
-        public async Task<Product> CheckApproveProduct(int productId)
-        {
-          return await _repositoryManager.Product.CheckApproveProduct(productId);
-        } 
-        public async Task<List<OrderProduct>> GetOrdersProduct(int productId)
-        {
-          return await _repositoryManager.OrderProducts.GetOrdersProductId(productId);
-        }
+      
         public async Task<BussnessResultModel> RemoveProduct(int productId)
         {
             var orders = await _repositoryManager.OrderProducts.GetOrdersProductId(productId);
@@ -562,7 +557,7 @@ namespace BusinessLogic.ApiClasses
                             TypeId = product.TypeId,
                             Price = product.Price,
                             IsStatus = product.IsStatus.ToString(),
-                            Availability = await AvailabilityProducts(product.Id),
+                            Availability =  AvailabilityProducts(product.Id),
                             Attributs = await GetOptions(product.Id),
                             Images = await _imageBL.GetListImagesProductIdAsync(product.Id),
                             ShareLink = _util.url1 + "/share.html?id=" + product.Id,
@@ -638,7 +633,7 @@ namespace BusinessLogic.ApiClasses
                             TypeId = product.TypeId,
                             Price = product.Price,
                             IsStatus = product.IsStatus.ToString(),
-                            Availability = await AvailabilityProducts(product.Id),
+                            Availability =  AvailabilityProducts(product.Id),
                             Attributs = await GetOptions(product.Id),
                             Images = await _imageBL.GetListImagesProductIdAsync(product.Id),
                             ShareLink = _util.url1 + "/share.html?id=" + product.Id,
@@ -715,6 +710,8 @@ namespace BusinessLogic.ApiClasses
                     Description = lang == "en" ? item.Description : item.DescriptionAr,
                     IsStatus = item.IsStatus,
                     ImageProduct = item.ImageProduct,
+                    Availability = AvailabilityProducts(item.Id),
+                    NumLike = item.WishLists.Count(),
                     CategoriesName = catsDto
                 });
                
@@ -743,7 +740,7 @@ namespace BusinessLogic.ApiClasses
                 TypeId = product.TypeId,
                 Price = product.Price,
                 IsStatus = product.IsStatus.ToString(),
-                Availability = await AvailabilityProducts(product.Id),
+                Availability =  AvailabilityProducts(product.Id),
                 Attributs = await GetOptions(product.Id),
                 Images = await _imageBL.GetListImagesProductIdAsync(product.Id),
                 //ShareLink = storeUrl + "/en/Home/share?id=" + product.Id + "&name=" + name.Trim(),
@@ -800,7 +797,7 @@ namespace BusinessLogic.ApiClasses
                 TypeId = product.TypeId,
                 Price = product.Price,
                 IsStatus = product.IsStatus.ToString(),
-                Availability = await AvailabilityProducts(product.Id),
+                Availability =  AvailabilityProducts(product.Id),
                 Attributs = await GetOptions(product.Id),
                 Images = await _imageBL.GetListImagesProductIdAsync(product.Id),
                 ShareLink = storeUrl + "/en/Home/share?id=" + product.Id + "&name=" + name.Trim(),
@@ -854,13 +851,14 @@ namespace BusinessLogic.ApiClasses
             var productsCatId = products.Where(c => c.IsSale == true).ToList();
             return productsCatId;
         }
-        public async Task<List<ProductVM>> GetWishProduct(int customerId ,string lang , Currency currency)
+        public async Task<List<ProductVM>> GetWishProductCustomer(int customerId ,string lang , Currency currency)
         {
             var products = await GetProducts(customerId, lang);
             var likes = await _repositoryManager.WishList.GetLikesCustomerId(customerId);
             var productsCatId = products.Where(c => likes.Any(x=> c.Id == x.ProductId)).ToList();
             return productsCatId;
         }
+       
         public async Task<SpecialDto> IsOffer(int productId)
         {
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
@@ -906,12 +904,6 @@ namespace BusinessLogic.ApiClasses
         {
             var populars = await _repositoryManager.Product.DailyDeals();
             var popularsDto = _mapper.Map<List<ProductPageDto>>(populars);
-            return popularsDto;
-        }
-        public async Task<List<ProductDto>> GetProductsCP(int storeId , string seacrh , int catId)
-        {
-            var populars = await _repositoryManager.Product.SearshProductByCategoryAndStore(storeId, seacrh,catId);
-            var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
         public async Task<List<ImageProductDto>> GetProductImages(int productId)
@@ -960,14 +952,6 @@ namespace BusinessLogic.ApiClasses
             return list;
         }
         //AttributesProduct------------------------------------------------
-        public async Task<ProductAttribut> GetProductAttribut(int id)
-        {
-            return await _repositoryManager.Attribute.GetAttributeId(id, false);
-        }
-        public async Task<List<ProductAttribut>> GetProductAttributesByProdId(int productId)
-        {
-            return await _repositoryManager.Attribute.GetAttributesProductId(productId);
-        }
         public async Task<List<AttributeDto>> GetAttributsProducts(int productId)
         {
             var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
@@ -990,7 +974,6 @@ namespace BusinessLogic.ApiClasses
                     }
                     else
                     {
-                        attribute.AttributePrice = createDto.AttributePrice;
                         attribute.AttributePrice = createDto.AttributePrice;
                     }
                     _repositoryManager.Attribute.AddAttributesProduct(productId, attribute);
@@ -1181,10 +1164,6 @@ namespace BusinessLogic.ApiClasses
             }
             return total;
         }
-        public async Task<ProductOption> GetProductOption(int optionId)
-        {
-            return await _repositoryManager.Option.GetOptionId(optionId, false);
-        }
         public async Task<List<OptionDto>> GetOptions(int productId)
         {
             var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
@@ -1229,10 +1208,6 @@ namespace BusinessLogic.ApiClasses
             }
             return optionDto;
         }
-        public async Task<List<ProductOption>> GetAllOptions()
-        {
-            return await _repositoryManager.Option.GetAllOptions();
-        }
         public async Task<PagedList<OptionDto>> GetProductOptions(PostsParameters postsParameters)
         {
             var options = await _repositoryManager.Option.GetAllOptions();
@@ -1240,18 +1215,6 @@ namespace BusinessLogic.ApiClasses
             return PagedList<OptionDto>.ToPagedList(optionsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         //Value------------------------------------------------
-        public async Task<List<ProductOptionValue>> GetValuesOption(int optionId)
-        {
-            return await _repositoryManager.Value.GetValuesOPtionId(optionId);
-        } 
-        public async Task<List<ProductOptionValue>> GetValues()
-        {
-            return await _repositoryManager.Value.GetValues();
-        }
-        public async Task<ProductOptionValue> FindOptionValue(int valueId)
-        {
-            return await _repositoryManager.Value.GetValueId(valueId, false);
-        }
         public async Task<ValueDto> GetValue(int valueId)
         {
             var value = await _repositoryManager.Value.GetValueId(valueId, false);
@@ -1272,7 +1235,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> AddValue(int optionId ,CreateValueDto createValueDto , string ValueHexModel = "#000000")
         {
-            var option = await GetProductOption(optionId);
+            var option = await _repositoryManager.Option.GetOptionId(optionId, false);
             if (option == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"),false);
@@ -1317,8 +1280,6 @@ namespace BusinessLogic.ApiClasses
                 {
                     var review = _mapper.Map<Review>(createReviewDto);
                     var product = await _repositoryManager.Product.GetActiveProductById(productId, true);
-                    product.Rate = await Rate(productId);
-                    product.CountReviews++;
                     review.ProductId = productId;
                     review.CustomerId = customerId;
                     review.IsStatus = Status.NotActive;
@@ -1432,38 +1393,21 @@ namespace BusinessLogic.ApiClasses
             return rate;
         }
         //WishList------------------------------------------------
-        public async Task<BussnessResultModel> AddWishList(CreateLikeDto create)
+        public async Task<BussnessResultModel> AddWishList(int customerId , int productId)
         {
-            var like = await _repositoryManager.WishList.GetWishListProductIdCustomerId(create.CustomerId, create.ProductId);
+            var like = await _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId, productId);
             if (like == null)
             {
-                var product = await _repositoryManager.Product.GetActiveProductById(create.ProductId, true);
-                product.NumLike++;
-                var wishList = _mapper.Map<WishList>(create);
-                _repositoryManager.WishList.Addlike(create.ProductId, wishList);
+                var wishList = new WishList{ ProductId = productId, CustomerId = customerId };
+                _repositoryManager.WishList.Addlike(productId, wishList);
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(wishList, "successfully Added");
             }
             else
             {
-                await DeleteLike(like.Id, create.CustomerId);
-                return new BussnessResultModel(like, "successfully Deleted");
-            }
-        }
-        public async Task<BussnessResultModel> DeleteLike(int id ,int customerId)
-        {
-            var wishList = await _repositoryManager.WishList.GetLikeCustomerId(id, customerId);
-            if (wishList != null)
-            {
-                 var product = await _repositoryManager.Product.GetActiveProductById(wishList.ProductId, true);
-                 product.NumLike--;
-                _repositoryManager.WishList.DeleteLike(wishList);
+                _repositoryManager.WishList.DeleteLike(like);
                 await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(wishList, _locService.GetLocalizedStringValue("successDelete"));
-            }
-            else
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false);
+                return new BussnessResultModel(like, _locService.GetLocalizedStringValue("successDelete"));
             }
         }
         public async Task<bool> IsFavourite(int customerId, int productId)
@@ -1486,10 +1430,25 @@ namespace BusinessLogic.ApiClasses
             }
             return favId;
         }
-       
-
         //inventory------------------------------------------------
-       
+        public async Task<PagedList<InventoryDto>> GetAllInventory(int userId ,string lang , PostsParameters postsParameters)
+        {
+            var stocks = await _repositoryManager.Inventory.GetAllInventory();
+            var store = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if(store.UserType == UserType.Store)
+            {
+                stocks.Where(c => c.VendorId == userId);
+            }
+            
+            var stocksDto = stocks.Select(async stock => new InventoryDto
+            {
+                Id = stock.Id,
+                Stock =  AvailabilityProducts(stock.Product.Id),
+                ProductName = lang == "en" ? stock.Product.ProductName : stock.Product.ProductNameAr
+            }).ToList();
+           
+            return PagedList<InventoryDto>.ToPagedList((IEnumerable<InventoryDto>)stocksDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }  
         public async Task<BussnessResultModel> AddInventory(int userId, CreateInventoryDto createDto)
         {
             var inventory = _mapper.Map<Inventory>(createDto);
@@ -1528,13 +1487,13 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
         }
-        public async Task<int> AvailabilityProducts(int productId)
+        public int AvailabilityProducts(int productId)
         {
-            int total = 0;
+            var total = 0;
             var instock = 0;
             var outstock = 0;
 
-            var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+            var inventories = _repositoryManager.Inventory.GetAllInventoryByPrductId(productId).Result;
             if (inventories != null)
             {
                 foreach (var inventory in inventories)

@@ -27,7 +27,8 @@ namespace Repository
          => await FindByCondition(r => r.ProductId == productId, false).ToListAsync();
         public async Task<Inventory> GetInventoryByProductId (int productId)
          => await FindByCondition(r => r.ProductId == productId, false).FirstOrDefaultAsync();
-        public async Task<IEnumerable<Inventory>> GetAllInventory() => await FindAll(false).ToListAsync();
+        public async Task<IEnumerable<Inventory>> GetAllInventory() 
+            => await FindAll(false).Include(c=>c.Product).ToListAsync();
         public async Task<IEnumerable<Inventory>> AllInventoryByVendor(int vendorId)
         => await FindByCondition(r => r.VendorId == vendorId , false).ToListAsync();
         public async Task<List<Inventory>> GetOptionsByProductIdInStock(int productId)

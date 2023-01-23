@@ -1,4 +1,5 @@
 ﻿using Entities.DataTransferObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace ControlPanel.Controllers
 {
@@ -41,19 +42,49 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpPut("changePass")]
-        public async Task<IActionResult> ChangePasswordAdmin(int UserId, string OldPassword, string NewPassword)
+        [HttpPost]
+        [Route("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
         {
-            var result = await _userBL.ChangePassword(UserId, OldPassword, NewPassword);
-            if (result.Success)
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            try
             {
-                return Ok(result.Message);
+                if (model is null)
+                    return BadRequest("No data found!");
+                var user = GetCurrentUser();
+                if (user == null)
+                    return BadRequest("No user found!");
+
+
+                var checkOldPassword =
+                    await _signInManager.PasswordSignInAsync(user.UserName, model.OldPassword, false, false);
+
+
+                if (!checkOldPassword.Succeeded)
+                    return BadRequest(_locService.GetLocalizedStringValue("Old password does not matched."));
+
+                if (model.ConfirmPassword != model.NewPassword)
+                    return BadRequest(_locService.GetLocalizedStringValue("New password does not matched Confirm Password"));
+
+                string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                if (string.IsNullOrEmpty(resetToken))
+                    return BadRequest(_locService.GetLocalizedStringValue("Error while generating reset token."));
+
+                var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
+
+                if (result.Succeeded)
+                    return Ok();
+                else
+                    return BadRequest(result);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(result.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpDelete("remove")]
         public async Task<IActionResult> RemoveAdmin(int id)
         {

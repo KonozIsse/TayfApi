@@ -56,10 +56,6 @@ namespace BusinessLogic.ApiClasses
             var rolesDto = _mapper.Map<List<RoleDto>>(roles);
             return rolesDto;
         } 
-        public async Task<Role> GetRoleId(int roleId)
-        {
-            return await _repositoryManager.Role.GetRoleId(roleId , false);
-        }
         public async Task<BussnessResultModel> SaveRole(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
             var permissions = await _repositoryManager.Permission.GetPermissionsRole(roleId, true);
@@ -172,18 +168,7 @@ namespace BusinessLogic.ApiClasses
             var storesDto = _mapper.Map<List<StoreDto>>(stores);
             return storesDto;
         } 
-        public async Task<IEnumerable<User>> GetStoreList(int PageId = 1, int rows = 10)
-        {
-           return await _repositoryManager.User.GetStoreList(PageId , rows);
-        } 
-        public int GetStoresCount()
-        {
-           return  _repositoryManager.User.GetStoresCount();
-        }
-        public async Task<User> GetStoreId(int storeId)
-        {
-           return await _repositoryManager.User.GetStore(storeId , false);
-        }
+       
         public async Task<List<StoreDto>> GetSomeStores()
         {
             var stores = await _repositoryManager.User.Get10Stores();
@@ -195,7 +180,7 @@ namespace BusinessLogic.ApiClasses
         {
             var store = await _repositoryManager.User.GetStoreId(id);
             var storeDto = _mapper.Map<StoreDto>(store);
-           // storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
+           //storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
             return storeDto;
         }
         public async Task<BussnessResultModel> AddStore(CreateStoreDto create,string lang)
@@ -306,10 +291,9 @@ namespace BusinessLogic.ApiClasses
             var customersDto = _mapper.Map<List<CustomerDto>>(customers);
             return PagedList<CustomerDto>.ToPagedList(customersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<List<UserTotal>> GetCustomerTotal(string search)
+        public async Task<PagedList<UserTotal>> GetCustomerTotal(string search , PostsParameters postsParameters)
         {
-            var customers = await _repositoryManager.User.GetAllCustomers(search, false);
-            
+            var customers = await _repositoryManager.User.GetAllCustomers(search, false); 
             var customerTotal = new List<UserTotal>();
             foreach (var x in customers)
             {
@@ -328,9 +312,9 @@ namespace BusinessLogic.ApiClasses
                 });
             }
             var descTotal = customerTotal.OrderByDescending(c => c.Total).ToList();
-            return descTotal;
+            return PagedList<UserTotal>.ToPagedList(descTotal, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<List<UserTotal>> GetVendorTotal(string search)
+        public async Task<PagedList<UserTotal>> GetVendorTotal(string search, PostsParameters postsParameters)
         {
             var stores = await _repositoryManager.User.GetVendorTotal(search, false);
             var storesTotal = new List<UserTotal>();
@@ -348,7 +332,7 @@ namespace BusinessLogic.ApiClasses
                 });
             }
             var descTotal = storesTotal.OrderByDescending(c => c.Total).ToList();
-            return descTotal;
+            return PagedList<UserTotal>.ToPagedList(descTotal, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> ResetPassword(ResetPasswordDto model)
         {
@@ -409,18 +393,6 @@ namespace BusinessLogic.ApiClasses
 
             }
             return customer;
-        }
-
-        public async Task<BussnessResultModel> ChangePassword (int UserId, string OldPassword, string NewPassword)
-        {
-            var user = await _repositoryManager.User.GetUserId(UserId, true);
-            var result = await _userManager.ChangePasswordAsync(user , OldPassword, NewPassword);
-            if (!result.Succeeded)
-            {
-                return new BussnessResultModel(null, "fail", false);
-            }
-            await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(result);
         }
         public async Task<BussnessResultModel> ChangePasswordCustomer (int UserId, string OldPassword, string NewPassword, string ConfirmedPassword)
         {
@@ -845,11 +817,6 @@ namespace BusinessLogic.ApiClasses
         } 
         public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister ,int zoneId , string street , string zip, string lang)
         {
-            var IsExists = _repositoryManager.User.GetEmail(userRegister.Email);
-            if (IsExists)
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("uniqUser"), false);
-            }
             MailAddress addr = new MailAddress(userRegister.Email);
             if (userRegister.Email != addr.ToString())
             {
@@ -862,12 +829,18 @@ namespace BusinessLogic.ApiClasses
                 user.UserName = userRegister.Email;
                 user.IsMobileVerified = false;
                 user.TypeRegister = TypeRegister.Normal;
-                user.UserType = UserType.Admin;
                 user.PasswordHash = userRegister.Password;
                 user.VerifiedCode = Convert.ToInt32(_util.GenerateRandomNo()) + Convert.ToInt32(_util.GenerateRandomNo2());
                 var country = await _repositoryManager.Country.GetcountryById(userRegister.CountryId.Value, false);
                 user.CodeMobileCountry = country.MobileCode == null ? null : country.MobileCode;
-
+                if (userRegister.RoleId == 3)
+                {
+                    user.UserType = UserType.Store;
+                }
+                else
+                {
+                    user.UserType = UserType.Admin;
+                }
                 var result = await _userManager.CreateAsync(user, userRegister.Password);
                 if (result.Succeeded)
                 {
@@ -907,7 +880,6 @@ namespace BusinessLogic.ApiClasses
                     }
                 }
             } 
-            
         }
         public async Task<BussnessResultModel> DeactiveCustomer(int id)
         {
@@ -1035,27 +1007,7 @@ namespace BusinessLogic.ApiClasses
                 }
             }
         }
-        public async Task<Device> CheckDeviceToken(string token)
-        {
-            return await _repositoryManager.Device.CheckDevice(token, false);
-        }
-        public async Task<List<Device>> GetDevices(int userId)
-        {
-            return await _repositoryManager.Device.GetDevicesUserId(userId, false);
-        }
-        public string GetTokenDevice(int userId)
-        {
-            return  _repositoryManager.Device.GetTokenUser(userId);
-        }
-        //Link------------------------------------------------
-        public async Task<IEnumerable<Link>> GetLinks()
-        {
-            var links = await _repositoryManager.Link.GetLinks();
-            return links;
-        } 
-        public async Task<IEnumerable<Permission>> GetPermissionsRoleId(int roleId)
-        {
-            return await _repositoryManager.Permission.GetPermissionsShowRole(roleId);
-        }
+       
+        
     }
 }

@@ -18,7 +18,7 @@ namespace ControlPanel.Controllers
            
         }
         [HttpGet("allCP")]
-        public async Task<IActionResult> GetProductsCP(string search, [FromQuery] PostsParameters postsParameters)
+        public async Task<IActionResult> GetAllProductsCP(string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _productBL.GetProductsCP(GetCurrentUserId(), search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
@@ -27,7 +27,7 @@ namespace ControlPanel.Controllers
         [HttpPost("createProduct")]
         public async Task<IActionResult> CreateProduct(CreateProductDto create )
         {
-            var result = await _productBL.AddProduct(create);
+            var result = await _productBL.AddProduct(GetCurrentUserId() ,create);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -40,7 +40,7 @@ namespace ControlPanel.Controllers
         [HttpPut("updateProduct")]
         public async Task<IActionResult> UpdateProduct( UpdateProductDto update)
         {
-            var result = await _productBL.EditProduct(update);
+            var result = await _productBL.EditProduct(GetCurrentUserId(),update);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -50,6 +50,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
+       
         [HttpPut("acceptProduct")]
         public async Task<IActionResult> AcceptProduct(int productId)
         {
