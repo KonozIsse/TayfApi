@@ -34,6 +34,12 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
+        [HttpPut("change-default")]
+        public async Task<IActionResult> ChangeDefaultCurrency(int id)
+        {
+            await _homeBL.ChangeCurrency(id);
+            return Ok();
+        }  
         [HttpPut("update")]
         public async Task<IActionResult> UpdateCurrency(UpdateCurrencyDto update)
         {

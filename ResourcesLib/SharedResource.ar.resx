@@ -927,6 +927,9 @@
   <data name="errorCode" xml:space="preserve">
     <value>خطا بالكود</value>
   </data>
+  <data name="ErrorOccurs" xml:space="preserve">
+    <value>حدث حطأ يرجى التأكد من بيانات الدخول</value>
+  </data>
   <data name="ETAYF" xml:space="preserve">
     <value>طيف</value>
   </data>

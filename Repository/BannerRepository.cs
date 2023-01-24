@@ -20,8 +20,15 @@ namespace Repository
         }
         public async Task<Banner> GetBannerByType(int langId, string type ,bool trackChanges)
          => await FindByCondition(c => c.LangId.Equals(langId) && c.Type == type, trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Banner>> GetAllBanner(bool trackChanges)
-         => await FindAll(trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+        public async Task<List<Banner>> GetAllBanner(string search, bool trackChanges)
+        {
+            var banners =  FindAll(trackChanges);
+            if (!string.IsNullOrEmpty(search))
+            {
+                banners.Where(c => c.Title.Contains(search));
+            }
+            return await banners.Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        } 
         public async Task<Banner> GetBannerById(int id, bool trackChanges)
             => await FindByCondition(c => c.Id.Equals(id) , trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).FirstOrDefaultAsync();
         public async Task<Banner> GetBannerId(int id, bool trackChanges)
@@ -52,9 +59,15 @@ namespace Repository
         {
 
         }
-        public List<Service> GetAllServices(bool trackChanges)
-          =>  FindAll(trackChanges).OrderByDescending(e => e.CreatedAt).Include(x => x.Image).Include(x => x.Image.ImageSettings).ToList();
-
+        public List<Service> GetAllServices(string search ,bool trackChanges)
+        {
+            var servies = FindAll(trackChanges);
+            if (!string.IsNullOrEmpty(search))
+            {
+                servies.Where(c => c.Title.Contains(search)|| c.Description.Contains(search));
+            }
+            return servies.OrderByDescending(e => e.CreatedAt).Include(x => x.Image).Include(x => x.Image.ImageSettings).ToList();
+        }
         public async Task<Service> GetServiceById(int id, bool trackChanges, bool includeOtherModels = true)
         {
             var service = FindByCondition(c => c.Id.Equals(id), trackChanges);

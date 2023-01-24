@@ -183,7 +183,7 @@ namespace BusinessLogic.ApiClasses
            //storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
             return storeDto;
         }
-        public async Task<BussnessResultModel> AddStore(CreateStoreDto create,string lang)
+        public async Task<BussnessResultModel> AddStore(CreateStoreDto create)
         {
             var store = _mapper.Map<User>(create);
             store.LastName = "Store";
@@ -208,17 +208,7 @@ namespace BusinessLogic.ApiClasses
             }
             if (!result.Succeeded)
             {
-                string errors = "";
-                foreach (var x in result.Errors)
-                     errors += x + ", ";
-                if (lang == "en")
-                {
-                    return new BussnessResultModel(null, errors, false) ;
-                }
-                else
-                {
-                    return new BussnessResultModel(null, "e: حدث خطأ يرجى التأكد من البيانات", false) ;
-                }
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
             }
             return new BussnessResultModel(store, _locService.GetLocalizedStringValue("successAdd"));
         }
@@ -815,7 +805,7 @@ namespace BusinessLogic.ApiClasses
 
             return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successSave"));
         } 
-        public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister ,int zoneId , string street , string zip, string lang)
+        public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister ,int zoneId , string street , string zip)
         {
             MailAddress addr = new MailAddress(userRegister.Email);
             if (userRegister.Email != addr.ToString())
@@ -870,14 +860,7 @@ namespace BusinessLogic.ApiClasses
                 }
                 else
                 {
-                    if (lang == "en")
-                    {
-                        return new BussnessResultModel(null, " Error Occurs", false);
-                    }
-                    else
-                    {
-                        return new BussnessResultModel(null, "e: حدث حطأ يرجى التأكد من بيانات الدخول", false); 
-                    }
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
                 }
             } 
         }

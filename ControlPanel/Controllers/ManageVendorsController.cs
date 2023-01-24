@@ -24,7 +24,7 @@ namespace ControlPanel.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateStore(CreateStoreDto create)
         {
-            var result = await _userBL.AddStore(create,GetLanguage());
+            var result = await _userBL.AddStore(create);
             if (result.Success)
             {
                 return Ok(result.Message);

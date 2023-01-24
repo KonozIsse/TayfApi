@@ -16,10 +16,11 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
         public Status IsStatus { get; set; }
         public decimal TotalTax { get; set; }
-        public DateTime CreatedAt { get; set; } 
+        public string CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }
         public string DatePurchased { get; set; }
-        public decimal OrderPrice { get; set; }
+        public decimal OrderPrice { get; set; }  
+        public decimal Total { get; set; }
         public string Notes { get; set; }
         public int DeliveryTimeId { get; set; }
         public int AddressId { get; set; }

@@ -1011,6 +1011,9 @@
   <data name="errorCode" xml:space="preserve">
     <value>Error Code</value>
   </data>
+  <data name="ErrorOccurs" xml:space="preserve">
+    <value>An error occurred, please be aware of the login information</value>
+  </data>
   <data name="ETAYF" xml:space="preserve">
     <value>ETAYF</value>
   </data>

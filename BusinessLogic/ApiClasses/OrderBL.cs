@@ -208,7 +208,7 @@ namespace BusinessLogic.ApiClasses
                         CustomerName = customer.FullName,
                         OrderStatusId = order.OrderStatusId,
                         OrderStatusName = orderStatus.StatusName,
-                        CreatedAt = order.CreatedAt,
+                        CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
                         UpdatedAt = order.UpdatedAt.Value
                     });
                 }
@@ -699,6 +699,31 @@ namespace BusinessLogic.ApiClasses
             }
             return orderDto;
         }
+        public async Task<List<OrderDto>> GetAllSalesOrders(int userId , string search , DateTime? dateFrom, DateTime? dateTo)
+        {
+            var orders = await _repositoryManager.Order.GetAllSalesOrders(search , dateFrom, dateTo);
+          
+            var store = await _repositoryManager.User.GetActiveUserId(userId,false);
+            if(store.UserType == UserType.Store)
+            {
+                orders.Where(c => c.StoreId == userId);
+            }
+            var ordersDto = orders.Select(order=> new OrderDto
+            {
+                Id = order.Id,
+                CustomerName = order.Customer.FullName,
+                Currency = order.Currency.Symbol,
+                CustomerPhone = order.Customer.PhoneNumber,
+                StoreName = store.FullName,
+                StorePhone = store.PhoneNumber,
+                CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
+                TotalTax = order.TotalTax,
+                OrderStatusName = order.OrderStatus.StatusName ?? null,
+                OrderPrice = order.OrderPrice,
+                Total = orders.Sum(c=>c.OrderPrice)
+           }).ToList();
+            return ordersDto;
+        } 
         public async Task<PagedList<OrderDto>> GetAllOrders( string search ,PostsParameters postsParameters)
         {
             var ordersDto = new List<OrderDto>();
@@ -725,7 +750,7 @@ namespace BusinessLogic.ApiClasses
                     StoreEmail = store.Email,
                     StorePhone = store.PhoneNumber,
                     AddressId = order.AddressId,
-                    CreatedAt = Convert.ToDateTime(order.CreatedAt),
+                    CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
                     DatePurchased = (!String.IsNullOrEmpty(order.DatePurchased.ToString()) ? order.DatePurchased.Value.AddHours(3).ToString("dd/MM/yyyy HH:mm:ss tt") : ""),
                     DeliveryTimeName = time.Time??null,
                     DeliveryTimeId = order.DeliveryTimeId,

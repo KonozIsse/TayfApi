@@ -35,4 +35,12 @@ namespace Entities.ViewModel
         public string android_app_link { get; set; }
         public string ios_app_link { get; set; }
     }
+    public class SettingStoreVM
+    {
+        public string contact_us_email { get; set; }
+        public string order_email { get; set; }
+        public string google_map_api { get; set; }
+        public string hide_price { get; set; }
+    }
+
 }

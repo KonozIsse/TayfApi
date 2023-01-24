@@ -8,6 +8,8 @@ using Microsoft.CodeAnalysis;
 using Entities.Exception;
 using Microsoft.Extensions.Configuration;
 using Entities.RequestFeatures;
+using AspNetCore.ReportingServices.ReportProcessing.OnDemandReportObjectModel;
+using Org.BouncyCastle.Crypto;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -1439,16 +1441,93 @@ namespace BusinessLogic.ApiClasses
             {
                 stocks.Where(c => c.VendorId == userId);
             }
-            
-            var stocksDto = stocks.Select(async stock => new InventoryDto
+            var chatGrouped = stocks.GroupBy(c => c.Product)
+                .Select(x => new
+                {
+                    ProductName =  lang == "en" ? x.Key.ProductName : x.Key.ProductNameAr,
+                    SumStock = AvailabilityProducts(x.Key.Id),
+                }).Distinct();
+            var i = 1;
+            var stocksDto = chatGrouped.Select(stock => new InventoryDto
             {
-                Id = stock.Id,
-                Stock =  AvailabilityProducts(stock.Product.Id),
-                ProductName = lang == "en" ? stock.Product.ProductName : stock.Product.ProductNameAr
+                Id = i++,
+                Stock =  stock.SumStock,
+                ProductName = stock.ProductName,
             }).ToList();
            
             return PagedList<InventoryDto>.ToPagedList((IEnumerable<InventoryDto>)stocksDto, postsParameters.PageNumber, postsParameters.PageSize);
-        }  
+        }
+        public async Task<PagedList<InventoryDto>> GetAllOutInventory(int userId, string lang, PostsParameters postsParameters)
+        {
+            var stocks = await _repositoryManager.Inventory.GetAllInventory();
+            var stocksDto = new List<InventoryDto>();
+            var store = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (store.UserType == UserType.Store)
+            {
+                stocks.Where(c => c.VendorId == userId);
+            }
+            foreach (var stock in stocks)
+            {
+                int inSum = 0;
+                var inStocks = await _repositoryManager.Inventory.GetInStockProduct(stock.ProductId);
+                if(inStocks != null)
+                {
+                    inSum = inStocks.Sum(c=>c.Stock);
+                }
+                int outSum = 0;
+                var outStocks = await _repositoryManager.Inventory.GetOutStockProduct(stock.ProductId);
+                if (outStocks != null)
+                {
+                    outSum = outStocks.Sum(c => c.Stock);
+                }
+                if ((inSum - outSum) == 0)
+                {
+                    stocksDto.Add(new InventoryDto
+                    {
+                        Id = stock.Id,
+                        ProductId = stock.ProductId,
+                        ProductName = lang == "en" ? stock.Product.ProductName : stock.Product.ProductNameAr,
+                        UpdateAt = stock.UpdatedAt.Value.ToString("MM/dd/yyyy hh:mm tt") ?? null
+                    });
+                }
+            }
+            return PagedList<InventoryDto>.ToPagedList((IEnumerable<InventoryDto>)stocksDto.DistinctBy(c => c.ProductId), postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task<List<InventoryDto>> GetAllViewInventory(int userId, string lang, int productId)
+        {
+            var stocks = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+            var store = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (store.UserType == UserType.Store)
+            {
+                stocks.Where(c => c.VendorId == userId);
+            }
+            int inSum = 0;
+            var inStocks = await _repositoryManager.Inventory.GetInStockProduct(productId);
+            if (inStocks != null)
+            {
+                inSum = inStocks.Sum(c => c.Stock);
+            }
+            int outSum = 0;
+            var outStocks = await _repositoryManager.Inventory.GetOutStockProduct(productId);
+            if (outStocks != null)
+            {
+                outSum = outStocks.Sum(c => c.Stock);
+            }
+
+            var stocksDto = stocks.Select(stock => new InventoryDto
+            {
+                Id = stock.Id,
+                AddedBy = store.FullName ,
+                ProductId = productId,
+                ProductName = lang == "en" ? stock.Product.ProductName : stock.Product.ProductNameAr,
+                CreatedAt = stock.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
+                StockType  = stock.StockType,   
+                Stock = stock.Stock,
+                PurchaseCode = stock.PurchaseCode,
+                Total = inSum - outSum
+            }).ToList();
+           return stocksDto;
+        }
         public async Task<BussnessResultModel> AddInventory(int userId, CreateInventoryDto createDto)
         {
             var inventory = _mapper.Map<Inventory>(createDto);

@@ -33,6 +33,12 @@ namespace ControlPanel.Controllers
             {
                 return BadRequest(result.Message);
             }
+        } 
+        [HttpPut("change-default")]
+        public async Task<IActionResult> ChangeDefaultLanugage(int id)
+        {
+             await _homeBL.ChangeLanugage(id);
+             return Ok();
         }
 
         [HttpDelete("delete")]

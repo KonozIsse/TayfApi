@@ -13,7 +13,14 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public int Stock { get; set; }
-        public string ProductName { get; set; }
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } 
+        public string AddedBy { get; set; } 
+        public string StockType { get; set; }
+        public string PurchaseCode { get; set; }
+        public string CreatedAt { get; set; } 
+        public string UpdateAt { get; set; }
+        public int Total { get; set; }
     } 
     public class CreateInventoryDto
     {

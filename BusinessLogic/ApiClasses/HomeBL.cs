@@ -9,11 +9,7 @@ using BussnessResultModel = Entities.Exception.BussnessResultModel;
 using Entities.Exception;
 using Entities.RequestFeatures;
 using Entities.Models.Enum;
-using MailKit.Search;
-using Org.BouncyCastle.Asn1.X509;
-using System.Numerics;
-using System.ServiceModel.Channels;
-using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -61,7 +57,7 @@ namespace BusinessLogic.ApiClasses
             {
                 //sliders = GetSliderWeb(code),
                 Banner = await GetBanner(langId),
-                services = GetServices(code),
+                services = GetServices("",code,null),
                 blog = await _newsBL.GetNews(code),
                 ProductsPopular = await _productBL.PopularsPage(),
                 ProductsBest = await _productBL.BestPage(),
@@ -78,7 +74,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<HomeCPVM> GetHomeCP(int userId)
         {
-            var orders = await _repositoryManager.Order.GetAllOrders();
+            var orders = await _repositoryManager.Order.GetAllOrders("");
             var products = await _repositoryManager.Product.GetAllProducts();
             var stocks = await _repositoryManager.Inventory.GetAllOutStock();
             var ordersTransaction = orders.Where(c => c.TransactionId != null);
@@ -109,15 +105,20 @@ namespace BusinessLogic.ApiClasses
             var customersDto = _mapper.Map<List<CustomerDto>>(customers);
             return customersDto.Take(4).ToList();
         } 
-        public async Task<List<RecentProductDto>> GetRecentProducts(int? storeId)
+        public async Task<List<RecentProductDto>> GetRecentProducts(int storeId)
         {
             var products = await _repositoryManager.Product.GetProductsCP("");
+            var store = await _repositoryManager.User.GetUserId(storeId, false);
+            if (store.UserType == UserType.Store)
+            {
+                products = products.Where(c => c.StoreId == storeId).ToList();
+            }
             var productsDto = _mapper.Map<List<RecentProductDto>>(products);
             return productsDto.Take(15).ToList();
         }
         public async Task<List<OrderDto>> GetOrders(int? storeId)
         {
-            var orders = await _repositoryManager.Order.GetAllOrders();
+            var orders = await _repositoryManager.Order.GetAllOrders("");
             if(storeId != 0)
             {
                 orders = orders.Where(c => c.StoreId == storeId).ToList();
@@ -136,35 +137,7 @@ namespace BusinessLogic.ApiClasses
            
             return productsDto.Take(15).ToList();
         }
-        // Math.Round((((double)x.Count() / AllCount.Count()) * 100), 2)
-        //public async Task<> GetGoalCompletion(int? storeId)
-        //{
-        //    var orders = await _repositoryManager.Order.GetAllOrders();
-        //    if (storeId != 0)
-        //    {
-        //        orders = orders.Where(c => c.StoreId == storeId).ToList();
-        //    }
-        //    var ordersPanding = orders.Where(c => c.OrderStatusId == 1);
-        //    var ordersCompleting = orders.Where(c => c.OrderStatusId == 2);
-        //    var ordersCanceled = orders.Where(c => c.OrderStatusId == 3);
-
-        //    var products =  await _repositoryManager.Product.GetProductsCP(storeId, "");
-
-        //    var carts = await _repositoryManager.Cart.GetCarts();
-        //    var grouped = carts.GroupBy(c => c.Product).Select(x => new
-        //    {
-        //        VotesCount = x.Count()  / products.Count(),
-        //        VotePercentage = Math.Round((((double)x.Count() / products.Count()) * 100), 2)
-        //    });
-        //    var groupedorders = orders.GroupBy(c => c.OrderStatus).Select(x => new
-        //    {
-        //        VotesCount = x.Count()  ,
-        //    });
-
-
-
-        //    return model;
-        //}
+      
         public async Task<string> GetLogo()
         {
             var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo", false);
@@ -184,17 +157,29 @@ namespace BusinessLogic.ApiClasses
                // ImgId = Convert.ToInt32( urlImg + banner.Image.ImageSettings.FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path)
             };
         }
-        public async Task<List<BannerDto>> GetBanners()
+        public async Task<PagedList<BannerDto>> GetBanners(string search , string lang, PostsParameters postsParameters)
         {
-            var banners = await _repositoryManager.Banner.GetAllBanner(false);
-            var bannersDto = _mapper.Map<List<BannerDto>>(banners);
-            return bannersDto;
+            var banners = await _repositoryManager.Banner.GetAllBanner(search,false);
+            var bannersDto = banners.Select( c => new BannerDto
+            {
+                Id = c.Id,
+                Title = lang == "en" ? c.Title : c.TitleAr,
+                LangName = lang == "en" ? c.Language.Name : c.Language.NameAr,
+                CreatedAt = c.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
+                Img = _imageBL.GetImageOriginal(c.Image.Name).Result ?? null,
+            }) ;
+            return PagedList<BannerDto>.ToPagedList(bannersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task UpdateBanner(UpdateBannerDto updateDto)
+        public async Task<BussnessResultModel> UpdateBanner(UpdateBannerDto updateDto)
         {
             var banner = await _repositoryManager.Banner.GetBannerId(updateDto.Id, true);
+            if(banner == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false);
+            }
             _mapper.Map(updateDto, banner);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(banner, _locService.GetLocalizedStringValue("successSave"));
         }
         //Sliders------------------------------------------------
         public PagedList<SliderDto> GetSliderMobile(string lang , PostsParameters postsParameters)
@@ -220,13 +205,22 @@ namespace BusinessLogic.ApiClasses
                 }).ToList();
             return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task AddSliderWeb(int storeId , CreateSliderDto createSliderDto)
+        public async Task<BussnessResultModel> AddSliderWeb(int storeId , CreateSliderDto createSliderDto)
         {
             var slider = _mapper.Map<Sliders>(createSliderDto);
             slider.Type = SlidersImageType.Web;
-            slider.VendorId = storeId;
+            var store = await _repositoryManager.User.GetActiveUserId(storeId, false);
+            if(store.UserType == UserType.Store)
+            {
+                slider.VendorId = storeId;
+            }
+            if (createSliderDto.ImageId == 0)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
+            }
             _repositoryManager.Slider.AddSlider(slider);
             await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(slider, _locService.GetLocalizedStringValue("successSave"));
         } 
         public async Task<BussnessResultModel> AddSliderMobile(int storeId, CreateSliderDto createSliderDto)
         {
@@ -265,16 +259,16 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(slider, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Services------------------------------------------------
-        public List<ServiceDto> GetServices(string code)
+        public PagedList<ServiceDto> GetServices(string search, string lang, PostsParameters postsParameters)
         {
-            var services = _repositoryManager.Services.GetAllServices(false)
+            var services = _repositoryManager.Services.GetAllServices(search,false)
                 .Select(c => new ServiceDto
                 {
-                    Title = code == "en" ? c.Title : c.TitleAr,
-                    Description = code == "en" ? c.Description : c.DescriptionAr,
+                    Title = lang == "en" ? c.Title : c.TitleAr,
+                    Description = lang == "en" ? c.Description : c.DescriptionAr,
                     // ImgId =  Convert.ToInt32(urlImg + x.Image.ImageSettings.FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path)
                 }).ToList();
-            return services;
+            return PagedList<ServiceDto>.ToPagedList(services, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> UpdateService( UpdateServiceDto update)
         {
@@ -639,13 +633,11 @@ namespace BusinessLogic.ApiClasses
         }
         //setting------------------------------------------------------
 
-        public async Task<Setting> GetSettingKey(string name)
+        public async Task<IEnumerable<SettingDto>> GetAllSettings()
         {
-            return await _repositoryManager.Setting.GetSettingByValue(name,false);
-        }
-        public async Task<IEnumerable<Setting>> GetAllSettings()
-        {
-            return await _repositoryManager.Setting.GetAllSettings(false);
+            var settings = await _repositoryManager.Setting.GetAllSettings(false);
+            var settingsDto = _mapper.Map<List<SettingDto>>(settings);
+            return settingsDto;
         }
         public async Task<PagedList<PageDto>> GetAllPages(string search ,string lang , PostsParameters postsParameters)
         {
@@ -657,17 +649,27 @@ namespace BusinessLogic.ApiClasses
             pageDto.Description = lang == "en" ? page.Description : page.DescriptionAr;
             return PagedList<PageDto>.ToPagedList(pagesDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
-        public async Task EditSettingVM (SettingVM update , string value)
+        public async Task<BussnessResultModel> EditSetting (SettingVM update )
         {
-            var itemDB = await GetSettingKey("cp_logo");
-            var itemDB2 = await GetSettingKey("website_logo");
-            if (value != null)
+            PropertyInfo[] properties = update.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
             {
-                itemDB.Value = value;
-                itemDB2.Value = value;
+                var itemDB = await _repositoryManager.Setting.GetSettingByValue(property.Name, true);
+                itemDB.Value = property.GetValue(update)?.ToString();
             }
             await _repositoryManager.SaveAsync();
-
+            return new BussnessResultModel(properties, _locService.GetLocalizedStringValue("successSave"));
+        } 
+        public async Task<BussnessResultModel> EditSettingStore (SettingStoreVM update )
+        {
+            PropertyInfo[] properties = update.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                var itemDB = await _repositoryManager.Setting.GetSettingByValue(property.Name, true);
+                itemDB.Value = property.GetValue(update)?.ToString();
+            }
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(properties, _locService.GetLocalizedStringValue("successSave"));
         }
         public async Task<PageDto> GetPage(int id , string lang = "en")
         {

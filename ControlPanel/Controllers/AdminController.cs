@@ -19,7 +19,7 @@ namespace ControlPanel.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAdmin(CreateAdminDto item, int state, string street , string zip)
         {
-            var result = await _userBL.RegisterUser(item, state, street, zip,GetLanguage());
+            var result = await _userBL.RegisterUser(item, state, street, zip);
             if (result.Success)
             {
                 return Ok(result.Message);

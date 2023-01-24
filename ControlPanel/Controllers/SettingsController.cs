@@ -22,12 +22,6 @@ namespace ControlPanel.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-        [HttpGet("getSetting")]
-        public async Task<IActionResult> GetAllSettings()
-        {
-            var result = await _homeBL.GetAllSettings(); 
-            return Ok(result);
-        }
        
         [HttpPut("updatePage")]
         public async Task<IActionResult> EditPage(EditPageDto update)
@@ -42,7 +36,39 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
+       //---------------------------------------------------------------
+        [HttpGet("getSettings")]
+        public async Task<IActionResult> GetAllSettings()
+        {
+            var result = await _homeBL.GetAllSettings();
+            return Ok(result);
+        }
 
-      
+        [HttpPut("EditSettingStore")]
+        public async Task<IActionResult> EditSettingStore(SettingStoreVM update)
+        {
+            var result = await _homeBL.EditSettingStore(update);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }
+        [HttpPut("EditSetting")]
+        public async Task<IActionResult> EditSetting(SettingVM update)
+        {
+            var result = await _homeBL.EditSetting(update);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }
     }
 }
