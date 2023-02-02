@@ -20,12 +20,12 @@ namespace Repository
         => await FindByCondition(y => y.ImgId == imageId, false).ToListAsync();
         public async Task<ImageSetting> GetImageSettingId(int id , bool trackChanges)
          => await FindByCondition(y => y.Id == id, trackChanges).FirstOrDefaultAsync();
-        public async Task<ImageSetting> GetByType(int imageId, string ImageType = null )
+        public async Task<ImageSetting> GetByType(int imageId, ImageType ImageType)
         {
             var query = FindByCondition(y => y.ImgId == imageId, false);
-            if (!string.IsNullOrWhiteSpace(ImageType))
+            if (ImageType != null)
             {
-                query = query.Where(y => y.ImageType.Equals(ImageType));
+                query = query.Where(y => y.ImageType == ImageType);
             }
             return await query.SingleOrDefaultAsync();
         }

@@ -19,6 +19,9 @@ using Image = Entities.Models.Image;
 using BussnessResultModel = Entities.Exception.BussnessResultModel;
 using Entities.RequestFeatures;
 using static System.Net.Mime.MediaTypeNames;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Reflection;
+using Entities.ViewModel;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -55,17 +58,7 @@ namespace BusinessLogic.ApiClasses
                 _imageUploadServices.DeleteImage(oldLink);
             }
         }
-        public async Task<int> AddImageProduct (CreateImageDto imageDto)
-        {
-            var image = _mapper.Map<Image>(imageDto);
-            _repositoryManager.Image.AddImage(image);
-            try
-            {
-                await _repositoryManager.SaveAsync();
-            }
-            catch { }
-            return image.Id;
-        }
+       
         public async Task<BussnessResultModel> CreateImages (/*int? adminId,*/ int? storeId, CreateImageDto create)
         {
             
@@ -363,7 +356,7 @@ namespace BusinessLogic.ApiClasses
             catch { }
             if (imgId != 0)
             {
-                var imageMedium = await _repositoryManager.ImageSetting.GetByType(imgId, ImageType.MEDIUM.ToString());
+                var imageMedium = await _repositoryManager.ImageSetting.GetByType(imgId, ImageType.MEDIUM);
 
                 if (imageMedium != null)
                 {
@@ -372,22 +365,12 @@ namespace BusinessLogic.ApiClasses
             }
             return image;
         }
-        public async Task<string> GetImageThumbnail(string img)
+        public async Task<string> GetImageThumbnail(int img)
         {
-            int imgId = 0;
             string image = "";
-            try
+            if (img != 0)
             {
-
-                if (!string.IsNullOrEmpty(img))
-                {
-                    imgId = Convert.ToInt32(img);
-                }
-            }
-            catch { }
-            if (imgId != 0)
-            {
-                var imageThumbnail = await _repositoryManager.ImageSetting.GetByType(imgId, ImageType.THUMBNAIL.ToString());
+                var imageThumbnail = await _repositoryManager.ImageSetting.GetByType(img, ImageType.THUMBNAIL);
 
                 if (imageThumbnail != null)
                 {
@@ -409,21 +392,21 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             catch { }
-            if (imgId != 0)
-            {
-                var imageOriginal = await _repositoryManager.ImageSetting.GetByType(imgId);
+           // if (imgId != 0)
+            //{
+            //    var imageOriginal = await _repositoryManager.ImageSetting.GetByType(imgId);
 
-                if (imageOriginal != null)
-                {
-                    image = imageOriginal.Path;
-                }
-            }
+            //    if (imageOriginal != null)
+            //    {
+            //        image = imageOriginal.Path;
+            //    }
+            //}
             return image;
         }
         public async Task<List<string>> GetListImagesProductIdAsync (int productId)
         {
             List<String> listImages = new List<String>();
-            var images = await  _repositoryManager.Image.GetProductImages(productId);
+            var images = await  _repositoryManager.ImageProduct.GetImagesProduct(productId,false);
             if (images != null)
             {
                 foreach(var image in images)
@@ -434,10 +417,7 @@ namespace BusinessLogic.ApiClasses
             }
             return listImages;
         }
-        public async Task<IEnumerable<ImageSetting>> GetImagesCategories(int vendorId = 0, string category = "")
-        {
-            return await _repositoryManager.ImageSetting.GetImagesStoreId(vendorId, category);
-        } 
+       
         public async Task<PagedList<ImageDto>> GetImages( string category , int? vendorId, PostsParameters postsParameters)
         {
             var images =  await _repositoryManager.Image.GetImages(category);
@@ -454,29 +434,17 @@ namespace BusinessLogic.ApiClasses
             var imagesDto = _mapper.Map<List<ImageSettingDto>>(images);
             return imagesDto;
         } 
-        public async Task<ImageSetting> GetImageSetting(int settingId)
+       
+        public async Task<BussnessResultModel> EditMediaSetting(SettingImageVM update)
         {
-            var images =  await _repositoryManager.ImageSetting.GetImageSettingId(settingId , false);
-            return images;
-        }
-        public async Task<BussnessResultModel> EditMediaSetting(string thh, string thw, string mh, string mw, string lh, string lw)
-        {
-
-            var settingImage = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_height", true);
-            settingImage.Value = thh ;
-            var settingImage1 = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_width", true);
-            settingImage1.Value = thw;
-            var settingImage2 = await _repositoryManager.Setting.GetSettingByValue("Medium_height", true);
-            settingImage2.Value = mh;
-            var itemFromDB4 = await _repositoryManager.Setting.GetSettingByValue("Medium_width", true);
-            itemFromDB4.Value = mw ;
-            var itemFromDB5 = await _repositoryManager.Setting.GetSettingByValue("Large_height", true);
-            itemFromDB5.Value = lh ;
-            var itemFromDB6 = await _repositoryManager.Setting.GetSettingByValue("Large_width", true);
-            itemFromDB6.Value = lw ;
-
+            PropertyInfo[] properties = update.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                var itemDB = await _repositoryManager.Setting.GetSettingByValue(property.Name, true);
+                itemDB.Value = property.GetValue(update)?.ToString();
+            } 
             await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(settingImage, _locService.GetLocalizedStringValue("successSave"))??
+            return new BussnessResultModel(update, _locService.GetLocalizedStringValue("successSave"))??
                  new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"));
 
         } 

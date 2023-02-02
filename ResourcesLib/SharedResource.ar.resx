@@ -954,6 +954,9 @@
   <data name="Female" xml:space="preserve">
     <value>أنثى</value>
   </data>
+  <data name="FileNotUploaded" xml:space="preserve">
+    <value>لم يتم تحميل الصورة</value>
+  </data>
   <data name="filter" xml:space="preserve">
     <value>بحث حسب</value>
   </data>
@@ -2183,6 +2186,12 @@
   </data>
   <data name="verifyCode" xml:space="preserve">
     <value>كود التحقق</value>
+  </data>
+  <data name="VerifyEmail" xml:space="preserve">
+    <value>يرجى التحقق من البريد الالكتروني</value>
+  </data>
+  <data name="VerifyMobile" xml:space="preserve">
+    <value>يرجى التحقق من رقم الهاتف المحمول ، يجب أن يكون رقم الجوال 14 رقمًا كحد أقصى</value>
   </data>
   <data name="ViewArticle" xml:space="preserve">
     <value>عرض المقالات</value>

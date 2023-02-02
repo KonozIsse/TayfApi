@@ -1,5 +1,6 @@
 ﻿using Entities.DataTransferObjects;
 using Entities.RequestFeatures;
+using Entities.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -19,12 +20,11 @@ namespace ControlPanel.Controllers
             var result = await _imageBL.GetMediaSetting();
             return Ok(result);
         }
-
        
         [HttpPut("update")]
-        public async Task<IActionResult> EditMediaSetting(string thh, string thw, string mh, string mw, string lh, string lw)
+        public async Task<IActionResult> EditMediaSetting(SettingImageVM update)
         {
-            var result = await _imageBL.EditMediaSetting(thh, thw, mh, mw, lh, lw);
+            var result = await _imageBL.EditMediaSetting(update);
             if (result.Success)
             {
                 return Ok(result.Message);

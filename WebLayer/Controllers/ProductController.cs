@@ -17,19 +17,13 @@ namespace WebLayer.Controllers
         {
            
         }
-        [HttpGet("allProductsCP")]
-        public async Task<IActionResult> GetProductsCP(string search, [FromQuery] PostsParameters postsParameters)
+        [HttpGet("getProductDetails/{id}")]
+        public async Task<IActionResult> GetProductDetails(int id)
         {
-            var result = await _productBL.GetProductsCP(GetStoreId(), search, GetLanguage(), postsParameters);
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
+            var result = await _productBL.GetProductDetails(id , GetCurrentUserId(),  GetLanguage());
             return Ok(result);
         }
-        [HttpGet("all")]
-        public async Task<IActionResult> GetProducts(string search)
-        {
-            var result = await _productBL.GetProductsHome(GetStoreId(), search, GetLanguage());
-            return Ok(result);
-        }
+      
         [HttpGet("popular")]
         public async Task<IActionResult> PopularProducts()
         {
@@ -43,16 +37,11 @@ namespace WebLayer.Controllers
             return Ok(result);
         }
       
-        [HttpGet("productId")]
-        public async Task<IActionResult> GetDetailProduct(int productId)
-        {
-            var result = await _productBL.GetDetailProduct(productId,GetCustomerId(), GetLanguage());
-            return Ok(result);
-        } 
+       
         [HttpPost("addReview")]
         public async Task<IActionResult> CreateReviewProduct(int productId ,CreateReviewDto create )
         {
-            var result = await _productBL.AddReview(productId, GetCustomerId(), create);
+            var result = await _productBL.AddReview(productId, GetCurrentUserId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);

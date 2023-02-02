@@ -1,4 +1,5 @@
 ﻿using Entities.Models.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Entities.DataTransferObjects
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
-        public string Avater { get; set; }
+        public IFormFile Avater { get; set; }
         public string Email { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public string IsSubscribe { get; set; }
@@ -42,7 +43,17 @@ namespace Entities.DataTransferObjects
         public int Agree { get; set; }
 
     }
-    public class UpdateCustomerDto : CreateCustomerDto
+    public class CreateCustomerCPDto
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public int? CountryId { get; set; }
+        public string Password { get; set; }
+        public Status Status { get; set; }
+    }
+    public class UpdateCustomerDto : CreateCustomerCPDto
     {
         public int Id { get; set; }
         public string ConfirmedPassword { get; set; }

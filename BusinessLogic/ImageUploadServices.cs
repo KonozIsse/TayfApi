@@ -24,15 +24,13 @@ namespace BusinessLogic
             _logger = logger;
             Configuration = configuration;
         }
-        
+
         public string Upload(IFormFile obj)
         {
             if (obj?.Length > 0)
             {
                 try
                 {
-                    //string _filesRootPath = Configuration.GetSection("filesRootPath").Value;
-                    // var fullFileName = Path.Combine("/" + _filesRootPath + "/" + fileName);
                     var fileName = Guid.NewGuid() + Path.GetExtension(obj.FileName);
                     if (!Directory.Exists(_webHostEnvironment.WebRootPath + "\\img\\"))
                     {
@@ -42,13 +40,12 @@ namespace BusinessLogic
                     {
                         obj.CopyTo(stream);
                         stream.Flush();
-                        return  fileName;
+                        return fileName;
                     }
                 }
                 catch (Exception ex)
                 {
-                    //_logger.Error("Exception Occured while uploading to Amazon S3 : " + ex, ex);
-                    throw;
+                    return "-1";
                 }
             }
             else
@@ -72,65 +69,14 @@ namespace BusinessLogic
                 var binData = Convert.FromBase64String(base64Image);
 
                 fileName = Guid.NewGuid() + Path.GetExtension(fileName);
-                var fullFileName = Path.Combine("/img/" + fileName);
-                System.IO.File.WriteAllBytes(fullFileName, binData);
+
+                System.IO.File.WriteAllBytes(_webHostEnvironment.WebRootPath + "\\img\\" + fileName, binData);
                 return fileName;
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError("Exception Occured while uploading to Amazon S3 : " + ex, ex);
-                return null;
+                return "-1";
             }
-        }
-        public Stream ResizeImageFile(Stream imageFileStream, int targetSize)
-        {
-            byte[] imageFile = StreamToByteArray(imageFileStream);
-            using (System.Drawing.Image oldImage = System.Drawing.Image.FromStream(new MemoryStream(imageFile)))
-            {
-                Size newSize = CalculateDimensions(oldImage.Size, targetSize);
-                using (Bitmap newImage = new Bitmap(newSize.Width, newSize.Height, PixelFormat.Format24bppRgb))
-                {
-                    using (Graphics canvas =  Graphics.FromImage(newImage))
-                    {
-                        canvas.SmoothingMode = SmoothingMode.AntiAlias;
-                        canvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        canvas.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                        canvas.DrawImage(oldImage, new Rectangle(new Point(0, 0), newSize));
-                        MemoryStream m = new MemoryStream();
-                        newImage.Save(m, ImageFormat.Jpeg);
-                        return new MemoryStream(m.GetBuffer());
-                    }
-                }
-            }
-        }
-        public  byte[] StreamToByteArray(Stream input)
-        {
-            byte[] buffer = new byte[16 * 1024];
-            using (MemoryStream ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    ms.Write(buffer, 0, read);
-                }
-                return ms.ToArray();
-            }
-        }
-
-        public static Size CalculateDimensions(Size oldSize, int targetSize)
-        {
-            Size newSize = new Size();
-            if (oldSize.Height > oldSize.Width)
-            {
-                newSize.Width = (int)(oldSize.Width * (targetSize / (float)oldSize.Height));
-                newSize.Height = targetSize;
-            }
-            else
-            {
-                newSize.Width = targetSize;
-                newSize.Height = (int)(oldSize.Height * (targetSize / (float)oldSize.Width));
-            }
-            return newSize;
         }
         public  bool DeleteImage(string link)
         {

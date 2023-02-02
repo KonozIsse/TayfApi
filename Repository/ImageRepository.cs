@@ -18,8 +18,7 @@ namespace Repository
         }
         public async Task<Image> GetImage(int id , bool trackChanges)
          => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Image>> GetProductImages(int productId)
-          => await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active ,false).ToListAsync();
+       
         public async Task<List<Image>> GetImages(string category)
         {
             var images = FindByCondition(c => c.IsStatus == Status.Active,false);

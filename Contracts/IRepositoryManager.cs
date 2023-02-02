@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,6 +56,7 @@ namespace Contracts
         IUnitRepository Unit { get; }
         IZoneRepository Zone { get; }
         IRoleRepository Role { get; }
+        IImageProductRepository ImageProduct { get; }
         IProductCategoryRepository ProductCategory { get; }
         Task SaveAsync();
     }

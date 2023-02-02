@@ -70,31 +70,16 @@ namespace WebLayer.Controllers
         {
             var userName = User.Identity.Name;
             var user = _userManager.FindByNameAsync(userName).Result;
-            user.RoleId = 2;
             return user;
 
         }
         [NonAction]
-        public int GetCustomerId()
+        public int GetCurrentUserId()
         {
             var user = GetCurrentUser();
-            user.RoleId = 2;
             return user.Id;
         }
-        [NonAction]
-        public int GetStoreId()
-        {
-            var user = GetCurrentUser();
-            user.RoleId = 3;
-            return user.Id;
-        }
-        [NonAction]
-        public int GetAdminId()
-        {
-            var user = GetCurrentUser();
-            user.RoleId = 1;
-            return user.Id;
-        }
+      
         [NonAction]
         public Currency GetCurrentCurrency()
         {

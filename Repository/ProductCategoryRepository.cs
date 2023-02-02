@@ -22,14 +22,9 @@ namespace Repository
         public void DeleteProductCategory(ProductCategory category)=>Delete(category);
 
         public async Task<IEnumerable<ProductCategory>> GetAllCategoriesProdId(int prodId, bool trackChanges)
-        => await FindByCondition(c => c.ProductId == prodId, trackChanges).Include(c=>c.Category).ToListAsync();
-
-        public async Task<IEnumerable<ProductCategory>> GetAllProductCategory(bool trackChanges)
-         => await FindAll(trackChanges).ToListAsync();
-        public async Task<IEnumerable<ProductCategory>> GetAllProductsCatId(int catId, bool trackChanges)
-         => await FindByCondition(c => c.CategoryId == catId, trackChanges).ToListAsync();
-        public async Task<ProductCategory> GetProductCategoryId(int id, bool trackChanges)
-        => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
+        => await FindByCondition(c => c.ProductId == prodId, trackChanges).Include(c => c.Category).ToListAsync();
+        public async Task<IEnumerable<ProductCategory>> GetCategoriesProdId(int prodId, bool trackChanges)
+        => await FindByCondition(c => c.ProductId == prodId, trackChanges).ToListAsync();
         public async Task<ProductCategory> GetCategoryToPrductId(int productId)
        => await FindByCondition(c => c.ProductId == productId, false).Include(c=>c.Category).SingleOrDefaultAsync();
     }

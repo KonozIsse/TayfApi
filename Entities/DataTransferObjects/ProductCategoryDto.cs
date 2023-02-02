@@ -8,10 +8,11 @@ namespace Entities.DataTransferObjects
 {
     public class ProductCategoryDto
     {
+        public int? MainCategoryId { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
     } 
-    public class CategoriesProductDto
+    public class CreateProductCategoryDto
     {
         public int CategoryId { get; set; }
     }

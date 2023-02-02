@@ -9,11 +9,6 @@ namespace Entities.ViewModel
 {
     public class ProductVM
     {
-        public int MainCategoryId { get; set; }
-        public Nullable<int> CategoryId { get; set; }
-        public string CategoryName { get; set; }
-        public string CategoryImage { get; set; }
-
         public int Id { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
@@ -42,7 +37,8 @@ namespace Entities.ViewModel
         public int NumLike { get; set; }
         public bool IsFavorite { get; set; }
         public bool IsReview { get; set; }
-        public List<ReviewDto> Reviews { get; set; }
+        public List<ReviewDto> Reviews { get; set; } 
+        public List<ProductCategoryDto> ProductCategories { get; set; }
         public Nullable<decimal> Rate { get; set; }
 
         public Nullable<int> StoreId { get; set; }

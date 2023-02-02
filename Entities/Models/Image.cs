@@ -10,11 +10,6 @@ namespace Entities.Models
         [StringLength(191)]
         public string Name { get; set; }
         public ImageCategory Category { get; set; }
-
-        [ForeignKey(nameof(Product))]
-        public int? ProductId { get; set; }
-        public Product Product { get; set; }
-
         [ForeignKey(nameof(Vender))]
         public int? VendId { get; set; }
         public User Vender { get; set; }
@@ -22,5 +17,6 @@ namespace Entities.Models
         //public int? AdminId { get; set; }
         //public User Admin { get; set; }
         public List<ImageSetting> ImageSettings { get; set; }
+        public List<ProductImage> ProductImages { get; set; }
     }
 }

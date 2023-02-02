@@ -38,6 +38,7 @@ namespace Entities
         public DbSet<DeliveryTime> DeliveryTimes { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<ImageSetting> ImageSettings { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Link> Links { get; set; }

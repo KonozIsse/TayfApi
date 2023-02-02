@@ -9,10 +9,8 @@ namespace Contracts
 {
     public interface IProductCategoryRepository
     {
-        Task<ProductCategory> GetProductCategoryId(int id, bool trackChanges);
-        Task<IEnumerable<ProductCategory>> GetAllProductCategory(bool trackChanges);
-        Task<IEnumerable<ProductCategory>> GetAllProductsCatId(int catId ,bool trackChanges);
         Task<IEnumerable<ProductCategory>> GetAllCategoriesProdId(int prodId, bool trackChanges);
+        Task<IEnumerable<ProductCategory>> GetCategoriesProdId(int prodId, bool trackChanges);
         Task<ProductCategory> GetCategoryToPrductId(int productId);
         void CreateProductCategory(ProductCategory category);
         void DeleteProductCategory(ProductCategory category);

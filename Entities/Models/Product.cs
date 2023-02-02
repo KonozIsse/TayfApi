@@ -6,7 +6,6 @@ namespace Entities.Models
     public class Product : BaseEntity
     {
         public string ProductName { get; set; }
-        public string ImageProduct { get; set; }
         public string ProductNameAr { get; set; }
         public string Description { get; set; }
         public string DescriptionAr { get; set; }
@@ -33,7 +32,7 @@ namespace Entities.Models
         public List<ProductSales> ProductSales { get; set; }
         public List<ProductAttribut> AttributesProducts { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }
-        public List<Image> Images { get; set; }
+        public List<ProductImage> Images { get; set; }
         public List<Cart> Carts { get; set; }
 
     }

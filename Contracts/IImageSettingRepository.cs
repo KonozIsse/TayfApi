@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Contracts
     {
         Task<IEnumerable<ImageSetting>> GetImageSettings(int imageId);
         Task<ImageSetting> GetImageSettingId(int id, bool trackChanges);
-        Task<ImageSetting> GetByType(int imageId, string ImageType = null);
+        Task<ImageSetting> GetByType(int imageId, ImageType ImageType );
         Task<IEnumerable<ImageSetting>> GetImagesStoreId(int vendorId, string category);
         void AddImageSetting(ImageSetting image);
         void DeleteImageSetting(ImageSetting image);

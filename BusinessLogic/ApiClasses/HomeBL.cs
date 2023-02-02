@@ -49,25 +49,25 @@ namespace BusinessLogic.ApiClasses
             };
             return navbarDto;
         }
-        public async Task<HomeVM> GetHome(int customerId, Currency cod, string code = "en")
+        public async Task<HomeVM> GetHome(int customerId, Currency cod, string lang = "en")
         {
-            var language = await _repositoryManager.Language.GetCodeLanguage(code, false);
+            var language = await _repositoryManager.Language.GetCodeLanguage(lang, false);
             int langId = language.Id;
             var model = new HomeVM
             {
                 //sliders = GetSliderWeb(code),
                 Banner = await GetBanner(langId),
-                services = GetServices("",code,null),
-                blog = await _newsBL.GetNews(code),
+                services = GetServices("", lang, null),
+                blog = await _newsBL.GetNews(lang),
                 ProductsPopular = await _productBL.PopularsPage(),
                 ProductsBest = await _productBL.BestPage(),
                 ProductsLatest = await _productBL.LatestPage(),
                 ProductsSpecial = await _productBL.SpecialsPage(),
                 ProductsTopRated = await _productBL.TopRatedPage(),
                 ProductsDailyDeal = await _productBL.DailyDeals(),
-                products = await _productBL.GetProducts(customerId, code),
-                flash = await _productBL.GetFlashProds(),
-                specialProducts = await _productBL.GetSpecialsProd(),
+                products = await _productBL.GetProducts(customerId, lang),
+                flash = await _productBL.GetFlashProds(customerId),
+                specialProducts = await _productBL.GetSpecialsProd(customerId , lang),
                 stores = await _userBL.GetStores()
             };
             return model;

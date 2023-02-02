@@ -3,8 +3,6 @@ using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Twilio.Rest.Serverless.V1.Service;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ControlPanel.Controllers
 {
@@ -24,9 +22,9 @@ namespace ControlPanel.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateCustomer(CreateCustomerDto create)
+        public async Task<IActionResult> CreateCustomer(CreateCustomerCPDto create)
         {
-            var result = await _userBL.RegisterCustomer(create, GetLanguage());
+            var result = await _userBL.RegisterCustomerCP(create);
             if (result.Success)
             {
                 return Ok(result.Message);

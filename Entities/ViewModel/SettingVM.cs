@@ -41,6 +41,15 @@ namespace Entities.ViewModel
         public string order_email { get; set; }
         public string google_map_api { get; set; }
         public string hide_price { get; set; }
+    } 
+    public class SettingImageVM
+    {
+        public string Thumbnail_height { get; set; }
+        public string Thumbnail_width { get; set; }
+        public string Medium_height { get; set; }
+        public string Medium_width { get; set; }
+        public string Large_height { get; set; }
+        public string Large_width { get; set; }
     }
 
 }

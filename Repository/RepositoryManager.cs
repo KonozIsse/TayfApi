@@ -58,7 +58,8 @@ namespace Repository
         private IZoneRepository _zoneRepository; 
         private IUnitRepository _unitRepository;    
         private IRoleRepository _roleRepository;
-        private IProductCategoryRepository _productCategoryRepository;
+        private IProductCategoryRepository _productCategoryRepository; 
+        private IImageProductRepository _imageProductRepository;
 
         public RepositoryManager(RepositoryContext repositoryContext)
         {
@@ -498,6 +499,16 @@ namespace Repository
                 if (_productCategoryRepository == null)
                     _productCategoryRepository = new ProductCategoryRepository(_repositoryContext);
                 return _productCategoryRepository;
+            }
+        } 
+
+        public IImageProductRepository ImageProduct
+        {
+            get
+            {
+                if (_imageProductRepository == null)
+                    _imageProductRepository = new ImageProductRepository(_repositoryContext);
+                return _imageProductRepository;
             }
         }
 

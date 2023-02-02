@@ -1032,6 +1032,9 @@
   <data name="Female" xml:space="preserve">
     <value>Female</value>
   </data>
+  <data name="FileNotUploaded" xml:space="preserve">
+    <value>image not uploaded</value>
+  </data>
   <data name="filter" xml:space="preserve">
     <value>Filter</value>
   </data>
@@ -2120,6 +2123,12 @@
   </data>
   <data name="verifyCode" xml:space="preserve">
     <value>Verification Code</value>
+  </data>
+  <data name="VerifyEmail" xml:space="preserve">
+    <value>Please Verify Your Email</value>
+  </data>
+  <data name="VerifyMobile" xml:space="preserve">
+    <value>Please Verify Mobile Number , Mobile must be at most 14 numbers</value>
   </data>
   <data name="ViewArticle" xml:space="preserve">
     <value>عرض المقالات</value>

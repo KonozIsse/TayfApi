@@ -31,7 +31,6 @@ namespace Entities.DataTransferObjects
         public string Password { get; set; }
         public Status Status { get; set; }
         public string Url { get; set; }
-        public string Lang { get; set; }
         public string Avater { get; set; }
         public string AdressInfo { get; set; }
     }
@@ -80,7 +79,6 @@ namespace Entities.DataTransferObjects
         public string Avater { get; set; }
         public string Password { get; set; }
         public Status Status { get; set; }
-        public string Lang { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public bool? IsMobileVerified { get; set; }
         public int? CodeMobileCountry { get; set; }

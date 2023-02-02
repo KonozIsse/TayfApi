@@ -73,7 +73,7 @@ namespace BusinessLogic
             CreateMap<CreateProductDto, Product>().ReverseMap();
             CreateMap<UpdateProductDto, Product>().ReverseMap();
             CreateMap<ProductPageDto, Product>().ReverseMap();
-            CreateMap<CategoriesProductDto, ProductCategory>().ReverseMap();
+            CreateMap<CreateProductCategoryDto, ProductCategory>().ReverseMap();
             CreateMap<ProductCategoryDto, ProductCategory>().ReverseMap();
             CreateMap<RecentProductDto, Product>().ReverseMap();
             //MapProductSales
@@ -113,7 +113,8 @@ namespace BusinessLogic
             CreateMap<UpdateStoreDto, User>().ReverseMap();  
             CreateMap<ResetPasswordDto, User>().ReverseMap(); 
             //MapCustomer
-            CreateMap<CreateCustomerDto, User>().ReverseMap();
+            CreateMap<CreateCustomerDto, User>().ReverseMap(); 
+            CreateMap<CreateCustomerCPDto, User>().ReverseMap();
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<CustomerDto, User>().ReverseMap();
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
@@ -148,8 +149,8 @@ namespace BusinessLogic
             //MapImage
             CreateMap<ImageDto, Image>().ReverseMap();
             CreateMap<CreateImageDto, Image>().ReverseMap();
-            CreateMap<CreateImageProductDto, Image>().ReverseMap();
-            CreateMap<ImageProductDto, Image>().ReverseMap();
+            //ImageProduct
+            CreateMap<ImageProductDto, ProductImage>().ReverseMap();
             //MapImageSetting
             CreateMap<ImageSettingDto, ImageSetting>().ReverseMap();
             CreateMap<CreateImageSettingDto, ImageSetting>().ReverseMap(); 
@@ -177,7 +178,11 @@ namespace BusinessLogic
                 typeMap.AddAfterMapAction(afterFunction);
             });
         }
-
+        //.AfterMap((s, d) => {
+        //    var request = _httpContextAccessor.HttpContext.Request;
+        //    var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+        //    d.NamePhoto = baseUrl + "/img/" + s.NamePhoto;
+        //});
         private void FillEnumDesc(object destObj)
         {
             var hasEnum = destObj.GetType().GetProperties().Any(x => x.IsDefined(typeof(EnumBindAttribute), false));

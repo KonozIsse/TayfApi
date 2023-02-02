@@ -28,7 +28,7 @@ namespace Repository
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();  
         public async Task<Product> GetAcceptAdminActiveProduct(int id)
         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
-            .Include(c=>c.ProductCategories).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
+            .Include(c=>c.Store).Include(c=>c.Images).Include(c=>c.ProductCategories).Include(s=>s.SpecialProducts).Include(c=>c.ProductSales)
             .Include(c=>c.Reviews).Include(e=>e.WishLists).Include(c=>c.AttributesProducts).FirstOrDefaultAsync();
          public async Task<List<Product>> GetProductsCatId(int categoryId)
        => await FindByCondition(c => c.ProductCategories.Any(n=>n.CategoryId == categoryId) && c.IsStatus == Status.Active, false).ToListAsync();

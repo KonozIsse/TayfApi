@@ -36,7 +36,6 @@ namespace ControlPanel.Controllers
         protected readonly UserBL _userBL;
         protected readonly ImageBL _imageBL;
         protected readonly LocationTaxBL _locationTaxBL;
-        protected readonly IWebHostEnvironment _webHostEnvironment;
 
         public MyBaseController(IServiceProvider provider)
         {
@@ -65,7 +64,6 @@ namespace ControlPanel.Controllers
             _userBL = provider.GetService<UserBL>();
             _imageBL = provider.GetService<ImageBL>();
             _locationTaxBL = provider.GetService<LocationTaxBL>();
-            _webHostEnvironment = provider.GetService<IWebHostEnvironment>();
         }
         [NonAction]
         public User GetCurrentUser()

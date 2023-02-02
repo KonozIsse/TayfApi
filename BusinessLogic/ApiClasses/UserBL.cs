@@ -33,6 +33,7 @@ namespace BusinessLogic.ApiClasses
         protected readonly IAuthenticationManager _authManager;
         protected readonly ILoggerManager _logger;
         protected readonly ISMSService _sms;
+        protected readonly ImageUploadServices _imageUploadServices;
         public UserBL(IRepositoryManager repositoryManager, IMapper mapper , Util util, UserManager<User> userManager,  IEmailSender emailSender
             , LocService locService , RoleManager<Role> roleManager , LocationTaxBL locationTaxBL , SignInManager<User> signInManager, IAuthenticationManager authManager , ILoggerManager logger ,ISMSService sms)
         {
@@ -419,38 +420,6 @@ namespace BusinessLogic.ApiClasses
             }
           
         }
-        public async Task<BussnessResultModel> ResetPasswordCustomer(string email, string NewPassword, string ConfirmedPassword)
-        {
-            var user = await _repositoryManager.User.GetCustomerEmail(email, true);
-            if (ConfirmedPassword == NewPassword)
-            {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, token, NewPassword);
-                if (result.Succeeded)
-                {
-                    user.ResetPasswordCode = null;
-                    user.PasswordHash = NewPassword;
-                    var devices = await _repositoryManager.Device.GetDevicesUserId(user.Id, true);
-                    if (devices != null)
-                    {
-                        foreach (var device in devices)
-                        {
-                            device.DeviceToken = user.PasswordHash;
-                        }
-                    }
-                    await _repositoryManager.SaveAsync();
-                    return new BussnessResultModel(user);
-                }
-                else
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"), false);
-                }
-            }
-            else
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("passwnotequal"), false);
-            }
-        }
         public async Task<BussnessResultModel> UpdateCustomerCP(UpdateCustomerDto updateDto)
         {
             var user = await _repositoryManager.User.GetUserId(updateDto.Id, true);
@@ -605,46 +574,47 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
-        public async Task<BussnessResultModel> RegisterCustomer(CreateCustomerDto userRegister,string lang = "en")
+        public async Task<BussnessResultModel> RegisterCustomer(CreateCustomerDto userRegister)
         {
-            //if (userRegister.TypeRegister == TypeRegister.Facebook)
-            //{
-            //    user.TypeRegister = TypeRegister.Facebook;
-            //    user.Avater = userRegister.SocialImage;
-            //}
-            //else if (user.TypeRegister == TypeRegister.Google)
-            //{
-            //    user.TypeRegister = TypeRegister.Google;
-            //    user.Avater = userRegister.SocialImage;
-            //}
-            //else if (user.TypeRegister == TypeRegister.Apple)
-            //{
-            //    user.TypeRegister = TypeRegister.Apple;
-            //    user.Avater = userRegister.SocialImage;
-            //}
-            //else
-            //{
-            //    user.TypeRegister = TypeRegister.Normal;
-            //}
+          
             var user = _mapper.Map<User>(userRegister);
+            if (userRegister.TypeRegister == TypeRegister.Facebook)
+            {
+                user.TypeRegister = TypeRegister.Facebook;
+                // user.Avater = userRegister.SocialImage;
+            }
+            else if (user.TypeRegister == TypeRegister.Google)
+            {
+                user.TypeRegister = TypeRegister.Google;
+                //user.Avater = userRegister.SocialImage;
+            }
+            else if (user.TypeRegister == TypeRegister.Apple)
+            {
+                user.TypeRegister = TypeRegister.Apple;
+                //user.Avater = userRegister.SocialImage;
+            }
+            else
+            {
+                user.TypeRegister = TypeRegister.Normal;
+            }
             if (userRegister.Agree == 1)
             {
                 if (userRegister.Password == userRegister.ConfirmPassword)
                 {
                     if (userRegister.PhoneNumber.Length > 14)
                     {
-                        if (lang == "en")
-                        {
-                            return new BussnessResultModel(null, "Please Verify Mobile Number , Mobile must be at most 14 numbers", false);
-                        }
-                        else
-                        {
-                            return new BussnessResultModel(null, "e: يرجى التحقق من رقم الهاتف المحمول ، يجب أن يكون رقم الجوال 14 رقمًا كحد أقصى", false);
-                        }
+                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("VerifyMobile"), false);
                     }
+                    var fileName = userRegister.Avater;
+                    var pic = _imageUploadServices.Upload(fileName);
+                    if (pic == "-1")
+                    {
+                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("FileNotUploaded"), false); 
+                    }
+                    user.Avater = pic;
 
                     user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
-                    user.TypeRegister = TypeRegister.Normal;
+            
                     user.UserType = UserType.Customer;
                     user.IsSubscribe = userRegister.IsSubscribe == "0" ? false : true;
                     user.IsMobileVerified = false;
@@ -657,14 +627,7 @@ namespace BusinessLogic.ApiClasses
                     MailAddress addr = new MailAddress(userRegister.Email);
                     if (userRegister.Email != addr.ToString())
                     {
-                        if (lang == "en")
-                        {
-                            return new BussnessResultModel(null, "Please Verify Your Email ", false);
-                        }
-                        else
-                        {
-                            return new BussnessResultModel(null, " يرجى التحقق من البريد الالكتروني", false);
-                        }
+                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("VerifyEmail"), false);
                     }
                     var result = await _userManager.CreateAsync(user, userRegister.Password);
                     if (result.Succeeded)
@@ -704,17 +667,7 @@ namespace BusinessLogic.ApiClasses
                     }
                     else
                     {
-                        string errors = "";
-                        foreach (var x in result.Errors)
-                            errors += x + ", ";
-                        if (lang == "en")
-                        {
-                            return new BussnessResultModel(null, errors, false);
-                        }
-                        else
-                        {
-                            return new BussnessResultModel(null, "e: حدث خطأ يرجى التأكد من البيانات", false);
-                        }
+                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
                     }
                 }
                 else
@@ -726,7 +679,66 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("plzAgree"), false);
             }
-        } 
+        }
+        public async Task<BussnessResultModel> RegisterCustomerCP(CreateCustomerCPDto userRegister)
+        {
+
+            var user = _mapper.Map<User>(userRegister);
+
+
+            user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
+
+            user.UserType = UserType.Customer;
+            user.IsMobileVerified = false;
+            user.TypeRegister = TypeRegister.Normal;
+            user.RoleId = 2;
+            user.UserName = userRegister.FirstName + userRegister.LastName;
+            //var regex = new Regex("1P([A-Z0-9]{4})");
+            user.VerifiedCode = Convert.ToInt32(_util.GenerateRandomNo()) + Convert.ToInt32(_util.GenerateRandomNo2());
+            var country = await _repositoryManager.Country.GetcountryById(userRegister.CountryId.Value, false);
+            user.CodeMobileCountry = country.MobileCode == null ? null : country.MobileCode;
+           
+            var result = await _userManager.CreateAsync(user, userRegister.Password);
+            if (result.Succeeded)
+            {
+                var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
+                await _userManager.AddClaimAsync(user, new Claim(role.Name, user.FirstName));
+                var validat = new UserForAuthenticationDto
+                {
+                    UserName = userRegister.Email,
+                    Password = userRegister.Password
+                };
+                if (!await _authManager.ValidateUser(validat))
+                {
+                    _logger.LogWarn($" Authentication failed. Wrong user name or password.");
+                }
+                var token = await _authManager.CreateToken();
+                var device = new Device
+                {
+                    DeviceType = "Web",
+                    UserId = user.Id,
+                    DeviceModel = "Web",
+                    OperatingSystem = "Windows",
+                    DeviceToken = token,
+                    IsStatus = Status.Active,
+                };
+                _repositoryManager.Device.AddDevice(device);
+
+
+                var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false);
+                var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
+
+                var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
+                _emailSender.SendEmail(message);
+
+                await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successAdd"));
+            }
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
+            }
+        }
         public async Task<BussnessResultModel> EditAdmin(UpdateAdminDto update )
         {
             var user = await _repositoryManager.User.GetUserId(update.Id, true);
