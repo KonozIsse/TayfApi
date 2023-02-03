@@ -63,7 +63,7 @@ namespace Entities.DataTransferObjects
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public List<ImageProductDto> imagesProduct { get; set; }
+        public List<ImageProductDto> ImagesProduct { get; set; }
         public bool IsSale { get; set; }
         public List<CreateSaleDto> ProductSales { get; set; }
         public bool IsSpecial { get; set; }
@@ -82,7 +82,7 @@ namespace Entities.DataTransferObjects
         public decimal Price { get; set; }
         public decimal Rate { get; set; }
     }
-    //Sales---------------------------------- 
+    //image---------------------------------- 
     public class ImageProductDto
     {
         public int ImageId { get; set; }

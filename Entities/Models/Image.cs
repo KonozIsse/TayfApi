@@ -13,9 +13,9 @@ namespace Entities.Models
         [ForeignKey(nameof(Vender))]
         public int? VendId { get; set; }
         public User Vender { get; set; }
-        //[ForeignKey(nameof(Admin))]
-        //public int? AdminId { get; set; }
-        //public User Admin { get; set; }
+        [ForeignKey(nameof(Admin))]
+        public int? AdminId { get; set; }
+        public User Admin { get; set; }
         public List<ImageSetting> ImageSettings { get; set; }
         public List<ProductImage> ProductImages { get; set; }
     }

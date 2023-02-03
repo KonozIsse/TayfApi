@@ -36,8 +36,6 @@ namespace WebLayer.Controllers
             var result = await _productBL.TopRatedPage();
             return Ok(result);
         }
-      
-       
         [HttpPost("addReview")]
         public async Task<IActionResult> CreateReviewProduct(int productId ,CreateReviewDto create )
         {

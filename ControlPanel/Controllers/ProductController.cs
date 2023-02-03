@@ -50,7 +50,6 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-       
         [HttpPut("acceptProduct")]
         public async Task<IActionResult> AcceptProduct(int productId)
         {
@@ -116,10 +115,10 @@ namespace ControlPanel.Controllers
                 return Ok(result.Message);
             }
         } 
-        [HttpPut("editImage")]
-        public async Task<IActionResult> EditImageProduct(int id , string image)
+        [HttpPut("editImageProduct")]
+        public async Task<IActionResult> EditImageProduct(int id , int image)
         {
-            var result = await _imageBL.EditImage(id, image);
+            var result = await _imageBL.EditProductImage(id, image);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -129,7 +128,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         } 
-        [HttpDelete("deleteImage")]
+        [HttpDelete("deleteImageProduct")]
         public async Task<IActionResult> DeleteImageProduct(int id )
         {
             var result = await _imageBL.DeleteImage(id);
@@ -142,6 +141,5 @@ namespace ControlPanel.Controllers
                 return Ok(result.Message);
             }
         }
-        
     }
 }

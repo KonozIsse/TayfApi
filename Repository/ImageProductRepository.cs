@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Entities.ViewModel;
 
 namespace Repository
 {
@@ -16,8 +17,17 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<ProductImage>> GetImagesProduct(int productId, bool trackChanges)
-            => await FindByCondition(c => c.ProductId == productId, trackChanges).ToListAsync();
+        public async Task<IEnumerable<ProductImage>> GetAllImagesProduct(int productId, bool trackChanges , bool isIncluded = false)
+          {
+             var cats = FindByCondition(c => c.ProductId == productId, trackChanges);
+            if (isIncluded == true)
+            {
+                cats = cats.Include(c => c.Image);
+            }
+            return  await cats.ToListAsync();
+        }
+        public async Task<ProductImage> GetImageProductId( int id, bool trackChanges)
+            => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public void CreateImageProduct(ProductImage image) => Create(image);
         public void DeleteImageProduct(ProductImage image) => Delete(image);
     }

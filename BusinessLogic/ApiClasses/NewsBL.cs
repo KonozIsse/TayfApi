@@ -21,29 +21,28 @@ namespace BusinessLogic.ApiClasses
         protected readonly IRepositoryManager _repositoryManager;
         protected readonly IMapper _mapper;
         protected readonly LocService _locService;
-        public NewsBL(IRepositoryManager repositoryManager, IMapper mapper, LocService locService)
+        protected readonly ImageBL _imageBL;
+        public NewsBL(IRepositoryManager repositoryManager, IMapper mapper, LocService locService, ImageBL imageBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _locService = locService;
+            _imageBL = imageBL;
         }
         //News------------------------------------------------
         public async Task<List<NewsDto>> GetNews(string lang= "en")
         {
             var news = await _repositoryManager.News.GetWithComments();
-            var list = new List<NewsDto>();
-            news.ForEach(x => list.Add(new NewsDto
+            var list = news.Select(x => new NewsDto
             {
                 Id = x.Id,
                 Url = x.Url,
                 CountComment = x.Comments.Count(),
                 Title = lang == "en" ? x.Title : x.TitleAr,
                 Decription = lang == "en" ? x.Decription : x.DecriptionAr,
-                CreatedAt = x.CreatedAt,
-                // ImageId = Convert.ToInt32((x.ImgId == 0 || x.Image == null ) ? "" :
-                //(x.Image.ImageSettings.Count() > 0 ? urlImg + x.Image.ImageSettings
-                //  .FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path : ""))
-            }));; 
+                CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
+                Image = _imageBL.GetImageOriginal(x.ImgId.Value)
+            }).ToList(); 
             return list;
         }
         public async Task<NewsDto> GetBlog(int blogId, string lang = "en")
@@ -52,7 +51,8 @@ namespace BusinessLogic.ApiClasses
             var newsDto = _mapper.Map<NewsDto>(blog);
             newsDto.Title = lang == "en" ? blog.Title : blog.TitleAr;
             newsDto.Decription = lang == "en" ? blog.Decription : blog.DecriptionAr;
-            newsDto.CountComment = blog.Comments.Count() == 0 ? 0 : blog.Comments.Count();
+            newsDto.CountComment = blog.Comments == null ? 0 : blog.Comments.Count();
+            newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId.Value);
             return newsDto;
         }
         public async Task<BussnessResultModel> AddNews (int storeId,CreateNewsDto create)

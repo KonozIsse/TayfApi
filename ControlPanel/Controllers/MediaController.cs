@@ -56,8 +56,8 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteImages(string Ids)
+        [HttpDelete("deleteListImages")]
+        public async Task<IActionResult> DeleteImages(List<int> Ids)
         {
             var result = await _imageBL.DeleteImageIds(Ids);
             if (!result.Success)

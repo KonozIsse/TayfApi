@@ -12,13 +12,12 @@ namespace Entities.DataTransferObjects
         public string Title { get; set; }
         public string Decription { get; set; }
         public string Url { get; set; }
-        public DateTime CreatedAt { get; set; } 
-        public DateTime? UpdatedAt { get; set; }
+        public string CreatedAt { get; set; } 
+        public string UpdatedAt { get; set; }
         public short IsFeature { get; set; }
         public int? IsViewed { get; set; }
-        public int ImageId { get; set; }
+        public string Image { get; set; }
         public int CountComment { get; set; }
-        public int? NewsCategoryId { get; set; }
         public List<CommentsDto> Comments{ get; set; }
 }
     public class CreateNewsDto

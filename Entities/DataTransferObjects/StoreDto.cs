@@ -31,7 +31,7 @@ namespace Entities.DataTransferObjects
         public string Password { get; set; }
         public Status Status { get; set; }
         public string Url { get; set; }
-        public string Avater { get; set; }
+        public int ImageId { get; set; }
         public string AdressInfo { get; set; }
     }
     public class UpdateStoreDto 
@@ -41,7 +41,7 @@ namespace Entities.DataTransferObjects
         public string PhoneNumber { get; set; }
         public Status Status { get; set; }
         public string Url { get; set; }
-        public string Avater { get; set; }
+        public int ImageId { get; set; }
         public string AdressInfo { get; set; }
     }
     public class AdminDto

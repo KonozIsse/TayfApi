@@ -41,10 +41,7 @@ namespace BusinessLogic.ApiClasses
             _locService = locService;
             Configuration = configuration;
         }
-        public List<string> GetImagesCategoriesConstants()
-        {
-            return Enum.GetNames(typeof(ImageCategory)).ToList();
-        }
+      
         public async Task UpdateAvatarCustomer (AvaterDto avaterDto)
         {
             var customer = await _repositoryManager.User.GetCustomerId(avaterDto.CustomerId, true);
@@ -59,32 +56,39 @@ namespace BusinessLogic.ApiClasses
             }
         }
        
-        public async Task<BussnessResultModel> CreateImages (/*int? adminId,*/ int? storeId, CreateImageDto create)
+        public async Task<BussnessResultModel> CreateImages (int userId, CreateImageDto create)
         {
             
-            foreach (var file in create.files)
+            foreach (var file in create.Files)
             {
                 //check size of image category
                 System.Drawing.Image bitfile = System.Drawing.Image.FromStream(file.OpenReadStream());
 
-                //if ((create.Category == ImageCategory.Banners && (bitfile.Width != 1140 || bitfile.Height != 240)) ||
-                //   (create.Category == ImageCategory.Categories && (bitfile.Width != 250 || bitfile.Height != 200)) ||
-                //   (create.Category == ImageCategory.Sliders && (bitfile.Width != 1400 || bitfile.Height != 600)) ||
-                //   (create.Category == ImageCategory.Products && (bitfile.Width != 1000 || bitfile.Height != 600)) ||
-                //   (create.Category == ImageCategory.Services && (bitfile.Width != 200 || bitfile.Height != 200)) ||
-                //   (create.Category == ImageCategory.Blogs && (bitfile.Width != 250 || bitfile.Height != 250)) ||
-                //   (create.Category == ImageCategory.Stores && (bitfile.Width != 250 || bitfile.Height != 200)))
-                //{
-                //    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
-                //}
+                if ((create.Category == ImageCategory.Banners && (bitfile.Width != 1140 || bitfile.Height != 240)) ||
+                   (create.Category == ImageCategory.Categories && (bitfile.Width != 250 || bitfile.Height != 200)) ||
+                   (create.Category == ImageCategory.Sliders && (bitfile.Width != 1400 || bitfile.Height != 600)) ||
+                   (create.Category == ImageCategory.Products && (bitfile.Width != 1000 || bitfile.Height != 600)) ||
+                   (create.Category == ImageCategory.Services && (bitfile.Width != 200 || bitfile.Height != 200)) ||
+                   (create.Category == ImageCategory.Blogs && (bitfile.Width != 250 || bitfile.Height != 250)) ||
+                   (create.Category == ImageCategory.Stores && (bitfile.Width != 250 || bitfile.Height != 200)))
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
+                }
                 var image = _mapper.Map<Image>(create);
                 Bitmap sourceImage = new Bitmap(bitfile);
-                var name =  _imageUploadServices.Upload(file/*, "original/" + name*/);
+                var name =  _imageUploadServices.Upload(file);
 
                 image.Name = name;
                 image.IsStatus = Status.Active;
-                image.VendId = storeId;
-
+                var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+                if(user.UserType == UserType.Admin)
+                {
+                    image.AdminId = userId;
+                }
+                else
+                {
+                    image.VendId = userId;
+                }
                 var set = await  _repositoryManager.Setting.GetAllSettings(false);
                 var thh = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_height").First().Value);
                 var thw = Convert.ToInt32(set.Where(x => x.Key == "Thumbnail_width").First().Value);
@@ -206,12 +210,12 @@ namespace BusinessLogic.ApiClasses
             }
             return new BussnessResultModel(create, _locService.GetLocalizedStringValue("successSave"));
         } 
-        public async Task<BussnessResultModel> EditImage(int id , string img)
+        public async Task<BussnessResultModel> EditProductImage(int id , int imageId)
         {
-            var image = await _repositoryManager.Image.GetImage(id, true);
+            var image = await _repositoryManager.ImageProduct.GetImageProductId(id, true);
             if(image != null)
             {
-                image.Name = img;
+                image.ImageId = imageId;
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(image);
             }
@@ -220,25 +224,22 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink") , false);
             }
         }
-        public async Task<BussnessResultModel> DeleteImageIds(string Ids)
+        public async Task<BussnessResultModel> DeleteImageIds(List<int> ids)
         {
-            char[] delimiters = new char[] { ',' };
-            string[] stringArray = Ids.Split(delimiters);
-            int[] intArray = Array.ConvertAll(stringArray, s => int.Parse(s));
             try
             {
-                foreach (var c in intArray)
+                foreach (var id in ids)
                 {
-                    var cats = await _repositoryManager.ImageSetting.GetImageSettings(c);
+                    var cats = await _repositoryManager.ImageSetting.GetImageSettings(id);
                     foreach (var t in cats)
                     {
                         _repositoryManager.ImageSetting.DeleteImageSetting(t);
                     }
-                    var image = await _repositoryManager.Image.GetImage(c, false);
+                    var image = await _repositoryManager.Image.GetImage(id, false);
                     _repositoryManager.Image.DeleteImage(image);
                 }
                 await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(Ids ,_locService.GetLocalizedStringValue("successDelete"));
+                return new BussnessResultModel(ids ,_locService.GetLocalizedStringValue("successDelete"));
             }
             catch
             {
@@ -341,26 +342,16 @@ namespace BusinessLogic.ApiClasses
             }
             return new BussnessResultModel(itemFromDB);
         }
-        public async Task<string> GetImageMedium(string img)
+        public string GetImageMedium(int img)
         {
-            int imgId = 0;
             string image = "";
-            try
+           
+            if (img != 0)
             {
-
-                if (!string.IsNullOrEmpty(img))
-                {
-                    imgId = Convert.ToInt32(img);
-                }
-            }
-            catch { }
-            if (imgId != 0)
-            {
-                var imageMedium = await _repositoryManager.ImageSetting.GetByType(imgId, ImageType.MEDIUM);
-
+                var imageMedium = _repositoryManager.ImageSetting.GetByType(img, ImageType.MEDIUM).Result;
                 if (imageMedium != null)
                 {
-                    image = /*url +*/ imageMedium.Path;
+                    image = "/img" + imageMedium.Path;
                 }
             }
             return image;
@@ -371,47 +362,35 @@ namespace BusinessLogic.ApiClasses
             if (img != 0)
             {
                 var imageThumbnail = await _repositoryManager.ImageSetting.GetByType(img, ImageType.THUMBNAIL);
-
                 if (imageThumbnail != null)
                 {
-                    image = /*url +*/ imageThumbnail.Path;
+                    image = "/img" + imageThumbnail.Path;
                 }
             }
             return image;
         }
-        public async Task<string> GetImageOriginal(string img)
+        public string GetImageOriginal(int img)
         {
-            int imgId = 0;
             string image = "";
-            try
+            if (img != 0)
             {
-
-                if (!string.IsNullOrEmpty(img))
+                var imageOriginal = _repositoryManager.ImageSetting.GetByType(img , ImageType.ACTUAL).Result;
+                if (imageOriginal != null)
                 {
-                    imgId = Convert.ToInt32(img);
+                    image = "/img" + imageOriginal.Path;
                 }
             }
-            catch { }
-           // if (imgId != 0)
-            //{
-            //    var imageOriginal = await _repositoryManager.ImageSetting.GetByType(imgId);
-
-            //    if (imageOriginal != null)
-            //    {
-            //        image = imageOriginal.Path;
-            //    }
-            //}
             return image;
         }
         public async Task<List<string>> GetListImagesProductIdAsync (int productId)
         {
             List<String> listImages = new List<String>();
-            var images = await  _repositoryManager.ImageProduct.GetImagesProduct(productId,false);
+            var images = await  _repositoryManager.ImageProduct.GetAllImagesProduct(productId,false,true);
             if (images != null)
             {
                 foreach(var image in images)
                 {
-                    listImages.Add(await GetImageOriginal(image.Id.ToString()));
+                    listImages.Add(GetImageOriginal(image.ImageId));
                 }
                 //images.ForEach( async x1 => listImages.Add(await GetImageOriginal(x1.Id.ToString())));
             }

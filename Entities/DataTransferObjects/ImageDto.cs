@@ -19,10 +19,8 @@ namespace Entities.DataTransferObjects
     } 
     public class CreateImageDto
     {
-        public List<IFormFile> files { get; set; }
+        public List<IFormFile> Files { get; set; }
         public ImageCategory Category { get; set; }
-        public int Height { get; set; }
-        public int Width { get; set; }
     } 
     public class CreateImageProductDto
     {

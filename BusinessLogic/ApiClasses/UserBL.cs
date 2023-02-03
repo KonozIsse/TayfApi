@@ -192,16 +192,15 @@ namespace BusinessLogic.ApiClasses
             store.PhoneNumber = create.PhoneNumber;
             store.UserName = create.Email;
             store.VerifiedCode = 1234;
-            store.IsMobileVerified = false;
+            store.IsMobileVerified = true;
             store.Status = Status.Active;
             store.TypeRegister = TypeRegister.Normal;
             store.UserType = UserType.Store;
             var result = await _userManager.CreateAsync(store, create.Password);
-            if (create.Avater == null)
+            if (create.ImageId == 0)
             {
                 return new BussnessResultModel(store, _locService.GetLocalizedStringValue("correctImage"),false);
             }
-
             MailAddress addr = new MailAddress(create.Email);
             if (create.Email != addr.ToString())
             {

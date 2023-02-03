@@ -20,15 +20,13 @@ namespace BusinessLogic.ApiClasses
         private readonly ImageBL _imageBL;
         private readonly Util _util;
         private readonly LocService _locService;
-        private readonly IConfiguration _configuration;
-        public ProductBL(IRepositoryManager repositoryManager, IMapper mapper, ImageBL imageBL, Util util , LocService locService, IConfiguration configuration)
+        public ProductBL(IRepositoryManager repositoryManager, IMapper mapper, ImageBL imageBL, Util util , LocService locService)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _imageBL = imageBL;
             _util = util;
             _locService = locService;
-            _configuration = configuration;
         }
         //Category------------------------------------------------
         public async Task<List<CategoryDto>> GetAllCategories(string lang = "en")
@@ -246,30 +244,26 @@ namespace BusinessLogic.ApiClasses
             {
                 product.IsAcceptAdmin = false;
             }
-            if (createProductDto.StoreId != null)
-            {
-                product.StoreId = createProductDto.StoreId;
-            }
+            product.StoreId = createProductDto.StoreId;
             _repositoryManager.Product.AddProduct(product);
             await _repositoryManager.SaveAsync();
             if (createProductDto.ProductCategories != null)
             {
                 product.ProductCategories.AddRange(_mapper.Map<List<ProductCategory>>(createProductDto.ProductCategories));
+                await _repositoryManager.SaveAsync();
             }
             else
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("selectcategory"), false);
             }
-            if (createProductDto.imagesProduct != null)
+            if (createProductDto.ImagesProduct != null)
             {
-                foreach(var imageProduct in createProductDto.imagesProduct)
+                foreach (var imageDto in createProductDto.ImagesProduct)
                 {
-                    var image = new ProductImage
-                    {
-                        ProductId = product.Id,
-                        ImageId  = imageProduct.ImageId,
-                    };
+                    var image = _mapper.Map<ProductImage>(imageDto);
+                    image.ProductId = product.Id;
                     _repositoryManager.ImageProduct.CreateImageProduct(image);
+                    await _repositoryManager.SaveAsync();
                 }
             }
             else
@@ -304,13 +298,15 @@ namespace BusinessLogic.ApiClasses
             {
                 var inventory = new Inventory
                 {
-                    Stock = product.Availability,
+                    Stock = createProductDto.Availability,
                     ProductId = product.Id,
                     StockType = "in",
                     AddedDate = _util.EasternTime.Millisecond,
-                    VendorId = product.StoreId == 0 ? 0 : product.StoreId
+                    VendorId =  product.StoreId,
+                    AdminId = user.UserType == UserType.Admin ? userId : null,
                 };
                _repositoryManager.Inventory.AddInventory(inventory);
+                await _repositoryManager.SaveAsync();
             }
             return new BussnessResultModel(product , _locService.GetLocalizedStringValue("successAdd"));
         }
@@ -338,7 +334,7 @@ namespace BusinessLogic.ApiClasses
             _mapper.Map(updateDto, product);
             if (updateDto.ProductCategories != null)
             {
-                var categoriesProdId = await _repositoryManager.ProductCategory.GetCategoriesProdId(product.Id, false);
+                var categoriesProdId = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false);
                 if (categoriesProdId.Count() > 0 && categoriesProdId != null)
                 {
                     foreach (var category in categoriesProdId)
@@ -347,10 +343,14 @@ namespace BusinessLogic.ApiClasses
                     }
                 }
                 //product.ProductCategories.AddRange(_mapper.Map<List<ProductCategory>>(updateDto.ProductCategories));
-                foreach (var imageProduct in updateDto.ProductCategories)
-                {
-                    var image = _mapper.Map<ProductCategory>(imageProduct);
-                    image.ProductId = product.Id;
+                foreach (var category in updateDto.ProductCategories)
+                { //_mapper.Map<ProductCategory>(imageProduct);
+                    var image = new ProductCategory
+                    {
+                       ProductId = product.Id,
+                       CategoryId = category.CategoryId,
+                       IsStatus = Status.Active
+                    };
                     _repositoryManager.ProductCategory.CreateProductCategory(image);
                 }
             }
@@ -358,9 +358,9 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("selectcategory"), false);
             }
-            if (updateDto.imagesProduct != null)
+            if (updateDto.ImagesProduct != null)
             {
-                var categoriesProdId = await _repositoryManager.ImageProduct.GetImagesProduct(product.Id, false);
+                var categoriesProdId = await _repositoryManager.ImageProduct.GetAllImagesProduct(product.Id, false);
                 if (categoriesProdId.Count() > 0 && categoriesProdId != null)
                 {
                     foreach (var category in categoriesProdId)
@@ -368,12 +368,7 @@ namespace BusinessLogic.ApiClasses
                         _repositoryManager.ImageProduct.DeleteImageProduct(category);
                     }
                 }
-                foreach (var imageProduct in updateDto.imagesProduct)
-                {
-                    var image = _mapper.Map<ProductImage>(imageProduct);
-                    image.ProductId = product.Id;
-                    _repositoryManager.ImageProduct.CreateImageProduct(image);
-                }
+                product.Images.AddRange(_mapper.Map<List<ProductImage>>(updateDto.ImagesProduct));
             }
             //else
             //{
@@ -535,7 +530,7 @@ namespace BusinessLogic.ApiClasses
                     var special = await IsOffer(product.Id);
                     var flash = await _repositoryManager.Sales.GetFlashProductId(product.Id);
                   
-                        var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProdId(product.Id, false);
+                        var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false,true);
                         var catsDto = cats.Select(c => new ProductCategoryDto
                         {
                             MainCategoryId = c.Category.MainCategoryId,
@@ -615,7 +610,7 @@ namespace BusinessLogic.ApiClasses
                     var flash = await _repositoryManager.Sales.GetFlashProductId(product.Id);
                     if (product != null)
                     {
-                        var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProdId(product.Id, false);
+                        var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false,true);
                         var catsDto = cats.Select(c => new ProductCategoryDto
                         {
                             MainCategoryId = c.Category.MainCategoryId,
@@ -693,26 +688,27 @@ namespace BusinessLogic.ApiClasses
             var productsDto = new List<ProductDto>();
             foreach (var item in products)
             {
-                var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProdId(item.Id,false);
-                var catsDto = cats.Select(c => new ProductCategoryDto
-                {
-                    MainCategoryId = c.Category.MainCategoryId,
-                    CategoryId = c.CategoryId,
-                    CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
-                    // CategoryImage = (category != null ? await _imageBL.GetImageThumbnail(category.ImgId.ToString()) : ""),
-                }).ToList();
+                var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(item.Id,false,true);
+               
+                    var catsDto = cats.Select( c => new ProductCategoryDto
+                    {
+                        MainCategoryId = c.Category.MainCategoryId,
+                        CategoryId = c.CategoryId,
+                        CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
+                        CategoryImage =  _imageBL.GetImageThumbnail(c.Category.ImgId).Result,
+                    }).ToList();
+                var images = await _repositoryManager.ImageProduct.GetAllImagesProduct(item.Id,false,true);
                 productsDto.Add(new ProductDto
                 {
                     Id = item.Id,
                     ProductName = lang == "en" ? item.ProductName : item.ProductNameAr,
                     Description = lang == "en" ? item.Description : item.DescriptionAr,
                     IsStatus = item.IsStatus,
-                    ImageProduct = "",
+                    ImageProduct = await _imageBL.GetImageThumbnail(images.First().Image.Id) ?? null,
                     Availability = AvailabilityProducts(item.Id),
                     NumLike = item.WishLists.Count(),
                     CategoriesName = catsDto
                 });
-               
             }
             return PagedList<ProductDto>.ToPagedList(productsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
@@ -728,15 +724,15 @@ namespace BusinessLogic.ApiClasses
             var name = lang == "en" ? product.ProductName : product.ProductNameAr;
             var descreption = lang == "en" ? product.Description : product.DescriptionAr;
 
-            var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProdId(product.Id, false);
+            var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false,true);
             var catsDto = cats.Select(c => new ProductCategoryDto
             {
                 MainCategoryId = c.Category.MainCategoryId,
                 CategoryId = c.CategoryId,
                 CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
-                // CategoryImage = (category != null ? await _imageBL.GetImageThumbnail(category.ImgId.ToString()) : ""),
-            }).ToList() ?? null;
-
+                CategoryImage = _imageBL.GetImageMedium(c.Category.ImgId),
+            }).ToList() ;
+            var images = await _repositoryManager.ImageProduct.GetAllImagesProduct(productId, false, true);
             return new ProductVM
             {
                 ProductCategories = catsDto,
@@ -744,7 +740,7 @@ namespace BusinessLogic.ApiClasses
                 ProductName = name,
                 Description = descreption,
                 ProductModel = product.ProductModel,
-                ProductImage = await _imageBL.GetImageThumbnail(product.Images.First().Id) ?? null,
+                ProductImage = _imageBL.GetImageOriginal(images.First().ImageId) ?? null,
                 TypeId = product.TypeId,
                 Price = product.Price,
                 IsStatus = product.IsStatus.ToString(),
@@ -763,7 +759,6 @@ namespace BusinessLogic.ApiClasses
                 StartDate = (flash != null ? flash.StartDate : null),
                 EndDate = (flash != null ? flash.EndDate : null),
 
-
                 IsFavorite = await IsFavourite(customerId, product.Id) ,
                 NumLike = await GetFavourite(customerId, product.Id) ,
                 IsReview = await IsReview(customerId, product.Id),
@@ -772,7 +767,7 @@ namespace BusinessLogic.ApiClasses
 
                 StoreId = product.StoreId == null ? 0 : product.StoreId,
                 StoreName =   product.Store.FullName ?? null,
-                StoreImage =  product.Store.Avater ?? null
+                StoreImage =  _imageBL.GetImageMedium(product.Store.ImageId.Value) ?? null
             };
         }
         public async Task<List<ProductVM>> GetProductsCatId(int catId, int customerId, string lang  , Currency currency = null)

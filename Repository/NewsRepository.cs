@@ -25,13 +25,12 @@ namespace Repository
         => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(r => r.Image)
             .ThenInclude(c=>c.ImageSettings)
             .Include(r => r.Comments).ToListAsync();
-      
         public async Task<News> GetBlogById(int id, bool trackChanges, bool Included = false)
         {
             var blog = FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges);
             if (Included == true)
             {
-                blog.Include(c => c.Comments).Include(v => v.Image);
+                blog = blog.Include(c => c.Comments).Include(v => v.Image);
             }
             return await blog.SingleOrDefaultAsync();
         }
@@ -48,23 +47,15 @@ namespace Repository
         => await FindByCondition(c => c.NewsId == newId, false).ToListAsync();
         public async Task<CommentNews> GetCommentId(int id)
         => await FindByCondition(c => c.Id == id, false).FirstOrDefaultAsync();
-        public async Task<CommentNews> GetCommentIdNewsId(int id,int blog , bool trackChanges)
-         => await FindByCondition(c => c.Id == id && c.NewsId == blog, trackChanges).FirstOrDefaultAsync();
         public async Task<List<CommentNews>> SearchCommets(int newId, string search)
-       => await FindByCondition(c => c.NewsId == newId && c.Comment.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
-        public int GetCountComments(int blog)
-         =>FindByCondition(c => c.NewsId == blog, false).Count();
+        => await FindByCondition(c => c.NewsId == newId && c.Comment.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public void CreateCommentNews(int newsId, CommentNews commentNews)
         {
             commentNews.NewsId = newsId;
             Create(commentNews);
         }
         public void DeleteCommentNews(CommentNews commentNews) => Delete(commentNews);
-        public async Task DeleteListCommentNews(List<int> Ids)
-        {
-            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
-            DeleteRange(result);
-        }
+       
     }
     
 }

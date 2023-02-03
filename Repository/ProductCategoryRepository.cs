@@ -21,10 +21,15 @@ namespace Repository
 
         public void DeleteProductCategory(ProductCategory category)=>Delete(category);
 
-        public async Task<IEnumerable<ProductCategory>> GetAllCategoriesProdId(int prodId, bool trackChanges)
-        => await FindByCondition(c => c.ProductId == prodId, trackChanges).Include(c => c.Category).ToListAsync();
-        public async Task<IEnumerable<ProductCategory>> GetCategoriesProdId(int prodId, bool trackChanges)
-        => await FindByCondition(c => c.ProductId == prodId, trackChanges).ToListAsync();
+        public async Task<IEnumerable<ProductCategory>> GetAllCategoriesProductId(int productId, bool trackChanges, bool isIncluded = false)
+        {
+             var cats = FindByCondition(c => c.ProductId == productId, trackChanges);
+            if (isIncluded == true)
+            {
+                cats = cats.Include(c => c.Category);
+            }
+            return  await cats.ToListAsync();
+        }
         public async Task<ProductCategory> GetCategoryToPrductId(int productId)
        => await FindByCondition(c => c.ProductId == productId, false).Include(c=>c.Category).SingleOrDefaultAsync();
     }

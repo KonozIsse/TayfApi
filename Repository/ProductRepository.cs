@@ -88,7 +88,7 @@ namespace Repository
             {
                 list.Where(r => r.ProductName.Contains(search));
             }
-            return await list.Include(c => c.ProductCategories).Include(c=>c.WishLists).OrderByDescending(r => r.Id).ToListAsync();
+            return await list.Include(c => c.ProductCategories).Include(c => c.Images).Include(c=>c.WishLists).OrderByDescending(r => r.Id).ToListAsync();
         }
         public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);

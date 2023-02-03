@@ -141,7 +141,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> GetLogo()
         {
             var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo", false);
-            return await _imageBL.GetImageOriginal(logo.Value);
+            return _imageBL.GetImageOriginal(Convert.ToInt32(logo.Value));
         }
         //Banner------------------------------------------------
         public async Task<BannerDto> GetBanner(int langId)
@@ -166,7 +166,7 @@ namespace BusinessLogic.ApiClasses
                 Title = lang == "en" ? c.Title : c.TitleAr,
                 LangName = lang == "en" ? c.Language.Name : c.Language.NameAr,
                 CreatedAt = c.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
-                Img = _imageBL.GetImageOriginal(c.Image.Name).Result ?? null,
+                Img = _imageBL.GetImageOriginal(c.ImgId) ?? null,
             }) ;
             return PagedList<BannerDto>.ToPagedList(bannersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
@@ -189,7 +189,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Decription = lang == "en" ? c.Decription : c.DecriptionAr,
-                    ImageId = Convert.ToInt32(_imageBL.GetImageMedium(c.ImgId.ToString()))
+                    Image = _imageBL.GetImageMedium(c.ImgId)
                 }).ToList();
             return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
         }
@@ -201,7 +201,7 @@ namespace BusinessLogic.ApiClasses
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Decription = lang == "en" ? c.Decription : c.DecriptionAr,
                     Url = c.Url,
-                    ImageId = Convert.ToInt32(_imageBL.GetImageOriginal(c.ImgId.ToString()))
+                    Image = _imageBL.GetImageOriginal(c.ImgId)
                 }).ToList();
             return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
         }

@@ -96,17 +96,7 @@ namespace WebLayer.Controllers
             }
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("TestSendEmail")]
-        public IActionResult TestSendEmail()
-        {
-            var rng = new Random();
-            var message = new Message(new string[] { "osama_rifag@hotmail.com", "ahmed.zaalan@gmail.com" }, "Test email", "This is the content from our email.");
-            _emailSender.SendEmail(message);
-            return Ok();
-        }
-
+       
         [AllowAnonymous]
         [HttpPost]
 
@@ -147,18 +137,6 @@ namespace WebLayer.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("create-role")]
-        public async Task<IActionResult> CreateRole(string name)
-        {
-          await  _roleManager.CreateAsync(new Role
-            {
-                Name = name,
-                NormalizedName = name.ToUpper()
-            }) ;
-            return Ok();
-        }
     }
 
 }

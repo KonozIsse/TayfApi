@@ -3,6 +3,7 @@ using Entities;
 using Entities.Models;
 using Entities.Models.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,27 +19,18 @@ namespace Repository
         }
         public async Task<IEnumerable<ImageSetting>> GetImageSettings(int imageId)
         => await FindByCondition(y => y.ImgId == imageId, false).ToListAsync();
+        public async Task<ImageSetting> GetByType(int ImgId , ImageType key)
+        {
+            var image =  FindByCondition(c => c.ImgId == ImgId, true);
+            if (key != 0) 
+            {
+                image = image.Where(c => c.ImageType == key);
+            }
+            return await image.SingleOrDefaultAsync(); 
+        }
         public async Task<ImageSetting> GetImageSettingId(int id , bool trackChanges)
          => await FindByCondition(y => y.Id == id, trackChanges).FirstOrDefaultAsync();
-        public async Task<ImageSetting> GetByType(int imageId, ImageType ImageType)
-        {
-            var query = FindByCondition(y => y.ImgId == imageId, false);
-            if (ImageType != null)
-            {
-                query = query.Where(y => y.ImageType == ImageType);
-            }
-            return await query.SingleOrDefaultAsync();
-        }
-        public async Task<IEnumerable<ImageSetting>> GetImagesStoreId(int vendorId , string category)
-        {
-            var items = await FindAll(false).Include(c => c.Image).Where(c => (c.Image != null && c.Image.VendId == vendorId))
-                .OrderByDescending(e => e.CreatedAt).ToListAsync();
-            if (vendorId == 0)
-            {
-                items = await FindAll(false).Include(c => c.Image).OrderByDescending(e => e.CreatedAt).ToListAsync();
-            }
-            return (category == "" ? items : items.Where(c => c.Image != null && c.Image.Category.Equals(category)).ToList());
-        }
+       
         public void AddImageSetting(ImageSetting image) => Create(image);
         public void DeleteImageSetting(ImageSetting image) => Delete(image);
     }
