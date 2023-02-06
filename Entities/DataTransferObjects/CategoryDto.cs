@@ -19,8 +19,8 @@ namespace Entities.DataTransferObjects
         public int? MainCategoryId { get; set; }
         public int? CountProduct { get; set; }
         public int? Total { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public string CreatedAt { get; set; }
+        public string UpdatedAt { get; set; }
         public List<ProductDto> Products { get; set; }
     }
     public class MainCategoryDto

@@ -28,7 +28,7 @@ namespace ControlPanel.Controllers
         [HttpGet("getRecentProducts")]
         public async Task<IActionResult> GetRecentProducts()
         {
-            var result = await _homeBL.GetRecentProducts(GetCurrentUserId());
+            var result = await _homeBL.GetRecentProducts(GetCurrentUserId(),GetLanguage());
             return Ok(result);
         } 
         [HttpGet("getNewOrders")]
@@ -40,8 +40,8 @@ namespace ControlPanel.Controllers
         [HttpGet("getNewStores")]
         public async Task<IActionResult> GetNewStores()
         {
-            var result = await _userBL.GetSomeStores();
-            return Ok(result);
+            var result = await _userBL.GetStores();
+            return Ok(result.Take(10));
         } 
       
        

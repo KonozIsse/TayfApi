@@ -11,12 +11,10 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
          public string Image { get; set; }
-        public Status IsStatus { get; set; }
         public string Title { get; set; }
         public string Decription { get; set; }
-        public string Url { get; set; }
-        public int? LangId { get; set; }
-        public DateTime CreateAt { get; set; }
+        public string CreatedAt { get; set; }
+        public string UpdatedAt { get; set; }
     }
     public class CreateSliderDto
     {

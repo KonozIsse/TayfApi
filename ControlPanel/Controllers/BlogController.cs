@@ -17,7 +17,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetBlogs(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _newsBL.SearchBlog(GetCurrentUserId(), search, postsParameters);
+            var result = await _newsBL.GetAllBlogs(GetCurrentUserId(), search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

@@ -17,17 +17,17 @@ namespace Entities.ViewModel
         public List<SliderDto> sliders { get; set; }
         public List<ServiceDto> services { get; set; }
         public List<NewsDto> blog { get; set; }
-        public List<ProductVM> products { get; set; }
-        public List<ProductVM> flash { get; set; }
-        public List<ProductVM> specialProducts { get; set; }
+        public List<ProductDto> products { get; set; }
+        public List<ProductDto> flash { get; set; }
+        public List<ProductDto> specialProducts { get; set; }
         public List<StoreDto> stores { get; set; }
         public List<SettingDto> settings { get; set; }
         public BannerDto Banner { get; set; }
-        public List<ProductPageDto> ProductsPopular { get; set; }
-        public List<ProductPageDto> ProductsBest { get; set; }
-        public List<ProductPageDto> ProductsLatest { get; set; }
-        public List<ProductPageDto> ProductsSpecial { get; set; }
-        public List<ProductPageDto> ProductsTopRated { get; set; }
-        public List<ProductPageDto> ProductsDailyDeal { get; set; }
+        public List<ProductDto> ProductsPopular { get; set; }
+        public List<ProductDto> ProductsBest { get; set; }
+        public List<ProductDto> ProductsLatest { get; set; }
+        public List<ProductDto> ProductsSpecial { get; set; }
+        public List<ProductDto> ProductsTopRated { get; set; }
+        public List<ProductDto> ProductsDailyDeal { get; set; }
     }
 }

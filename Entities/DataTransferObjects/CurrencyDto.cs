@@ -11,13 +11,13 @@ namespace Entities.DataTransferObjects
     public class CurrencyDto
     {
         public int Id { get; set; }
-        public Status IsStatus { get; set; }
+        public string IsStatus { get; set; }
         public string Name { get; set; }
         public string Position { get; set; }
         public string Symbol { get; set; }
         public string DecimalPlaces { get; set; }
         public double? Value { get; set; }
-        public int IsDefault { get; set; }
+        public string IsDefault { get; set; }
     }
     public class CreateCurrencyDto
     {

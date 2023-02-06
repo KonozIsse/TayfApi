@@ -16,7 +16,7 @@ namespace ControlPanel.Controllers
         [HttpGet("getMain")]
         public async Task<IActionResult> GetMainCategories(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _productBL.GetSearchMainCategories(search, GetLanguage(), postsParameters);
+            var result = await _productBL.GethMainCategoriesCP(search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

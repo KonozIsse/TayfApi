@@ -19,8 +19,7 @@ namespace BusinessLogic.ApiClasses
     public class OrderBL 
     {
         protected readonly IRepositoryManager _repositoryManager;
-        protected readonly IMapper _mapper;
-        protected readonly CartBL _cartBL;  
+        protected readonly IMapper _mapper; 
         protected readonly LocationTaxBL _locationTaxBL;
         protected readonly ImageBL _imageBL;
         protected readonly ProductBL _productBL;
@@ -29,12 +28,11 @@ namespace BusinessLogic.ApiClasses
         protected readonly Util _util;
         protected readonly SignInManager<User> _signInManager; 
        // protected readonly LoggerManager _logger;
-        public OrderBL(IRepositoryManager repositoryManager, IMapper mapper, CartBL cartBL, LocationTaxBL locationTaxBL
+        public OrderBL(IRepositoryManager repositoryManager, IMapper mapper, LocationTaxBL locationTaxBL
             , ImageBL imageBL, ProductBL productBL, IEmailSender emailSender, Util util , LocService locService , SignInManager<User> signInManager/*, LoggerManager logger*/ )
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
-            _cartBL = cartBL;
             _locationTaxBL = locationTaxBL;
             _imageBL = imageBL;
             _productBL = productBL;
@@ -45,8 +43,6 @@ namespace BusinessLogic.ApiClasses
            // _logger = logger;
         }
         //Order------------------------------------------------
-
-       
         public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
         {
             decimal total = 0;
@@ -110,7 +106,7 @@ namespace BusinessLogic.ApiClasses
                             OrderAttributesProducts = orderAttributs
                         });
 
-                        total += orderProducts.First().FinalPrice;
+                        total = orderProducts.Sum(c=>c.FinalPrice);
 
                     }
                     order.OrderProducts = orderProducts;
@@ -143,7 +139,7 @@ namespace BusinessLogic.ApiClasses
                                 total = 0;
                                 foreach (var item in carts)
                                 {
-                                    if (coupon.Product.Contains(item.ProdId.ToString()))
+                                    if (coupon.Products.Contains(item.ProdId.ToString()))
                                     {
                                         var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
                                         total += newTotal;
@@ -159,7 +155,7 @@ namespace BusinessLogic.ApiClasses
                                 total = 0;
                                 foreach (var item in carts)
                                 {
-                                    if (coupon.Product.Contains(item.ProdId.ToString()))
+                                    if (coupon.Products.Contains(item.ProdId.ToString()))
                                     {
                                         decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
                                         total = total + newval;
@@ -182,7 +178,7 @@ namespace BusinessLogic.ApiClasses
                 _repositoryManager.Order.CreateOrder(order);
                 await _repositoryManager.SaveAsync();
             }
-            await _cartBL.DeleteByStore(order.StoreId, customerId);
+            await DeleteByStore(order.StoreId, customerId);
             return new BussnessResultModel(total, _locService.GetLocalizedStringValue("PendOrdMsg"));
         }
         public async Task<List<OrderDto>> GetHistoryOrder(int customerId , Currency currency )
@@ -592,7 +588,6 @@ namespace BusinessLogic.ApiClasses
                 await _repositoryManager.SaveAsync();
             }
         }
-      
         public async Task GetFailOrder(int orderId)
         {
             var order = await _repositoryManager.Order.GetOrderId(orderId, false);
@@ -686,7 +681,9 @@ namespace BusinessLogic.ApiClasses
                 var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
                 var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
 
-                orderDto.CustomerName = customer.FullName;
+                orderDto.CustomerName = customer.FullName; 
+                orderDto.CustomerEmail = customer.Email; 
+                orderDto.CustomerPhone = customer.PhoneNumber;
                 orderDto.Currency = currency.Symbol;
                 orderDto.CustomerEmail = customer.Email;
                 orderDto.CustomerPhone = customer.PhoneNumber;
@@ -858,6 +855,23 @@ namespace BusinessLogic.ApiClasses
             all = img + bdy1 + m3 + t;
             return all;
         }
+        public async Task<BussnessResultModel> DeleteByStore(int storeId, int userId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToStoreCustomer(storeId, userId);
+            if (carts == null)
+            {
+                return new BussnessResultModel(null, "Please make sure the link", false);
+            }
+            else
+            {
+                foreach (var cart in carts)
+                {
+                    _repositoryManager.Cart.DeleteCart(cart);
+                    await _repositoryManager.SaveAsync();
+                }
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("successDelete"), false);
+            }
+        }
 
         //Coupon------------------------------------------------
         public async Task<BussnessResultModel> AddCoupon(CreateCouponDto createDto, int userId)
@@ -884,11 +898,11 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue(" Please Choose Products"),false);
             }
-            if ((createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product"))
+            if (createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product")
             {
                 if (createDto.Products != null && createDto.Products.Count() > 0)
                 {
-                    coupon.Product = createDto.Products == null ? null : string.Join(",", createDto.Products);
+                    coupon.Products = createDto.Products == null ? null : string.Join(",", createDto.Products);
                 }
             }
             _repositoryManager.Coupon.AddCoupon(coupon);
@@ -926,15 +940,14 @@ namespace BusinessLogic.ApiClasses
             {
                 if (updateDto.Products != null && updateDto.Products.Count() > 0)
                 {
-                    coupon.Product = updateDto.Products == null ? null : string.Join(",", updateDto.Products);
+                    coupon.Products = updateDto.Products == null ? null : string.Join(",", updateDto.Products);
                 }
             }
             _mapper.Map(updateDto, coupon);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successSave"));
         }
-
-        public async Task<PagedList<CouponDto>> GetAllCoupons(string search , [FromQuery] PostsParameters postsParameters)
+        public async Task<PagedList<CouponDto>> GetAllCoupons(string search , PostsParameters postsParameters)
         {
             var coupons = await _repositoryManager.Coupon.GetCoupons(search);
             var couponsDto = _mapper.Map<List<CouponDto>>(coupons);
@@ -945,16 +958,12 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<OrderStatusDto>> GetOrderStatus(string lang  , PostsParameters postsParameters)
         {
             var orderStatuses = await _repositoryManager.OrderStatus.GetOrderStatusesList(false);
-            var model = new List<OrderStatusDto>();
-            foreach(var status in orderStatuses)
-            {
-                model.Add(new OrderStatusDto
+            var model = orderStatuses.Select(status=>new OrderStatusDto
                 {
                     Id = status.Id,
                     StatusName = lang == "en" ? status.StatusName : status.StatusNameAr,
                     option = lang == "en" ? (status.Option == 1 ? "Yes" : "No") : (status.Option == 1 ? "نعم" : "لا")
                 });
-            }
             return PagedList<OrderStatusDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> EditOrderStatus(UpdateOrderStatusDto update)
@@ -979,10 +988,6 @@ namespace BusinessLogic.ApiClasses
             var paymentsDto = _mapper.Map<List<PaymentDto>>(payments);
             return PagedList<PaymentDto>.ToPagedList(paymentsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<List<PaymentMethods>> GetPaymentsByVendor(int vendorId)
-        {
-            return await _repositoryManager.PaymentMethods.GetPaymentsByVendor(vendorId);
-        }
         //DeliveryTime------------------------------------------------
         public async Task<DeliveryTimeDto> GetTimeById(int timeId)
         {
@@ -990,19 +995,6 @@ namespace BusinessLogic.ApiClasses
             var timeDto = _mapper.Map<DeliveryTimeDto>(time);
             return timeDto;
         }
-        public async Task<List<DeliveryTime>> GetTimes()
-        {
-            return await _repositoryManager.DeliveryTime.GetAllDeliveryTimes();
-        }
-        //Unit------------------------------------------------
-        public async Task<List<Unit>> GetUnit()
-        {
-            return await _repositoryManager.Unit.GetAlActivelUnit();
-        }
-        public async Task<List<Unit>> GetUnitsByVendor(int vendorId)
-        {
-            return await _repositoryManager.Unit.GetUnitsByVendor(vendorId);
-        }
-      
+        
     }
 }

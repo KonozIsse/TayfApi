@@ -13,64 +13,20 @@ using System.Reflection;
 
 namespace BusinessLogic.ApiClasses
 {
-    public class HomeBL 
+    public class HomeBL
     {
         protected readonly IRepositoryManager _repositoryManager;
-        protected readonly IMapper _mapper; 
+        protected readonly IMapper _mapper;
         protected readonly NewsBL _newsBL;
         private readonly LocService _locService;
-        private readonly ProductBL _productBL;
         private readonly ImageBL _imageBL;
-        private readonly UserBL _userBL;
-        private readonly Util _util;
-        public HomeBL(IRepositoryManager repositoryManager, IMapper mapper,  NewsBL newsBL, LocService locService , ProductBL productBL, ImageBL imageBL , UserBL userBL,Util util)
+        public HomeBL(IRepositoryManager repositoryManager, IMapper mapper, NewsBL newsBL, LocService locService, ImageBL imageBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _newsBL = newsBL;
             _locService = locService;
-            _productBL = productBL;
             _imageBL = imageBL;
-            _userBL = userBL;
-            _util = util;
-        }
-        public List<string> GetListStatus()
-        {
-            return Enum.GetNames(typeof(Status)).ToList();
-        }
-      
-        public async Task<NavbarVM> GetNavbar()
-        {
-            var navbarDto = new NavbarVM
-            {
-                DefaultLanguage = await GetDefaultLanguage(),
-                Languages = await GetAllLanguages(),
-                Currencies = await GetCurrencies()
-            };
-            return navbarDto;
-        }
-        public async Task<HomeVM> GetHome(int customerId, Currency cod, string lang = "en")
-        {
-            var language = await _repositoryManager.Language.GetCodeLanguage(lang, false);
-            int langId = language.Id;
-            var model = new HomeVM
-            {
-                //sliders = GetSliderWeb(code),
-                Banner = await GetBanner(langId),
-                services = GetServices("", lang, null),
-                blog = await _newsBL.GetNews(lang),
-                ProductsPopular = await _productBL.PopularsPage(),
-                ProductsBest = await _productBL.BestPage(),
-                ProductsLatest = await _productBL.LatestPage(),
-                ProductsSpecial = await _productBL.SpecialsPage(),
-                ProductsTopRated = await _productBL.TopRatedPage(),
-                ProductsDailyDeal = await _productBL.DailyDeals(),
-                products = await _productBL.GetProducts(customerId, lang),
-                flash = await _productBL.GetFlashProds(customerId),
-                specialProducts = await _productBL.GetSpecialsProd(customerId , lang),
-                stores = await _userBL.GetStores()
-            };
-            return model;
         }
         public async Task<HomeCPVM> GetHomeCP(int userId)
         {
@@ -104,8 +60,8 @@ namespace BusinessLogic.ApiClasses
             var customers = await _repositoryManager.User.GetCustomers(false);
             var customersDto = _mapper.Map<List<CustomerDto>>(customers);
             return customersDto.Take(4).ToList();
-        } 
-        public async Task<List<RecentProductDto>> GetRecentProducts(int storeId)
+        }
+        public async Task<List<ProductDto>> GetRecentProducts(int storeId, string lang)
         {
             var products = await _repositoryManager.Product.GetProductsCP("");
             var store = await _repositoryManager.User.GetUserId(storeId, false);
@@ -113,18 +69,29 @@ namespace BusinessLogic.ApiClasses
             {
                 products = products.Where(c => c.StoreId == storeId).ToList();
             }
-            var productsDto = _mapper.Map<List<RecentProductDto>>(products);
+            var productsDto = new List<ProductDto>();
+            foreach (var c in products)
+            {
+                var images = await _repositoryManager.ImageProduct.GetAllImagesProduct(c.Id, false, true);
+                productsDto.Add(new ProductDto
+                {
+                    Id = c.Id,
+                    ProductName = lang == "en" ? c.ProductName : c.ProductNameAr,
+                    ImageProduct = _imageBL.GetImageOriginal(images.First().ImageId),
+                    Price = c.Price
+                });
+            }
             return productsDto.Take(15).ToList();
         }
         public async Task<List<OrderDto>> GetOrders(int? storeId)
         {
             var orders = await _repositoryManager.Order.GetAllOrders("");
-            if(storeId != 0)
+            if (storeId != 0)
             {
                 orders = orders.Where(c => c.StoreId == storeId).ToList();
             }
             var productsDto = new List<OrderDto>();
-            foreach(var order in orders)
+            foreach (var order in orders)
             {
                 productsDto.Add(new OrderDto
                 {
@@ -134,62 +101,45 @@ namespace BusinessLogic.ApiClasses
                     OrderStatusName = order.OrderStatus.StatusName
                 });
             }
-           
+
             return productsDto.Take(15).ToList();
         }
-      
-        public async Task<string> GetLogo()
-        {
-            var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo", false);
-            return _imageBL.GetImageOriginal(Convert.ToInt32(logo.Value));
-        }
+
         //Banner------------------------------------------------
-        public async Task<BannerDto> GetBanner(int langId)
+        public async Task<PagedList<BannerDto>> GetBanners(string search, string lang, PostsParameters postsParameters)
         {
-            var banner = await _repositoryManager.Banner.GetBannerByType(langId, "category" , false);
-            if(banner == null)
-            {
-                return null;
-            }
-            return new BannerDto
-            {
-                Url = banner.Url,
-               // ImgId = Convert.ToInt32( urlImg + banner.Image.ImageSettings.FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path)
-            };
-        }
-        public async Task<PagedList<BannerDto>> GetBanners(string search , string lang, PostsParameters postsParameters)
-        {
-            var banners = await _repositoryManager.Banner.GetAllBanner(search,false);
-            var bannersDto = banners.Select( c => new BannerDto
+            var banners = await _repositoryManager.Banner.GetAllBanner(search, false);
+            var bannersDto = banners.Select(c => new BannerDto
             {
                 Id = c.Id,
-                Title = lang == "en" ? c.Title : c.TitleAr,
+                Title =  c.Title,
                 LangName = lang == "en" ? c.Language.Name : c.Language.NameAr,
-                CreatedAt = c.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
-                Img = _imageBL.GetImageOriginal(c.ImgId) ?? null,
-            }) ;
+                Img = _imageBL.GetImageOriginal(c.ImgId),
+            });
             return PagedList<BannerDto>.ToPagedList(bannersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> UpdateBanner(UpdateBannerDto updateDto)
         {
             var banner = await _repositoryManager.Banner.GetBannerId(updateDto.Id, true);
-            if(banner == null)
+            if (banner == null)
             {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
             _mapper.Map(updateDto, banner);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(banner, _locService.GetLocalizedStringValue("successSave"));
         }
         //Sliders------------------------------------------------
-        public PagedList<SliderDto> GetSliderMobile(string lang , PostsParameters postsParameters)
+        public PagedList<SliderDto> GetSliderMobile(string lang, PostsParameters postsParameters)
         {
             var sliders = _repositoryManager.Slider.GetSlidersForMobile()
                 .Select(c => new SliderDto
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Decription = lang == "en" ? c.Decription : c.DecriptionAr,
-                    Image = _imageBL.GetImageMedium(c.ImgId)
+                    Image = _imageBL.GetImageMedium(c.ImgId),
+                     CreatedAt = c.CreatedAt.ToString("G"),
+                    UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
             return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
         }
@@ -200,17 +150,18 @@ namespace BusinessLogic.ApiClasses
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Decription = lang == "en" ? c.Decription : c.DecriptionAr,
-                    Url = c.Url,
-                    Image = _imageBL.GetImageOriginal(c.ImgId)
+                    Image = _imageBL.GetImageOriginal(c.ImgId),
+                    CreatedAt = c.CreatedAt.ToString("G") ,
+                    UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
             return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<BussnessResultModel> AddSliderWeb(int storeId , CreateSliderDto createSliderDto)
+        public async Task<BussnessResultModel> AddSliderWeb(int storeId, CreateSliderDto createSliderDto)
         {
             var slider = _mapper.Map<Sliders>(createSliderDto);
             slider.Type = SlidersImageType.Web;
             var store = await _repositoryManager.User.GetActiveUserId(storeId, false);
-            if(store.UserType == UserType.Store)
+            if (store.UserType == UserType.Store)
             {
                 slider.VendorId = storeId;
             }
@@ -221,11 +172,11 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Slider.AddSlider(slider);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(slider, _locService.GetLocalizedStringValue("successSave"));
-        } 
+        }
         public async Task<BussnessResultModel> AddSliderMobile(int storeId, CreateSliderDto createSliderDto)
         {
             var slider = _mapper.Map<Sliders>(createSliderDto);
-            if(createSliderDto.ImageId == 0)
+            if (createSliderDto.ImageId == 0)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
             }
@@ -247,7 +198,7 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(slider, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task<BussnessResultModel> DeleteSlide (int id)
+        public async Task<BussnessResultModel> DeleteSlide(int id)
         {
             var slider = await _repositoryManager.Slider.GetSlideById(id, false);
             if (slider == null)
@@ -261,16 +212,18 @@ namespace BusinessLogic.ApiClasses
         //Services------------------------------------------------
         public PagedList<ServiceDto> GetServices(string search, string lang, PostsParameters postsParameters)
         {
-            var services = _repositoryManager.Services.GetAllServices(search,false)
+            var services = _repositoryManager.Services.GetAllServices(search, false)
                 .Select(c => new ServiceDto
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Description = lang == "en" ? c.Description : c.DescriptionAr,
-                    // ImgId =  Convert.ToInt32(urlImg + x.Image.ImageSettings.FirstOrDefault(i => i.ImageType == ImageType.ACTUAL).Path)
+                    Image = _imageBL.GetImageOriginal(c.ImgId.Value),
+                    CreatedAt = c.CreatedAt.ToString("G"),
+                    UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
             return PagedList<ServiceDto>.ToPagedList(services, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<BussnessResultModel> UpdateService( UpdateServiceDto update)
+        public async Task<BussnessResultModel> UpdateService(UpdateServiceDto update)
         {
             var service = await _repositoryManager.Services.GetServiceById(update.Id, true, false);
             if (service == null)
@@ -284,18 +237,18 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> DeleteService(int id)
         {
-            var service = await _repositoryManager.Services.GetServiceById(id,false, false);
+            var service = await _repositoryManager.Services.GetServiceById(id, false, false);
             if (service == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            
+
             _repositoryManager.Services.DeleteService(service);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(service, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Contact------------------------------------------------
-        public async Task<ContactVM>  GetContactSetting()
+        public async Task<ContactVM> GetContactSetting()
         {
             var setting = await _repositoryManager.Setting.GetAllSettings(false);
             return new ContactVM
@@ -308,14 +261,10 @@ namespace BusinessLogic.ApiClasses
                 close_time = setting.Where(r => r.Key == "close_time").First().Value
             };
         }
-        public async Task<Contact> GetContact(int id)
-        {
-            return await _repositoryManager.Contact.GetContactById(id, false);
-        }
         public async Task<List<ContactDto>> GetAllContacts(string search, int rows, int pageId = 1)
         {
-            var contacts = await _repositoryManager.Contact.GetContacts(search,rows, pageId);
-            if(contacts == null)
+            var contacts = await _repositoryManager.Contact.GetContacts(search, rows, pageId);
+            if (contacts == null)
             {
                 return null;
             }
@@ -329,7 +278,7 @@ namespace BusinessLogic.ApiClasses
             contact.IsStatus = Status.NotActive;
             _repositoryManager.Contact.CreateContact(contact);
             await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(contact ,_locService.GetLocalizedStringValue("successAdd"));
+            return new BussnessResultModel(contact, _locService.GetLocalizedStringValue("successAdd"));
         }
         public async Task<BussnessResultModel> DeleteContact(int id)
         {
@@ -343,20 +292,16 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(contact, _locService.GetLocalizedStringValue("successDelete"));
         }
         //template------------------------------------------------
-        public async Task<MessageTemplate> GetEmailMessage(int id)
-        {
-            return await _repositoryManager.MessageTemplate.GetTemplateById(id, false);
-        }
         public async Task<List<MessageTemplateDto>> GetAllMessageTemplates()
         {
             var templets = await _repositoryManager.MessageTemplate.GetEmailTemplatesList(false);
             var templetsDto = _mapper.Map<List<MessageTemplateDto>>(templets);
             return templetsDto;
         }
-        public async Task<BussnessResultModel> UpdateTemplate( UpdateTemplateDto updateDto)
+        public async Task<BussnessResultModel> UpdateTemplate(UpdateTemplateDto updateDto)
         {
             var template = await _repositoryManager.MessageTemplate.GetTemplateById(updateDto.Id, true);
-            if(template == null)
+            if (template == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
@@ -365,26 +310,16 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(template, _locService.GetLocalizedStringValue("successSave"));
         }
         //Email------------------------------------------------
-        public async Task<MailList> GetMailListId(int id)
-        {
-            return await _repositoryManager.MailList.GetMailListById(id, false);
-        }
-        public async Task<List<MailListDto>> GetAllMailLists()
-        {
-            var emails = await _repositoryManager.MailList.GetMailLists();
-            var emailsDto = _mapper.Map<List<MailListDto>>(emails);
-            return emailsDto;
-        }  
         public async Task<PagedList<MailListDto>> GetMailLists(string search, PostsParameters postsParameters)
         {
             var emails = await _repositoryManager.MailList.GetMailListEmail(search);
             var emailsDto = _mapper.Map<List<MailListDto>>(emails);
             return PagedList<MailListDto>.ToPagedList(emailsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task SendUserEmail( string email)
+        public async Task SendUserEmail(string email)
         {
             var exsitEmail = await _repositoryManager.MailList.GetEmail(email);
-            if(exsitEmail == null)
+            if (exsitEmail == null)
             {
                 var send = new SendMailListDto
                 {
@@ -407,47 +342,24 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(email, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Language------------------------------------------------
-       
-        public async Task<PagedList<LanguageDto>> GetLanguages(string search , string lang , PostsParameters postsParameters)
+        public async Task<PagedList<LanguageDto>> GetAllLanguages(string search, string lang, PostsParameters postsParameters)
         {
             var languages = await _repositoryManager.Language.GetAllLanguage(search);
-            //var languagesDto = _mapper.Map<List<LanguageDto>>(languages);
-            var languagesDto = new List<LanguageDto>();
-            foreach(var language in languages)
+            var languagesDto = languages.Select(language => new LanguageDto
             {
-                languagesDto.Add(new LanguageDto
-                {
-                    Id = language.Id,
-                    Name = lang == "en" ? language.Name : language.NameAr,
-                });
-            }
+                Id = language.Id,
+                Name = lang == "en" ? language.Name : language.NameAr,
+                Image = _imageBL.GetImageOriginal(language.ImgId),
+                Sort = language.Sort,
+                Code = language.Code,
+                IsDefault = language.IsDefault,
+            }).ToList();
             return PagedList<LanguageDto>.ToPagedList(languagesDto, postsParameters.PageNumber, postsParameters.PageSize);
-        }
-        public async Task<List<LanguageDto>> GetAllLanguages()
-        {
-            var languages = await _repositoryManager.Language.ListLanguage(false);
-            var languagesDto = _mapper.Map<List<LanguageDto>>(languages);
-            return languagesDto;
-        }
-        public async Task<LanguageDto> GetDefaultLanguage()
-        {
-            var language = await _repositoryManager.Language.GetDefaultLanguage( false);
-            var languagesDto = _mapper.Map<LanguageDto>(language);
-          //  languagesDto.ImgId = Convert.ToInt32(await _imageApi.GetImageOriginal(language.ImgId.ToString()));
-            return languagesDto;
-        }  
-        public async Task<Language> GetLanguageCode(string code)
-        {
-           return await _repositoryManager.Language.GetCodeLanguage(code , false);
-        } 
-        public async Task<Language> GetLanguageId(int id)
-        {
-            return await _repositoryManager.Language.GetCodeLanguageId(id , false);
         }
         public async Task<BussnessResultModel> DeleteLanguage(int id)
         {
             var language = await _repositoryManager.Language.GetCodeLanguageId(id, false);
-            if(language == null)
+            if (language == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
@@ -467,48 +379,46 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(language, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task ChangeLanugage(int id)
+        public async Task ChangeDefaultLanugage(int id)
         {
-          var language = await _repositoryManager.Language.GetCodeLanguageId(id, true);
-            if (language != null)
+            var languages = await _repositoryManager.Language.GetListLanguage(true);
+            foreach (var item in languages)
             {
-                language.IsDefault = 1;
+                if (item.Id == id)
+                {
+                    item.IsDefault = 1;
+                }
+                else
+                {
+                    item.IsDefault = 0;
+                }
                 await _repositoryManager.SaveAsync();
             }
         }
-       
+
         //Currency------------------------------------------------
-        public async Task<PagedList<CurrencyDto>> GetAllCurrencies(string lang , PostsParameters postsParameters)
+        public async Task<PagedList<CurrencyDto>> GetAllCurrencies(string lang, PostsParameters postsParameters)
         {
             var currencies = await _repositoryManager.Currency.GetAllCurrencies(false);
-            var currenciesDto = _mapper.Map<List<CurrencyDto>>(currencies);
-            var currency = currencies.First();
-            var currencyDto = currenciesDto.First();
-            currencyDto.Name = lang == "en" ? currency.Name : currency.NameAr;
+            var currenciesDto = currencies.Select(currency => new CurrencyDto
+            {
+                Id = currency.Id,
+                Name = lang == "en" ? currency.Name : currency.NameAr,
+                Symbol = currency.Symbol,
+                Position = currency.Position == "Left" ? _locService.GetLocalizedStringValue("left") : _locService.GetLocalizedStringValue("right"),
+                DecimalPlaces = currency.DecimalPlaces,
+                Value = currency.Value,
+                IsDefault = currency.IsDefault == 1 ? _locService.GetLocalizedStringValue("Default") : "",
+                IsStatus = currency.IsStatus == Status.Active ? _locService.GetLocalizedStringValue("active") : _locService.GetLocalizedStringValue("notActive"),
+            }).ToList();
             return PagedList<CurrencyDto>.ToPagedList(currenciesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<List<CurrencyDto>> GetCurrencies(string lang = "")
-        {
-            var currencies = await _repositoryManager.Currency.GetAllCurrencies(false);
-            var currenciesDto = _mapper.Map<List<CurrencyDto>>(currencies);
-            var currency = currencies.First();
-            var currencyDto = currenciesDto.First();
-            currencyDto.Name = lang == "en" ? currency.Name : currency.NameAr;
-            return currenciesDto;
-        } 
-        public async Task<CurrencyDto> GetCurrency(int id ,string lang = "en")
-        {
-            var currency = await _repositoryManager.Currency.GetCurrency(id,false);
-            var currencyDto = _mapper.Map<CurrencyDto>(currency);
-            currencyDto.Name = lang == "en" ? currency.Name : currency.NameAr;
-            return currencyDto;
-        } 
         public async Task<BussnessResultModel> AddCurrency(CreateCurrencyDto createDto)
         {
             var IsExists = _repositoryManager.Currency.ExistCurrency(createDto.Symbol);
             if (IsExists)
             {
-                return new BussnessResultModel(null,_locService.GetLocalizedStringValue("ExistItem"),false) ;
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"), false);
             }
             else
             {
@@ -531,7 +441,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<BussnessResultModel> UpdatCurrency(UpdateCurrencyDto updateDto)
         {
             var currency = await _repositoryManager.Currency.GetCurrency(updateDto.Id, true);
-            if(currency != null)
+            if (currency != null)
             {
                 _mapper.Map(updateDto, currency);
                 await _repositoryManager.SaveAsync();
@@ -545,29 +455,20 @@ namespace BusinessLogic.ApiClasses
         public async Task<BussnessResultModel> DeleteCurrency(int id)
         {
             var currency = await _repositoryManager.Currency.GetCurrency(id, false);
-            if(currency == null)
+            if (currency == null)
             {
-                return new BussnessResultModel(null,_locService.GetLocalizedStringValue("correctLink"), false);
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            _repositoryManager.Currency.DeleteCurrency(currency); 
+            _repositoryManager.Currency.DeleteCurrency(currency);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(currency, _locService.GetLocalizedStringValue("successDelete"));
-        }
-        public async Task ChangeCurrency(int id)
-        {
-            var currency = await _repositoryManager.Currency.GetCurrency(id, true);
-            if (currency != null)
-            {
-                currency.IsDefault = 1;
-                await _repositoryManager.SaveAsync();
-            }
         }
         //Notification------------------------------------------------
 
         public async Task<BussnessResultModel> CreateNotification(CreateNotificationDto create)
         {
-           
-            var users =  await _repositoryManager.User.GetCustomers(false);
+
+            var users = await _repositoryManager.User.GetCustomers(false);
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.GeneralNotfication);
             if (create.IdUsers.First() == 0)
             {
@@ -585,7 +486,7 @@ namespace BusinessLogic.ApiClasses
             {
                 foreach (var f in create.IdUsers)
                 {
-                    var user = await _repositoryManager.User.GetActiveUserId(f, false);;
+                    var user = await _repositoryManager.User.GetActiveUserId(f, false); ;
                     if (user != null)
                     {
                         var notification = _mapper.Map<Notification>(create);
@@ -600,13 +501,13 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
 
             return new BussnessResultModel(users, _locService.GetLocalizedStringValue("successAdd"));
-        } 
+        }
         public async Task<BussnessResultModel> DeleteNotification(int id)
         {
             var notification = await _repositoryManager.Notification.FindNotificationId(id, false);
-            if(notification == null)
+            if (notification == null)
             {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false) ;
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
             _repositoryManager.Notification.DeleteNotification(notification);
             await _repositoryManager.SaveAsync();
@@ -614,10 +515,10 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<List<NotificationDto>> GetNotifications(int PageId)
         {
-            var notfis = await _repositoryManager.Notification.GetNotificationsPage(PageId,15);
+            var notfis = await _repositoryManager.Notification.GetNotificationsPage(PageId, 15);
             //var dto = _mapper.Map<List<NotificationDto>>(notfis);
-            var dto =  new List<NotificationDto>();
-            foreach(var item in notfis)
+            var dto = new List<NotificationDto>();
+            foreach (var item in notfis)
             {
                 dto.Add(new NotificationDto
                 {
@@ -631,36 +532,36 @@ namespace BusinessLogic.ApiClasses
             }
             return dto;
         }
+        //Pages---------------------------------------------------------
+        public async Task<PagedList<PageDto>> GetAllPages(string search, string lang, PostsParameters postsParameters)
+        {
+            var pages = await _repositoryManager.StaticPages.GetAllPages(search, false);
+            var pagesDto = pages.Select(page => new PageDto
+            {
+                Title = lang == "en" ? page.Title : page.TitleAr,
+                Description = lang == "en" ? page.Description : page.DescriptionAr,
+            }).ToList();
+            return PagedList<PageDto>.ToPagedList(pagesDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task<BussnessResultModel> EditPage(EditPageDto update)
+        {
+            var page = await _repositoryManager.StaticPages.GetPage(update.Id, true);
+            if (page == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            _mapper.Map(update, page);
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(page, _locService.GetLocalizedStringValue("successSave"));
+        }
         //setting------------------------------------------------------
-
         public async Task<IEnumerable<SettingDto>> GetAllSettings()
         {
             var settings = await _repositoryManager.Setting.GetAllSettings(false);
             var settingsDto = _mapper.Map<List<SettingDto>>(settings);
             return settingsDto;
         }
-        public async Task<PagedList<PageDto>> GetAllPages(string search ,string lang , PostsParameters postsParameters)
-        {
-            var pages = await _repositoryManager.StaticPages.GetAllPages(search ,false);
-            var pagesDto = _mapper.Map<List<PageDto>>(pages);
-            var page = pages.First();
-            var pageDto = pagesDto.First();
-            pageDto.Title = lang == "en" ? page.Title : page.TitleAr;
-            pageDto.Description = lang == "en" ? page.Description : page.DescriptionAr;
-            return PagedList<PageDto>.ToPagedList(pagesDto, postsParameters.PageNumber, postsParameters.PageSize);
-        } 
-        public async Task<BussnessResultModel> EditSetting (SettingVM update )
-        {
-            PropertyInfo[] properties = update.GetType().GetProperties();
-            foreach (PropertyInfo property in properties)
-            {
-                var itemDB = await _repositoryManager.Setting.GetSettingByValue(property.Name, true);
-                itemDB.Value = property.GetValue(update)?.ToString();
-            }
-            await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(properties, _locService.GetLocalizedStringValue("successSave"));
-        } 
-        public async Task<BussnessResultModel> EditSettingStore (SettingStoreVM update )
+        public async Task<BussnessResultModel> EditSetting(SettingVM update)
         {
             PropertyInfo[] properties = update.GetType().GetProperties();
             foreach (PropertyInfo property in properties)
@@ -671,23 +572,16 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(properties, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task<PageDto> GetPage(int id , string lang = "en")
+        public async Task<BussnessResultModel> EditSettingStore(SettingStoreVM update)
         {
-            var page = await _repositoryManager.StaticPages.GetPage(id,false);
-            var pageDto = _mapper.Map<PageDto>(page);
-            pageDto.Description = lang == "en" ? page.Description : page.DescriptionAr;
-            return pageDto;
-        }
-        public async Task<BussnessResultModel> EditPage(EditPageDto update)
-        {
-            var page = await _repositoryManager.StaticPages.GetPage(update.Id,true);
-            if(page == null)
+            PropertyInfo[] properties = update.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
             {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink") , false);
-            } 
-            _mapper.Map(update, page);
+                var itemDB = await _repositoryManager.Setting.GetSettingByValue(property.Name, true);
+                itemDB.Value = property.GetValue(update)?.ToString();
+            }
             await _repositoryManager.SaveAsync();
-            return new BussnessResultModel(page, _locService.GetLocalizedStringValue("successSave"));
+            return new BussnessResultModel(properties, _locService.GetLocalizedStringValue("successSave"));
         }
         public async Task<SocialSettingVM> GetSocialSetting()
         {
@@ -702,64 +596,6 @@ namespace BusinessLogic.ApiClasses
                 android_app_link = settingList.Where(r => r.Key == "android_app_link").First().Value,
                 ios_app_link = settingList.Where(r => r.Key == "ios_app_link").First().Value
             };
-        }
-        //Address------------------------------------------------------
-        public async Task<List<AddressDto>> GetAddresses(int user)
-        {
-            var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(user);
-            var addressesDto = _mapper.Map<List<AddressDto>>(addresses);
-            return addressesDto;
-        }
-        public async Task<User> GetCustomer(int custId)
-        {
-            return await _repositoryManager.User.GetActiveUserId(custId,false);
-        }
-        public async Task<List<CartVM>> GetHomeCart(int user, Currency currency)
-        {
-            var carts = await _repositoryManager.Cart.CartsNotActiveCustomer(user);
-            if (carts == null)
-            {
-                // return new ExceptionModel<List<CartVM>>(null, _locService.GetLocalizedStringValue(""), false);
-            }
-            var cartVM = new List<CartVM>();
-            foreach (var cart in carts)
-            {
-                if (cart.StoreId != 0)
-                {
-                    var product = await _repositoryManager.Product.GetProductById(cart.ProdId, false);
-                    var store = await _repositoryManager.User.GetStore(cart.StoreId, false);
-                    var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(cart.ProdId);
-                    var attr = await _productBL.GetOptions(cart.ProdId);
-                    var flash = await _repositoryManager.Sales.GetFlashProductId(cart.ProdId);
-                    if (product != null)
-                    {
-                        var offer_price = special == null ? 0 : special.SpecialPrice;
-                        cartVM.Add(new CartVM
-                        {
-                            Id = cart.Id,
-                            Qty = cart.Qty,
-                            StoreId = cart.StoreId,
-                            FinalPrice = cart.FinalPrice,
-                            Attributes = attr ?? null,
-                            ShareLink = _util.url1 + "/share.html?id=" + cart.ProdId,
-                            ProductId = cart.ProdId,
-                            ProductName = product.ProductName,
-                            //ProductImage = await _imageBL.GetImageOriginal(product.Images.First().ToString()),
-                            IsFeature = product.IsFeature,
-                            SpecialPrice = offer_price,
-                            StoreName = store.FirstName,
-                            IsSpecial = (special == null ? false : true),
-                            ProductDescription = product.Description,
-                            CreatedAt = product.CreatedAt.ToString(),
-                            UpdatedAt = product.UpdatedAt.ToString() ?? null,
-                            ProductModel = product.ProductModel,
-                            ProductPrice = (flash != null ? flash.DiscountPrice : product.Price),
-                            ProductStatus = Convert.ToInt16(product.IsStatus)
-                        });
-                    }
-                }
-            }
-            return/* new ExceptionModel<List<CartVM>>(cartVM)*/ cartVM;
         }
     }
 }

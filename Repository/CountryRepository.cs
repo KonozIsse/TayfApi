@@ -19,8 +19,6 @@ namespace Repository
         {
 
         }
-        public async Task<List<Country>> GetCountriesCountZones(bool trackChanges)
-        => await FindByCondition(c => c.Zones.Count() > 0, trackChanges).Include(x => x.Zones).ToListAsync();
         public async Task<List<Country>> GetCountries()
         => await FindAll(false).Include(x => x.Zones).Include(c=>c.Image).ToListAsync();
         public async Task<IEnumerable<Country>> GetAllCountries(string search)
@@ -37,8 +35,6 @@ namespace Repository
          => await FindByCondition(c => c.Id == id , trackChanges).FirstOrDefaultAsync();
         public bool ExistCountry(string countryName, string code)
          => FindByCondition(x => x.CountryName == countryName && x.MobileCode == code,false).Count() > 0;
-        public async Task<Country> GetCountryByCode(string code, bool trackChanges)
-         => await FindByCondition(c => c.MobileCode == code, trackChanges).FirstOrDefaultAsync();
         public void AddCountry(Country country) => Create(country);
         public void DeleteCountry(Country country) => Delete(country);
     }
@@ -48,15 +44,12 @@ namespace Repository
         {
 
         }
-        public bool ExistZone(string name, string code)
-        => FindByCondition(x => x.ZoneName == name && x.ZoneCode == code, false).Count() > 0;
+       
         public async Task<List<Zone>> GetZonesByCountryId(int countryId)
         => await FindByCondition(c => c.CountryId == countryId, false).ToListAsync();
         public async Task<Zone> GetZoneId (int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
-        public async Task<Zone> GetZoneIdCountryId(int id,int countryId , bool trackChanges)
-       => await FindByCondition(c => c.Id == id&& c.CountryId == countryId, trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Zone>> GetAllZones(string search)
+       public async Task<List<Zone>> GetAllZones(string search)
         {
             var zones = FindAll(false);
             if (!string.IsNullOrEmpty(search))
@@ -72,5 +65,8 @@ namespace Repository
             Create(zone); 
         }
         public void DeleteZone(Zone zone) => Delete(zone);
+
+        public bool ExistZone(string zoneName, string code)
+       => FindByCondition(x => x.ZoneName == zoneName && x.ZoneCode == code, false).Count() > 0;
     }
 }

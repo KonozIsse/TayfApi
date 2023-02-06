@@ -1,7 +1,6 @@
 namespace Entities.Models
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     public class Coupon : BaseEntity
@@ -26,6 +25,6 @@ namespace Entities.Models
         [ForeignKey(nameof(Admin))]
         public int? AdminId { get; set; }
         public User Admin { get; set; }
-        public string Product { get; set; }
+        public string Products { get; set; }
     }
 }

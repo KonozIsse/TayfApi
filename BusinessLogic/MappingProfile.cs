@@ -72,10 +72,9 @@ namespace BusinessLogic
             CreateMap<ProductDto, Product>().ReverseMap();
             CreateMap<CreateProductDto, Product>().ReverseMap();
             CreateMap<UpdateProductDto, Product>().ReverseMap();
-            CreateMap<ProductPageDto, Product>().ReverseMap();
+            //MapProductCategory
             CreateMap<CreateProductCategoryDto, ProductCategory>().ReverseMap();
             CreateMap<ProductCategoryDto, ProductCategory>().ReverseMap();
-            CreateMap<RecentProductDto, Product>().ReverseMap();
             //MapProductSales
             CreateMap<SaleDto, ProductSales>().ReverseMap();
             CreateMap<CreateSaleDto, ProductSales>().ReverseMap();
@@ -115,7 +114,6 @@ namespace BusinessLogic
             //MapCustomer
             CreateMap<CreateCustomerDto, User>().ReverseMap(); 
             CreateMap<CreateCustomerCPDto, User>().ReverseMap();
-            CreateMap<UserDto, User>().ReverseMap();
             CreateMap<CustomerDto, User>().ReverseMap();
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             CreateMap<UserForRegistrationDto, User>().ReverseMap(); 

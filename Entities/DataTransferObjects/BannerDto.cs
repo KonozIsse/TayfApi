@@ -13,16 +13,9 @@ namespace Entities.DataTransferObjects
     public class BannerDto
     {
         public int Id { get; set; }
-        public Status IsStatus { get; set; }
         public string Title { get; set; }
         public string LangName { get; set; }
-        public string Url { get; set; }
-        public string Type { get; set; }
-        public DateTime? AddDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public int? VendorId { get; set; }
         public string Img { get; set; }
-        public string CreatedAt { get; set; }
     }
     public class UpdateBannerDto
     {

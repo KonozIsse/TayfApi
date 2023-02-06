@@ -147,7 +147,7 @@ namespace ControlPanel.Controllers
         [HttpPost("AddPerssmionRole")]
         public async Task<IActionResult> AddPerssmionRole(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
-            var result = await _userBL.SaveRole(roleId, RoleLinksDto);
+            var result = await _userBL.AddPermission(roleId, RoleLinksDto);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -160,7 +160,7 @@ namespace ControlPanel.Controllers
         [HttpPut("EditPerssmionRole")]
         public async Task<IActionResult> EditPerssmionRole(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
-            var result = await _userBL.EditPermissionRoleId(roleId, RoleLinksDto);
+            var result = await _userBL.EditPermission(roleId, RoleLinksDto);
             if (result.Success)
             {
                 return Ok(result.Message);

@@ -19,9 +19,9 @@ namespace ControlPanel.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class AcountController : MyBaseController
+    public class AccountController : MyBaseController
     {
-        public AcountController(IServiceProvider serviceProvider) : base(serviceProvider)
+        public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
         [HttpPost("login")]
@@ -32,9 +32,20 @@ namespace ControlPanel.Controllers
                 _logger.LogWarn($"{nameof(Authenticate)}: Authentication failed. Wrong user name or password.");
                 return Unauthorized();
             }
-            //return Ok(new { usToken = await _authManager.CreateToken() });
             return Ok(new { Token = await _authManager.CreateToken() });
-
+        } 
+        [HttpPost("AddOrder")]
+        public async Task<IActionResult> AddOrder([FromForm] CreateOrderDto createOrderDto)
+        {
+            var result = await _orderBL.AddOrder(GetCurrentUserId(), createOrderDto);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return Ok(result.Message);
+            }
         }
        
 

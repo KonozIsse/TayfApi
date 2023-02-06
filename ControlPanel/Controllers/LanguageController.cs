@@ -16,7 +16,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetAllLanguages(string search ,[FromQuery] PostsParameters postsParameters)
         {
-            var result = await _homeBL.GetLanguages(search, GetLanguage(),postsParameters);
+            var result = await _homeBL.GetAllLanguages(search, GetLanguage(),postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
@@ -37,7 +37,7 @@ namespace ControlPanel.Controllers
         [HttpPut("change-default")]
         public async Task<IActionResult> ChangeDefaultLanugage(int id)
         {
-             await _homeBL.ChangeLanugage(id);
+             await _homeBL.ChangeDefaultLanugage(id);
              return Ok();
         }
 

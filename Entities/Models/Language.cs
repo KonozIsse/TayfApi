@@ -13,7 +13,7 @@ namespace Entities.Models
         public string Direction { get; set; } 
         public short Sort { get; set; }
         public short? IsDefault { get; set; }
-        public int? ImgId { get; set; }
+        public int ImgId { get; set; }
         [ForeignKey(nameof(ImgId))]
         public Image Image { get; set; }
     }

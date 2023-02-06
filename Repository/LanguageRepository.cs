@@ -23,7 +23,7 @@ namespace Repository
        => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Language> GetDefaultLanguage(bool trackChanges)
         => await FindByCondition(c => c.IsDefault == 1, trackChanges).FirstOrDefaultAsync();
-        public async Task<IEnumerable<Language>> ListLanguage(bool trackChanges)
+        public async Task<IEnumerable<Language>> GetListLanguage(bool trackChanges)
         => await FindAll(trackChanges).ToListAsync();
         public async Task<IEnumerable<Language>> GetAllLanguage(string search)
         { 
@@ -34,7 +34,6 @@ namespace Repository
             }
             return await langs.ToListAsync();
         }
-        public bool IsExistLang(string code) => FindByCondition(c => c.Code == code, false).Count() > 0;
         public void DeleteLanguage(Language language) => Delete(language);
     }
 }

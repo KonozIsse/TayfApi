@@ -16,7 +16,7 @@ namespace Entities.DataTransferObjects
         public string Code { get; set; }
         public string Name { get; set; }
         public short? IsDefault { get; set; }
-       public int? ImgId { get; set; }
+       public string Image { get; set; }
         public short Sort { get; set; }
     }
 

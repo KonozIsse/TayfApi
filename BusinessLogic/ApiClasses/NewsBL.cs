@@ -5,15 +5,6 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
-using Newtonsoft.Json;
-using Repository;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BussnessResultModel = Entities.Exception.BussnessResultModel;
 namespace BusinessLogic.ApiClasses
 {//BusinessException
     public class NewsBL
@@ -119,7 +110,7 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
-        public async Task<PagedList<NewsDto>> SearchBlog(int vendorId, string search, PostsParameters postsParameters)
+        public async Task<PagedList<NewsDto>> GetAllBlogs (int vendorId, string search, PostsParameters postsParameters)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(vendorId, search);
             if (vendorId != 0) { searchBlog.Where(c => c.VendorId == vendorId); }
@@ -127,10 +118,6 @@ namespace BusinessLogic.ApiClasses
             return PagedList<NewsDto>.ToPagedList(newsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         //CommentNews------------------------------------------------
-        public async Task<CommentNews> GetCommentId (int commentId)
-        {
-            return await _repositoryManager.CommentNews.GetCommentId(commentId);
-        }
         public async Task<BussnessResultModel> DeleteNewsComments(int id )
         {
             var comment = await _repositoryManager.CommentNews.GetCommentId(id);

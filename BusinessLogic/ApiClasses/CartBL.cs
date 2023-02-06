@@ -17,20 +17,19 @@ namespace BusinessLogic.ApiClasses
         private readonly LocService _locService;
         private readonly LocationTaxBL _locationTaxBL;
         private readonly Util _util;
-        public CartBL( IRepositoryManager repositoryManager, IMapper mapper, LocService locService, LocationTaxBL locationTaxBL, Util util)
+        private readonly ImageBL _imageBL;
+        public CartBL( IRepositoryManager repositoryManager, IMapper mapper, LocService locService, LocationTaxBL locationTaxBL, Util util,ImageBL imageBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _locService = locService;
             _locationTaxBL = locationTaxBL;
             _util = util;
+            _imageBL = imageBL;
         }
         //Cart------------------------------------------------
-        public int CartCount()
-        {
-            return _repositoryManager.Cart.CartCount();
-        }
-        public async Task<decimal> GetTotalOrder (int customerId, int orderId = 0)
+      
+        public async Task<decimal> GetTotalOrder (int customerId, int orderId )
         {
             decimal total = 0;
             if (orderId != 0)
@@ -65,27 +64,6 @@ namespace BusinessLogic.ApiClasses
             }
             return total;
         
-        }
-        public async Task<IEnumerable<StoreDto>> GetCartsCustomerId(int customer)
-        {
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customer);
-            var store = await _repositoryManager.User.GetStore(carts.First().StoreId, false);
-            var storeGrouped = carts.GroupBy(c => c.Store).Select(x => new
-            {
-                CountCart = carts.Count(),
-                TotalPrice = x.Sum(c => c.FinalPrice)
-            });
-            var storeList = storeGrouped.Select(x =>
-                new StoreDto
-                {
-                    Id = store.Id,
-                    FirstName = store.FirstName,
-                    Avater = store.Avater,
-                    AdressInfo = store.AdressInfo,
-                    CountCart = x.CountCart,
-                    TotalPrice = x.TotalPrice,
-                });
-            return storeList;
         }
         public async Task ChangeActiveStatusCart(int id)
         {
@@ -145,18 +123,6 @@ namespace BusinessLogic.ApiClasses
                 _mapper.Map(createDto, cart);
             }
             await _repositoryManager.SaveAsync();
-        }
-        public  decimal UpdateCart( int id,int CustomerID, int Quantity = 1)
-        {
-            var cart = _repositoryManager.Cart.GetCartId(id, true).Result;
-            var update = new CreateCartDto
-            {
-                Id = id,
-                ProductId = cart.ProdId,
-                Qty = Quantity,
-                CartAttributeProducts = null
-            };
-            return UpdateTotalCart(CustomerID, update).Result;
         }
         public async Task<decimal> UpdateTotalCart(int customerId, CreateCartDto createDto)
         {
@@ -344,7 +310,7 @@ namespace BusinessLogic.ApiClasses
                         foreach (var item in carts)
                         {
                             var product = await _repositoryManager.Product.GetProductById(item.ProdId, false);
-                            if (coupon.Product.Contains(item.ProdId.ToString()))
+                            if (coupon.Products.Contains(item.ProdId.ToString()))
                             {
                                 var newTotal = Convert.ToDecimal(product.Price) - Convert.ToDecimal(coupon.CouponAmount);
                                 total = total + newTotal;
@@ -361,7 +327,7 @@ namespace BusinessLogic.ApiClasses
                         foreach (var item in carts)
                         {
                             var product = await _repositoryManager.Product.GetProductById(item.ProdId, false);
-                            if (coupon.Product.Contains(item.ProdId.ToString()))
+                            if (coupon.Products.Contains(item.ProdId.ToString()))
                             {
                                 decimal newval = Convert.ToDecimal(product.Price) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
                                 total = total + newval;
@@ -408,7 +374,7 @@ namespace BusinessLogic.ApiClasses
                     foreach (var cart in carts)
                     {
                         string pid = cart.ProdId.ToString();
-                        if (coupon.Product.Contains(pid))
+                        if (coupon.Products.Contains(pid))
                         {
                             isEx = true;
                         }
@@ -430,7 +396,7 @@ namespace BusinessLogic.ApiClasses
                     foreach (var cart in carts)
                     {
                         string pid = cart.ProdId.ToString();
-                        if (coupon.Product.Contains(pid))
+                        if (coupon.Products.Contains(pid))
                         {
                             isEx = true;
                         }
@@ -554,27 +520,7 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(cart , _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task AddCookie(int customerId)
-        {
-            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
-            try
-            {
-                for (int i = 0; i < carts.Count; i++)
-                {
-                    var create = new CreateCartDto
-                    {
-                        ProductId = carts[i].ProdId,
-                        Qty = carts[i].Qty,
-                        Id = carts[i].Id,
-                        CartAttributeProducts = null
-                    };
-                    await AddCart(customerId, create);
-                    await ChangeActiveStatusCart(carts[i].Id);
-                }
-            }
-            catch { }
-        }
-        public async Task<List<CartVM>> GetCarts (int storeId, int userId, Currency curr)
+        public async Task<List<CartVM>> GetCarts (int storeId, int userId)
         {
             var carts = await _repositoryManager.Cart.GetCartsToCustomerId(userId);
             if (storeId != 0)
@@ -604,7 +550,7 @@ namespace BusinessLogic.ApiClasses
                             ShareLink = _util.url1 + "/share.html?id=" + cart.ProdId,
                             ProductId = cart.ProdId,
                             ProductName = product.ProductName,
-                            //ProductImage = await _imageBL.GetImageOriginal(product.Images.First().ToString()),
+                            ProductImage =  _imageBL.GetImageOriginal(product.Images.First().ImageId),
                             IsFeature = product.IsFeature,
                             SpecialPrice = offer_price,
                             StoreName = store.FirstName,
@@ -631,8 +577,8 @@ namespace BusinessLogic.ApiClasses
                 Phone = usr.PhoneNumber,
                 DisCount = GetValueCodeCoupon(CustomerId, coupon, code).Result ?? null,
                 Payment = await _repositoryManager.PaymentMethods.GetPaymentMethods("") ?? null,
-                Countries = await _locationTaxBL.GetCountriesForWeb() ?? null,
-                Cart = await GetCarts(storeId, CustomerId, code) ?? null,
+                Countries = await _locationTaxBL.GetAllCountries() ?? null,
+                Cart = await GetCarts(storeId, CustomerId) ?? null,
                 Tax = await _locationTaxBL.GetTax(CustomerId) == 0 ? 0 : await _locationTaxBL.GetTax(CustomerId),
                 Times = await _repositoryManager.DeliveryTime.GetAllDeliveryTimes() ?? null,
                 Coupon = coupon ?? null,
@@ -641,24 +587,6 @@ namespace BusinessLogic.ApiClasses
             };
             return model;
         }
-
-
-        public async Task<BussnessResultModel> DeleteByStore(int storeId, int userId)
-        {
-            var carts = await _repositoryManager.Cart.GetCartsToStoreCustomer(storeId,userId);
-            if(carts == null)
-            {
-                return new BussnessResultModel(null, "Please make sure the link", false);
-            }
-            else
-            {
-                foreach (var cart in carts)
-                {
-                    _repositoryManager.Cart.DeleteCart(cart);
-                    await _repositoryManager.SaveAsync();
-                }
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("successDelete"), false);
-            }
-        }
+        
     }
 }

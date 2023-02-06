@@ -16,6 +16,7 @@ using BusinessLogic.Services;
 using System.Web.Helpers;
 using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -33,9 +34,11 @@ namespace BusinessLogic.ApiClasses
         protected readonly IAuthenticationManager _authManager;
         protected readonly ILoggerManager _logger;
         protected readonly ISMSService _sms;
+        protected readonly ImageBL _imageBL;
         protected readonly ImageUploadServices _imageUploadServices;
         public UserBL(IRepositoryManager repositoryManager, IMapper mapper , Util util, UserManager<User> userManager,  IEmailSender emailSender
-            , LocService locService , RoleManager<Role> roleManager , LocationTaxBL locationTaxBL , SignInManager<User> signInManager, IAuthenticationManager authManager , ILoggerManager logger ,ISMSService sms)
+            , LocService locService , RoleManager<Role> roleManager , LocationTaxBL locationTaxBL , SignInManager<User> signInManager, IAuthenticationManager authManager 
+            , ILoggerManager logger ,ISMSService sms, ImageUploadServices imageUploadServices , ImageBL imageBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
@@ -49,6 +52,8 @@ namespace BusinessLogic.ApiClasses
             _authManager = authManager;
             _logger = logger;
             _sms = sms;
+            _imageUploadServices = imageUploadServices;
+            _imageBL = imageBL;
         }
         //Role------------------------------------------------
         public async Task<List<RoleDto>> GetTypesStoreAdmin()
@@ -57,7 +62,7 @@ namespace BusinessLogic.ApiClasses
             var rolesDto = _mapper.Map<List<RoleDto>>(roles);
             return rolesDto;
         } 
-        public async Task<BussnessResultModel> SaveRole(int roleId, List<RoleLinksDto> RoleLinksDto)
+        public async Task<BussnessResultModel> AddPermission(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
             var permissions = await _repositoryManager.Permission.GetPermissionsRole(roleId, true);
             if (permissions != null)
@@ -121,7 +126,7 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
         }
-        public async Task<BussnessResultModel> EditPermissionRoleId(int id , List<RoleLinksDto> RoleLinksDto)
+        public async Task<BussnessResultModel> EditPermission(int id , List<RoleLinksDto> RoleLinksDto)
         {
             var role = await _repositoryManager.Role.GetRoleId(id, false);
             if(role == null)
@@ -129,7 +134,7 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"), false);
             }
             var links = await _repositoryManager.Link.GetLinks();
-            links.Where(r =>  r.IsVendorLink == true && role.IsVendorLink == true);
+            links = links.Where(r =>  r.IsVendorLink == true && role.IsVendorLink == true);
             
             var linkIdsDto = RoleLinksDto.Select(x => x.Id).ToList();
             var permissions = await _repositoryManager.Permission.GetLinksRole(id, linkIdsDto, true);
@@ -160,29 +165,80 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<StoreDto>> GetAllStores(string search, PostsParameters postsParameters)
         {
             var stores = await _repositoryManager.User.GetSearchStores(search);
-            var StoreDto = _mapper.Map<List<StoreDto>>(stores);
+            var StoreDto = stores.Select(c => new StoreDto
+            {
+                Id = c.Id,
+                Image = _imageBL.GetImageMedium(c.ImageId.Value),
+                FirstName = c.FirstName,
+                AdressInfo = c.AdressInfo,
+                Email =c.Email,
+                PhoneNumber = c.PhoneNumber,
+                CreatedAt = c.CreatedAt.ToString("G")
+            }).ToList();
             return PagedList<StoreDto>.ToPagedList(StoreDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<StoreDto>> GetStores()
         {
             var stores = await _repositoryManager.User.GetAllStores(false);
-            var storesDto = _mapper.Map<List<StoreDto>>(stores);
+            var storesDto = stores.Select(c => new StoreDto
+            {
+                Id = c.Id,
+                Image = _imageBL.GetImageMedium(c.ImageId.Value),
+                FirstName = c.FirstName,
+                AdressInfo = c.AdressInfo ?? null,
+                Email = c.Email,
+                PhoneNumber = c.PhoneNumber,
+                CreatedAt = c.CreatedAt.ToString("G")
+            }).ToList();
             return storesDto;
         } 
-       
-        public async Task<List<StoreDto>> GetSomeStores()
-        {
-            var stores = await _repositoryManager.User.Get10Stores();
-            var storesDto = _mapper.Map<List<StoreDto>>(stores);
-           
-            return storesDto;
-        }
         public async Task<StoreDto> GetStore(int id)
         {
             var store = await _repositoryManager.User.GetStoreId(id);
             var storeDto = _mapper.Map<StoreDto>(store);
-           //storeDto.Avater = await _imageBL.GetImageMedium(store.Avater);
+            storeDto.Image = _imageBL.GetImageMedium(store.ImageId.Value);
             return storeDto;
+        }
+        public async Task<IEnumerable<StoreDto>> GetCartsCustomerId(int customer)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customer);
+            var store = await _repositoryManager.User.GetStore(carts.First().StoreId, false);
+            var storeGrouped = carts.GroupBy(c => c.Store).Select(x => new
+            {
+                CountCart = carts.Count(),
+                TotalPrice = x.Sum(c => c.FinalPrice)
+            });
+            var storeList = storeGrouped.Select(x =>
+                new StoreDto
+                {
+                    Id = store.Id,
+                    FirstName = store.FirstName,
+                    Image = _imageBL.GetImageMedium(store.ImageId.Value),
+                    AdressInfo = store.AdressInfo,
+                    CountCart = x.CountCart,
+                    TotalPrice = x.TotalPrice,
+                }).ToList();
+            return storeList;
+        }
+        public async Task<PagedList<UserTotal>> GetVendorTotal(string search, PostsParameters postsParameters)
+        {
+            var stores = await _repositoryManager.User.GetVendorTotal(search, false);
+            var storesTotal = new List<UserTotal>();
+            foreach (var x in stores)
+            {
+                x.StoreOrders = await _repositoryManager.Order.GetsAllTransactionOrders();
+                var order = x.StoreOrders.Where(c => c.StoreId == x.Id);
+
+                storesTotal.Add(new UserTotal
+                {
+                    FirstName = x.FirstName,
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    Total = Convert.ToInt32(order.Sum(c => c.OrderPrice)),
+                });
+            }
+            var descTotal = storesTotal.OrderByDescending(c => c.Total).ToList();
+            return PagedList<UserTotal>.ToPagedList(descTotal, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> AddStore(CreateStoreDto create)
         {
@@ -220,7 +276,6 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
             store.FirstName = update.NameStore;
-            store.LastName = "Store";
             _mapper.Map(update, store);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(store, _locService.GetLocalizedStringValue("successSave"));
@@ -245,7 +300,154 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
-        //user------------------------------------------------
+        //Admin------------------------------------------------ 
+        public async Task<List<AdminDto>> GetAdminsStores()
+        {
+            var admins = await _repositoryManager.User.GetAdminsStors(false);
+            var adminsDto = admins.Select(admin => new AdminDto
+            {
+                Id = admin.Id,
+                FullName = admin.FirstName,
+                Email = admin.Email,
+                RoleName = admin.Role.Name,
+                Status = admin.Status == Status.Active ? _locService.GetLocalizedStringValue("active") : _locService.GetLocalizedStringValue("notActive"),
+            }).ToList();
+            return adminsDto;
+        }
+        public async Task<BussnessResultModel> RemoveUserData(int id)
+        {
+            var user = await _repositoryManager.User.GetUserId(id, false);
+            if (user != null)
+            {
+                var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(id);
+                if (addresses != null)
+                {
+                    foreach (var address in addresses)
+                    {
+                        _repositoryManager.Address.DeleteAddress(address);
+                    }
+                }
+                var orders = await _repositoryManager.Order.GetOrdersToCustomer(id);
+                if (orders != null)
+                {
+                    foreach (var order in orders)
+                    {
+                        _repositoryManager.Order.DeleteOrder(order);
+                    }
+                }
+                var devices = await _repositoryManager.Device.GetDevicesUserId(id, false);
+                if (devices != null)
+                {
+                    foreach (var device in devices)
+                    {
+                        _repositoryManager.Device.DeleteDevice(device);
+                    }
+                }
+                var notifications = await _repositoryManager.Notification.GetNotificationsToUserId(id, false);
+                if (notifications != null)
+                {
+                    foreach (var notification in notifications)
+                    {
+                        _repositoryManager.Notification.DeleteNotification(notification);
+                    }
+                }
+                _repositoryManager.User.DeleteUser(user);
+                await _repositoryManager.SaveAsync();
+                return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successDelete"));
+            }
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
+        }
+        public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister, int zoneId, string street, string zip)
+        {
+            MailAddress addr = new MailAddress(userRegister.Email);
+            if (userRegister.Email != addr.ToString())
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("EnterValidEmailAddress"), false);
+            }
+            else
+            {
+                var user = _mapper.Map<User>(userRegister);
+                user.PhoneNumber = userRegister.PhoneNumber;
+                user.UserName = userRegister.Email;
+                user.IsMobileVerified = false;
+                user.TypeRegister = TypeRegister.Normal;
+                user.PasswordHash = userRegister.Password;
+                user.VerifiedCode = Convert.ToInt32(_util.GenerateRandomNo()) + Convert.ToInt32(_util.GenerateRandomNo2());
+                var country = await _repositoryManager.Country.GetcountryById(userRegister.CountryId.Value, false);
+                user.CodeMobileCountry = country.MobileCode == null ? null : country.MobileCode;
+                if (userRegister.RoleId == 3)
+                {
+                    user.UserType = UserType.Store;
+                }
+                else
+                {
+                    user.UserType = UserType.Admin;
+                }
+                var result = await _userManager.CreateAsync(user, userRegister.Password);
+                if (result.Succeeded)
+                {
+                    var existAddress = await _repositoryManager.Address.GetDefaultAddressCustomer(user.Id);
+                    if (existAddress == null)
+                    {
+                        var address = new Address();
+                        address.UserId = user.Id;
+                        address.CountryId = user.CountryId.Value;
+                        address.Street = street;
+                        address.ZoneId = zoneId;
+                        address.Post_Code = zip;
+                        _repositoryManager.Address.AddAddress(address);
+                    }
+
+                    var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
+                    await _userManager.AddClaimAsync(user, new Claim(/*ClaimTypes.Name*/role.Name, user.Email));
+
+                    var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false); //verify emasil
+                    var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
+
+                    var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
+                    _emailSender.SendEmail(message);
+
+                    await _repositoryManager.SaveAsync();
+                    return new BussnessResultModel(user, "successAdd");
+                }
+                else
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
+                }
+            }
+        }
+        public async Task<BussnessResultModel> EditAdmin(UpdateAdminDto update)
+        {
+            var user = await _repositoryManager.User.GetUserId(update.Id, true);
+            if (user == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            if (!string.IsNullOrEmpty(update.Password))
+            {
+                if (String.IsNullOrEmpty(update.OldPassword))
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPassword"), false);
+                }
+                if (!update.OldPassword.Equals(user.PasswordHash))
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("errorOldPassword"), false);
+                }
+                var change = await _userManager.ChangePasswordAsync(user, update.OldPassword, update.Password);
+                if (!change.Succeeded)
+                {
+                    return new BussnessResultModel(change, _locService.GetLocalizedStringValue("ConfirmPassAtLeast"), false);
+                }
+            }
+            _mapper.Map(update, user);
+            await _repositoryManager.SaveAsync();
+
+            return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successSave"));
+        }
+        //Customer------------------------------------------------
         public async Task<BussnessResultModel> EditSubscribeletter(string newsletter, int CustomerId)
         {
             var customer = await _repositoryManager.User.GetCustomerId(CustomerId,true);
@@ -256,24 +458,6 @@ namespace BusinessLogic.ApiClasses
             customer.IsSubscribe = newsletter == "0" ? false : true;
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(customer, _locService.GetLocalizedStringValue("successSave"));
-        }
-        public async Task<IEnumerable<AdminDto>> GetAdminsStores()
-        {
-            var admins = await _repositoryManager.User.GetAdminsStors(false);
-            var adminsDto = new List<AdminDto>();// _mapper.Map<List<AdminDto>>(admins);
-            foreach (var admin in admins)
-            {
-                var role = await _repositoryManager.Role.GetRoleId(admin.RoleId, false);
-                adminsDto.Add(new AdminDto
-                {
-                    Id = admin.Id,
-                    FullName = admin.FirstName,
-                    Email = admin.Email,
-                    RoleName = role.Name,
-                    Status = admin.Status,
-                });
-            }
-            return adminsDto;
         }
         public async Task<PagedList<CustomerDto>> GetCustomers(string search, PostsParameters postsParameters)
         {
@@ -304,43 +488,6 @@ namespace BusinessLogic.ApiClasses
             var descTotal = customerTotal.OrderByDescending(c => c.Total).ToList();
             return PagedList<UserTotal>.ToPagedList(descTotal, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<PagedList<UserTotal>> GetVendorTotal(string search, PostsParameters postsParameters)
-        {
-            var stores = await _repositoryManager.User.GetVendorTotal(search, false);
-            var storesTotal = new List<UserTotal>();
-            foreach (var x in stores)
-            {
-                x.StoreOrders = await _repositoryManager.Order.GetsAllTransactionOrders();
-                var order = x.StoreOrders.Where(c => c.StoreId == x.Id);
-
-                storesTotal.Add(new UserTotal
-                {
-                    FirstName = x.FirstName,
-                    Email = x.Email,
-                    PhoneNumber = x.PhoneNumber,
-                    Total = Convert.ToInt32(order.Sum(c => c.OrderPrice)),
-                });
-            }
-            var descTotal = storesTotal.OrderByDescending(c => c.Total).ToList();
-            return PagedList<UserTotal>.ToPagedList(descTotal, postsParameters.PageNumber, postsParameters.PageSize);
-        }
-        public async Task<BussnessResultModel> ResetPassword(ResetPasswordDto model)
-        {
-            var user = await _userManager.FindByNameAsync(model.Email);
-            if (model.Password == model.ConfirmPassword)
-            {
-                var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-                if (!result.Succeeded)
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"), false);
-                }
-            }
-            else
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("passwnotequal"), false);
-            }
-            return new BussnessResultModel(user);
-        }
         public async Task<BussnessResultModel> AddVerifyUser(int userId, int code)
         {
             var isVerify = await _repositoryManager.User.VerifiedCodeUser(userId, code, true);
@@ -356,7 +503,7 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null , _locService.GetLocalizedStringValue("errorCode"), false);
             }
         }
-        public async Task<User> ReSendCode(string email)
+        public async Task ReSendCode(string email)
         {
             var customer = await _repositoryManager.User.GetCustomerEmail(email,false);
             if (customer != null)
@@ -382,42 +529,6 @@ namespace BusinessLogic.ApiClasses
                 }
 
             }
-            return customer;
-        }
-        public async Task<BussnessResultModel> ChangePasswordCustomer (int UserId, string OldPassword, string NewPassword, string ConfirmedPassword)
-        {
-            var user = await _repositoryManager.User.GetUserId(UserId, true);
-            if (!String.IsNullOrEmpty(ConfirmedPassword) && !String.IsNullOrEmpty(NewPassword))
-            {
-                if (ConfirmedPassword == NewPassword)
-                {
-                    if (OldPassword != user.PasswordHash)
-                    {
-                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("passwnotequal"), false);
-                    }
-
-                    var result2 = await _userManager.ChangePasswordAsync(user, OldPassword, NewPassword);
-                    if (result2.Succeeded)
-                    {
-                        user.PasswordHash = NewPassword;
-                        await _repositoryManager.SaveAsync();
-                        return new BussnessResultModel(user, _locService.GetLocalizedStringValue("PasswordChangedSuccessfully"));
-                    }
-                    else
-                    {
-                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ConfirmPassAtLeast"), false);
-                    }
-                }
-                else
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("passwnotequal"), false);
-                }
-            }
-            else
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPassword"), false);
-            }
-          
         }
         public async Task<BussnessResultModel> UpdateCustomerCP(UpdateCustomerDto updateDto)
         {
@@ -519,52 +630,6 @@ namespace BusinessLogic.ApiClasses
                 };
                 _repositoryManager.Notification.CreateNotification(notification);
 
-                await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successDelete") );
-            }
-            else
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
-            }
-        }
-        public async Task<BussnessResultModel> RemoveUserData(int id)
-        {
-            var user = await _repositoryManager.User.GetUserId(id, false);
-            if(user != null)
-            {
-                var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(id);
-                if (addresses != null)
-                {
-                    foreach (var address in addresses)
-                    {
-                        _repositoryManager.Address.DeleteAddress(address);
-                    }
-                }
-                var orders = await _repositoryManager.Order.GetOrdersToCustomer(id);
-                if (orders != null)
-                {
-                    foreach (var order in orders)
-                    {
-                        _repositoryManager.Order.DeleteOrder(order);
-                    }
-                }
-                var devices = await _repositoryManager.Device.GetDevicesUserId(id, false);
-                if (devices != null)
-                {
-                    foreach (var device in devices)
-                    {
-                        _repositoryManager.Device.DeleteDevice(device);
-                    }
-                }
-                var notifications = await _repositoryManager.Notification.GetNotificationsToUserId(id, false);
-                if (notifications != null)
-                {
-                    foreach (var notification in notifications)
-                    {
-                        _repositoryManager.Notification.DeleteNotification(notification);
-                    }
-                }
-                _repositoryManager.User.DeleteUser(user);
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successDelete") );
             }
@@ -738,34 +803,6 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
             }
         }
-        public async Task<BussnessResultModel> EditAdmin(UpdateAdminDto update )
-        {
-            var user = await _repositoryManager.User.GetUserId(update.Id, true);
-            if(user == null)
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
-            }
-            if (!string.IsNullOrEmpty(update.Password))
-            {
-                if (String.IsNullOrEmpty(update.OldPassword))
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPassword"), false);
-                }
-                if (!update.OldPassword.Equals(user.PasswordHash))
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("errorOldPassword"), false);
-                }
-                var change = await _userManager.ChangePasswordAsync(user, update.OldPassword, update.Password);
-                if (!change.Succeeded)
-                {
-                    return new BussnessResultModel(change, _locService.GetLocalizedStringValue("ConfirmPassAtLeast"), false);
-                }
-            }
-            _mapper.Map(update, user);
-            await _repositoryManager.SaveAsync();
-
-            return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successSave"));
-        } 
         public async Task<BussnessResultModel> EditCustomer(UpdateCustomerDto update )
         {
             var user = await _repositoryManager.User.GetActiveCustomerId(update.Id, true);
@@ -816,65 +853,6 @@ namespace BusinessLogic.ApiClasses
 
             return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successSave"));
         } 
-        public async Task<BussnessResultModel> RegisterUser(CreateAdminDto userRegister ,int zoneId , string street , string zip)
-        {
-            MailAddress addr = new MailAddress(userRegister.Email);
-            if (userRegister.Email != addr.ToString())
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("EnterValidEmailAddress"), false); 
-            }
-            else
-            {
-                var user = _mapper.Map<User>(userRegister);
-                user.PhoneNumber = userRegister.PhoneNumber;
-                user.UserName = userRegister.Email;
-                user.IsMobileVerified = false;
-                user.TypeRegister = TypeRegister.Normal;
-                user.PasswordHash = userRegister.Password;
-                user.VerifiedCode = Convert.ToInt32(_util.GenerateRandomNo()) + Convert.ToInt32(_util.GenerateRandomNo2());
-                var country = await _repositoryManager.Country.GetcountryById(userRegister.CountryId.Value, false);
-                user.CodeMobileCountry = country.MobileCode == null ? null : country.MobileCode;
-                if (userRegister.RoleId == 3)
-                {
-                    user.UserType = UserType.Store;
-                }
-                else
-                {
-                    user.UserType = UserType.Admin;
-                }
-                var result = await _userManager.CreateAsync(user, userRegister.Password);
-                if (result.Succeeded)
-                {
-                    var existAddress = await _repositoryManager.Address.GetDefaultAddressCustomer(user.Id);
-                    if (existAddress == null)
-                    {
-                        var address = new Address();
-                        address.UserId = user.Id;
-                        address.CountryId = user.CountryId.Value;
-                        address.Street = street;
-                        address.ZoneId = zoneId;
-                        address.Post_Code = zip;
-                        _repositoryManager.Address.AddAddress(address);
-                    }
-
-                    var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
-                    await _userManager.AddClaimAsync(user, new Claim(/*ClaimTypes.Name*/role.Name, user.Email));
-
-                    var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false); //verify emasil
-                    var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
-
-                    var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
-                    _emailSender.SendEmail(message);
-
-                    await _repositoryManager.SaveAsync();
-                    return new BussnessResultModel(user, "successAdd");
-                }
-                else
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ErrorOccurs"), false);
-                }
-            } 
-        }
         public async Task<BussnessResultModel> DeactiveCustomer(int id)
         {
             var customer = await _repositoryManager.User.GetCustomerId(id, true);
@@ -925,26 +903,7 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
-        public async Task<string> ValidateUser(UserForAuthenticationDto user)
-        {
-            if (!await _authManager.ValidateUser(user))
-            {
-                try
-                {
-                    _logger.LogInfo(string.Format("{0} provided invalid password to generate token", user.UserName));
-                }
-                catch (Exception) { }
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
-            }
-            try
-            {
-                _logger.LogInfo(string.Format("{0} successfully generate token", user.UserName));
-            }
-            catch (Exception) { }
-            return await _authManager.CreateToken();
-        }
-       
-
+      
         //Device------------------------------------------------
         public async Task AddDevice(CreateDeviceDto createDto)
         {
@@ -954,52 +913,6 @@ namespace BusinessLogic.ApiClasses
              device.DeviceToken= user.PasswordHash;
             _repositoryManager.Device.AddDevice(device);
             await _repositoryManager.SaveAsync();
-        }
-        public async Task UpdateDevice(string deviceId , UpdateDeviceDto updateDeviceDto)
-        {
-            var user = await _repositoryManager.User.GetUserId(updateDeviceDto.UserId, true);
-            var device = await _repositoryManager.Device.GetDeviceUser(Convert.ToInt32(deviceId),updateDeviceDto.UserId, true);
-            if (device == null )
-            {
-                try {await AddDevice(updateDeviceDto);} catch { }
-            }
-            else
-            {
-                _mapper.Map(updateDeviceDto, device);
-                await _repositoryManager.SaveAsync();
-            }
-        }
-        public async Task UpdateFcm( int deviceId,int userId, string fcmToken)
-        {
-            var device = await _repositoryManager.Device.GetDeviceUser(deviceId,userId,  true); 
-            if (device != null)
-            {
-                device.FcmToken = fcmToken;
-                await _repositoryManager.SaveAsync();
-            }
-        }
-        public async Task ResendToken(int userId)
-        {
-            var user = await _repositoryManager.User.GetUserId(userId, true); 
-            string token = _repositoryManager.Device.GetTokenUser(userId);
-            if (token != null && token == user.PasswordHash)
-            {
-                var code = Convert.ToInt32(_util.GenerateRandomNo());
-                user.VerifiedCode = code;
-                await _repositoryManager.SaveAsync();
-            }
-        }
-        public async Task LogOutDevice(int userId)
-        {
-            var devicesUser = await _repositoryManager.Device.GetDevicesUserId(userId, false);
-            if (devicesUser != null)
-            {
-                foreach (var device in devicesUser)
-                {
-                    _repositoryManager.Device.DeleteDevice(device);
-                    await _repositoryManager.SaveAsync();
-                }
-            }
         }
        
         

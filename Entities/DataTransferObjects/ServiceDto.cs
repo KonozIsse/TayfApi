@@ -11,11 +11,11 @@ namespace Entities.DataTransferObjects
     public class ServiceDto
     {
         public int Id { get; set; }
-        public Status IsStatus { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public int? ImgId { get; set; } 
-        public DateTime CreatedAt { get; set; }
+        public string Image { get; set; } 
+        public string CreatedAt { get; set; } 
+        public string UpdatedAt { get; set; }
     } 
    
     public class UpdateServiceDto
@@ -23,6 +23,6 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public int? ImgId { get; set; }
+        public int ImgId { get; set; }
     }
 }

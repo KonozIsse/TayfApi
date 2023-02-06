@@ -20,14 +20,7 @@ namespace WebLayer.Controllers
         {
             
         }
-        [HttpGet]
-        [Route("user-details")]
-        public async Task<IActionResult> GetUserDetails(int userId)
-        {
-            var userDetails = await _repositoryManager.User.GetActiveUserId(userId, false);
-            var UserProfile = _mapper.Map<UserDto>(userDetails);
-            return Ok(UserProfile);
-        }
+       
       
 
     }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Entities.ViewModel;
+using Entities.Models.Enums;
 
 namespace Repository
 {
@@ -19,7 +19,7 @@ namespace Repository
         }
         public async Task<IEnumerable<ProductImage>> GetAllImagesProduct(int productId, bool trackChanges , bool isIncluded = false)
           {
-             var cats = FindByCondition(c => c.ProductId == productId, trackChanges);
+             var cats = FindByCondition(c => c.ProductId == productId && c.Image.IsStatus == Status.Active, trackChanges);
             if (isIncluded == true)
             {
                 cats = cats.Include(c => c.Image);

@@ -41,21 +41,6 @@ namespace BusinessLogic.ApiClasses
             _locService = locService;
             Configuration = configuration;
         }
-      
-        public async Task UpdateAvatarCustomer (AvaterDto avaterDto)
-        {
-            var customer = await _repositoryManager.User.GetCustomerId(avaterDto.CustomerId, true);
-            var fileName = avaterDto.Avater;
-            //var pic = _imageUploadServices.Upload(fileName);
-            //customer.Avater = pic;
-            var oldLink = customer.Avater;
-            await _repositoryManager.SaveAsync();
-            if (!string.IsNullOrEmpty(oldLink))
-            {
-                _imageUploadServices.DeleteImage(oldLink);
-            }
-        }
-       
         public async Task<BussnessResultModel> CreateImages (int userId, CreateImageDto create)
         {
             
@@ -236,6 +221,7 @@ namespace BusinessLogic.ApiClasses
                         _repositoryManager.ImageSetting.DeleteImageSetting(t);
                     }
                     var image = await _repositoryManager.Image.GetImage(id, false);
+                    image.IsStatus = Status.NotActive;
                     _repositoryManager.Image.DeleteImage(image);
                 }
                 await _repositoryManager.SaveAsync();
@@ -356,12 +342,12 @@ namespace BusinessLogic.ApiClasses
             }
             return image;
         }
-        public async Task<string> GetImageThumbnail(int img)
+        public string GetImageThumbnail(int img)
         {
             string image = "";
             if (img != 0)
             {
-                var imageThumbnail = await _repositoryManager.ImageSetting.GetByType(img, ImageType.THUMBNAIL);
+                var imageThumbnail = _repositoryManager.ImageSetting.GetByType(img, ImageType.THUMBNAIL).Result;
                 if (imageThumbnail != null)
                 {
                     image = "/img" + imageThumbnail.Path;
@@ -382,7 +368,7 @@ namespace BusinessLogic.ApiClasses
             }
             return image;
         }
-        public async Task<List<string>> GetListImagesProductIdAsync (int productId)
+        public async Task<List<string>> GetAllImagesProductId(int productId)
         {
             List<String> listImages = new List<String>();
             var images = await  _repositoryManager.ImageProduct.GetAllImagesProduct(productId,false,true);

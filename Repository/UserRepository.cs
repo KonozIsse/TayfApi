@@ -65,7 +65,7 @@ namespace Repository
         => await FindByCondition(c => c.Id == id && c.RoleId == 2 && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
         // Admin 1-------------------------------------------------
         public async Task<IEnumerable<User>> GetAdminsStors (bool trackChanges)
-         => await FindByCondition(c => c.RoleId != 2, trackChanges).ToListAsync();
+         => await FindByCondition(c => c.RoleId != 2, trackChanges).Include(c=>c.Role).ToListAsync();
         public async Task<User> GetAdminAndStoreEmail(string email)
          => await FindByCondition(c => c.Email == email && c.RoleId != 2 && c.Status == Status.Active, false).SingleOrDefaultAsync();
         // Store 3--------------------------------------------------

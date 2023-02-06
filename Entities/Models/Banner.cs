@@ -9,15 +9,10 @@ namespace Entities.Models
         [Required]
         [StringLength(64)]
         public string Title { get; set; }
-        public string TitleAr { get; set; }
+        public string Type { get; set; }
         [Required]
         [StringLength(191)]
         public string Url { get; set; }
-        [Required]
-        [StringLength(250)]
-        public string Type { get; set; }
-        public DateTime? AddDate { get; set; }
-        public DateTime? EndDate { get; set; }
         [ForeignKey(nameof(Language))]
         public int? LangId { get; set; }
         public Language Language { get; set; }

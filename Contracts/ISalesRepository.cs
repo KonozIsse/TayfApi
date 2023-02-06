@@ -11,9 +11,10 @@ namespace Contracts
     {
         Task<ProductSales> CheckFlashExists(int productId, bool trackChanges);
         Task<ProductSales> GetFlashProductId(int productId);
-        List<ProductSales> GetAllSales();
-        Task<IEnumerable<ProductSales>> GetAllSalesProductId(int productId);
+        Task<IEnumerable<ProductSales>> GetAllSalesProductId(int productId, bool trackChanges);
         void AddFlashSale(ProductSales sale);
         void DeleteFlashSale(ProductSales sale);
+        void CreateListSales(List<ProductSales> entity);
+        Task DeleteListSales(List<int> Ids);
     }
 }
