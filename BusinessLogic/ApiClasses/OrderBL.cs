@@ -675,24 +675,53 @@ namespace BusinessLogic.ApiClasses
             var store = await _repositoryManager.User.GetStoreId(order.StoreId);
             if (store != null)
             {
-                var products = await _repositoryManager.Product.GetProductsTOStoreId(store.Id);
+                decimal subTotal = 0;
+                var products = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
                 var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
                 var currency = await _repositoryManager.Currency.GetCurrency(order.CurrencyId, false);
                 var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
                 var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-
+                var address = await _repositoryManager.Address.GetDefaultAddressCustomer(order.CustomerId);
+               
+                var orderProducts = new List<OrderProductDto>();
+                foreach(var c in products)
+                {
+                    var attributes = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(id,c.ProductId);
+                    var attributesOrder = attributes.Select(c => new OrderAttributProductDto
+                    {
+                        Option = c.ProductAttribut.ProductOption.OptionName,
+                        Value = c.ProductAttribut.ProductOptionValue.OptionValueName,
+                    }).ToList();
+                    var images = await _repositoryManager.ImageProduct.GetAllImagesProduct(c.ProductId, false, true);
+                    orderProducts.Add(new OrderProductDto
+                    {
+                        Qty = c.Qty,
+                        ProductName = c.Product.ProductName,
+                        ProductModel = c.Product.ProductModel,
+                        ProductPrice = c.Product.Price,
+                        ProductImage = _imageBL.GetImageOriginal(images.First().ImageId),
+                        OrderAttributesProducts = attributesOrder ?? null
+                    });
+                    subTotal = subTotal + c.Qty * c.Product.Price;
+                }
                 orderDto.CustomerName = customer.FullName; 
                 orderDto.CustomerEmail = customer.Email; 
                 orderDto.CustomerPhone = customer.PhoneNumber;
+                orderDto.AddressName = address != null ? address.AddressTitle : null; 
+                orderDto.AddressDetail = address != null ? $" {address.Address1} , {address.CityName} , {address.Street} ,  {address.Flat} "   : null;
                 orderDto.Currency = currency.Symbol;
-                orderDto.CustomerEmail = customer.Email;
-                orderDto.CustomerPhone = customer.PhoneNumber;
-                orderDto.StoreName = (store.FullName);
+                orderDto.StoreName = store.FirstName;
                 orderDto.StoreEmail = store.Email;
                 orderDto.StorePhone = store.PhoneNumber;
                 orderDto.DeliveryTimeName = time.Time ?? null;
                 orderDto.OrderStatusName = states.StatusName ?? null;
-                orderDto.CountProduct = products.Count();
+                orderDto.ShippingMethods = order.ShippingMethod == null ? null : order.ShippingMethod.ShippingMethod;
+                orderDto.ShippingCost = order.ShippingMethod == null ? 0 : order.ShippingMethod.ShippingCost;
+                orderDto.OrderProducts = orderProducts ?? null;
+                orderDto.OrderPrice = subTotal;
+                orderDto.TotalTax = order.TotalTax;
+                orderDto.DisCount = order.Coupon == null ? 0 : order.Coupon.CouponAmount;
+                orderDto.Total = order.OrderPrice;
             }
             return orderDto;
         }

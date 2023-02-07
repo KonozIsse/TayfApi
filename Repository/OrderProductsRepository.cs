@@ -22,7 +22,7 @@ namespace Repository
         public async Task<OrderProduct> GetOrderProductsId(int productId, int orderId , bool trackChanges)
         => await FindByCondition(r => r.ProductId == productId && r.OrderId == orderId, trackChanges).FirstOrDefaultAsync();
         public async Task<List<OrderProduct>> GetAllProductsToOrderId (int orderId)
-        => await FindByCondition(r =>  r.OrderId == orderId, false).ToListAsync();
+        => await FindByCondition(r =>  r.OrderId == orderId, false).Include(c=>c.Product).ToListAsync();
         public void CreateOrderProduct (OrderProduct orderProducts) => Create(orderProducts);
         public void DeleteOrderProduct(OrderProduct orderProducts) => Delete(orderProducts);
     }

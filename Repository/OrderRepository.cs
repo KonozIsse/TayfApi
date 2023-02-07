@@ -27,7 +27,8 @@ namespace Repository
                 orders.Where(c => c.Customer.FullName.Contains(search) || c.Store.FirstName.Contains(search)
                 || c.OrderStatus.StatusName.Contains(search) || c.Id.ToString().Contains(search));
             }
-            return await orders.Include(c => c.Customer).Include(c => c.OrderStatus).OrderByDescending(r => r.CreatedAt).ToListAsync();
+            return await orders.Include(c => c.Customer).Include(c => c.OrderStatus).Include(c=>c.ShippingMethod)
+                .OrderByDescending(r => r.CreatedAt).ToListAsync();
         }
         public async Task<List<Order>> GetOrdersToStore(int storeId)
           => await FindByCondition(c => c.StoreId == storeId, false).ToListAsync(); 

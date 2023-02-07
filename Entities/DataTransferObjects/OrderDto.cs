@@ -24,6 +24,8 @@ namespace Entities.DataTransferObjects
         public string Notes { get; set; }
         public int DeliveryTimeId { get; set; }
         public int AddressId { get; set; }
+        public string AddressName { get; set; }
+        public string AddressDetail { get; set; }
         public int CustomerId { get; set; }
         public int OrderStatusId { get; set; }
         public int CurrencyId { get; set; }
@@ -38,6 +40,9 @@ namespace Entities.DataTransferObjects
         public string Currency { get; set; }
         public int CountProduct { get; set; }
         public string DeliveryTimeName { get; set; }
+        public string ShippingMethods { get; set; } 
+        public decimal ShippingCost { get; set; }
+        public decimal DisCount { get; set; }
         public List<OrderProductDto> OrderProducts { get; set; }
     } 
     public class CreateOrderDto
@@ -54,13 +59,16 @@ namespace Entities.DataTransferObjects
     {
         public int Qty { get; set; }
         public int? OrderId { get; set; }
-        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductImage { get; set; } 
+        public string ProductModel{ get; set; }
+        public decimal ProductPrice { get; set; }
         public List<OrderAttributProductDto> OrderAttributesProducts { get; set; }
     } 
     public class OrderAttributProductDto
     {
-        public int? OrderProductsId { get; set; }
-        public int? ProductAttributId { get; set; }
+        public string Option { get; set; }
+        public string Value { get; set; }
     }
     public class InvoiceOrderVM
     {

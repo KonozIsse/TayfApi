@@ -21,7 +21,8 @@ namespace Repository
         public async Task<IEnumerable<OrderAttributProduct>> GetAllOrderAttributesProducts(int orderProductId, bool trackChanges)
         => await FindByCondition(c => c.OrderProductsId == orderProductId, trackChanges).ToListAsync();
         public async Task<IEnumerable<OrderAttributProduct>> GetAttributesOrderProduct(int orderId, int productId)
-       => await FindByCondition(c => c.OrderProducts.OrderId == orderId && c.OrderProducts.ProductId == productId, false).ToListAsync();
+       => await FindByCondition(c => c.OrderProducts.OrderId == orderId && c.OrderProducts.ProductId == productId, false)
+            .Include(c=>c.ProductAttribut).ThenInclude(c=>c.ProductOption).Include(c=>c.ProductAttribut).ThenInclude(c=>c.ProductOptionValue).ToListAsync();
         public void DeleteOrderAttributProduct(OrderAttributProduct orderAttributProduct) => Delete(orderAttributProduct);
     }
 }
