@@ -19,7 +19,7 @@ namespace Entities.Models
         public short IsPopular { get; set; }
         public int? AdminId { get; set; }
         [ForeignKey(nameof(Store))]
-        public int? StoreId { get; set; }
+        public int StoreId { get; set; }
         public User Store { get; set; }
         public bool? IsAcceptAdmin { get; set; }
         [ForeignKey(nameof(ProductType))]

@@ -111,13 +111,13 @@ namespace BusinessLogic.ApiClasses
                 var addCart = _mapper.Map<Cart>(createDto);
                 addCart.IsStatus = Status.NotActive;
                 addCart.CustomerId = customerId;
-                addCart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
+                addCart.StoreId = product.StoreId == 0 ? 0 : product.StoreId;
                 addCart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
                 _repositoryManager.Cart.AddCart(addCart);
             }
             else
             {
-                cart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
+                cart.StoreId = product.StoreId == 0 ? 0 : product.StoreId;
                 createDto.Qty = cart.Qty + createDto.Qty;
                 cart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
                 _mapper.Map(createDto, cart);
@@ -162,7 +162,7 @@ namespace BusinessLogic.ApiClasses
             if (cart != null)
             {
                 cart.CustomerId = customerId;
-                cart.StoreId = product.StoreId == 0 ? 0 : product.StoreId.Value;
+                cart.StoreId = product.StoreId == 0 ? 0 : product.StoreId;
                 createDto.Qty = cart.Qty + createDto.Qty;
                 cart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
                 _mapper.Map(createDto, cart);
@@ -209,7 +209,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     return _locService.GetLocalizedStringValue("notAvOp");
                 }
-                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId.Value, customerId);
+                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
                 if (order != null)
                 {
                     var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(createDto.ProductId, order.Id, true);
@@ -252,7 +252,7 @@ namespace BusinessLogic.ApiClasses
                     return _locService.GetLocalizedStringValue("notAvOp");
                 }
 
-                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId.Value, customerId);
+                var order = await _repositoryManager.Order.GetCustomerNewOlderByStore(storeId, customerId);
                 if (order != null)
                 {
                     var orderProduct = await _repositoryManager.OrderProducts.GetOrderProductsId(createDto.ProductId, order.Id, true);

@@ -51,5 +51,29 @@ namespace Entities.ViewModel
         public string Large_height { get; set; }
         public string Large_width { get; set; }
     }
-
+    public class SocialSettingVM
+    {
+        public string phone_no { get; set; }
+        public string website_logo { get; set; }
+        public string logo { get; set; }
+        public string press_link { get; set; }
+        public string youtube_link { get; set; }
+        public string instagram_url { get; set; }
+        public string twitter_url { get; set; }
+        public string facebook_url { get; set; }
+        public string privacy { get; set; }
+        public string android_app_link { get; set; }
+        public string ios_app_link { get; set; }
+    }
+    public class ContactVM
+    {
+        public string phone_no { get; set; }
+        public string website_logo { get; set; }
+        public string logo { get; set; }
+        public string country { get; set; }
+        public string city { get; set; }
+        public string address { get; set; }
+        public string open_time { get; set; }
+        public string close_time { get; set; }
+    }
 }

@@ -17,7 +17,7 @@ namespace Entities.DataTransferObjects
         public int Availability { get; set; }
         public int CountReviews { get; set; }
         public int NumLike { get; set; }
-        public int? StoreId { get; set; }
+        public int StoreId { get; set; }
         public string StoreName { get; set; }
         public string StoreImage { get; set; }
         public int? AdminId { get; set; }
@@ -55,7 +55,7 @@ namespace Entities.DataTransferObjects
         public string DescriptionAr { get; set; }
         public int TypeId { get; set; }
         public int Availability { get; set; }
-        public int? StoreId { get; set; } 
+        public int StoreId { get; set; } 
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
