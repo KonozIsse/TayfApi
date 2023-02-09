@@ -17,6 +17,7 @@ using System.Web.Helpers;
 using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using Org.BouncyCastle.Utilities;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -165,7 +166,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<StoreDto>> GetAllStores(string search, PostsParameters postsParameters)
         {
             var stores = await _repositoryManager.User.GetSearchStores(search);
-            var StoreDto = stores.Select(c => new StoreDto
+            var storesDto = stores.Select(c => new StoreDto
             {
                 Id = c.Id,
                 Image = _imageBL.GetImageMedium(c.ImageId.Value),
@@ -175,7 +176,7 @@ namespace BusinessLogic.ApiClasses
                 PhoneNumber = c.PhoneNumber,
                 CreatedAt = c.CreatedAt.ToString("G")
             }).ToList();
-            return PagedList<StoreDto>.ToPagedList(StoreDto, postsParameters.PageNumber, postsParameters.PageSize);
+            return PagedList<StoreDto>.ToPagedList(storesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<StoreDto>> GetStores()
         {
@@ -191,6 +192,29 @@ namespace BusinessLogic.ApiClasses
                 CreatedAt = c.CreatedAt.ToString("G")
             }).ToList();
             return storesDto;
+        } 
+        public async Task<List<StoreDto>> GetAllActiveStores(PostsParameters postsParameters , int? sort)
+        {
+            var stores = await _repositoryManager.User.GetAllStores(false);
+            if (sort == 1)
+            {
+                stores = stores.OrderBy(x => x.FirstName).ToList();
+            }
+            else if (sort == 2)
+            {
+                stores = stores.OrderByDescending(x => x.FirstName).ToList();
+            }
+            var storesDto = stores.Select(c => new StoreDto
+            {
+                Id = c.Id,
+                Image = _imageBL.GetImageMedium(c.ImageId.Value),
+                FirstName = c.FirstName,
+                AdressInfo = c.AdressInfo ?? null,
+                Email = c.Email,
+                PhoneNumber = c.PhoneNumber,
+                CreatedAt = c.CreatedAt.ToString("G")
+            }).ToList();
+            return PagedList<StoreDto>.ToPagedList(storesDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
         public async Task<StoreDto> GetStore(int id)
         {

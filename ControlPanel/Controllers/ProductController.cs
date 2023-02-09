@@ -17,6 +17,12 @@ namespace ControlPanel.Controllers
         {
            
         }
+        [HttpGet("getAllTypesProducts")]
+        public async Task<IActionResult> GetAllTypesProductP()
+        {
+            var result = await _productBL.GetProductTypes(GetLanguage());
+            return Ok(result);
+        }
         [HttpGet("allCP")]
         public async Task<IActionResult> GetAllProductsCP(string search, [FromQuery] PostsParameters postsParameters)
         {

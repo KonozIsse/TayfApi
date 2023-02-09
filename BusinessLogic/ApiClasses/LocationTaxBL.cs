@@ -144,6 +144,25 @@ namespace BusinessLogic.ApiClasses
             }
             return PagedList<AddressDto>.ToPagedList(addressDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
+        public async Task<List<AddressDto>> GetAddressesCustomer(int customerId)
+        {
+            var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(customerId);
+            //var addressDto = _mapper.Map<List<AddressDto>>(addresses);
+            var addressDto = new List<AddressDto>();
+            foreach (var address in addresses)
+            {
+                addressDto.Add(new AddressDto
+                {
+                    Id = address.Id,
+                    CustomerName = address.User.FullName,
+                    AddressTitle = address.AddressTitle,
+                    Address1 = address.Address1,
+                    CityName = address.CityName,
+                    Street = address.Street,
+                });
+            }
+            return addressDto;
+        }
         public async Task<AddressDto> GetAddressIdCustomerId(int id, int customerId)
         {
             var addresses = await _repositoryManager.Address.GetAddressIdByCustomerId(id, customerId, false);

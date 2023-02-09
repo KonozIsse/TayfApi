@@ -125,9 +125,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"),false);
             }
-
-            var blog = await _repositoryManager.News.GetBlogById(comment.NewsId, true);
-             blog.CountComment--;
             _repositoryManager.CommentNews.DeleteCommentNews(comment);
 
             await _repositoryManager.SaveAsync();
@@ -142,7 +139,6 @@ namespace BusinessLogic.ApiClasses
                 {
                     return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
                 }
-                blog.CountComment++;
                 var commentNews = _mapper.Map<CommentNews>(createCommentsDto);
                     commentNews.CustomerId = userId;
                 _repositoryManager.CommentNews.CreateCommentNews(newsId, commentNews);

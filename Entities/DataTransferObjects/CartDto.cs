@@ -20,17 +20,18 @@ namespace Entities.DataTransferObjects
         public List<CartAttributeProductDto> CartAttributeProducts { get; set; }
         public object StoreGrouped { get; set; }
     }
-    public class  CreateCartDto
+    public class CreateCartDto
     {
-        public int Id { get; set; }
         public int ProductId { get; set; }
         public int Qty { get; set; }
         public List<CartAttributeProductDto> CartAttributeProducts { get; set; }
     }
-    public class CartAttributeProductDto
+    public class UpdateCartDto: CreateCartDto
     {
         public int Id { get; set; }
-        public int? CartId { get; set; }
+    }
+    public class CartAttributeProductDto
+    {
         public int AttributesProductId { get; set; }
     }
 }

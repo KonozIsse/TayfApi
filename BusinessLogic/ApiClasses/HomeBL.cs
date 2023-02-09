@@ -10,6 +10,9 @@ using Entities.Exception;
 using Entities.RequestFeatures;
 using Entities.Models.Enum;
 using System.Reflection;
+using System.Web.Mvc;
+using Twilio.Http;
+using Repository;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -19,14 +22,38 @@ namespace BusinessLogic.ApiClasses
         protected readonly IMapper _mapper;
         protected readonly NewsBL _newsBL;
         private readonly LocService _locService;
-        private readonly ImageBL _imageBL;
-        public HomeBL(IRepositoryManager repositoryManager, IMapper mapper, NewsBL newsBL, LocService locService, ImageBL imageBL)
+        private readonly ImageBL _imageBL; 
+        private readonly ProductBL _productBL;
+        private readonly UserBL _userBL;
+        public HomeBL(IRepositoryManager repositoryManager, IMapper mapper, NewsBL newsBL, LocService locService, ImageBL imageBL, ProductBL productBL, UserBL userBL)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
             _newsBL = newsBL;
             _locService = locService;
             _imageBL = imageBL;
+            _productBL = productBL;
+            _userBL = userBL;
+        }
+        public async Task<HomeVM> GetHome(int customerId, Currency cod, string lang )
+        {
+            var model = new HomeVM
+            {
+                sliders = await GetAllSliders(lang),
+                services = await GetAllServices(lang),
+                blog = await _newsBL.GetNews(lang),
+                ProductsPopular = await _productBL.PopularsPage(),
+                ProductsBest = await _productBL.BestPage(),
+                ProductsLatest = await _productBL.LatestPage(),
+                ProductsSpecial = await _productBL.SpecialsPage(),
+                ProductsTopRated = await _productBL.TopRatedPage(),
+                ProductsDailyDeal = await _productBL.DailyDeals(),
+                products = await _productBL.GetAllActiveAcceptProducts(customerId, lang),
+                flash = await _productBL.GetFlashProds(customerId,lang),
+                specialProducts = await _productBL.GetSpecialsProd(customerId, lang),
+                stores = await _userBL.GetStores()
+            };
+            return model;
         }
         public async Task<HomeCPVM> GetHomeCP(int userId)
         {
@@ -104,7 +131,11 @@ namespace BusinessLogic.ApiClasses
 
             return productsDto.Take(15).ToList();
         }
-
+        public async Task<string> GetLogo()
+        {
+            var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo",false);
+            return _imageBL.GetImageOriginal(Convert.ToInt32(logo.Value));
+        }
         //Banner------------------------------------------------
         public async Task<PagedList<BannerDto>> GetBanners(string search, string lang, PostsParameters postsParameters)
         {
@@ -130,23 +161,23 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(banner, _locService.GetLocalizedStringValue("successSave"));
         }
         //Sliders------------------------------------------------
-        public PagedList<SliderDto> GetSliderMobile(string lang, PostsParameters postsParameters)
+        public async Task<PagedList<SliderDto>> GetSliderMobile(string lang, PostsParameters postsParameters)
         {
-            var sliders = _repositoryManager.Slider.GetSlidersForMobile()
-                .Select(c => new SliderDto
-                {
+            var sliders = await _repositoryManager.Slider.GetSlidersForMobile();
+            var slidersDto = sliders.Select(c => new SliderDto
+            {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Decription = lang == "en" ? c.Decription : c.DecriptionAr,
                     Image = _imageBL.GetImageMedium(c.ImgId),
                      CreatedAt = c.CreatedAt.ToString("G"),
                     UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
-            return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
+            return PagedList<SliderDto>.ToPagedList(slidersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public PagedList<SliderDto> GetSliderWeb(string search, string lang, PostsParameters postsParameters)
+        public async Task<PagedList<SliderDto>> GetSliderWeb(string search, string lang, PostsParameters postsParameters)
         {
-            var sliders = _repositoryManager.Slider.GetSlidersForWeb(search)
-                .Select(c => new SliderDto
+            var sliders = await _repositoryManager.Slider.GetSlidersForWeb(search);
+                var slidersDto = sliders.Select(c => new SliderDto
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Decription = lang == "en" ? c.Decription : c.DecriptionAr,
@@ -154,7 +185,20 @@ namespace BusinessLogic.ApiClasses
                     CreatedAt = c.CreatedAt.ToString("G") ,
                     UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
-            return PagedList<SliderDto>.ToPagedList(sliders, postsParameters.PageNumber, postsParameters.PageSize);
+            return PagedList<SliderDto>.ToPagedList(slidersDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task<List<SliderDto>> GetAllSliders(string lang)
+        {
+            var sliders = await _repositoryManager.Slider.GetSliders();
+               var slidersDto =  sliders.Select(c => new SliderDto
+                {
+                    Title = lang == "en" ? c.Title : c.TitleAr,
+                    Decription = lang == "en" ? c.Decription : c.DecriptionAr,
+                    Image = _imageBL.GetImageOriginal(c.ImgId),
+                    CreatedAt = c.CreatedAt.ToString("G") ,
+                    UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
+                }).ToList();
+            return slidersDto;
         }
         public async Task<BussnessResultModel> AddSliderWeb(int storeId, CreateSliderDto createSliderDto)
         {
@@ -210,10 +254,10 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(slider, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Services------------------------------------------------
-        public PagedList<ServiceDto> GetServices(string search, string lang, PostsParameters postsParameters)
+        public async Task<List<ServiceDto>> GetAllServices(string lang)
         {
-            var services = _repositoryManager.Services.GetAllServices(search, false)
-                .Select(c => new ServiceDto
+            var services = await _repositoryManager.Services.GetAllServices("", false);
+               var servicesDto = services.Select(c => new ServiceDto
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Description = lang == "en" ? c.Description : c.DescriptionAr,
@@ -221,7 +265,20 @@ namespace BusinessLogic.ApiClasses
                     CreatedAt = c.CreatedAt.ToString("G"),
                     UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
-            return PagedList<ServiceDto>.ToPagedList(services, postsParameters.PageNumber, postsParameters.PageSize);
+            return servicesDto;
+        } 
+        public async Task<PagedList<ServiceDto>> GetServices(string search, string lang, PostsParameters postsParameters)
+        {
+            var services = await _repositoryManager.Services.GetAllServices(search, false);
+                 var servicesDto = services.Select(c => new ServiceDto
+                 {
+                    Title = lang == "en" ? c.Title : c.TitleAr,
+                    Description = lang == "en" ? c.Description : c.DescriptionAr,
+                    Image = _imageBL.GetImageOriginal(c.ImgId.Value),
+                    CreatedAt = c.CreatedAt.ToString("G"),
+                    UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
+                }).ToList();
+            return PagedList<ServiceDto>.ToPagedList(servicesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> UpdateService(UpdateServiceDto update)
         {
@@ -321,11 +378,7 @@ namespace BusinessLogic.ApiClasses
             var exsitEmail = await _repositoryManager.MailList.GetEmail(email);
             if (exsitEmail == null)
             {
-                var send = new SendMailListDto
-                {
-                    Email = email
-                };
-                var mailList = _mapper.Map<MailList>(send);
+                var mailList = new MailList { Email = email };
                 _repositoryManager.MailList.SendUserEmail(mailList);
                 await _repositoryManager.SaveAsync();
             }
@@ -412,6 +465,15 @@ namespace BusinessLogic.ApiClasses
                 IsStatus = currency.IsStatus == Status.Active ? _locService.GetLocalizedStringValue("active") : _locService.GetLocalizedStringValue("notActive"),
             }).ToList();
             return PagedList<CurrencyDto>.ToPagedList(currenciesDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task ChangeCurrency(int id)
+        {
+            var currency = await _repositoryManager.Currency.GetDefaultCurrency(false);
+            if (id != 0)
+            {
+                currency = await _repositoryManager.Currency.GetCurrency(id, false);
+            }
+            await _repositoryManager.SaveAsync();
         }
         public async Task<BussnessResultModel> AddCurrency(CreateCurrencyDto createDto)
         {
@@ -533,6 +595,14 @@ namespace BusinessLogic.ApiClasses
             return dto;
         }
         //Pages---------------------------------------------------------
+        public async Task<PageDto> GetTypePage(PageType type, string lang)
+        {
+            var page = await _repositoryManager.StaticPages.GetTypePage(type, false);
+            var pageDto = _mapper.Map<PageDto>(page);
+            pageDto.Title = lang == "en" ? page.Title : page.TitleAr;
+            pageDto.Description = lang == "en" ? page.Description : page.DescriptionAr;
+            return pageDto;
+        }
         public async Task<PagedList<PageDto>> GetAllPages(string search, string lang, PostsParameters postsParameters)
         {
             var pages = await _repositoryManager.StaticPages.GetAllPages(search, false);

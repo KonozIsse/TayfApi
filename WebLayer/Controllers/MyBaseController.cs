@@ -35,6 +35,7 @@ namespace WebLayer.Controllers
         protected readonly CartBL _cartBL;
         protected readonly UserBL _userBL;
         protected readonly ImageBL _imageBL;
+        protected readonly LocationTaxBL _locationTaxBL;
         protected readonly IWebHostEnvironment _webHostEnvironment;
 
         public MyBaseController(IServiceProvider provider)
@@ -63,6 +64,7 @@ namespace WebLayer.Controllers
             _cartBL = provider.GetService<CartBL>();
             _userBL = provider.GetService<UserBL>();
             _imageBL = provider.GetService<ImageBL>();
+            _locationTaxBL = provider.GetService<LocationTaxBL>();
             _webHostEnvironment = provider.GetService<IWebHostEnvironment>();
         }
         [NonAction]

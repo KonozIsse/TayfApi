@@ -17,11 +17,11 @@ using System.Transactions;
 
 namespace WebLayer.Controllers
 {
-    [Route("api/authentication")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController : MyBaseController
+    public class AccountController : MyBaseController
     {
-        public AuthenticationController(IServiceProvider serviceProvider) : base(serviceProvider)
+        public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
         [HttpPost]

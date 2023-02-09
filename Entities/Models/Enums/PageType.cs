@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Entities.Models.Enums
 {
-    public enum ProductTypeEunm
+    public enum PageType
     {
-        Simple = 1,
-        Variable =2,
-        External = 3,
+        AboutUs = 1,
+        Privacy ,
+        BecomeVendor,
+        DeliveryInformation,
+        Termsconditions
     }
 }

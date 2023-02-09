@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,18 +18,20 @@ namespace Contracts
     public interface IStaticPagesRepository
     {
         Task<StaticPages> GetPage(int id, bool trackChanges);
+        Task<StaticPages> GetTypePage(PageType type, bool trackChanges);
         Task<IEnumerable<StaticPages>> GetAllPages(string search ,bool trackChanges);
     } 
     public interface IServicesRepository
     {
-       List<Service> GetAllServices(string search, bool trackChanges);
+        Task<List<Service>> GetAllServices(string search, bool trackChanges);
         Task<Service> GetServiceById(int id, bool trackChanges, bool includeDetails = true);
         void DeleteService(Service service);
     }
     public interface ISliderRepository
     {
-        List<Sliders> GetSlidersForWeb(string search);
-        List<Sliders> GetSlidersForMobile();
+        Task<List<Sliders>> GetSliders(); 
+        Task<List<Sliders>> GetSlidersForWeb(string search);
+        Task<List<Sliders>> GetSlidersForMobile();
         Task<Sliders> GetSlideById(int id, bool trackChanges);
         void AddSlider(Sliders sliders);
         void DeleteSlider(Sliders sliders);

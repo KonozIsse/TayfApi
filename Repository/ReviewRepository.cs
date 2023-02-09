@@ -26,9 +26,9 @@ namespace Repository
          => await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active, false)
                 .Include(u => u.Customer).OrderByDescending(r => r.Rating).Take(3).ToListAsync();
         public async Task<IEnumerable<Review>> GetReviewsProductId(int productId)
-         => await FindByCondition(c => c.ProductId == productId , false).Include(c=>c.Customer).ToListAsync();
+         => await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active , false).Include(c=>c.Customer).ToListAsync();
         public async Task<IEnumerable<Review>> GetReviewsActiveProductId(int productId)
-         => await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active, false).Include(c=>c.Customer).ToListAsync();
+         => await FindByCondition(c => c.ProductId == productId && c.IsStatus == Status.Active, false).Include(c=>c.Customer).Include(c=>c.Product).ToListAsync();
         public async Task<Review> GetReviewProductIdToCustomerId(int productId, int customerId, bool trackChanges)
          => await FindByCondition(c => c.ProductId == productId && c.CustomerId == customerId , trackChanges).FirstOrDefaultAsync();
         public async Task<Review> GetActiveReviewProductCustomer(int productId, int customerId , bool trackChanges)

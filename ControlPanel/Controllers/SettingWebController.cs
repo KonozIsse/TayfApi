@@ -16,7 +16,7 @@ namespace ControlPanel.Controllers
         [HttpGet("getSliderWeb")]
         public async Task<IActionResult> GetSliderWeb(string search ,[FromQuery] PostsParameters postsParameters)
         {
-            var result = _homeBL.GetSliderWeb(search,GetLanguage(), postsParameters);
+            var result = await _homeBL.GetSliderWeb(search,GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

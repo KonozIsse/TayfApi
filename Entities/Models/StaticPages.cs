@@ -1,3 +1,5 @@
+using Entities.Models.Enums;
+
 namespace Entities.Models
 {
     public class StaticPages : BaseEntity
@@ -6,5 +8,6 @@ namespace Entities.Models
         public string TitleAr { get; set; }
         public string Description { get; set; }
         public string DescriptionAr { get; set; }
+        public PageType PageType { get; set; }
     }
 }

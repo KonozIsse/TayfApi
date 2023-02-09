@@ -16,7 +16,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetSliderMobile([FromQuery] PostsParameters postsParameters)
         {
-            var result = _homeBL.GetSliderMobile(GetLanguage(), postsParameters);
+            var result = await _homeBL.GetSliderMobile(GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

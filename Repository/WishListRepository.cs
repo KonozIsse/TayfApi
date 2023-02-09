@@ -21,10 +21,6 @@ namespace Repository
         public async Task<WishList> GetLikeCustomerId(int id,int customerId )
          => await FindByCondition(x => x.Id == id && x.CustomerId == customerId , false).FirstOrDefaultAsync();
 
-        public int GetCountLikesToProductId(int productId)
-          => FindByCondition(x => x.ProductId == productId , false).Count();
-        public int GetCountLikesByCustomersId(int customerId)
-         => FindByCondition(x => x.CustomerId == customerId, false).Count();
         public async Task<IEnumerable<WishList>> GetLikesCustomerId(int customerId)
         => await FindByCondition(x => x.CustomerId == customerId, false).ToListAsync();
         public async Task<IEnumerable<WishList>> GetLikesProductId(int productId)

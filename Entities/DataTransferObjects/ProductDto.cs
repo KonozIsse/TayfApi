@@ -25,16 +25,17 @@ namespace Entities.DataTransferObjects
         public bool? IsAcceptAdmin { get; set; }
         public string ShareLink { get; set; }
         public bool IsFavorite { get; set; } 
-        public bool IsSpecial { get; set; }
-        public bool IsSale { get; set; }
         public short IsFeature { get; set; }
         public decimal Rate { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
+        public bool IsSpecial { get; set; }
+        public decimal SpecialPrice { get; set; }
+        public DateTime? EndDateSpecial { get; set; }
+        public bool IsSale { get; set; }
         public decimal DiscountPrice { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public decimal SpecialPrice { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }
         public List<ReviewDto> Reviews { get; set; }

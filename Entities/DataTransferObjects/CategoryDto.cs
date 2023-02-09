@@ -13,8 +13,8 @@ namespace Entities.DataTransferObjects
     public class CategoryDto
     {
         public int Id { get; set; }
-        public int? ImageId { get; set; }
-        public Status IsStatus { get; set; }
+        public string ImageId { get; set; }
+        public string IsStatus { get; set; }
         public string CategoryName { get; set; }
         public int? MainCategoryId { get; set; }
         public int? CountProduct { get; set; }

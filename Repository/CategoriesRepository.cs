@@ -27,7 +27,7 @@ namespace Repository
         => await FindByCondition(c => c.MainCategoryId == mainId , false).OrderByDescending(x => x.CreatedAt).ToListAsync();
         public async Task<IEnumerable<Category>> GetSubActiveCategories(bool trackChanges)
       => await FindByCondition(c => c.MainCategoryId != 0 && c.IsStatus == Status.Active, trackChanges).ToListAsync();
-        public async Task<IEnumerable<Category>> GetSubCategories(bool trackChanges)
+        public async Task<IEnumerable<Category>> GetAllActiveMainCategories(bool trackChanges)
         => await FindByCondition(c => c.MainCategoryId == 0 && c.IsStatus == Status.Active, trackChanges).ToListAsync();
         public async Task<IEnumerable<Category>> GetAllMainCategories()
         => await FindByCondition(c => c.MainCategoryId == 0 , false).ToListAsync();
