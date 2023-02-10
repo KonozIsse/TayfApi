@@ -393,7 +393,6 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(taxClass, _locService.GetLocalizedStringValue("successDelete"));
         }
         //TaxRate------------------------------------------------
-
         public async Task<PagedList<TaxRateDto>> GetTaxeRates(string seach, string lang, PostsParameters postsParameters)
         {
             var taxes = await _repositoryManager.TaxRate.GetTaxRates(seach);
@@ -408,7 +407,6 @@ namespace BusinessLogic.ApiClasses
 
             return PagedList<TaxRateDto>.ToPagedList(taxesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-
         public async Task<BussnessResultModel> AddTaxRate(int storeId, CreateTaxRateDto create)
         {
             var IsExists = _repositoryManager.TaxRate.ExistTaxRates(create.ZoneId);

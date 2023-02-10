@@ -24,22 +24,6 @@ namespace WebLayer.Controllers
         public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
-        [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromForm] CreateCustomerDto userForRegistration)
-        {
-            var user = _mapper.Map<User>(userForRegistration);
-            var result = await _userManager.CreateAsync(user, userForRegistration.Password);
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.TryAddModelError(error.Code, error.Description);
-                }
-                return BadRequest(ModelState);
-            }
-            return StatusCode(201);
-        }
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
@@ -49,9 +33,21 @@ namespace WebLayer.Controllers
                 _logger.LogWarn($"{nameof(Authenticate)}: Authentication failed. Wrong user name or password.");
                 return Unauthorized();
             }
-            //return Ok(new { usToken = await _authManager.CreateToken() });
             return Ok(new { Token = await _authManager.CreateToken() });
+        }
 
+        [HttpPost("registe-customer")]
+        public async Task<IActionResult> RegisterCustomer([FromForm] CreateCustomerDto userForRegistration)
+        {
+            var result = await _userBL.RegisterCustomer(userForRegistration);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            else
+            {
+                return Ok(result.Message);
+            }
         }
         [HttpPost]
         [Route("change-password")]
@@ -95,7 +91,6 @@ namespace WebLayer.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
        
         [AllowAnonymous]
         [HttpPost]

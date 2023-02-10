@@ -26,8 +26,13 @@ namespace WebLayer.Controllers
         {
             var result =  await _cartBL.GetCarts(GetCurrentUserId());
             return Ok(result);
+        } 
+        [HttpGet("getcartToCustomer")]
+        public async Task<IActionResult> GetAllCartToCustomer()
+        {
+            var result =  await _cartBL.GetCarts(GetCurrentUserId());
+            return Ok(result);
         }
-      
         [HttpDelete("deleteCart")]
         public async Task<IActionResult> DeleteCart(int id)
         {

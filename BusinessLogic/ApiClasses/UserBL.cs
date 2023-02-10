@@ -193,7 +193,7 @@ namespace BusinessLogic.ApiClasses
             }).ToList();
             return storesDto;
         } 
-        public async Task<List<StoreDto>> GetAllActiveStores(PostsParameters postsParameters , int? sort)
+        public async Task<PagedList<StoreDto>> GetAllActiveStores(PostsParameters postsParameters , int? sort)
         {
             var stores = await _repositoryManager.User.GetAllStores(false);
             if (sort == 1)
@@ -207,6 +207,7 @@ namespace BusinessLogic.ApiClasses
             var storesDto = stores.Select(c => new StoreDto
             {
                 Id = c.Id,
+                Status = c.Status == Status.Active ? _locService.GetLocalizedStringValue("active") : _locService.GetLocalizedStringValue("notActive"),
                 Image = _imageBL.GetImageMedium(c.ImageId.Value),
                 FirstName = c.FirstName,
                 AdressInfo = c.AdressInfo ?? null,
@@ -216,13 +217,7 @@ namespace BusinessLogic.ApiClasses
             }).ToList();
             return PagedList<StoreDto>.ToPagedList(storesDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
-        public async Task<StoreDto> GetStore(int id)
-        {
-            var store = await _repositoryManager.User.GetStoreId(id);
-            var storeDto = _mapper.Map<StoreDto>(store);
-            storeDto.Image = _imageBL.GetImageMedium(store.ImageId.Value);
-            return storeDto;
-        }
+      
         public async Task<IEnumerable<StoreDto>> GetCartsCustomerId(int customer)
         {
             var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customer);

@@ -12,5 +12,6 @@ namespace Entities.ViewModel
         public List<CategoryDto> Categories { get; set; }
         public List<ProductDto> Products { get; set; }
         public List<StoreDto> Stores { get; set; }
+        public StoreDto Store { get; set; }
     }
 }

@@ -13,7 +13,8 @@ namespace Entities.DataTransferObjects
     public class StoreDto
     {
         public int Id { get; set; }
-        public string FirstName { get; set; }
+        public string FirstName { get; set; }  
+        public string Status { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Image { get; set; }

@@ -70,19 +70,7 @@ namespace Entities.DataTransferObjects
         public string Option { get; set; }
         public string Value { get; set; }
     }
-    public class InvoiceOrderVM
-    {
-        public int Id { get; set; }
-        public decimal TotalTax { get; set; }
-        public decimal CouponAmount { get; set; }
-        public decimal OrderPrice { get; set; }
-        public DateTime CreateAt { get; set; }
-        public string CouponCode { get; set; }
-        public List<OrderProductsDto> OrderProducts { get; set; }
-        public User Customer { get; set; }
-        public AddressDto Address { get; set; }
-        public DeliveryTime Time { get; set; }
-    }
+
     public class OrderProductsDto
     {
         public int Qty { get; set; }

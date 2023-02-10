@@ -22,6 +22,7 @@ using static System.Net.Mime.MediaTypeNames;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.Reflection;
 using Entities.ViewModel;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -40,6 +41,27 @@ namespace BusinessLogic.ApiClasses
             _imageUploadServices = imageUploadServices;
             _locService = locService;
             Configuration = configuration;
+        }
+        public async Task<BussnessResultModel> AddImageCustomer(int CustomerId, IFormFile file)
+        {
+            var customer = await _repositoryManager.User.GetUserId(CustomerId, true);
+            if(customer == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"),false);
+            }
+            var upload = _imageUploadServices.Upload(file);
+            if(upload == "-1")
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
+            }
+            var oldLink = customer.Avater;
+            customer.Avater = upload;
+            await _repositoryManager.SaveAsync();
+            if (!string.IsNullOrEmpty(oldLink))
+            {
+                _imageUploadServices.DeleteImage(oldLink);
+            }
+            return new BussnessResultModel(customer, _locService.GetLocalizedStringValue("successSave"));
         }
         public async Task<BussnessResultModel> CreateImages (int userId, CreateImageDto create)
         {
@@ -382,7 +404,6 @@ namespace BusinessLogic.ApiClasses
             }
             return listImages;
         }
-       
         public async Task<PagedList<ImageDto>> GetImages( string category , int? vendorId, PostsParameters postsParameters)
         {
             var images =  await _repositoryManager.Image.GetImages(category);
@@ -399,7 +420,6 @@ namespace BusinessLogic.ApiClasses
             var imagesDto = _mapper.Map<List<ImageSettingDto>>(images);
             return imagesDto;
         } 
-       
         public async Task<BussnessResultModel> EditMediaSetting(SettingImageVM update)
         {
             PropertyInfo[] properties = update.GetType().GetProperties();

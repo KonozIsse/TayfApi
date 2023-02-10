@@ -34,7 +34,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         } 
-        [HttpPut("change-default")]
+        [HttpPut("change-defaultLanguage")]
         public async Task<IActionResult> ChangeDefaultLanugage(int id)
         {
              await _homeBL.ChangeDefaultLanugage(id);

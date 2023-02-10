@@ -23,7 +23,7 @@ namespace Entities.ViewModel
         public decimal ProductPrice { get; set; }
         public bool? IsFavorite { get; set; }
         public short ProductStatus { get; set; }
-        public int? TaxId { get; set; }
+        public decimal TotaLTax { get; set; }
         public short IsFeature { get; set; }
         public string CreatedAt { get; set; }
         public string UpdatedAt { get; set; }
@@ -32,7 +32,7 @@ namespace Entities.ViewModel
         public string ProductDescription { get; set; }
         //public string CategoryName { get; set; }
         //public Nullable<int> CategoryId { get; set; }
-        public List<OptionDto> Attributes { get; set; }
+        public List<AttributeDto> Attributes { get; set; }
         public decimal? Rating { get; set; }
     }
 }

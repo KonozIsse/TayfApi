@@ -17,6 +17,7 @@ namespace Entities.DataTransferObjects
         public string IsStatus { get; set; }
         public string CategoryName { get; set; }
         public int? MainCategoryId { get; set; }
+        public string MainCategoryName { get; set; }
         public int? CountProduct { get; set; }
         public int? Total { get; set; }
         public string CreatedAt { get; set; }

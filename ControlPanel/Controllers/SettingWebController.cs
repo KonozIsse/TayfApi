@@ -86,7 +86,7 @@ namespace ControlPanel.Controllers
         [HttpGet("get-services")]
         public async Task<IActionResult> GetServices(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = _homeBL.GetServices(search, GetLanguage(), postsParameters);
+            var result = await _homeBL.GetServices(search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using BusinessLogic;
 using BusinessLogic.StartUp;
+using Entities.Models;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -25,6 +26,9 @@ builder.Services.ConfigureLocService();
 builder.Services.ConfigureAddQuartz();
 builder.Services.ConfigureSMSService();
 //---------------------------------------
+builder.Services.AddControllers().AddJsonOptions(
+                options =>
+              options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

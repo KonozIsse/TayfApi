@@ -33,7 +33,7 @@ namespace WebLayer
     {
         public Startup(IConfiguration configuration)
         {
-            LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
+            //LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             Configuration = configuration;
         }
         public IConfiguration Configuration { get; }
@@ -43,25 +43,6 @@ namespace WebLayer
         {
             services.ConfigureCors();
             services.ConfigureIISIntegration();
-            services.AddControllers().AddJsonOptions(
-                options =>
-              options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
-            services.AddControllers();
-            //--------------------------------
-
-           // services.Scan(scan => scan
-           //.FromAssemblyOf<BaseClassBL>()
-           //.AddClasses(classes => classes.InNamespaces("BusinessLogic"))
-           //.AsSelf()
-           //.WithTransientLifetime());
-            //-------------------------------------=
-            services.AddHttpClient<FcmSender>();
-            services.AddHttpClient<ApnSender>();
-            //services.AddAutoMapper(typeof(Startup));
-            services.AddSingleton(provider => new MapperConfiguration(cfg =>
-            {
-               cfg.AddProfile(new MappingProfile(provider.GetService<IHttpContextAccessor>()));
-            }).CreateMapper());
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.AddHttpContextAccessor();
@@ -80,7 +61,26 @@ namespace WebLayer
             services.ConfigureSMSService();
             services.ConfigurePaymentService();
             //------------------------------
+            services.AddControllers().AddJsonOptions(
+                options =>
+              options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
+            services.AddControllers();
+            //--------------------------------
 
+            // services.Scan(scan => scan
+            //.FromAssemblyOf<BaseClassBL>()
+            //.AddClasses(classes => classes.InNamespaces("BusinessLogic"))
+            //.AsSelf()
+            //.WithTransientLifetime());
+            //-------------------------------------
+            services.AddHttpClient<FcmSender>();
+            services.AddHttpClient<ApnSender>();
+            //services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton(provider => new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MappingProfile(provider.GetService<IHttpContextAccessor>()));
+            }).CreateMapper());
+            //-------------------------------------------
 
             services.AddSwaggerGen(c =>
             {
@@ -122,17 +122,11 @@ namespace WebLayer
                  });
             });
             
-
-           
-
             services.Configure<QuartzOptions>(options =>
             {
                 options.Scheduling.IgnoreDuplicates = true;
                 options.Scheduling.OverWriteExistingData = true;
             });
-
-        
-
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env )
         {
@@ -170,7 +164,7 @@ namespace WebLayer
                 s.SwaggerEndpoint("/swagger/v2/swagger.json", "Code Maze API v2");
             });
             //---------------------------------------------------
-               }
+        }
 
     }
 }

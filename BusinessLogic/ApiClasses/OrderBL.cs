@@ -181,7 +181,7 @@ namespace BusinessLogic.ApiClasses
             await DeleteByStore(order.StoreId, customerId);
             return new BussnessResultModel(total, _locService.GetLocalizedStringValue("PendOrdMsg"));
         }
-        public async Task<List<OrderDto>> GetHistoryOrder(int customerId , Currency currency )
+        public async Task<PagedList<OrderDto>> GetHistoryOrder(int customerId , Currency currency,PostsParameters postsParameters )
         {
             var model = new List<OrderDto>();
             var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
@@ -204,40 +204,11 @@ namespace BusinessLogic.ApiClasses
                         CustomerName = customer.FullName,
                         OrderStatusId = order.OrderStatusId,
                         OrderStatusName = orderStatus.StatusName,
-                        CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
-                        UpdatedAt = order.UpdatedAt.Value
+                        CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
                     });
                 }
             }
-            return model.OrderByDescending(c=>c.CreatedAt).ToList();
-        }
-        public async Task<ExceptionModel<List<InvoiceOrderVM>>> GetInvoiceOrder(int customerId, string lang)
-        {
-            var model = new List<InvoiceOrderVM>();
-            var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
-            if (orders == null)
-            {
-                return new ExceptionModel<List<InvoiceOrderVM>>(null, _locService.GetLocalizedStringValue("Error"), false);
-            }
-            foreach (var order in orders)
-            {
-                var orderProducts = await GetOrderProducts(order.Id, lang);
-                var copune = await _repositoryManager.Coupon.GetCouponCode(order.CodeCoupon);
-                model.Add(new InvoiceOrderVM
-                {
-                    Id = order.Id,
-                    TotalTax = order.TotalTax,
-                    CouponAmount = copune == null ? 0 : copune.CouponAmount,
-                    CouponCode = order.CodeCoupon ?? null,
-                    OrderPrice = order.OrderPrice,
-                    CreateAt = order.CreatedAt,
-                    Customer = await _repositoryManager.User.GetCustomerId(customerId, false),
-                    Address = await _locationTaxBL.GetAddressIdCustomerId(order.AddressId, customerId) ?? null,
-                    Time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false) ?? null,
-                    OrderProducts = orderProducts
-                });
-            }
-            return new ExceptionModel<List<InvoiceOrderVM>>(model);
+            return PagedList<OrderDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<OrderProductsDto>> GetOrderProducts( int orderId,  string lang)
         {
@@ -259,7 +230,7 @@ namespace BusinessLogic.ApiClasses
                             ProductId = product.Id,
                             ProductName = lang == "en" ? product.ProductName : product.ProductNameAr,
                             ProductModel = product.ProductModel,
-                            //ProductImage = ,
+                            //ProductImage = _imageBL.GetImageMedium(),
                             CreatedAt = product.CreatedAt,
                             ProductPrice = product.Price,
                         }) ;
@@ -790,13 +761,6 @@ namespace BusinessLogic.ApiClasses
              }
             }
             return PagedList<OrderDto>.ToPagedList(ordersDto, postsParameters.PageNumber, postsParameters.PageSize);
-        }
-        public async Task<List<OrderDto>> GetOrderCustomer(int CustomerId, int storeId = 0)
-        {
-            var orders = await _repositoryManager.Order.GetOrdersToCustomer(CustomerId);
-            if(storeId != 0) { orders.Where(c => c.StoreId == storeId); }
-            var ordersDto = _mapper.Map<List<OrderDto>>(orders);
-           return ordersDto;
         }
         public async Task<string> InvoiceOrder(int id)
         {

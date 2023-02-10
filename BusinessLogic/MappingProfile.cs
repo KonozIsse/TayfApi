@@ -114,7 +114,11 @@ namespace BusinessLogic
             //MapCustomer
             CreateMap<CreateCustomerDto, User>().ReverseMap(); 
             CreateMap<CreateCustomerCPDto, User>().ReverseMap();
-            CreateMap<CustomerDto, User>().ReverseMap();
+            CreateMap<CustomerDto, User>().AfterMap((s, d) => {
+                var request = _httpContextAccessor.HttpContext.Request;
+                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                d.Avater = baseUrl + "/img/" + s.Avater;
+            });
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             CreateMap<UserForRegistrationDto, User>().ReverseMap(); 
             //AdminMap
@@ -176,11 +180,7 @@ namespace BusinessLogic
                 typeMap.AddAfterMapAction(afterFunction);
             });
         }
-        //.AfterMap((s, d) => {
-        //    var request = _httpContextAccessor.HttpContext.Request;
-        //    var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-        //    d.NamePhoto = baseUrl + "/img/" + s.NamePhoto;
-        //});
+      
         private void FillEnumDesc(object destObj)
         {
             var hasEnum = destObj.GetType().GetProperties().Any(x => x.IsDefined(typeof(EnumBindAttribute), false));

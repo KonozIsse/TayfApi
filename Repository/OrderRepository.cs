@@ -35,7 +35,7 @@ namespace Repository
         public async Task<List<Order>> GetsAllTransactionOrders()
          => await FindByCondition(c => c.TransactionId != null, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<List<Order>> GetOrdersToCustomer(int customerId)
-        => await FindByCondition(c => c.CustomerId == customerId, false).ToListAsync();
+        => await FindByCondition(c => c.CustomerId == customerId, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<Order> GetCustomerNewOlderByStore(int vendorId, int customerId)
          => await FindByCondition(c => c.StoreId == vendorId && c.CustomerId == customerId && c.OrderStatusId == 1, false).SingleOrDefaultAsync();
          public void DeleteOrder(Order order) => Delete(order);

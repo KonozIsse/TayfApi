@@ -26,9 +26,12 @@ namespace Entities.DataTransferObjects
         public int Qty { get; set; }
         public List<CartAttributeProductDto> CartAttributeProducts { get; set; }
     }
-    public class UpdateCartDto: CreateCartDto
+    public class UpdateCartDto
     {
         public int Id { get; set; }
+        public int ProductId { get; set; }
+        public int Qty { get; set; }
+        public List<CartAttributeProductDto> CartAttributeProducts { get; set; }
     }
     public class CartAttributeProductDto
     {
