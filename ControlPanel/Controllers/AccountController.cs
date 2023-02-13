@@ -35,20 +35,6 @@ namespace ControlPanel.Controllers
             }
             return Ok(new { Token = await _authManager.CreateToken() });
         } 
-        [HttpPost("AddOrder")]
-        public async Task<IActionResult> AddOrder([FromForm] CreateOrderDto createOrderDto)
-        {
-            var result = await _orderBL.AddOrder(GetCurrentUserId(), createOrderDto);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return Ok(result.Message);
-            }
-        }
-       
 
         [AllowAnonymous]
         [HttpPost]

@@ -36,7 +36,7 @@ namespace Entities.DataTransferObjects
         public IFormFile Avater { get; set; }
         public string Email { get; set; }
         public TypeRegister TypeRegister { get; set; }
-        public string IsSubscribe { get; set; }
+        public bool IsSubscribe { get; set; }
         public int? CountryId { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }

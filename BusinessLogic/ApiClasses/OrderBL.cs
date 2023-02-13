@@ -77,7 +77,7 @@ namespace BusinessLogic.ApiClasses
                     {
                         order.StoreId = cart.StoreId;
                         var orderAttributs = new List<OrderAttributProduct>();
-                        var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id);
+                        var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id,false);
                         if (cartAttributeProducts != null)
                         {
                             foreach (var cartAttribute in cartAttributeProducts)
@@ -885,8 +885,6 @@ namespace BusinessLogic.ApiClasses
             {
                 coupon.StoreId = userId;
             }
-
-
             if ((createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product") && (createDto.Products == null || createDto.Products.Count() == 0))
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue(" Please Choose Products"),false);

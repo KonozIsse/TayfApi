@@ -12,7 +12,6 @@ namespace WebLayer.Controllers
 {
     [Route("api/product")]
     [ApiController]
-    [Authorize]
     public class ProductController : MyBaseController
     {
         public ProductController(IServiceProvider serviceProvider) : base(serviceProvider)

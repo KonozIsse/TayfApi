@@ -513,7 +513,6 @@ namespace BusinessLogic.ApiClasses
             if (isVerify != null)
             {
                 isVerify.IsMobileVerified = true;
-                var result = await _signInManager.PasswordSignInAsync(isVerify.Email, isVerify.PasswordHash, true, false);
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(isVerify);
             }
@@ -697,9 +696,7 @@ namespace BusinessLogic.ApiClasses
                     user.Avater = pic;
 
                     user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
-            
                     user.UserType = UserType.Customer;
-                    user.IsSubscribe = userRegister.IsSubscribe == "0" ? false : true;
                     user.IsMobileVerified = false;
                     user.RoleId = 2;
                     user.UserName = userRegister.FirstName + userRegister.LastName;
@@ -712,6 +709,9 @@ namespace BusinessLogic.ApiClasses
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("VerifyEmail"), false);
                     }
+
+                    var newpass = _util.encry(userRegister.Password);
+                    user.PasswordHash = newpass;
                     var result = await _userManager.CreateAsync(user, userRegister.Password);
                     if (result.Succeeded)
                     {

@@ -1,5 +1,7 @@
-﻿using Entities.DataTransferObjects;
+﻿using BusinessLogic;
+using Entities.DataTransferObjects;
 using Entities.RequestFeatures;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -49,7 +51,7 @@ namespace WebLayer.Controllers
                 return Ok(result.Message);
             }
         }
-        //----------------------------------------------------------
+        //Account----------------------------------------------------------
         [HttpPut("edit-account-customer")]
         public async Task<IActionResult> EditCustomer(UpdateCustomerDto update)
         {
@@ -61,6 +63,54 @@ namespace WebLayer.Controllers
             else
             {
                 return BadRequest(result.Message);
+            }
+        }
+        [HttpPut("editSubscribeletter")]
+        public async Task<IActionResult> EditSubscribeLetter(string subscribe)
+        {
+            var result = await _userBL.EditSubscribeletter(subscribe,GetCurrentUserId());
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            try
+            {
+                if (model is null)
+                    return BadRequest(_locService.GetLocalizedStringValue("enterPassword"));
+                var user = GetCurrentUser();
+                string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                if (string.IsNullOrEmpty(resetToken))
+                    return BadRequest(_locService.GetLocalizedStringValue("Error while generating reset token."));
+                //if (user.PasswordHash != model.OldPassword)
+                //    return BadRequest(_locService.GetLocalizedStringValue("passwnotequal"));
+
+                if (model.ConfirmPassword != model.NewPassword)
+                    return BadRequest(_locService.GetLocalizedStringValue(_locService.GetLocalizedStringValue("ConfirmPassAtLeast")));
+                var decrpass = _util.decr(model.OldPassword);
+                
+                var result = await _userManager.ChangePasswordAsync(user, decrpass, model.NewPassword);
+
+                if (result.Succeeded)
+                    return Ok(_locService.GetLocalizedStringValue("PasswordChangedSuccessfully"));
+                else
+                    return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         [HttpPut("add-image-customer")]
@@ -76,9 +126,9 @@ namespace WebLayer.Controllers
                 return BadRequest(result.Message);
             }
         }
-        //----------------------------------------------------------
-        [HttpGet("getHistoryAllOrdersToCustomer")]
-        public async Task<IActionResult> GetHistoryOrder([FromQuery]PostsParameters postsParameters)
+        //Order----------------------------------------------------------
+        [HttpGet("getHistoryAllMyOrders")]
+        public async Task<IActionResult> GetHistoryMyOrders([FromQuery]PostsParameters postsParameters)
         {
             var result = await _orderBL.GetHistoryOrder(GetCurrentUserId(), GetCurrentCurrency(),postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
@@ -97,7 +147,7 @@ namespace WebLayer.Controllers
                 return BadRequest(_locService.GetLocalizedStringValue("Error"));
             }
         }
-        //----------------------------------------------------------
+        //Address----------------------------------------------------------
         [HttpGet("getAllAddressesToCustomer")]
         public async Task<IActionResult> GetAddressesCustomer()
         {

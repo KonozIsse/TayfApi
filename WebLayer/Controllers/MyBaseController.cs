@@ -28,14 +28,14 @@ namespace WebLayer.Controllers
         protected readonly IEmailSender _emailSender;
         protected readonly LocService _locService;
         protected readonly NewsBL _newsBL;
-        protected readonly UserBL _userApi;
         protected readonly HomeBL _homeBL;
         protected readonly ProductBL _productBL;
         protected readonly OrderBL _orderBL;
         protected readonly CartBL _cartBL;
         protected readonly UserBL _userBL;
         protected readonly ImageBL _imageBL;
-        protected readonly LocationTaxBL _locationTaxBL;
+        protected readonly LocationTaxBL _locationTaxBL; 
+        protected readonly Util _util;
         protected readonly IWebHostEnvironment _webHostEnvironment;
 
         public MyBaseController(IServiceProvider provider)
@@ -56,7 +56,6 @@ namespace WebLayer.Controllers
 
             _emailSender = provider.GetService<IEmailSender>();
             _locService = provider.GetService<LocService>();
-            _userApi = provider.GetService<UserBL>();
             _homeBL = provider.GetService<HomeBL>();
             _newsBL = provider.GetService<NewsBL>();
             _productBL = provider.GetService<ProductBL>();
@@ -64,7 +63,8 @@ namespace WebLayer.Controllers
             _cartBL = provider.GetService<CartBL>();
             _userBL = provider.GetService<UserBL>();
             _imageBL = provider.GetService<ImageBL>();
-            _locationTaxBL = provider.GetService<LocationTaxBL>();
+            _locationTaxBL = provider.GetService<LocationTaxBL>(); 
+            _util = provider.GetService<Util>();
             _webHostEnvironment = provider.GetService<IWebHostEnvironment>();
         }
         [NonAction]

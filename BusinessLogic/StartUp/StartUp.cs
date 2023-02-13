@@ -65,7 +65,7 @@ namespace BusinessLogic.StartUp
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
                 o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 12;
+                o.Password.RequiredLength = 10;
                 o.User.RequireUniqueEmail = true;
             });
             builder = new IdentityBuilder(builder.UserType, typeof(Role),

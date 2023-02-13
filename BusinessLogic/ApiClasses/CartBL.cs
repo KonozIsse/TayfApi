@@ -6,6 +6,7 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.ViewModel;
+using MailKit;
 using System.Runtime.Intrinsics.X86;
 using System.Web.Mvc;
 
@@ -68,6 +69,45 @@ namespace BusinessLogic.ApiClasses
             return total;
         
         }
+        public async Task<List<StoreDto>> GetAllStoresInCartsToCustomer(int userId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToCustomerId(userId);
+            var cartsStores = carts.GroupBy(x => x.StoreId).Select(x => x.First()).ToList();
+            var model = new List<StoreDto>();
+            foreach (var cart in cartsStores)
+            {
+                var store = await _repositoryManager.User.GetStoreId(cart.StoreId);
+                model.Add(new StoreDto
+                {
+                    Id = store.Id,
+                    FirstName = store.FirstName,
+                    Image = _imageBL.GetImageMedium(store.ImageId.Value),
+                    AdressInfo = store.AdressInfo,
+                    CountCart = carts.Where(r => r.StoreId == store.Id).Count(),
+                    TotalPrice = carts.Where(r => r.StoreId == store.Id).Count() > 0 ? carts.Where(r => r.StoreId == store.Id).Sum(r => r.FinalPrice) : 0
+                });
+            }
+                //var grouped = carts.GroupBy(c => c.Store).Select(x => new
+                //{
+                //    x.Key.Id,
+                //    x.Key.FirstName,
+                //    x.Key.AdressInfo,
+                //    ImageStore = _imageBL.GetImageMedium(x.Key.ImageId.Value),
+                //    TotalPrice =  x.Sum(c => c.FinalPrice),
+                //    CountCarts = x.Count(),
+                //});
+                //var storeDto = grouped.Select(c => new StoreDto
+                //{
+                //    Id = c.Id,
+                //    FirstName = c.FirstName,
+                //    Image = c.ImageStore,
+                //    AdressInfo = c.AdressInfo,
+                //    CountCart = c.CountCarts,
+                //    TotalPrice = c.TotalPrice,
+                //}).DistinctBy(c=>c.Id).ToList();
+
+                return model;
+        }
         public async Task ChangeActiveStatusCart(int id)
         {
             var cart = await _repositoryManager.Cart.GetCartId(id, true);
@@ -86,7 +126,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAv"), false);
             }
-
             var productPrice = product.Price;
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(createDto.ProductId);
             if (special != null)
@@ -103,49 +142,8 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAv"), false);
             }
-
-            var attributes = await _repositoryManager.Attribute.GetAttributesProductId(createDto.ProductId);
-            if (attributes != null)
-            {
-                if (createDto.CartAttributeProducts != null)
-                {
-                    if (createDto.CartAttributeProducts.Count() != attributes.Count())
-                    {
-                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("plzchooseoption"), false);
-                    }
-                    else
-                    {
-                        foreach (var cartAttributDto in createDto.CartAttributeProducts)
-                        {
-                            var attribut = attributes.Where(c => c.Id == cartAttributDto.AttributesProductId).FirstOrDefault();
-                            var availableAttribute = _productBL.AvailabilityProductOption(createDto.ProductId, attribut.Id);
-                            if (availableAttribute <= createDto.Qty)
-                            {
-                                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
-                            }
-                            if (cart != null && (availableAttribute) < (cart.Qty + createDto.Qty))
-                            {
-                                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
-                            }
-                            if (attribut != null && attribut.AttributePrice != 0)
-                            {
-                                if (attribut.PricePrefix == "+")
-                                {
-                                    productPrice += attribut.AttributePrice;
-                                }
-                                if (attribut.PricePrefix == "-" && productPrice != 0)
-                                {
-                                    productPrice -= attribut.AttributePrice;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("plzchooseoption"), false);
-                }
-            }
+           
+          
 
            
             if (cart == null)
@@ -164,8 +162,71 @@ namespace BusinessLogic.ApiClasses
                 cart.ProdId = createDto.ProductId;
                 createDto.Qty = cart.Qty + createDto.Qty;
                 cart.FinalPrice = Convert.ToDecimal(productPrice * createDto.Qty);
-                _mapper.Map(createDto.CartAttributeProducts, cart.CartAttributeProducts);
+               
                 _mapper.Map(createDto, cart);
+            }
+            var attributes = await _repositoryManager.Attribute.GetAttributesProductId(createDto.ProductId);
+            if (attributes != null)
+            {
+                if (createDto.CartAttributeProducts != null)
+                {
+                    if (createDto.CartAttributeProducts.Count() != attributes.Count())
+                    {
+                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("plzchooseoption"), false);
+                    }
+                    else
+                    {
+                        foreach (var cartAttributDto in createDto.CartAttributeProducts)
+                        {
+                            var attribut = await _repositoryManager.Attribute.GetAttributeId(cartAttributDto.AttributesProductId, false);
+                            var availableAttribute = _productBL.AvailabilityProductOption(createDto.ProductId, attribut.Id);
+                            if (availableAttribute <= createDto.Qty)
+                            {
+                                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
+                            }
+                            var attributeCart = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id, true);
+                            if (attributeCart != null)
+                            {
+                               foreach(var item in attributeCart)
+                                {
+                                    item.CartId = cart.Id;
+                                    item.AttributesProductId = attribut.Id;
+                                    if (attribut != null && attribut.AttributePrice != 0)
+                                    {
+                                        if (attribut.PricePrefix == "+")
+                                        {
+                                            productPrice += attribut.AttributePrice;
+                                        }
+                                        if (attribut.PricePrefix == "-" && productPrice != 0)
+                                        {
+                                            productPrice -= attribut.AttributePrice;
+                                        }
+                                    }
+                                    _mapper.Map(cartAttributDto, item);
+                                }
+                            }
+                            else
+                            {
+                                if (attribut != null && attribut.AttributePrice != 0)
+                                {
+                                    if (attribut.PricePrefix == "+")
+                                    {
+                                        productPrice += attribut.AttributePrice;
+                                    }
+                                    if (attribut.PricePrefix == "-" && productPrice != 0)
+                                    {
+                                        productPrice -= attribut.AttributePrice;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("plzchooseoption"), false);
+                }
             }
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(cart, _locService.GetLocalizedStringValue("AddedToCart"));
@@ -368,7 +429,7 @@ namespace BusinessLogic.ApiClasses
             var cart = await _repositoryManager.Cart.GetCartId(cartId, false);
             cart.Id = cartId;
             cart.CustomerId = customerId;
-            var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId);
+            var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId,false);
             if (cartAttributeProducts != null)
             {
                 var productAttribut = cartAttributeProducts.First().AttributesProductId;
@@ -450,6 +511,29 @@ namespace BusinessLogic.ApiClasses
                 }
             }
         }
+        public async Task<BussnessResultModel> DeleteCartCustomerStore(int customerId , int storeId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToStoreCustomer(storeId, customerId);
+            if (carts == null)
+            {
+                return new BussnessResultModel(null, "Please make sure the link is correct", false);
+            }
+            foreach(var cart in carts)
+            {
+                var cartAttributes = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id, false);
+                if (cartAttributes != null)
+                {
+                    foreach (var cartAttribut in cartAttributes)
+                    {
+                        _repositoryManager.CartAttributeProduct.DeleteCartAttributeProduct(cartAttribut);
+                    }
+                }
+                _repositoryManager.Cart.DeleteCart(cart);
+                await _repositoryManager.SaveAsync();
+            }
+          
+            return new BussnessResultModel(carts , _locService.GetLocalizedStringValue("successDelete"));
+        } 
         public async Task<BussnessResultModel> DeleteCart(int cartId)
         {
             var cart = await _repositoryManager.Cart.GetCartId(cartId, false);
@@ -457,7 +541,7 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, "Please make sure the link is correct", false);
             }
-            var cartAttributes = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId);
+            var cartAttributes = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cartId,false);
             if (cartAttributes != null)
             {
                 foreach (var cartAttribut in cartAttributes)

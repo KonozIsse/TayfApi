@@ -75,7 +75,7 @@ namespace WebLayer.Controllers
             var result = await _homeBL.GetTypePage(PageType.DeliveryInformation, GetLanguage());
             return Ok(result);
         }
-        [HttpGet("getTermsconditionsPage")]
+        [HttpGet("getTermsConditionsPage")]
         public async Task<IActionResult> TermsConditionsPage()
         {
             var result = await _homeBL.GetTypePage(PageType.Termsconditions, GetLanguage());
@@ -147,32 +147,25 @@ namespace WebLayer.Controllers
         {
             await _homeBL.SendUserEmail(email);
             return Ok();
-        }
-        [Authorize]
-        [HttpPost("addProductsToCart")]
-        public async Task<IActionResult> AddToCart(CreateCartDto create)
+        } 
+        [HttpPost("ReSendCodeb")]
+        public async Task<IActionResult> ReSendCode(string email)
         {
-            var result = await _cartBL.AddedToCart(GetCurrentUserId(), create);
+            await _userBL.ReSendCode(email);
+            return Ok();
+        } 
+        [HttpPost("AddVerifyUser")]
+        public async Task<IActionResult> AddVerifyUser(int code)
+        {
+            var result = await _userBL.AddVerifyUser(GetCurrentUserId(),code);
             if (result.Success)
             {
-                return Ok(result.Message);
+                return Ok();
             }
-            else
-            {
-                return BadRequest(result.Message);
-            }
-        } 
-        [HttpPut("updateCartToCustomer")]
-        public async Task<IActionResult> UpdateCart(int id, int Quantity = 1)
-        {
-            var create = new UpdateCartDto
-            {
-                Id = id,
-                Qty = Quantity
-            };
-            decimal final = await _cartBL.UpdateTotalCart(GetCurrentUserId(), create);
-            return Ok(final);
+            else { return BadRequest(result.Message); }
+            
         }
+        
         [HttpGet("getAllProductsToCategory")]
         public async Task<IActionResult> GetAllProductsCategory(int catId,int? sort,[FromQuery] PostsParameters postsParameters)
         {

@@ -10,7 +10,7 @@ namespace BusinessLogic
 
         public Random random = new Random();
         public string url1 = "http://demotay.com/admin";
-       
+
         public string encry(string str)
         {
             //You should  not hard code the encryption key here
@@ -20,13 +20,22 @@ namespace BusinessLogic
             return eStr;
             //Mes*sageBox.Show(dStr);
         }
-      
+        public string decr(string eStr)
+        {
+            //You should  not hard code the encryption key here
+            string EncryptionKey = "encryptionkey";
+            //MessageBox.Show(eStr);
+            string dStr = passwordDecrypt(eStr, EncryptionKey);
+            return dStr;
+            //Mes*sageBox.Show(dStr);
+        }
+        //Encrypting a string
         public static string passwordEncrypt(string inText, string key)
         {
             byte[] bytesBuff = Encoding.Unicode.GetBytes(inText);
             using (Aes aes = Aes.Create())
             {
-                Rfc2898DeriveBytes crypto = new Rfc2898DeriveBytes(key, new byte[] 
+                Rfc2898DeriveBytes crypto = new Rfc2898DeriveBytes(key, new byte[]
                 { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
                 aes.Key = crypto.GetBytes(32);
                 aes.IV = crypto.GetBytes(16);
@@ -41,6 +50,28 @@ namespace BusinessLogic
                 }
             }
             return inText;
+        }
+        //Decrypting a string
+        public static string passwordDecrypt(string cryptTxt, string key)
+        {
+            cryptTxt = cryptTxt.Replace(" ", "+");
+            byte[] bytesBuff = Convert.FromBase64String(cryptTxt);
+            using (Aes aes = Aes.Create())
+            {
+                Rfc2898DeriveBytes crypto = new Rfc2898DeriveBytes(key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                aes.Key = crypto.GetBytes(32);
+                aes.IV = crypto.GetBytes(16);
+                using (MemoryStream mStream = new MemoryStream())
+                {
+                    using (CryptoStream cStream = new CryptoStream(mStream, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cStream.Write(bytesBuff, 0, bytesBuff.Length);
+                        cStream.Close();
+                    }
+                    cryptTxt = Encoding.Unicode.GetString(mStream.ToArray());
+                }
+            }
+            return cryptTxt;
         }
         public string GenerateRandomNo()
         {

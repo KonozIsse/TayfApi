@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface ICartAttributeProductRepository
     {
-        Task<CartAttributeProduct> CartAttributeProductId(int id, bool trackChanges);
-        Task<List<CartAttributeProduct>> CartAttributeProductsCartId(int cartId);
+        Task<CartAttributeProduct> GetCartIdAttributeId(int cartId, int attr, bool trackChanges);
+        Task<List<CartAttributeProduct>> CartAttributeProductsCartId(int cartId, bool trackChanges);
         void DeleteCartAttributeProduct(CartAttributeProduct cartAttribute);
     }
 }
