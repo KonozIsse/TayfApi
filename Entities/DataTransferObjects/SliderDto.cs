@@ -18,7 +18,7 @@ namespace Entities.DataTransferObjects
     }
     public class CreateSliderDto
     {
-         public int? ImageId { get; set; }
+         public int ImgId { get; set; }
         public string Title { get; set; }
         public string Decription { get; set; }
         public string Url { get; set; }

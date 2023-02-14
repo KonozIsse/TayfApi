@@ -45,9 +45,9 @@ namespace WebLayer.Controllers
             }
         }
         [HttpPut("updateCart")]
-        public async Task<IActionResult> UpdateCart(UpdateCartDto create)
+        public async Task<IActionResult> UpdateCart(int cartId, int qty)
         {
-            var result = await _cartBL.UpdateTotalCart(GetCurrentUserId(), create);
+            var result = await _cartBL.UpdateTotalCart(GetCurrentUserId(), cartId,qty);
            return Ok(result);
         }
         [HttpPost("checkout-order")]

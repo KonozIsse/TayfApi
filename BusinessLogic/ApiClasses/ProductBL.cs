@@ -9,6 +9,8 @@ using Entities.Exception;
 using Microsoft.Extensions.Configuration;
 using Entities.RequestFeatures;
 using Twilio.Base;
+using System.Security.Policy;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -946,6 +948,27 @@ namespace BusinessLogic.ApiClasses
         }
         
         //ProductType------------------------------------------------
+        public async Task<List<string>> GetProductTypeEnum(string lang)
+        {
+            var names = Enum.GetNames(typeof(ProductsType)).ToList();
+            foreach (string type in names)
+            {
+                if ( type == ProductsType.Simple.ToString())
+                {
+                    type.Equals ( lang == "en" ? ProductsType.Simple.ToString() : " منتج بسيط");
+                }
+                else if (type == ProductsType.Variable.ToString())
+                {
+                    type.Equals(lang == "en" ? ProductsType.Variable.ToString() : " منتج له سمات");
+                }
+                else
+                {
+                    type.Equals(lang == "en" ? ProductsType.External.ToString() : " منتج خارجي");
+                }
+            }
+            return names;
+        }
+       
         public async Task<List<ProductType>> GetProductTypes(string lang)
         {
             var list = new List<ProductType>();

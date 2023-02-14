@@ -29,14 +29,12 @@ namespace Repository
         {
 
         }
-        public async Task<MessageTemplate> GetVerificationEmail()
-        => await FindByCondition(c => c.Id == 2, false).FirstOrDefaultAsync();
+        public async Task<MessageTemplate> GetNameTemplate(NameTemplate name)
+        => await FindByCondition(c => c.NameTemplate == name, false).FirstOrDefaultAsync();
         public async Task<MessageTemplate> GetTemplateById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<IEnumerable<MessageTemplate>> GetEmailTemplatesList (bool trackChanges)
          => await FindAll(trackChanges).ToListAsync();
-        public async Task<MessageTemplate> GetDefaultEmailTemplate()
-         => await FindAll(false).FirstOrDefaultAsync();
     }
     public class MailListRepository : RepositoryBase<MailList>, IMailListRepository
     {
@@ -44,8 +42,6 @@ namespace Repository
         {
 
         }
-        public async Task<List<MailList>> GetMailLists()
-         => await FindAll(false).ToListAsync();
         public async Task<MailList> GetMailListById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync(); 
         public async Task<MailList> GetEmail(string email)

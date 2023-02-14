@@ -34,6 +34,6 @@ namespace Entities.Models
         public List<OrderProduct> OrderProducts { get; set; }
         public List<ProductImage> Images { get; set; }
         public List<Cart> Carts { get; set; }
-
+        public List<ProductsCoupon> ProductsCoupons { get; set; }
     }
 }

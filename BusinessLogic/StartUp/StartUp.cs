@@ -97,7 +97,7 @@ namespace BusinessLogic.StartUp
         {
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(
                configuration.GetConnectionString("SqlConnection"),
-                  x => x.MigrationsAssembly("Tayf")));
+                  x => x.MigrationsAssembly("WebLayer")));
         }
         public static void ConfigureFcmNotification(this IServiceCollection services, IConfiguration configuration)
         {

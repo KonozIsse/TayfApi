@@ -404,14 +404,15 @@ namespace BusinessLogic.ApiClasses
             }
             return listImages;
         }
-        public async Task<PagedList<ImageDto>> GetImages( string category , int? vendorId, PostsParameters postsParameters)
+        public async Task<PagedList<ImageDto>> GetImages(ImageCategory? category , int userId, PostsParameters postsParameters)
         {
             var images =  await _repositoryManager.Image.GetImages(category);
-            if (vendorId != 0)
+            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (user.UserType == UserType.Store)
             {
-                images =  await _repositoryManager.Image.GetImagesVendor(vendorId.Value, category);
+                images =  await _repositoryManager.Image.GetImagesVendor(userId, category);
             }
-           var imagesDto =  _mapper.Map<List<ImageDto>>(images);
+            var imagesDto =  _mapper.Map<List<ImageDto>>(images);
             return PagedList<ImageDto>.ToPagedList(imagesDto, postsParameters.PageNumber, postsParameters.PageSize); 
         }
         public async Task<List<ImageSettingDto>> GetImageSettingImg(int imgId)

@@ -18,7 +18,7 @@ namespace ControlPanel.Controllers
            
         }
         [HttpGet("getAllTypesProducts")]
-        public async Task<IActionResult> GetAllTypesProductP()
+        public async Task<IActionResult> GetAllTypesProducts()
         {
             var result = await _productBL.GetProductTypes(GetLanguage());
             return Ok(result);

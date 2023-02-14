@@ -59,7 +59,8 @@ namespace Repository
         private IUnitRepository _unitRepository;    
         private IRoleRepository _roleRepository;
         private IProductCategoryRepository _productCategoryRepository; 
-        private IImageProductRepository _imageProductRepository;
+        private IImageProductRepository _imageProductRepository; 
+        private IProductsCouponRepository _productsCouponRepository;
 
         public RepositoryManager(RepositoryContext repositoryContext)
         {
@@ -511,6 +512,15 @@ namespace Repository
                 return _imageProductRepository;
             }
         }
+
+        public IProductsCouponRepository ProductsCoupon {
+            get
+            {
+                if (_productsCouponRepository == null)
+                    _productsCouponRepository = new ProductsCouponRepository(_repositoryContext);
+                return _productsCouponRepository;
+            }
+        } 
 
         public Task SaveAsync() => _repositoryContext.SaveChangesAsync();
     }

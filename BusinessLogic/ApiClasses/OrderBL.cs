@@ -120,50 +120,57 @@ namespace BusinessLogic.ApiClasses
                         }
                         if (coupon != null)
                         {
-                            if (coupon.DiscountType == "fixed_cart")
+                            if (coupon.DiscountType == DiscountType.CartDiscount)
                             {
                                 if (total > coupon.CouponAmount)
                                 {
                                     total = total - Convert.ToDecimal(coupon.CouponAmount);
                                 }
                             }
-                            else if (coupon.DiscountType == "percent")
+                            else if (coupon.DiscountType == DiscountType.CartPercentDiscount)
                             {
                                 if (total > 0)
                                 {
                                     total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
                                 }
                             }
-                            else if (coupon.DiscountType == "fixed_product")
+                            else if (coupon.DiscountType == DiscountType.ProductDiscount)
                             {
                                 total = 0;
                                 foreach (var item in carts)
                                 {
-                                    if (coupon.Products.Contains(item.ProdId.ToString()))
+                                    foreach(var productsCoupons in coupon.ProductsCoupons)
                                     {
-                                        var newTotal = Convert.ToDecimal(item.FinalPrice) - Convert.ToDecimal(coupon.CouponAmount);
-                                        total += newTotal;
-                                    }
-                                    else
-                                    {
-                                        total += Convert.ToDecimal(item.FinalPrice);
+                                        if (productsCoupons.ProductId == item.ProdId)
+                                        {
+                                            var newTotal = Convert.ToDecimal(item.Product.Price) - Convert.ToDecimal(coupon.CouponAmount);
+                                            total += newTotal;
+                                        }
+                                        else
+                                        {
+                                            total += Convert.ToDecimal(item.Product.Price);
+                                        }
                                     }
                                 }
                             }
-                            else if (coupon.DiscountType == "percent_product")
+                            else if (coupon.DiscountType == DiscountType.ProductPercentDiscount)
                             {
                                 total = 0;
                                 foreach (var item in carts)
                                 {
-                                    if (coupon.Products.Contains(item.ProdId.ToString()))
+                                    foreach (var productsCoupons in coupon.ProductsCoupons)
                                     {
-                                        decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
-                                        total = total + newval;
+                                        if (productsCoupons.ProductId == item.ProdId)
+                                        {
+                                            decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
+                                            total = total + newval;
+                                        }
+                                        else
+                                        {
+                                            total = total + Convert.ToDecimal(item.FinalPrice);
+                                        }
                                     }
-                                    else
-                                    {
-                                        total = total + Convert.ToDecimal(item.FinalPrice);
-                                    }
+                                  
                                 }
                             }
                         }
@@ -338,7 +345,7 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Notification.CreateNotification(notification);
             //send email 
             string msgEm1 = await InvoiceOrder(id);
-            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(4, false); //shipped email
+            var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderCompleted); 
             var msgem = msgEm1 + temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
             var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
             try
@@ -408,7 +415,7 @@ namespace BusinessLogic.ApiClasses
             };
             _repositoryManager.Notification.CreateNotification(notification);
             string msgEm1 = await InvoiceOrder(id);
-            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(5, false);
+            var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderRejected);
             var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
             var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
             try
@@ -490,15 +497,11 @@ namespace BusinessLogic.ApiClasses
 
             //send email 
             string msgEm1 = await InvoiceOrder(id);
-            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(6, false); //recived email
+            var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderRecieved); //recived email
             var msgem = msgEm1 + temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
             var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
             var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
             _emailSender.SendEmail(message);
-            if (customer != null)
-            {
-                await _signInManager.PasswordSignInAsync(customer.Email, customer.PasswordHash, true, false);
-            }
         }
         public async Task<BussnessResultModel> ShippedOrder(int id)
         {
@@ -532,7 +535,7 @@ namespace BusinessLogic.ApiClasses
              string msgEm1 = await InvoiceOrder(id);
 
             //send email
-            var temp = await _repositoryManager.MessageTemplate.GetTemplateById(3, false);
+            var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderShipped);
             var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
             var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
             try
@@ -885,16 +888,13 @@ namespace BusinessLogic.ApiClasses
             {
                 coupon.StoreId = userId;
             }
-            if ((createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product") && (createDto.Products == null || createDto.Products.Count() == 0))
+            if ((createDto.DiscountType == DiscountType.ProductDiscount || createDto.DiscountType == DiscountType.ProductPercentDiscount) && (createDto.ProductsCoupons == null || createDto.ProductsCoupons.Count() == 0))
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue(" Please Choose Products"),false);
             }
-            if (createDto.DiscountType == "fixed_product" || createDto.DiscountType == "percent_product")
+            if (createDto.DiscountType == DiscountType.ProductDiscount || createDto.DiscountType == DiscountType.ProductPercentDiscount && (createDto.ProductsCoupons != null || createDto.ProductsCoupons.Count() > 0))
             {
-                if (createDto.Products != null && createDto.Products.Count() > 0)
-                {
-                    coupon.Products = createDto.Products == null ? null : string.Join(",", createDto.Products);
-                }
+              //  coupon.ProductsCoupons.AddRange(_mapper.Map<List<ProductsCoupon>>(createDto.ProductsCoupons));
             }
             _repositoryManager.Coupon.AddCoupon(coupon);
             await _repositoryManager.SaveAsync();
@@ -927,11 +927,16 @@ namespace BusinessLogic.ApiClasses
             {
                 coupon.StoreId = userId;
             }
-            if ((updateDto.DiscountType == "fixed_product" || updateDto.DiscountType == "percent_product"))
+            if (updateDto.DiscountType == DiscountType.ProductDiscount || updateDto.DiscountType == DiscountType.ProductPercentDiscount)
             {
-                if (updateDto.Products != null && updateDto.Products.Count() > 0)
+                if (updateDto.ProductsCoupons != null && updateDto.ProductsCoupons.Count() > 0)
                 {
-                    coupon.Products = updateDto.Products == null ? null : string.Join(",", updateDto.Products);
+                    var products = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(updateDto.Id, false);
+                    foreach(var product in products)
+                    {
+                        _repositoryManager.ProductsCoupon.DeleteProductsCoupon(product);
+                    }
+                    coupon.ProductsCoupons.AddRange(_mapper.Map<List<ProductsCoupon>>(updateDto.ProductsCoupons));
                 }
             }
             _mapper.Map(updateDto, coupon);

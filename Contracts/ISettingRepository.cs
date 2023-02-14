@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,12 @@ namespace Contracts
     } 
     public interface IMessageTemplateRepository
     {
-        Task<MessageTemplate> GetVerificationEmail();
-        Task<MessageTemplate> GetDefaultEmailTemplate();
+        Task<MessageTemplate> GetNameTemplate(NameTemplate name);
         Task<IEnumerable<MessageTemplate>> GetEmailTemplatesList(bool trackChanges);
         Task<MessageTemplate> GetTemplateById(int id, bool trackChanges);
     }
     public interface IMailListRepository
     {
-        Task<List<MailList>> GetMailLists();
         Task<MailList> GetMailListById(int id, bool trackChanges);
         Task<List<MailList>> GetMailListEmail(string search);
         Task<MailList> GetEmail(string email);

@@ -22,24 +22,23 @@ namespace Entities.DataTransferObjects
         public DateTime? ExpiryDate { get; set; }
         public int? StoreId { get; set; }
         public int? AdminId { get; set; }
-        public List<int> ProductIds { get; set; }
     }
     public class CreateCouponDto
     {
         public string CouponName { get; set; }
         public string Description { get; set; }
         public string CouponCode { get; set; }
-        public string DiscountType { get; set; }
+        public DiscountType DiscountType { get; set; }
         public decimal CouponAmount { get; set; }
         public DateTime? ExpiryDate { get; set; }
-        public string Products { get; set; }
+        public List<ProductsCouponDto> ProductsCoupons { get; set; }
     }
     public class UpdateCouponDto: CreateCouponDto
     {
         public int Id { get; set; }
     }
-    public class ListProductsDto
+    public class ProductsCouponDto
     {
-        public int Id { get; set; }
+        public int ProductId { get; set; }
     }
 }

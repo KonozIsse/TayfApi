@@ -19,19 +19,19 @@ namespace Repository
         public async Task<Image> GetImage(int id , bool trackChanges)
          => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();
        
-        public async Task<List<Image>> GetImages(string category)
+        public async Task<List<Image>> GetImages(ImageCategory? category)
         {
             var images = FindByCondition(c => c.IsStatus == Status.Active,false);
-            if(category != null && category != "")
+            if(category != null)
             {
-                images.Where(c => c.Category.Equals(category));
+                images.Where(c => c.Category  == category);
             }
             return await images.OrderByDescending(c => c.CreatedAt).Include(c=>c.ImageSettings).ToListAsync();
         }
-        public async Task<List<Image>> GetImagesVendor(int vendorId, string category)
+        public async Task<List<Image>> GetImagesVendor(int vendorId, ImageCategory? category)
         {
             var images = FindByCondition(c=>c.VendId == vendorId && c.IsStatus == Status.Active, false);
-            if (category != null && category != "")
+            if (category != null)
             {
                 images.Where(c => c.Category.Equals(category));
             }

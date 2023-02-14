@@ -209,10 +209,11 @@ namespace BusinessLogic.ApiClasses
             {
                 slider.VendorId = storeId;
             }
-            if (createSliderDto.ImageId == 0)
+            if (createSliderDto.ImgId == 0)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
             }
+            slider.ImgId = createSliderDto.ImgId;
             _repositoryManager.Slider.AddSlider(slider);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(slider, _locService.GetLocalizedStringValue("successSave"));
@@ -220,7 +221,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<BussnessResultModel> AddSliderMobile(int storeId, CreateSliderDto createSliderDto)
         {
             var slider = _mapper.Map<Sliders>(createSliderDto);
-            if (createSliderDto.ImageId == 0)
+            if (createSliderDto.ImgId == 0)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
             }

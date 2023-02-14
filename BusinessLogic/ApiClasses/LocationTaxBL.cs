@@ -465,7 +465,7 @@ namespace BusinessLogic.ApiClasses
         {
             decimal tax = 0;
             var customer = await _repositoryManager.User.GetCustomerId(customerId, false);
-            if (customer != null && customer.DefaultAddressId != 0)
+            if (customer != null && customer.DefaultAddressId != null)
             {
                 var defaultAddress = await _repositoryManager.Address.GetAddressIdByCustomerId(customer.DefaultAddressId.Value, customerId, false);
                 if (defaultAddress != null)

@@ -1,5 +1,6 @@
 namespace Entities.Models
 {
+    using Entities.Models.Enums;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -13,9 +14,7 @@ namespace Entities.Models
         [Required]
         [StringLength(191)]
         public string CouponCode { get; set; }
-        [Required]
-        [StringLength(100)]
-        public string DiscountType { get; set; }
+        public DiscountType DiscountType { get; set; }
         public decimal CouponAmount { get; set; }
         public DateTime? ExpiryDate { get; set; }
 
@@ -26,8 +25,6 @@ namespace Entities.Models
         [ForeignKey(nameof(Admin))]
         public int? AdminId { get; set; }
         public User Admin { get; set; }
-       // public List<Product> ListProducts { get; set; }
-        public string Products { get; set; } 
-        //public List<int> ProductIds { get; set; }
+        public List<ProductsCoupon> ProductsCoupons { get; set; }
     }
 }

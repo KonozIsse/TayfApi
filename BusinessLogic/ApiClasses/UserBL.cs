@@ -423,11 +423,11 @@ namespace BusinessLogic.ApiClasses
                     var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
                     await _userManager.AddClaimAsync(user, new Claim(/*ClaimTypes.Name*/role.Name, user.Email));
 
-                    var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false); //verify emasil
-                    var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
+                    //var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false); //verify emasil
+                    //var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
 
-                    var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
-                    _emailSender.SendEmail(message);
+                    //var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
+                    //_emailSender.SendEmail(message);
 
                     await _repositoryManager.SaveAsync();
                     return new BussnessResultModel(user, "successAdd");
@@ -526,7 +526,7 @@ namespace BusinessLogic.ApiClasses
             var customer = await _repositoryManager.User.GetCustomerEmail(email,false);
             if (customer != null)
             {
-                var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false);
+                var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.VerificationEmail);
                 var msgem = "Hello " + customer.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + customer.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
                 try
                 {
@@ -699,7 +699,7 @@ namespace BusinessLogic.ApiClasses
                     user.UserType = UserType.Customer;
                     user.IsMobileVerified = false;
                     user.RoleId = 2;
-                    user.UserName = userRegister.FirstName + userRegister.LastName;
+                    user.UserName = userRegister.Email;
                     //var regex = new Regex("1P([A-Z0-9]{4})");
                     user.VerifiedCode = Convert.ToInt32(_util.GenerateRandomNo()) + Convert.ToInt32(_util.GenerateRandomNo2());
                     var country = await _repositoryManager.Country.GetcountryById(userRegister.CountryId.Value, false);
@@ -710,40 +710,29 @@ namespace BusinessLogic.ApiClasses
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("VerifyEmail"), false);
                     }
 
-                    var newpass = _util.encry(userRegister.Password);
-                    user.PasswordHash = newpass;
                     var result = await _userManager.CreateAsync(user, userRegister.Password);
                     if (result.Succeeded)
                     {
                         var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
                         await _userManager.AddClaimAsync(user, new Claim(role.Name, user.FirstName));
-                        var validat = new UserForAuthenticationDto
-                        {
-                            UserName = userRegister.Email,
-                            Password = userRegister.Password
-                        };
-                        if (!await _authManager.ValidateUser(validat))
-                        {
-                            _logger.LogWarn($" Authentication failed. Wrong user name or password.");
-                        }
-                        var token = await _authManager.CreateToken();
+                       
                         var device = new Device
                         {
                             DeviceType = "Web",
                             UserId = user.Id,
                             DeviceModel = "Web",
                             OperatingSystem = "Windows",
-                            DeviceToken = token,
+                            DeviceToken = userRegister.Password,
                             IsStatus = Status.Active,
                         };
                         _repositoryManager.Device.AddDevice(device);
 
 
-                        var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false);
-                        var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
+                        //var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false);
+                        //var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
 
-                        var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
-                        _emailSender.SendEmail(message);
+                        //var message = new Message(new string[] { user.Email }, temp.Subject, msgem);
+                        //_emailSender.SendEmail(message);
 
                         await _repositoryManager.SaveAsync();
                         return new BussnessResultModel(user, _locService.GetLocalizedStringValue("successAdd"));
@@ -808,7 +797,7 @@ namespace BusinessLogic.ApiClasses
                 _repositoryManager.Device.AddDevice(device);
 
 
-                var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false);
+                var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.VerificationEmail);
                 var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
 
                 var message = new Message(new string[] { user.Email }, temp.Subject, msgem);

@@ -23,7 +23,7 @@ namespace Repository
         public async Task<List<Cart>> CartsNotActiveCustomer(int customerId)
          => await FindByCondition(x => x.CustomerId == customerId && x.IsStatus == Status.NotActive, false).ToListAsync();
          public async Task<List<Cart>> GetCartsToCustomerId(int customerId)
-         => await FindByCondition(x => x.CustomerId == customerId , false).Include(c=>c.Store).ToListAsync();
+         => await FindByCondition(x => x.CustomerId == customerId , false).Include(c=>c.Store).Include(c=>c.Product).ToListAsync();
         public async Task<List<Cart>> GetCartsToStoreId(int storeId)
         => await FindByCondition(x => x.StoreId == storeId && x.IsStatus == Status.Active, false).ToListAsync();
         public async Task<List<Cart>> GetCartsToStoreCustomer(int storeId , int customerId)

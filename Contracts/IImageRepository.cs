@@ -11,8 +11,8 @@ namespace Contracts
     public interface IImageRepository
     {
         Task<Image> GetImage(int id, bool trackChanges);
-        Task<List<Image>> GetImages(string category);
-        Task<List<Image>> GetImagesVendor(int vendorId, string category);
+        Task<List<Image>> GetImages(ImageCategory? category);
+        Task<List<Image>> GetImagesVendor(int vendorId, ImageCategory? category);
         void AddImage(Image image);
         void DeleteImage(Image image);
     }

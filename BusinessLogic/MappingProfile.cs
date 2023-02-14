@@ -47,7 +47,10 @@ namespace BusinessLogic
             CreateMap<CartAttributeProductDto, CartAttributeProduct>().ReverseMap();
             //MapCoupon
             CreateMap<CreateCouponDto, Coupon>().ReverseMap();
-            CreateMap<CouponDto, Coupon>().ReverseMap();
+            CreateMap<CouponDto, Coupon>().ReverseMap(); 
+            CreateMap<UpdateCouponDto, Coupon>().ReverseMap();
+            //ProductsCoupon
+            CreateMap<ProductsCouponDto, ProductsCoupon>().ReverseMap();
             //MapCategory
             CreateMap<CategoryDto, Category>().ReverseMap();
             CreateMap<MainCategoryDto, Category>().ReverseMap();

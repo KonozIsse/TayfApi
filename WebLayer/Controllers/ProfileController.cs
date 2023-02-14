@@ -78,7 +78,6 @@ namespace WebLayer.Controllers
                 return BadRequest(result.Message);
             }
         }
-
         [HttpPost]
         [Route("change-password")]
         [Authorize]
@@ -89,19 +88,23 @@ namespace WebLayer.Controllers
             try
             {
                 if (model is null)
-                    return BadRequest(_locService.GetLocalizedStringValue("enterPassword"));
+                    return BadRequest("enterPassword");
                 var user = GetCurrentUser();
+
+                var checkOldPassword =
+                    await _signInManager.PasswordSignInAsync(user.UserName, model.OldPassword, false, false);
+
+                if (!checkOldPassword.Succeeded)
+                    return BadRequest(_locService.GetLocalizedStringValue("passwnotequal"));
+
+                if (model.ConfirmPassword != model.NewPassword)
+                    return BadRequest(_locService.GetLocalizedStringValue("ConfirmPassAtLeast"));
+
                 string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
                 if (string.IsNullOrEmpty(resetToken))
                     return BadRequest(_locService.GetLocalizedStringValue("Error while generating reset token."));
-                //if (user.PasswordHash != model.OldPassword)
-                //    return BadRequest(_locService.GetLocalizedStringValue("passwnotequal"));
 
-                if (model.ConfirmPassword != model.NewPassword)
-                    return BadRequest(_locService.GetLocalizedStringValue(_locService.GetLocalizedStringValue("ConfirmPassAtLeast")));
-                var decrpass = _util.decr(model.OldPassword);
-                
-                var result = await _userManager.ChangePasswordAsync(user, decrpass, model.NewPassword);
+                var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
 
                 if (result.Succeeded)
                     return Ok(_locService.GetLocalizedStringValue("PasswordChangedSuccessfully"));

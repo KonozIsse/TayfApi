@@ -58,6 +58,7 @@ namespace Contracts
         IRoleRepository Role { get; }
         IImageProductRepository ImageProduct { get; }
         IProductCategoryRepository ProductCategory { get; }
+        IProductsCouponRepository ProductsCoupon { get; }
         Task SaveAsync();
     }
 }

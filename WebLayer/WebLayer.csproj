@@ -8,13 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="Migrations\**" />
 		<Compile Remove="Services\**" />
-		<Content Remove="Migrations\**" />
 		<Content Remove="Services\**" />
-		<EmbeddedResource Remove="Migrations\**" />
 		<EmbeddedResource Remove="Services\**" />
-		<None Remove="Migrations\**" />
 		<None Remove="Services\**" />
 	</ItemGroup>
 
@@ -86,6 +82,10 @@
 			<Generator>MSDataSetGenerator</Generator>
 			<LastGenOutput>BlogForTrainingDataSet3.Designer.cs</LastGenOutput>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
 </Project>

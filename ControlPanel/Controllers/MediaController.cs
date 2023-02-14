@@ -1,5 +1,6 @@
 ﻿using Entities.DataTransferObjects;
 using Entities.Models;
+using Entities.Models.Enums;
 using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace ControlPanel.Controllers
         {
         }
         [HttpGet("get/category")]
-        public async Task<IActionResult> GetImages(string category, [FromQuery] PostsParameters postsParameters)
+        public async Task<IActionResult> GetImages(ImageCategory? category, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _imageBL.GetImages(category , GetCurrentUserId(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));

@@ -31,18 +31,15 @@ namespace WebLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Address1")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address2")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressTitle")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CityName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CountryId")
@@ -55,7 +52,6 @@ namespace WebLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Flat")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDefault")
@@ -102,16 +98,10 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("AddDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ImgId")
@@ -132,9 +122,7 @@ namespace WebLayer.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -184,10 +172,13 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ProdId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StoreId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -196,6 +187,10 @@ namespace WebLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProdId");
+
+                    b.HasIndex("StoreId");
 
                     b.ToTable("Carts");
                 });
@@ -211,7 +206,7 @@ namespace WebLayer.Migrations
                     b.Property<int>("AttributesProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CartProductId")
+                    b.Property<int?>("CartId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -233,126 +228,9 @@ namespace WebLayer.Migrations
 
                     b.HasIndex("AttributesProductId");
 
-                    b.HasIndex("CartProductId");
+                    b.HasIndex("CartId");
 
                     b.ToTable("CartAttributeProducts");
-                });
-
-            modelBuilder.Entity("Entities.Models.CartProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CartsProducts");
-                });
-
-            modelBuilder.Entity("Entities.Models.CartStore", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("FinalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StoreId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("StoreId");
-
-                    b.ToTable("CartStore");
-                });
-
-            modelBuilder.Entity("Entities.Models.CategoriesStore", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("CategoriesStores");
                 });
 
             modelBuilder.Entity("Entities.Models.Category", b =>
@@ -366,13 +244,16 @@ namespace WebLayer.Migrations
                     b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CategoryNameAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ImgId")
+                    b.Property<int>("ImgId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -402,11 +283,20 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -414,23 +304,20 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("NewsId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("NewsId");
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("NewsId");
 
                     b.ToTable("CommentNews");
                 });
@@ -492,6 +379,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("CountryName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CountryNameAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -507,8 +397,8 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MobileCode")
-                        .HasColumnType("int");
+                    b.Property<string>("MobileCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -542,6 +432,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("CouponName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CouponNameAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -551,10 +444,11 @@ namespace WebLayer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DiscountType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ExpiryDate")
                         .HasColumnType("datetime2");
@@ -564,9 +458,6 @@ namespace WebLayer.Migrations
 
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
-
-                    b.Property<string>("Product")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("StoreId")
                         .HasColumnType("int");
@@ -614,6 +505,9 @@ namespace WebLayer.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("NameAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Position")
                         .HasColumnType("nvarchar(max)");
 
@@ -629,133 +523,6 @@ namespace WebLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Currencies");
-                });
-
-            modelBuilder.Entity("Entities.Models.CustomerAttributesProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("AttributesProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CustomerProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttributesProductId");
-
-                    b.HasIndex("CustomerProductId");
-
-                    b.ToTable("CustomerAttributesProducts");
-                });
-
-            modelBuilder.Entity("Entities.Models.CustomerProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DateAdded")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("FinalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StoreId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CustomerProducts");
-                });
-
-            modelBuilder.Entity("Entities.Models.CustomerStore", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StoreId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("StoreId");
-
-                    b.ToTable("CustomerStores");
                 });
 
             modelBuilder.Entity("Entities.Models.DeliveryTime", b =>
@@ -854,7 +621,7 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AdminId")
+                    b.Property<int?>("AdminId")
                         .HasColumnType("int");
 
                     b.Property<int>("Category")
@@ -877,9 +644,6 @@ namespace WebLayer.Migrations
                         .HasMaxLength(191)
                         .HasColumnType("nvarchar(191)");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -889,8 +653,6 @@ namespace WebLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AdminId");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("VendId");
 
@@ -1029,7 +791,7 @@ namespace WebLayer.Migrations
                     b.Property<string>("Direction")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ImgId")
+                    b.Property<int>("ImgId")
                         .HasColumnType("int");
 
                     b.Property<short?>("IsDefault")
@@ -1044,6 +806,12 @@ namespace WebLayer.Migrations
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NameAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<short>("Sort")
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1081,6 +849,9 @@ namespace WebLayer.Migrations
                     b.Property<bool?>("IsVendorLink")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LinkUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("OrderedId")
                         .HasColumnType("int");
 
@@ -1090,7 +861,10 @@ namespace WebLayer.Migrations
                     b.Property<bool>("Show")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("TitleLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TitleLinkAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1155,8 +929,8 @@ namespace WebLayer.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NameTemplate")
+                        .HasColumnType("int");
 
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
@@ -1177,16 +951,13 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("AddDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CountComment")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Decription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DecriptionAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -1207,9 +978,6 @@ namespace WebLayer.Migrations
                     b.Property<int?>("IsViewed")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("LastUpdateDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("NewsCategoryId")
                         .HasColumnType("int");
 
@@ -1217,6 +985,9 @@ namespace WebLayer.Migrations
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("TitleAr")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1246,9 +1017,6 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("AddDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
 
@@ -1266,9 +1034,6 @@ namespace WebLayer.Migrations
 
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastUpdateDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("MainCategoryId")
                         .HasColumnType("int");
@@ -1400,6 +1165,9 @@ namespace WebLayer.Migrations
 
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CodeCoupon")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CouponId")
                         .HasColumnType("int");
@@ -1595,6 +1363,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("StatusName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StatusNameAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -1729,13 +1500,10 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Availability")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountReviews")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1747,6 +1515,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool?>("IsAcceptAdmin")
                         .HasColumnType("bit");
 
@@ -1754,9 +1525,6 @@ namespace WebLayer.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsFavorite")
                         .HasColumnType("bit");
 
                     b.Property<short>("IsFeature")
@@ -1774,9 +1542,6 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<int>("Like")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -1786,10 +1551,10 @@ namespace WebLayer.Migrations
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("ProductNameAr")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TopRateProductId")
+                    b.Property<int>("StoreId")
                         .HasColumnType("int");
 
                     b.Property<int>("TypeId")
@@ -1800,7 +1565,7 @@ namespace WebLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("StoreId");
 
                     b.HasIndex("TypeId");
 
@@ -1861,6 +1626,82 @@ namespace WebLayer.Migrations
                     b.ToTable("AttributesProducts");
                 });
 
+            modelBuilder.Entity("Entities.Models.ProductCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IsStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductCategories");
+                });
+
+            modelBuilder.Entity("Entities.Models.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ImageId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IsStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImages");
+                });
+
             modelBuilder.Entity("Entities.Models.ProductOption", b =>
                 {
                     b.Property<int>("Id")
@@ -1892,7 +1733,7 @@ namespace WebLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductOption");
+                    b.ToTable("ProductOptions");
                 });
 
             modelBuilder.Entity("Entities.Models.ProductOptionValue", b =>
@@ -1931,7 +1772,7 @@ namespace WebLayer.Migrations
 
                     b.HasIndex("OptionId");
 
-                    b.ToTable("ProductOptionValue");
+                    b.ToTable("ProductOptionValues");
                 });
 
             modelBuilder.Entity("Entities.Models.ProductSales", b =>
@@ -1942,9 +1783,6 @@ namespace WebLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("AddDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1954,7 +1792,7 @@ namespace WebLayer.Migrations
                     b.Property<decimal>("DiscountPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -1963,13 +1801,10 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("LastUpdate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1982,13 +1817,16 @@ namespace WebLayer.Migrations
                     b.ToTable("ProductSales");
                 });
 
-            modelBuilder.Entity("Entities.Models.ProductsStore", b =>
+            modelBuilder.Entity("Entities.Models.ProductsCoupon", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -2008,16 +1846,13 @@ namespace WebLayer.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("VendorId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CouponId");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("ProductsStores");
+                    b.ToTable("ProductsCoupon");
                 });
 
             modelBuilder.Entity("Entities.Models.ProductType", b =>
@@ -2064,6 +1899,9 @@ namespace WebLayer.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
@@ -2146,30 +1984,30 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "8ad32a4d-5b3b-475d-b654-07f0d453fb53",
-                            CreatedAt = new DateTime(2022, 11, 15, 16, 5, 26, 598, DateTimeKind.Local).AddTicks(8833),
+                            ConcurrencyStamp = "d23cee9a-f861-41aa-b331-ada0bc857897",
+                            CreatedAt = new DateTime(2023, 2, 13, 14, 49, 22, 567, DateTimeKind.Local).AddTicks(857),
                             IsDeleted = false,
-                            IsStatus = 2,
+                            IsStatus = 0,
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "744e750b-24f0-47ab-ad51-116a94e0481a",
-                            CreatedAt = new DateTime(2022, 11, 15, 16, 5, 26, 598, DateTimeKind.Local).AddTicks(8961),
+                            ConcurrencyStamp = "1a8ba188-b3b8-408e-a89b-c6c565107a96",
+                            CreatedAt = new DateTime(2023, 2, 13, 14, 49, 22, 567, DateTimeKind.Local).AddTicks(929),
                             IsDeleted = false,
-                            IsStatus = 2,
+                            IsStatus = 0,
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "eb8eb86d-6e20-404c-955d-fd968ce88a27",
-                            CreatedAt = new DateTime(2022, 11, 15, 16, 5, 26, 598, DateTimeKind.Local).AddTicks(8966),
+                            ConcurrencyStamp = "0281109d-0c14-4a7a-a929-2eb7a08bc5bf",
+                            CreatedAt = new DateTime(2023, 2, 13, 14, 49, 22, 567, DateTimeKind.Local).AddTicks(934),
                             IsDeleted = false,
-                            IsStatus = 2,
+                            IsStatus = 0,
                             Name = "Store",
                             NormalizedName = "STORE"
                         });
@@ -2192,6 +2030,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("ImgId")
                         .HasColumnType("int");
 
@@ -2202,6 +2043,9 @@ namespace WebLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TitleAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -2317,6 +2161,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("Decription")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DecriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -2332,13 +2179,13 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LangId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("TitleAr")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -2356,8 +2203,6 @@ namespace WebLayer.Migrations
 
                     b.HasIndex("ImgId");
 
-                    b.HasIndex("LangId");
-
                     b.HasIndex("VendorId");
 
                     b.ToTable("Sliders");
@@ -2374,9 +2219,6 @@ namespace WebLayer.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateAdded")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -2388,9 +2230,6 @@ namespace WebLayer.Migrations
 
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -2425,13 +2264,22 @@ namespace WebLayer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
+                    b.Property<int>("PageType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TitleAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -2459,13 +2307,22 @@ namespace WebLayer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StoreId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TitleAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -2490,10 +2347,16 @@ namespace WebLayer.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("IsStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StoreId")
                         .HasColumnType("int");
 
                     b.Property<int>("TaxClassId")
@@ -2564,11 +2427,17 @@ namespace WebLayer.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("AdressInfo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Avater")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CodeMobileCountry")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CodeMobileCountry")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -2596,6 +2465,9 @@ namespace WebLayer.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -2604,11 +2476,6 @@ namespace WebLayer.Migrations
 
                     b.Property<bool?>("IsSubscribe")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Lang")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -2626,9 +2493,6 @@ namespace WebLayer.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -2657,9 +2521,6 @@ namespace WebLayer.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("Telephone")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -2676,10 +2537,15 @@ namespace WebLayer.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int>("UserType")
+                        .HasColumnType("int");
+
                     b.Property<int?>("VerifiedCode")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CountryId");
 
@@ -2696,44 +2562,6 @@ namespace WebLayer.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Entities.Models.UserCoupon", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CouponId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CouponId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserCoupons");
                 });
 
             modelBuilder.Entity("Entities.Models.WishList", b =>
@@ -2805,6 +2633,9 @@ namespace WebLayer.Migrations
 
                     b.Property<string>("ZoneName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZoneNameAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -2975,7 +2806,23 @@ namespace WebLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Entities.Models.Product", "Product")
+                        .WithMany("Carts")
+                        .HasForeignKey("ProdId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Models.User", "Store")
+                        .WithMany()
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Entities.Models.CartAttributeProduct", b =>
@@ -2986,96 +2833,43 @@ namespace WebLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entities.Models.CartProduct", "CartProduct")
+                    b.HasOne("Entities.Models.Cart", "Cart")
                         .WithMany("CartAttributeProducts")
-                        .HasForeignKey("CartProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("CartId");
 
                     b.Navigation("AttributesProduct");
 
-                    b.Navigation("CartProduct");
-                });
-
-            modelBuilder.Entity("Entities.Models.CartProduct", b =>
-                {
-                    b.HasOne("Entities.Models.Cart", "Cart")
-                        .WithMany("CartProducts")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Entities.Models.Product", "Product")
-                        .WithMany("CartProducts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Cart");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Entities.Models.CartStore", b =>
-                {
-                    b.HasOne("Entities.Models.Cart", "Cart")
-                        .WithMany("CartStores")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Entities.Models.User", "Store")
-                        .WithMany("CartStores")
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Store");
-                });
-
-            modelBuilder.Entity("Entities.Models.CategoriesStore", b =>
-                {
-                    b.HasOne("Entities.Models.Category", "Category")
-                        .WithMany("CategoriesStores")
-                        .HasForeignKey("CategoryId");
-
-                    b.HasOne("Entities.Models.User", "Vendor")
-                        .WithMany("CategoriesStores")
-                        .HasForeignKey("VendorId");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Entities.Models.Category", b =>
                 {
-                    b.HasOne("Entities.Models.Image", "Images")
+                    b.HasOne("Entities.Models.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImgId");
+                        .HasForeignKey("ImgId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Images");
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("Entities.Models.CommentNews", b =>
                 {
+                    b.HasOne("Entities.Models.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Entities.Models.News", "News")
                         .WithMany("Comments")
                         .HasForeignKey("NewsId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entities.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("Customer");
 
                     b.Navigation("News");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Entities.Models.Country", b =>
@@ -3102,55 +2896,6 @@ namespace WebLayer.Migrations
                     b.Navigation("Store");
                 });
 
-            modelBuilder.Entity("Entities.Models.CustomerAttributesProduct", b =>
-                {
-                    b.HasOne("Entities.Models.ProductAttribut", "AttributesProduct")
-                        .WithMany()
-                        .HasForeignKey("AttributesProductId");
-
-                    b.HasOne("Entities.Models.CustomerProduct", "CustomerProduct")
-                        .WithMany("CustomerAttributesProducts")
-                        .HasForeignKey("CustomerProductId");
-
-                    b.Navigation("AttributesProduct");
-
-                    b.Navigation("CustomerProduct");
-                });
-
-            modelBuilder.Entity("Entities.Models.CustomerProduct", b =>
-                {
-                    b.HasOne("Entities.Models.User", "Customer")
-                        .WithMany("CustomerProducts")
-                        .HasForeignKey("CustomerId");
-
-                    b.HasOne("Entities.Models.Product", "Product")
-                        .WithMany("CustomerProducts")
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Entities.Models.CustomerStore", b =>
-                {
-                    b.HasOne("Entities.Models.User", "Customer")
-                        .WithMany("Customers")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Entities.Models.User", "Store")
-                        .WithMany("Stores")
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Store");
-                });
-
             modelBuilder.Entity("Entities.Models.Device", b =>
                 {
                     b.HasOne("Entities.Models.User", "User")
@@ -3166,21 +2911,13 @@ namespace WebLayer.Migrations
                 {
                     b.HasOne("Entities.Models.User", "Admin")
                         .WithMany()
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Entities.Models.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("AdminId");
 
                     b.HasOne("Entities.Models.User", "Vender")
                         .WithMany()
                         .HasForeignKey("VendId");
 
                     b.Navigation("Admin");
-
-                    b.Navigation("Product");
 
                     b.Navigation("Vender");
                 });
@@ -3229,7 +2966,9 @@ namespace WebLayer.Migrations
                 {
                     b.HasOne("Entities.Models.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImgId");
+                        .HasForeignKey("ImgId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Image");
                 });
@@ -3296,7 +3035,7 @@ namespace WebLayer.Migrations
                         .IsRequired();
 
                     b.HasOne("Entities.Models.Coupon", "Coupon")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("CouponId");
 
                     b.HasOne("Entities.Models.Currency", "Currency")
@@ -3424,9 +3163,9 @@ namespace WebLayer.Migrations
 
             modelBuilder.Entity("Entities.Models.Product", b =>
                 {
-                    b.HasOne("Entities.Models.Category", "Category")
+                    b.HasOne("Entities.Models.User", "Store")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -3436,9 +3175,9 @@ namespace WebLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Category");
-
                     b.Navigation("ProductType");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Entities.Models.ProductAttribut", b =>
@@ -3468,6 +3207,44 @@ namespace WebLayer.Migrations
                     b.Navigation("ProductOptionValue");
                 });
 
+            modelBuilder.Entity("Entities.Models.ProductCategory", b =>
+                {
+                    b.HasOne("Entities.Models.Category", "Category")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Models.Product", "Product")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Entities.Models.ProductImage", b =>
+                {
+                    b.HasOne("Entities.Models.Image", "Image")
+                        .WithMany("ProductImages")
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Models.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Image");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Entities.Models.ProductOptionValue", b =>
                 {
                     b.HasOne("Entities.Models.ProductOption", "ProductOption")
@@ -3490,23 +3267,23 @@ namespace WebLayer.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Entities.Models.ProductsStore", b =>
+            modelBuilder.Entity("Entities.Models.ProductsCoupon", b =>
                 {
+                    b.HasOne("Entities.Models.Coupon", "Coupon")
+                        .WithMany("ProductsCoupons")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Entities.Models.Product", "Product")
-                        .WithMany("ProductsStores")
+                        .WithMany("ProductsCoupons")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entities.Models.User", "Vendor")
-                        .WithMany("ProductsStores")
-                        .HasForeignKey("VendorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("Coupon");
 
                     b.Navigation("Product");
-
-                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Entities.Models.Review", b =>
@@ -3560,17 +3337,11 @@ namespace WebLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entities.Models.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LangId");
-
                     b.HasOne("Entities.Models.User", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
 
                     b.Navigation("Image");
-
-                    b.Navigation("Language");
 
                     b.Navigation("Vendor");
                 });
@@ -3616,6 +3387,10 @@ namespace WebLayer.Migrations
 
             modelBuilder.Entity("Entities.Models.User", b =>
                 {
+                    b.HasOne("Entities.Models.Category", null)
+                        .WithMany("Stores")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("Entities.Models.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId");
@@ -3635,25 +3410,6 @@ namespace WebLayer.Migrations
                     b.Navigation("DefaultAddress");
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("Entities.Models.UserCoupon", b =>
-                {
-                    b.HasOne("Entities.Models.Coupon", "Coupon")
-                        .WithMany("UserCoupons")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Entities.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Coupon");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Entities.Models.WishList", b =>
@@ -3739,21 +3495,14 @@ namespace WebLayer.Migrations
 
             modelBuilder.Entity("Entities.Models.Cart", b =>
                 {
-                    b.Navigation("CartProducts");
-
-                    b.Navigation("CartStores");
-                });
-
-            modelBuilder.Entity("Entities.Models.CartProduct", b =>
-                {
                     b.Navigation("CartAttributeProducts");
                 });
 
             modelBuilder.Entity("Entities.Models.Category", b =>
                 {
-                    b.Navigation("CategoriesStores");
+                    b.Navigation("ProductCategories");
 
-                    b.Navigation("Products");
+                    b.Navigation("Stores");
                 });
 
             modelBuilder.Entity("Entities.Models.Country", b =>
@@ -3765,19 +3514,14 @@ namespace WebLayer.Migrations
 
             modelBuilder.Entity("Entities.Models.Coupon", b =>
                 {
-                    b.Navigation("Orders");
-
-                    b.Navigation("UserCoupons");
-                });
-
-            modelBuilder.Entity("Entities.Models.CustomerProduct", b =>
-                {
-                    b.Navigation("CustomerAttributesProducts");
+                    b.Navigation("ProductsCoupons");
                 });
 
             modelBuilder.Entity("Entities.Models.Image", b =>
                 {
                     b.Navigation("ImageSettings");
+
+                    b.Navigation("ProductImages");
                 });
 
             modelBuilder.Entity("Entities.Models.Link", b =>
@@ -3819,17 +3563,17 @@ namespace WebLayer.Migrations
                 {
                     b.Navigation("AttributesProducts");
 
-                    b.Navigation("CartProducts");
-
-                    b.Navigation("CustomerProducts");
+                    b.Navigation("Carts");
 
                     b.Navigation("Images");
 
                     b.Navigation("OrderProducts");
 
+                    b.Navigation("ProductCategories");
+
                     b.Navigation("ProductSales");
 
-                    b.Navigation("ProductsStores");
+                    b.Navigation("ProductsCoupons");
 
                     b.Navigation("Reviews");
 
@@ -3869,23 +3613,13 @@ namespace WebLayer.Migrations
                 {
                     b.Navigation("Addresses");
 
-                    b.Navigation("CartStores");
-
-                    b.Navigation("CategoriesStores");
-
                     b.Navigation("CustomerOrders");
-
-                    b.Navigation("CustomerProducts");
-
-                    b.Navigation("Customers");
 
                     b.Navigation("Devices");
 
-                    b.Navigation("ProductsStores");
+                    b.Navigation("Products");
 
                     b.Navigation("StoreOrders");
-
-                    b.Navigation("Stores");
                 });
 
             modelBuilder.Entity("Entities.Models.Zone", b =>
