@@ -24,7 +24,6 @@ namespace Entities.DataTransferObjects
     }
     public class RoleLinksDto
     {
-        public int Id { get; set; }
         public int LinkId { get; set; }
     }
     public class UpdateRoleDto : CreateRoleDto

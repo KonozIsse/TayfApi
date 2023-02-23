@@ -49,7 +49,7 @@ namespace WebLayer.Controllers
         public async Task<IActionResult> GetSpecialsProducts(int? catId, int type, int? price1, int? price2)
         {
             var result = await _productBL.GetAllProducts(catId, GetCurrentUserId(), GetLanguage(), type, price1, price2);
-            result.Products = result.Products.Where(c => c.IsSpecial == true && c.EndDateSpecial > DateTime.Now).ToList();
+            result.Products = result.Products.Where(c => c.IsSpecial == true).ToList();
             return Ok(result);
         }
         [HttpGet("getAllProductsToCategory")]

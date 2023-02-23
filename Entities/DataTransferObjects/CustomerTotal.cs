@@ -33,7 +33,7 @@ namespace Entities.DataTransferObjects
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
-        public IFormFile Avater { get; set; }
+        //public IFormFile Avater { get; set; }
         public string Email { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public bool IsSubscribe { get; set; }

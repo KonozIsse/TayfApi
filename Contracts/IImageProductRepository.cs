@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface IImageProductRepository
     {
-        Task<IEnumerable<ProductImage>> GetAllImagesProduct(int productId, bool trackChanges, bool isIncluded = false);
+        Task<IEnumerable<ProductImage>> GetAllImagesProductId(int productId, bool trackChanges, bool isIncluded = false);
         Task<ProductImage> GetImageProductId(int id, bool trackChanges);
         void CreateImageProduct(ProductImage image);  
         void DeleteImageProduct(ProductImage image);

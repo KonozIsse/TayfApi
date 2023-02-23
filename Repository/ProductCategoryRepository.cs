@@ -30,6 +30,9 @@ namespace Repository
             }
             return  await cats.ToListAsync();
         }
+        public async Task<IEnumerable<ProductCategory>> GetAllProductsCategory(int catId, bool trackChanges)
+         => await FindByCondition(c => c.CategoryId == catId, trackChanges).ToListAsync();
+        
         public async Task<ProductCategory> GetCategoryToPrductId(int productId)
        => await FindByCondition(c => c.ProductId == productId, false).Include(c=>c.Category).SingleOrDefaultAsync();
     }

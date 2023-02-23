@@ -6,7 +6,7 @@ using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
 namespace BusinessLogic.ApiClasses
-{//BusinessException
+{
     public class NewsBL
     {
         protected readonly IRepositoryManager _repositoryManager;
@@ -21,7 +21,7 @@ namespace BusinessLogic.ApiClasses
             _imageBL = imageBL;
         }
         //News------------------------------------------------
-        public async Task<List<NewsDto>> GetNews(string lang= "en")
+        public async Task<List<NewsDto>> GetNews(string lang)
         {
             var news = await _repositoryManager.News.GetWithComments();
             var list = news.Select(x => new NewsDto
@@ -36,7 +36,7 @@ namespace BusinessLogic.ApiClasses
             }).ToList(); 
             return list;
         }
-        public async Task<NewsDto> GetBlog(int blogId, string lang = "en")
+        public async Task<NewsDto> GetBlog(int blogId, string lang)
         {
             var blog = await _repositoryManager.News.GetBlogById(blogId , false, true);  
             var newsDto = _mapper.Map<NewsDto>(blog);
@@ -112,8 +112,11 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<PagedList<NewsDto>> GetAllBlogs (int vendorId, string search, PostsParameters postsParameters)
         {
-            var searchBlog = await _repositoryManager.News.SearchNews(vendorId, search);
-            if (vendorId != 0) { searchBlog.Where(c => c.VendorId == vendorId); }
+            var searchBlog = await _repositoryManager.News.SearchNews(search);
+            if (vendorId != null) 
+            { 
+                searchBlog =  searchBlog.Where(c => c.VendorId == vendorId).ToList(); 
+            }
             var newsDto = _mapper.Map<List<NewsDto>>(searchBlog);
             return PagedList<NewsDto>.ToPagedList(newsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }

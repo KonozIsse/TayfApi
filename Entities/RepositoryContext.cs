@@ -100,25 +100,6 @@ namespace Entities
                             entry.State = EntityState.Modified;
                             entry.CurrentValues["IsDeleted"] = true;
                             entry.CurrentValues["DeletedAt"] = DateTime.Now;
-
-                            //foreach (var navigationEntry in entry.Navigations.Where(n => !n.Metadata.IsDependentToPrincipal()))
-                            //{
-                            //    if (navigationEntry is CollectionEntry collectionEntry)
-                            //    {
-                            //        foreach (var dependentEntry in collectionEntry.CurrentValue)
-                            //        {
-                            //            HandleDependent(Entry(dependentEntry));
-                            //        }
-                            //    }
-                            //    else
-                            //    {
-                            //        var dependentEntry = navigationEntry.CurrentValue;
-                            //        if (dependentEntry != null)
-                            //        {
-                            //            HandleDependent(Entry(dependentEntry));
-                            //        }
-                            //    }
-                            //}
                         }
                         break;
                     case EntityState.Modified:
@@ -145,7 +126,7 @@ namespace Entities
             ConfigureConfiguration(modelBuilder);
 
             ConfigureSoftDelete(modelBuilder);
-
+            ConfigureSoftDeleteUser(modelBuilder);
             ConfigureAutoMapToTables(modelBuilder);
 
             modelBuilder.Entity<User>().HasMany(address => address.Addresses)
@@ -182,7 +163,7 @@ namespace Entities
 
         private static void ConfigureSoftDelete(ModelBuilder modelBuilder)
         {
-            Expression<Func<BaseEntity, bool>> filterExpr = bm => !bm.IsDeleted;
+            Expression<Func<BaseEntity, bool>> filterExpr = bm => !bm.IsDeleted ;
             foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
             {
                 // check if current entity type is child of BaseModel
@@ -198,6 +179,25 @@ namespace Entities
                 }
             }
         }
+        private static void ConfigureSoftDeleteUser(ModelBuilder modelBuilder)
+        {
+            Expression<Func<User, bool>> filterExpr = bm => !bm.IsDeleted;
+            foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
+            {
+                // check if current entity type is child of BaseModel
+                if (mutableEntityType.ClrType.IsAssignableTo(typeof(User)))
+                {
+                    // modify expression to handle correct child type
+                    var parameter = Expression.Parameter(mutableEntityType.ClrType);
+                    var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
+                    var lambdaExpression = Expression.Lambda(body, parameter);
+
+                    // set filter
+                    mutableEntityType.SetQueryFilter(lambdaExpression);
+                }
+            }
+        }
+       
 
         private static void ConfigureAutoMapToTables(ModelBuilder modelBuilder)
         {

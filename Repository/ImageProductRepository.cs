@@ -17,9 +17,9 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<ProductImage>> GetAllImagesProduct(int productId, bool trackChanges , bool isIncluded = false)
+        public async Task<IEnumerable<ProductImage>> GetAllImagesProductId(int productId, bool trackChanges , bool isIncluded = false)
           {
-             var cats = FindByCondition(c => c.ProductId == productId && c.Image.IsStatus == Status.Active, trackChanges);
+             var cats = FindByCondition(c => c.ProductId == productId , trackChanges);
             if (isIncluded == true)
             {
                 cats = cats.Include(c => c.Image);

@@ -83,7 +83,6 @@ namespace BusinessLogic.StartUp
             services.AddScoped<CartBL>();
             services.AddScoped<ImageUploadServices>();
             services.AddScoped<OrderBL>();
-            services.AddScoped<Util>();
             services.AddScoped<LocationTaxBL>();
             services.AddScoped<NewsBL>();
         }

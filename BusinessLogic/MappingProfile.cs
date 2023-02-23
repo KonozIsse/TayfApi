@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using BusinessLogic.Helpers;
+using Entities.ViewModel;
 
 namespace BusinessLogic
 {
@@ -117,13 +118,12 @@ namespace BusinessLogic
             //MapCustomer
             CreateMap<CreateCustomerDto, User>().ReverseMap(); 
             CreateMap<CreateCustomerCPDto, User>().ReverseMap();
-            CreateMap<CustomerDto, User>().AfterMap((s, d) => {
+            CreateMap<User, CustomerDto>().AfterMap((s, d) => {
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Avater = baseUrl + "/img/" + s.Avater;
+                d.Avater = baseUrl + "/media_files/ " + s.Avater;
             });
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
-            CreateMap<UserForRegistrationDto, User>().ReverseMap(); 
             //AdminMap
             CreateMap<AdminDto, User>().ReverseMap();
             CreateMap<CreateAdminDto, User>().ReverseMap();
@@ -152,13 +152,22 @@ namespace BusinessLogic
             CreateMap<BannerDto, Banner>().ReverseMap(); 
             CreateMap<UpdateBannerDto, Banner>().ReverseMap();
             //MapImage
-            CreateMap<ImageDto, Image>().ReverseMap();
+            CreateMap<Image, ImageDto>().AfterMap((s, d) => {
+                var request = _httpContextAccessor.HttpContext.Request;
+                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                d.Name = baseUrl + "/media_files/" + s.Name;
+            });
             CreateMap<CreateImageDto, Image>().ReverseMap();
             //ImageProduct
             CreateMap<ImageProductDto, ProductImage>().ReverseMap();
+            CreateMap<ProductImagesDto, ProductImage>().ReverseMap();
             //MapImageSetting
-            CreateMap<ImageSettingDto, ImageSetting>().ReverseMap();
-            CreateMap<CreateImageSettingDto, ImageSetting>().ReverseMap(); 
+            CreateMap<ImageSetting, ImageSettingDto>().AfterMap((s, d) => {
+                var request = _httpContextAccessor.HttpContext.Request;
+                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                d.Path = baseUrl + "/media_files" + s.Path;
+            });
+            CreateMap<CreateImageSettingDto, ImageSetting>().ReverseMap();
             CreateMap<UpdateImageSettingDto, ImageSetting>().ReverseMap();
             //MapDeliveryTime
             CreateMap<DeliveryTimeDto, DeliveryTime>().ReverseMap();

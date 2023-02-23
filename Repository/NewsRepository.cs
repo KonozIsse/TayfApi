@@ -17,10 +17,15 @@ namespace Repository
         {
 
         }
-        public async Task<List<News>> SearchNews(int vendorId, string search)
-         => await FindByCondition(c => (c.VendorId == vendorId  || c.VendorId == null)  &&
-         ( c.Title.Contains(search) || c.Decription.Contains(search)), false)
-            .Include(r => r.Image).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+        public async Task<List<News>> SearchNews(string search)
+        {
+            var qury = FindAll(false);
+            if (string.IsNullOrEmpty(search))
+            {
+                qury = qury.Where(c => c.Title.Contains(search) || c.Decription.Contains(search));
+            }
+            return await qury.Include(r => r.Image).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        }
         public async Task<List<News>> GetWithComments()
         => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(r => r.Image)
             .ThenInclude(c=>c.ImageSettings)

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
@@ -18,14 +17,12 @@ using CorePush.Google;
 using CorePush.Apple;
 using Microsoft.OpenApi.Any;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Localization;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Entities.Models.CorePushModels;
 using BusinessLogic;
 using BusinessLogic.StartUp;
-using BusinessLogic.Services;
-using BusinessLogic.Services.Jobs;
+using Microsoft.Extensions.Configuration;
+using System.Text.Json.Serialization;
 
 namespace WebLayer
 {
@@ -60,6 +57,20 @@ namespace WebLayer
             services.ConfigureLangaugeService();
             services.ConfigureSMSService();
             services.ConfigurePaymentService();
+            //------------------------------
+     
+            services.AddAuthentication().AddFacebook(facebook =>
+            {
+                var facebookSettings = Configuration.GetSection("FacebookSetting");
+                facebook.AppId = facebookSettings.GetSection("facebookAppId").Value;
+                facebook.AppSecret = facebookSettings.GetSection("facebookAppSecret").Value;
+            });
+            services.AddAuthentication().AddGoogle(google =>
+            {
+                var googleSettings = Configuration.GetSection("GoogleSetting");
+                google.ClientId = googleSettings.GetSection("googleClientId").Value;
+                google.ClientSecret = googleSettings.GetSection("googleClientSecret").Value;
+            });
             //------------------------------
             services.AddControllers().AddJsonOptions(
                 options =>
@@ -137,7 +148,6 @@ namespace WebLayer
 
             var lockOption = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(lockOption.Value);
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors("CorsPolicy");

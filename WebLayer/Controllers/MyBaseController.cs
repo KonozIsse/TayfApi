@@ -35,7 +35,6 @@ namespace WebLayer.Controllers
         protected readonly UserBL _userBL;
         protected readonly ImageBL _imageBL;
         protected readonly LocationTaxBL _locationTaxBL; 
-        protected readonly Util _util;
         protected readonly IWebHostEnvironment _webHostEnvironment;
 
         public MyBaseController(IServiceProvider provider)
@@ -64,7 +63,6 @@ namespace WebLayer.Controllers
             _userBL = provider.GetService<UserBL>();
             _imageBL = provider.GetService<ImageBL>();
             _locationTaxBL = provider.GetService<LocationTaxBL>(); 
-            _util = provider.GetService<Util>();
             _webHostEnvironment = provider.GetService<IWebHostEnvironment>();
         }
         [NonAction]

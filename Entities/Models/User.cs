@@ -6,7 +6,7 @@ namespace Entities.Models
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    public class User : IdentityUser<int>
+    public class User :  IdentityUser<int>
     { 
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -16,7 +16,6 @@ namespace Entities.Models
         public Status Status { get; set; }
         public TypeRegister TypeRegister { get; set; }
         public UserType UserType { get; set; }
-        public bool? IsMobileVerified { get; set; }
         public string CodeMobileCountry { get; set; }
         public bool? IsSubscribe { get; set; }
         public int? VerifiedCode { get; set; }

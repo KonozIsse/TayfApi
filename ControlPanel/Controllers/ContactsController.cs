@@ -11,13 +11,13 @@ namespace ControlPanel.Controllers
         public ContactsController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpGet("getAll")]
+        [HttpGet("get-contacts")]
         public async Task<IActionResult> GetAllContacts(string search,int pageId)
         {
             var result = await _homeBL.GetAllContacts(search, 50, pageId);
             return Ok(result);
         }
-        [HttpDelete("delete")]
+        [HttpDelete("delete-contect")]
         public async Task<IActionResult> DeleteContact(int id)
         {
             var result = await _homeBL.DeleteContact(id);

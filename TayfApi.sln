@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailService", "EmailServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{B17E5736-34AD-4B54-A34A-27A557D71451}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlPanel", "ControlPanel\ControlPanel.csproj", "{30763FE9-2E0B-40AA-BCC2-1EA2D9EBA257}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlPanel", "ControlPanel\ControlPanel.csproj", "{30763FE9-2E0B-40AA-BCC2-1EA2D9EBA257}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
-using Entities.Models.Enum;
+using Entities.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

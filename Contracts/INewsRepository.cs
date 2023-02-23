@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface INewsRepository
     {
-        Task<List<News>> SearchNews(int vendorId, string search);
+        Task<List<News>> SearchNews(string search);
         Task<List<News>> GetWithComments();
         Task<News> GetBlogById(int id, bool trackChanges, bool Included = false);
         void CreateBlog(News blog);

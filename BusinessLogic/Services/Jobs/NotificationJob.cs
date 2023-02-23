@@ -1,12 +1,8 @@
 ﻿using Contracts;
 using Entities.Models.CorePushModels;
-using Entities.Models.Enum;
+using Entities.Models.Enums;
 using Quartz;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Razor.Language;
 using BusinessLogic.Services;
 
 namespace BusinessLogic.Services.Jobs

@@ -14,21 +14,21 @@ namespace ControlPanel.Controllers
         public BlogController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpGet("get")]
+        [HttpGet("get-blogs")]
         public async Task<IActionResult> GetBlogs(string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _newsBL.GetAllBlogs(GetCurrentUserId(), search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-        [HttpGet("getCommments")]
+        [HttpGet("get-commments")]
         public async Task<IActionResult> GetCommentsBlog(int id , string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _newsBL.SearchCommetsNews(id , search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-        [HttpPost("createBlog")]
+        [HttpPost("create-blog")]
         public async Task<IActionResult> CreateBlog(CreateNewsDto create)
         {
             var result = await _newsBL.AddNews(GetCurrentUserId(), create);
@@ -41,7 +41,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpPut("editBlog")]
+        [HttpPut("edit-blog")]
         public async Task<IActionResult> EditBlog(UpdateNewsDto update)
         {
             var result = await _newsBL.EditNews(GetCurrentUserId(), update);
@@ -55,7 +55,7 @@ namespace ControlPanel.Controllers
             }
         }
        
-        [HttpDelete("removeBlog")]
+        [HttpDelete("remove-blog")]
         public async Task<IActionResult> RemoveBlog(int id)
         {
             var result = await _newsBL.DeleteNews(id);
@@ -68,7 +68,7 @@ namespace ControlPanel.Controllers
                 return Ok(result.Message);
             }
         } 
-        [HttpDelete("removeComment")]
+        [HttpDelete("remove-comment")]
         public async Task<IActionResult> RemoveComment(int commentId)
         {
             var result = await _newsBL.DeleteNewsComments(commentId);

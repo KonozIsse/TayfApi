@@ -10,7 +10,7 @@ namespace ControlPanel.Controllers
         public AdminController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpGet("get")]
+        [HttpGet("get-admins-stores")]
         public async Task<IActionResult> GetAdminsStors()
         {
             var result = await _userBL.GetAdminsStores();
@@ -85,10 +85,10 @@ namespace ControlPanel.Controllers
             }
         }
 
-        [HttpDelete("remove")]
+        [HttpDelete("remove-admin")]
         public async Task<IActionResult> RemoveAdmin(int id)
         {
-            var result = await _userBL.RemoveUserData(id);
+            var result = await _userBL.RemoveUser(id);
             if (!result.Success)
             {
                 return BadRequest(result.Message);
@@ -99,7 +99,7 @@ namespace ControlPanel.Controllers
             }
         }
         
-        [HttpPost("createRole")]
+        [HttpPost("create-role")]
         public async Task<IActionResult> AddRole(CreateRoleDto create)
         {
             var result = await _userBL.AddRole(create);
@@ -112,13 +112,13 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpGet("getRoles")]
+        [HttpGet("get-roles")]
         public async Task<IActionResult> GetTypesStoreAdmin()
         {
             var result = await _userBL.GetTypesStoreAdmin();
             return Ok(result);
         }
-        [HttpPut("editRole")]
+        [HttpPut("edit-role")]
         public async Task<IActionResult> EditRole(UpdateRoleDto update)
         {
             var result = await _userBL.EditRole(update);
@@ -131,7 +131,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpDelete("removeRole")]
+        [HttpDelete("remove-role")]
         public async Task<IActionResult> RemoveRole(int id)
         {
             var result = await _userBL.DeleteRole(id);
@@ -144,23 +144,10 @@ namespace ControlPanel.Controllers
                 return Ok(result.Message);
             }
         }
-        [HttpPost("AddPerssmionRole")]
+        [HttpPost("manage-role")]
         public async Task<IActionResult> AddPerssmionRole(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
             var result = await _userBL.AddPermission(roleId, RoleLinksDto);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
-        }
-        [HttpPut("EditPerssmionRole")]
-        public async Task<IActionResult> EditPerssmionRole(int roleId, List<RoleLinksDto> RoleLinksDto)
-        {
-            var result = await _userBL.EditPermission(roleId, RoleLinksDto);
             if (result.Success)
             {
                 return Ok(result.Message);

@@ -10,7 +10,7 @@ namespace Entities.ViewModel
 {
     public class CheckoutVM
     {
-        public List<CartVM> Cart { get; set; }
+        public List<CartDto> Cart { get; set; }
         public List<DeliveryTime> Times { get; set; }
         public List<PaymentMethods> Payment { get; set; }
         public List<CountryDto> Countries { get; set; }

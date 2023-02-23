@@ -11,20 +11,26 @@ using System.Threading.Tasks;
 
 namespace Repository
 {
-    public class ImageRepository :RepositoryBase<Image>, IImageRepository
+    public class ImageRepository : RepositoryBase<Image>, IImageRepository
     {
         public ImageRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         {
         }
-        public async Task<Image> GetImage(int id , bool trackChanges)
-         => await FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();
-       
+        public async Task<Image> GetImage(int id, bool trackChanges,bool included = false)
+        {
+            var image = FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges);
+            if (included == true)
+            {
+                image = image.Include(c => c.ProductImages);
+            }
+            return await image.FirstOrDefaultAsync();
+        }
         public async Task<List<Image>> GetImages(ImageCategory? category)
         {
             var images = FindByCondition(c => c.IsStatus == Status.Active,false);
             if(category != null)
             {
-                images.Where(c => c.Category  == category);
+                images = images.Where(c => c.Category  == category);
             }
             return await images.OrderByDescending(c => c.CreatedAt).Include(c=>c.ImageSettings).ToListAsync();
         }

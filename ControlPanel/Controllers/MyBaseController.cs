@@ -28,7 +28,6 @@ namespace ControlPanel.Controllers
         protected readonly IEmailSender _emailSender;
         protected readonly LocService _locService;
         protected readonly NewsBL _newsBL;
-        protected readonly UserBL _userApi;
         protected readonly HomeBL _homeBL;
         protected readonly ProductBL _productBL;
         protected readonly OrderBL _orderBL;
@@ -55,7 +54,6 @@ namespace ControlPanel.Controllers
 
             _emailSender = provider.GetService<IEmailSender>();
             _locService = provider.GetService<LocService>();
-            _userApi = provider.GetService<UserBL>();
             _homeBL = provider.GetService<HomeBL>();
             _newsBL = provider.GetService<NewsBL>();
             _productBL = provider.GetService<ProductBL>();

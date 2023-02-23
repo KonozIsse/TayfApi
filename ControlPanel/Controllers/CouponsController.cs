@@ -13,7 +13,7 @@ namespace ControlPanel.Controllers
         public CouponsController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpGet("get")]
+        [HttpGet("get-coupons")]
         public async Task<IActionResult> GetAllCoupons(string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _orderBL.GetAllCoupons(search,postsParameters);
@@ -21,7 +21,7 @@ namespace ControlPanel.Controllers
             return Ok(result);
         }
 
-        [HttpPost("create")]
+        [HttpPost("create-coupon")]
         public async Task<IActionResult> CreateCoupon(CreateCouponDto create)
         {
             var result = await _orderBL.AddCoupon(create, GetCurrentUserId());
@@ -34,7 +34,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpPut("update")]
+        [HttpPut("update-coupon")]
         public async Task<IActionResult> UpdateCoupon(UpdateCouponDto update)
         {
             var result = await _orderBL.UpdateCoupon(update, GetCurrentUserId());
@@ -48,7 +48,7 @@ namespace ControlPanel.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete-coupons")]
         public async Task<IActionResult> DeleteCoupon(int id)
         {
             var result = await _orderBL.DeleteCoupon(id);

@@ -20,9 +20,7 @@ namespace Entities.DataTransferObjects
         public int StoreId { get; set; }
         public string StoreName { get; set; }
         public string StoreImage { get; set; }
-        public int? AdminId { get; set; }
         public int TypeId { get; set; }
-        public bool? IsAcceptAdmin { get; set; }
         public string ShareLink { get; set; }
         public bool IsFavorite { get; set; } 
         public short IsFeature { get; set; }
@@ -30,12 +28,7 @@ namespace Entities.DataTransferObjects
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
         public bool IsSpecial { get; set; }
-        public decimal SpecialPrice { get; set; }
-        public DateTime? EndDateSpecial { get; set; }
         public bool IsSale { get; set; }
-        public decimal DiscountPrice { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }
         public List<ReviewDto> Reviews { get; set; }
@@ -43,7 +36,7 @@ namespace Entities.DataTransferObjects
         public List<SaleDto> ProductSales { get; set; }
         public List<AttributeDto> AttributesProducts { get; set; }
         public List<ProductCategoryDto> ProductCategories { get; set; }
-        public List<string> Images { get; set; }
+        public List<ProductImagesDto> Images { get; set; }
     }
     public class CreateProductDto
     {
@@ -75,6 +68,10 @@ namespace Entities.DataTransferObjects
     public class ImageProductDto
     {
         public int ImageId { get; set; }
+    }
+    public class ProductImagesDto
+    {
+        public string Image { get; set; }
     }
     //Sales----------------------------------
     public class SaleDto

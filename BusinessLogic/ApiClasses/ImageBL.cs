@@ -2,11 +2,6 @@
 using System;
 using BusinessLogic;
 using Entities.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Entities.DataTransferObjects;
 using AutoMapper;
 using Contracts;
@@ -16,13 +11,11 @@ using System.Net.Security;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Image = Entities.Models.Image;
-using BussnessResultModel = Entities.Exception.BussnessResultModel;
 using Entities.RequestFeatures;
-using static System.Net.Mime.MediaTypeNames;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.Reflection;
 using Entities.ViewModel;
 using Microsoft.AspNetCore.Http;
+using Entities.Exception;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -242,9 +235,12 @@ namespace BusinessLogic.ApiClasses
                     {
                         _repositoryManager.ImageSetting.DeleteImageSetting(t);
                     }
-                    var image = await _repositoryManager.Image.GetImage(id, false);
-                    image.IsStatus = Status.NotActive;
-                    _repositoryManager.Image.DeleteImage(image);
+                    var image = await _repositoryManager.Image.GetImage(id, true);
+                    if (image != null)
+                    {
+                        image.IsStatus = Status.NotActive;
+                        _repositoryManager.Image.DeleteImage(image);
+                    }
                 }
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(ids ,_locService.GetLocalizedStringValue("successDelete"));
@@ -350,58 +346,67 @@ namespace BusinessLogic.ApiClasses
             }
             return new BussnessResultModel(itemFromDB);
         }
-        public string GetImageMedium(int img)
+        public string GetImageMedium(int imageId)
         {
-            string image = "";
-           
-            if (img != 0)
+            var image = _repositoryManager.Image.GetImage(imageId, false,true).Result;
+            if (image != null)
             {
-                var imageMedium = _repositoryManager.ImageSetting.GetByType(img, ImageType.MEDIUM).Result;
+                var imageMedium = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.MEDIUM).Result;
                 if (imageMedium != null)
                 {
-                    image = "/img" + imageMedium.Path;
+                    var dto = _mapper.Map<ImageSettingDto>(imageMedium);
+                    image.Name = dto.Path;
                 }
+                return image.Name;
             }
-            return image;
-        }
-        public string GetImageThumbnail(int img)
-        {
-            string image = "";
-            if (img != 0)
+            else
             {
-                var imageThumbnail = _repositoryManager.ImageSetting.GetByType(img, ImageType.THUMBNAIL).Result;
+                return " ";
+            }
+        }
+        public string GetImageThumbnail(int imageId)
+        {
+            var image = _repositoryManager.Image.GetImage(imageId, false,true).Result;
+            if (image != null)
+            {
+                var imageThumbnail = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.THUMBNAIL).Result;
                 if (imageThumbnail != null)
                 {
-                    image = "/img" + imageThumbnail.Path;
+                    var dto = _mapper.Map<ImageSettingDto>(imageThumbnail);
+                    image.Name = dto.Path;
                 }
+                return image.Name;
             }
-            return image;
-        }
-        public string GetImageOriginal(int img)
-        {
-            string image = "";
-            if (img != 0)
+            else
             {
-                var imageOriginal = _repositoryManager.ImageSetting.GetByType(img , ImageType.ACTUAL).Result;
+                return " ";
+            }
+        }
+        public string GetImageOriginal(int imageId)
+        {
+            var image = _repositoryManager.Image.GetImage(imageId, false,true).Result;
+            if (image != null)
+            {
+                var imageOriginal = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.ACTUAL).Result;
                 if (imageOriginal != null)
                 {
-                    image = "/img" + imageOriginal.Path;
+                    var dto = _mapper.Map<ImageSettingDto>(imageOriginal);
+                    image.Name = dto.Path;
                 }
+                return image.Name;
             }
-            return image;
-        }
-        public async Task<List<string>> GetAllImagesProductId(int productId)
-        {
-            List<String> listImages = new List<String>();
-            var images = await  _repositoryManager.ImageProduct.GetAllImagesProduct(productId,false,true);
-            if (images != null)
+            else
             {
-                foreach(var image in images)
-                {
-                    listImages.Add(GetImageOriginal(image.ImageId));
-                }
-                //images.ForEach( async x1 => listImages.Add(await GetImageOriginal(x1.Id.ToString())));
+                return " ";
             }
+        }
+        public async Task<List<ProductImagesDto>> GetAllImagesToProduct(int productId)
+        {
+            var images = await _repositoryManager.ImageProduct.GetAllImagesProductId(productId,false,true);
+            var listImages = images.Select(image => new ProductImagesDto
+            {
+                Image = GetImageOriginal(image.ImageId),
+            }).ToList();
             return listImages;
         }
         public async Task<PagedList<ImageDto>> GetImages(ImageCategory? category , int userId, PostsParameters postsParameters)

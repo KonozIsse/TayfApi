@@ -87,8 +87,9 @@ namespace WebLayer.Controllers
                 return BadRequest(ModelState);
             try
             {
+                var chan = _userBL.ActiveCustomer;
                 if (model is null)
-                    return BadRequest("enterPassword");
+                    return BadRequest(_locService.GetLocalizedStringValue("enterPassword"));
                 var user = GetCurrentUser();
 
                 var checkOldPassword =

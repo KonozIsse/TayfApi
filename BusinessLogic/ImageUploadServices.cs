@@ -87,8 +87,6 @@ namespace BusinessLogic
             }
             catch (Exception)
             {
-                //_logger.Error("Exception Occured while uploading to Amazon S3 : " + ex, ex);
-               // return false;
                return false;
             }
         }

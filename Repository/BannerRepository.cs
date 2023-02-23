@@ -18,8 +18,8 @@ namespace Repository
         {
 
         }
-        public async Task<Banner> GetBannerByType(int langId, string type ,bool trackChanges)
-         => await FindByCondition(c => c.LangId.Equals(langId) && c.Type == type, trackChanges).FirstOrDefaultAsync();
+        public async Task<Banner> GetBannerByType( int langId ,string type ,bool trackChanges)
+         => await FindByCondition(c => c.LangId == langId &&  c.Type == type, trackChanges).Include(c=>c.Language).FirstOrDefaultAsync();
         public async Task<List<Banner>> GetAllBanner(string search, bool trackChanges)
         {
             var banners =  FindAll(trackChanges);
@@ -89,7 +89,8 @@ namespace Repository
 
         }
         public async Task<List<Sliders>> GetSliders()
-       => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToListAsync();
+       => await FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Web, false)
+            .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToListAsync();
         
         public async Task<List<Sliders>>  GetSlidersForWeb(string search)
         {

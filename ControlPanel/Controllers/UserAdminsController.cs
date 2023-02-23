@@ -12,7 +12,7 @@ namespace ControlPanel.Controllers
         public UserAdminsController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpPut("update")]
+        [HttpPut("update-admin")]
         public async Task<IActionResult> UpdateAdmin(UpdateAdminDto update)
         {
             var result = await _userBL.EditAdmin(update);
@@ -68,10 +68,10 @@ namespace ControlPanel.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete-admin")]
         public async Task<IActionResult> DeleteAdmin(int id)
         {
-            var result = await _userBL.RemoveUserData(id);
+            var result = await _userBL.RemoveUser(id);
             if (!result.Success)
             {
                 return BadRequest(result.Message);

@@ -148,22 +148,21 @@ namespace WebLayer.Controllers
             await _homeBL.SendUserEmail(email);
             return Ok();
         } 
-        [HttpPost("ReSendCodeb")]
-        public async Task<IActionResult> ReSendCode(string email)
+        [HttpPost("resend-code-customer")]
+        public async Task<IActionResult> ResendCodeToCustomer(string email)
         {
-            await _userBL.ReSendCode(email);
+            await _userBL.ResendCode(email);
             return Ok();
         } 
-        [HttpPost("AddVerifyUser")]
-        public async Task<IActionResult> AddVerifyUser(int code)
+        [HttpPut("verify-customer")]
+        public async Task<IActionResult> VerifyCustomer(int code)
         {
-            var result = await _userBL.AddVerifyUser(GetCurrentUserId(),code);
+            var result = await _userBL.VerifyCustomer(GetCurrentUserId(),code);
             if (result.Success)
             {
-                return Ok();
+                return Ok(result.Message);
             }
             else { return BadRequest(result.Message); }
-            
         }
         
         [HttpGet("getAllProductsToCategory")]
@@ -185,6 +184,13 @@ namespace WebLayer.Controllers
             var result = await _productBL.GetActiveSubCategoriesMainId(mainCatId, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
+        }
+
+        [HttpPut("changeDefaultCurrency")]
+        public async Task<IActionResult> ChangeDefaultCurrency(int id)
+        {
+            await _homeBL.ChangeDefaultCurrency(id);
+            return Ok();
         }
     }
 }

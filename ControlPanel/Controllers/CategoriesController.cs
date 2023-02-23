@@ -13,14 +13,14 @@ namespace ControlPanel.Controllers
         public CategoriesController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpGet("getMain")]
+        [HttpGet("get-main-categories")]
         public async Task<IActionResult> GetMainCategories(string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _productBL.GethMainCategoriesCP(search, GetLanguage(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-        [HttpGet("getSub")]
+        [HttpGet("get-sub-categories")]
         public async Task<IActionResult> GetSubCategories(int id,string search , [FromQuery] PostsParameters postsParameters)
         {
             var result =  await _productBL.GetSubCategoriesCP(id,search, GetLanguage(), postsParameters);
@@ -28,7 +28,7 @@ namespace ControlPanel.Controllers
             return Ok(result);
         }
        
-        [HttpPost("create")]
+        [HttpPost("create-category")]
         public async Task<IActionResult> CreateCategory(CreateCategoryDto create)
         {
             var result = await _productBL.CreateCategory(create);
@@ -41,7 +41,7 @@ namespace ControlPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpPut("edit")]
+        [HttpPut("edit-category")]
         public async Task<IActionResult> EditCategory(UpdateCategoryDto update)
         {
             var result = await _productBL.EditCategory(update);
@@ -55,7 +55,7 @@ namespace ControlPanel.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete-category")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var result = await _productBL.DeleteCategory(id);

@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -25,6 +26,12 @@ namespace ControlPanel.Controllers
         public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
+        [HttpGet("GetAllImagesProductId")]
+        public async Task<IActionResult> GetAllImagesProductId()
+        {
+            var images = await _productBL.GetAllActiveAcceptProducts(GetCurrentUserId(),GetLanguage());
+            return Ok(images);
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
         {
@@ -34,7 +41,7 @@ namespace ControlPanel.Controllers
                 return Unauthorized();
             }
             return Ok(new { Token = await _authManager.CreateToken() });
-        } 
+        }
 
         [AllowAnonymous]
         [HttpPost]

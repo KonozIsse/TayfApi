@@ -12,8 +12,6 @@ namespace Entities.Models
         public string ProductModel { get; set; }
         public decimal Price { get; set; }
         public int Availability { get; set; }
-        public bool IsSpecial { get; set; }
-        public bool IsSale { get; set; }
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }

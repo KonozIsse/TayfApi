@@ -5,15 +5,11 @@ using Entities;
 using Entities.DataTransferObjects;
 using Entities.Exception;
 using Entities.Models;
-using Entities.Models.Enum;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
-using Entities.ViewModel;
-using MailKit.Search;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Twilio.Jwt.AccessToken;
-
+using System.Text;
+using System.Security.Cryptography;
 namespace BusinessLogic.ApiClasses
 {
     public class OrderBL 
@@ -25,11 +21,10 @@ namespace BusinessLogic.ApiClasses
         protected readonly ProductBL _productBL;
         protected readonly IEmailSender _emailSender; 
         protected readonly LocService _locService;
-        protected readonly Util _util;
         protected readonly SignInManager<User> _signInManager; 
        // protected readonly LoggerManager _logger;
         public OrderBL(IRepositoryManager repositoryManager, IMapper mapper, LocationTaxBL locationTaxBL
-            , ImageBL imageBL, ProductBL productBL, IEmailSender emailSender, Util util , LocService locService , SignInManager<User> signInManager/*, LoggerManager logger*/ )
+            , ImageBL imageBL, ProductBL productBL, IEmailSender emailSender,  LocService locService , SignInManager<User> signInManager/*, LoggerManager logger*/ )
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;
@@ -37,10 +32,22 @@ namespace BusinessLogic.ApiClasses
             _imageBL = imageBL;
             _productBL = productBL;
             _emailSender = emailSender;
-            _util = util;
             _locService = locService;
             _signInManager = signInManager;
            // _logger = logger;
+        }
+        public string ComputeSha256Hash(string rawData)
+        {
+            using (SHA256 Sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = Sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+                var builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
         }
         //Order------------------------------------------------
         public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
@@ -181,7 +188,7 @@ namespace BusinessLogic.ApiClasses
                     total = total + ((total * tax) / 100);
                 }
                 order.OrderPrice = total;
-                order.HashedCtpAndPayment = _util.ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+                order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
                 _repositoryManager.Order.CreateOrder(order);
                 await _repositoryManager.SaveAsync();
             }
@@ -255,7 +262,7 @@ namespace BusinessLogic.ApiClasses
             }
             order.OrderPrice = totalPrice;
             order.CustomerId = customerId;
-            order.HashedCtpAndPayment = _util.ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
+            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
             await _repositoryManager.SaveAsync();
         }
         public async Task<BussnessResultModel> OrderPending(int id)
@@ -395,7 +402,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var period = _repositoryManager.Setting.GetPeriod();
                 //if order shipped or recieved and allowed period for refund ended
-                if ((order.OrderStatusId == 5 || order.OrderStatusId == 6) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < _util.EasternTime))
+                if ((order.OrderStatusId == 5 || order.OrderStatusId == 6) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < DateTime.UtcNow))
                 {
                     return new BussnessResultModel(null, "e: You Cann't Reject Order After period about " + period + " days from order", false);
                 }
@@ -556,7 +563,7 @@ namespace BusinessLogic.ApiClasses
             if (order.OrderStatusId == 1)
             {
                 order.OrderStatusId = 5; //recieved order
-                order.DatePurchased = _util.EasternTime;
+                order.DatePurchased = DateTime.UtcNow;
                 order.TransactionId = PaymentsId;
                 order.PaymentMethodsId = Convert.ToInt32(payment);// "Qatar Charity";
                 await _repositoryManager.SaveAsync();
@@ -625,7 +632,7 @@ namespace BusinessLogic.ApiClasses
                     }
                 }
 
-                inventory.AddedDate = _util.EasternTime.Millisecond;
+                inventory.AddedDate = DateTime.UtcNow.Millisecond;
                 inventory.AdminId = adminId;
                 if (vendorId != 0)
                 {
@@ -666,14 +673,13 @@ namespace BusinessLogic.ApiClasses
                         Option = c.ProductAttribut.ProductOption.OptionName,
                         Value = c.ProductAttribut.ProductOptionValue.OptionValueName,
                     }).ToList();
-                    var images = await _repositoryManager.ImageProduct.GetAllImagesProduct(c.ProductId, false, true);
                     orderProducts.Add(new OrderProductDto
                     {
                         Qty = c.Qty,
                         ProductName = c.Product.ProductName,
                         ProductModel = c.Product.ProductModel,
                         ProductPrice = c.Product.Price,
-                        ProductImage = _imageBL.GetImageOriginal(images.First().ImageId),
+                        ProductImage = _imageBL.GetImageOriginal(c.Product.Images.First().ImageId),
                         OrderAttributesProducts = attributesOrder ?? null
                     });
                     subTotal = subTotal + c.Qty * c.Product.Price;
@@ -906,6 +912,14 @@ namespace BusinessLogic.ApiClasses
             if (coupon == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
+            }
+            var products = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(id, false);
+            if(products != null)
+            {
+                foreach(var item in products)
+                {
+                    _repositoryManager.ProductsCoupon.DeleteProductsCoupon(item);
+                }
             }
             _repositoryManager.Coupon.DeleteCoupon(coupon);
             await _repositoryManager.SaveAsync();

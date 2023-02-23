@@ -17,10 +17,10 @@ namespace Repository
 
         }
         public async Task<List<Role>> GetRolesAdminStore()
-            => await FindByCondition(c => c.IsStatus == Status.Active && c.Id != 2, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();  
+            => await FindByCondition(c => c.IsStatus == Status.Active && c.Name != "Customer", false).OrderByDescending(c=>c.CreatedAt).ToListAsync();  
         public async Task<Role> GetRoleId(int id ,bool trackChanges)
-            => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync(); 
+            => await FindByCondition(c => c.Id == id &&  c.IsStatus== Status.Active, trackChanges).FirstOrDefaultAsync(); 
         public bool IsExistRole(string name)
-            =>  FindByCondition(c => c.Name.Equals(name), false).Count()>0;
+            => FindByCondition(c => c.Name.Equals(name), false).Count()>0;
     }
 }

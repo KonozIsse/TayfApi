@@ -18,17 +18,17 @@ namespace ControlPanel.Controllers
         public MediaController(IServiceProvider provider) : base(provider)
         {
         }
-        [HttpGet("get/category")]
+        [HttpGet("get-images")]
         public async Task<IActionResult> GetImages(ImageCategory? category, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _imageBL.GetImages(category , GetCurrentUserId(), postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         } 
-        [HttpGet("getSettings/id")]
-        public async Task<IActionResult> GetSettingsByImg(int id)
+        [HttpGet("get-settings-image/{imgId}")]
+        public async Task<IActionResult> GetSettingsByImg(int imgId)
         {
-            var result = await _imageBL.GetImageSettingImg(id);
+            var result = await _imageBL.GetImageSettingImg(imgId);
             return Ok(result);
         }
         [HttpPost("addImages")]

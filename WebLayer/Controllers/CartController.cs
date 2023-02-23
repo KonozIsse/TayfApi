@@ -49,7 +49,7 @@ namespace WebLayer.Controllers
         {
             var result = await _cartBL.UpdateTotalCart(GetCurrentUserId(), cartId,qty);
            return Ok(result);
-        }
+        } 
         [HttpPost("checkout-order")]
         public async Task<IActionResult> CheckoutOrder(CreateOrderDto create )
         {
