@@ -122,28 +122,22 @@ namespace Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
             ConfigureConfiguration(modelBuilder);
-
             ConfigureSoftDelete(modelBuilder);
             ConfigureSoftDeleteUser(modelBuilder);
             ConfigureAutoMapToTables(modelBuilder);
+            ConfigureDeleteBehavior(modelBuilder);
+
+        
 
             modelBuilder.Entity<User>().HasMany(address => address.Addresses)
                           .WithOne(user => user.User).HasForeignKey(con => con.UserId);
 
-
-            //modelBuilder.Entity<Product>().HasMany(store => store.Carts)
-            //             .WithOne(order => order.Product).HasForeignKey(con => con.ProductId);
-            
             modelBuilder.Entity<User>().HasMany(store => store.StoreOrders)
                          .WithOne(order => order.Store).HasForeignKey(con => con.StoreId);
 
             modelBuilder.Entity<User>().HasMany(customer => customer.CustomerOrders)
-                         .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId); 
-
-            ConfigureDeleteBehavior(modelBuilder);
-
+                         .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId);
         }
 
         private static void ConfigureDeleteBehavior(ModelBuilder modelBuilder)

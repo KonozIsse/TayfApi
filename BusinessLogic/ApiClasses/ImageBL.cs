@@ -230,50 +230,43 @@ namespace BusinessLogic.ApiClasses
             {
                 foreach (var id in ids)
                 {
-                    var cats = await _repositoryManager.ImageSetting.GetImageSettings(id);
-                    foreach (var t in cats)
-                    {
-                        _repositoryManager.ImageSetting.DeleteImageSetting(t);
-                    }
                     var image = await _repositoryManager.Image.GetImage(id, true);
                     if (image != null)
                     {
-                        image.IsStatus = Status.NotActive;
+                        var cats = await _repositoryManager.ImageSetting.GetImageSettings(id);
+                        foreach (var t in cats)
+                        {
+                            _repositoryManager.ImageSetting.DeleteImageSetting(t);
+                        }
                         _repositoryManager.Image.DeleteImage(image);
                     }
                 }
                 await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(ids ,_locService.GetLocalizedStringValue("successDelete"));
+                return new BussnessResultModel(ids, _locService.GetLocalizedStringValue("successDelete"));
             }
-            catch
+            catch (Exception)
             {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false); 
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
             }
-            
         } 
         public async Task<BussnessResultModel> DeleteImage(int id)
         {
             var image = await _repositoryManager.Image.GetImage(id, false);
-            if(image != null)
-            {
-                var settings = await _repositoryManager.ImageSetting.GetImageSettings(id);
-                if(settings != null)
-                {
-                    foreach (var setting in settings)
-                    {
-                        _repositoryManager.ImageSetting.DeleteImageSetting(setting);
-                    }
-
-                }
-                image.IsStatus = Status.NotActive;
-                _repositoryManager.Image.DeleteImage(image);
-                await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(image , _locService.GetLocalizedStringValue("successDelete"));
-            }
-            else
+            if (image == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
+            var settings = await _repositoryManager.ImageSetting.GetImageSettings(id);
+            if(settings != null)
+            {
+                foreach (var setting in settings)
+                {
+                    _repositoryManager.ImageSetting.DeleteImageSetting(setting);
+                }
+            }
+            _repositoryManager.Image.DeleteImage(image);
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(image , _locService.GetLocalizedStringValue("successDelete"));
         }
         public async Task AddImageSetting(CreateImageSettingDto settingDto)
         {

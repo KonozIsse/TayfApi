@@ -14,5 +14,8 @@ namespace Contracts
         Task<ProductCategory> GetCategoryToPrductId(int productId);
         void CreateProductCategory(ProductCategory category);
         void DeleteProductCategory(ProductCategory category);
+        Task DeleteRowRange(List<int> Ids);
+        void CreatProductCategoryRange(List<ProductCategory> productCategory);
+        Task<ProductCategory> GetItemId(int id, bool trackChanges);
     }
 }

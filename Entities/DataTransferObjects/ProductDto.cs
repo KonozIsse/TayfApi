@@ -53,7 +53,7 @@ namespace Entities.DataTransferObjects
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
         public short IsPopular { get; set; }
-        public List<ImageProductDto> ImagesProduct { get; set; }
+        public List<CreateImageProductDto> Images { get; set; }
         public bool IsSale { get; set; }
         public List<CreateSaleDto> ProductSales { get; set; }
         public bool IsSpecial { get; set; }
@@ -65,8 +65,9 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
     }
     //image---------------------------------- 
-    public class ImageProductDto
+    public class CreateImageProductDto
     {
+        public int Id { get; set; }
         public int ImageId { get; set; }
     }
     public class ProductImagesDto

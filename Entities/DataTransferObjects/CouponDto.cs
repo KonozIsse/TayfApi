@@ -39,6 +39,7 @@ namespace Entities.DataTransferObjects
     }
     public class ProductsCouponDto
     {
+        public int Id { get; set; }
         public int ProductId { get; set; }
     }
 }

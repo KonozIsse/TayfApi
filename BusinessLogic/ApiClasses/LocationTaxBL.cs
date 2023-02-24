@@ -227,18 +227,12 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<CountryDto>> GetAllCountries(string lang, string search, PostsParameters postsParameters)
         {
             var countries = await _repositoryManager.Country.GetAllCountries(search);
-            //var countriesDto = _mapper.Map<List<CountryDto>>(countries);
-            var countriesDto = new List<CountryDto>();
-            foreach (var category in countries)
+            var countriesDto = countries.Select(c=>
             {
-                countriesDto.Add(new CountryDto
-                {
-                    Id = category.Id,
-                    CountryName = lang == "en" ? category.CountryName : category.CountryNameAr,
-                    IsStatus = category.IsStatus,
-                    CountryCode3 = category.CountryCode3
-                });
-            }
+                var countryDto = _mapper.Map<CountryDto>(c);
+                countryDto.CountryName = lang == "en" ? c.CountryName : c.CountryNameAr;
+                return countryDto;
+            }).ToList();
             return PagedList<CountryDto>.ToPagedList(countriesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<CountryDto>> GetAllCountries()

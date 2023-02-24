@@ -941,20 +941,37 @@ namespace BusinessLogic.ApiClasses
             {
                 coupon.StoreId = userId;
             }
-            if (updateDto.DiscountType == DiscountType.ProductDiscount || updateDto.DiscountType == DiscountType.ProductPercentDiscount)
-            {
-                if (updateDto.ProductsCoupons != null && updateDto.ProductsCoupons.Count() > 0)
-                {
-                    var products = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(updateDto.Id, false);
-                    foreach(var product in products)
-                    {
-                        _repositoryManager.ProductsCoupon.DeleteProductsCoupon(product);
-                    }
-                    coupon.ProductsCoupons.AddRange(_mapper.Map<List<ProductsCoupon>>(updateDto.ProductsCoupons));
-                }
-            }
             _mapper.Map(updateDto, coupon);
             await _repositoryManager.SaveAsync();
+            if (updateDto.DiscountType == DiscountType.ProductDiscount || updateDto.DiscountType == DiscountType.ProductPercentDiscount)
+            {
+                  var products = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(updateDto.Id, false);
+                var Ids = products.Select(x => x.Id);
+                var IdsDto = updateDto.ProductsCoupons.Select(x => x.Id);
+                var listToDelete = Ids.Except(IdsDto).ToList();
+
+                await _repositoryManager.ProductsCoupon.DeleteRowRange(listToDelete);
+
+                var listToAdd = updateDto.ProductsCoupons.Where(x => x.Id == 0);
+
+                var entity = _mapper.Map<List<ProductsCoupon>>(listToAdd);
+                foreach (var item in entity)
+                {
+                    item.ProductId = updateDto.Id;
+                }
+                _repositoryManager.ProductsCoupon.CreatProductsCouponRange(entity);
+
+                var listToUpdate = Ids.Intersect(IdsDto);
+
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(item, true);
+                    var dtoEntity = updateDto.ProductsCoupons.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
+                await _repositoryManager.SaveAsync();
+            }
+           
             return new BussnessResultModel(coupon, _locService.GetLocalizedStringValue("successSave"));
         }
         public async Task<PagedList<CouponDto>> GetAllCoupons(string search , PostsParameters postsParameters)

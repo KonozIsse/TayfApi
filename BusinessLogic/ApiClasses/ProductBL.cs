@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Entities.Exception;
 using Entities.RequestFeatures;
 using System;
+using MailKit.Search;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -25,13 +26,6 @@ namespace BusinessLogic.ApiClasses
             _locService = locService;
         }
         //Category------------------------------------------------
-        public async Task<CategoryDto> GetCategory(int catId, string lang)
-        {
-            var category = await _repositoryManager.Categories.GetCategoryById(catId ,false);
-            var categoryDto = _mapper.Map<CategoryDto>(category);
-            categoryDto.CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr;
-            return categoryDto;
-        }
         public async Task<PagedList<CategoryDto>> GethMainCategoriesCP(string search, string lang, PostsParameters postsParameters)
         {
             var categories = await _repositoryManager.Categories.SearchMainCategoriesCP(search);
@@ -210,10 +204,10 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("selectcategory"), false);
             }
-            if (createProductDto.ImagesProduct != null)
+            if (createProductDto.Images != null)
             {
                 product.Images = new List<ProductImage>();
-                product.Images.AddRange(_mapper.Map<List<ProductImage>>(createProductDto.ImagesProduct));
+                product.Images.AddRange(_mapper.Map<List<ProductImage>>(createProductDto.Images));
             }
             else
             {
@@ -263,11 +257,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
-            if (user.UserType == UserType.Admin)
-            {
-                product.AdminId = userId;
-            }
             if (updateDto.DescriptionAr == null || updateDto.ProductNameAr == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
@@ -276,40 +265,75 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPrice"), false);
             }
+            _mapper.Map(updateDto, product);
+            await _repositoryManager.SaveAsync();
             if (updateDto.ProductCategories != null)
             {
                 var categoriesProdId = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false);
-                if (categoriesProdId.Count() > 0 && categoriesProdId != null)
+                var Ids = categoriesProdId.Select(x => x.Id);
+                var productCategoriesDto = updateDto.ProductCategories.Select(x => x.Id);
+                var listToDelete = Ids.Except(productCategoriesDto).ToList();
+
+                await _repositoryManager.ProductCategory.DeleteRowRange(listToDelete);
+
+                var listToAdd = updateDto.ProductCategories.Where(x => x.Id == 0);
+
+                var entity = _mapper.Map<List<ProductCategory>>(listToAdd);
+                foreach (var item in entity)
                 {
-                    foreach (var category in categoriesProdId)
-                    {
-                        _repositoryManager.ProductCategory.DeleteProductCategory(category);
-                    }
+                    item.ProductId = updateDto.Id;
                 }
-                product.ProductCategories.AddRange(_mapper.Map<List<ProductCategory>>(updateDto.ProductCategories));
+                _repositoryManager.ProductCategory.CreatProductCategoryRange(entity);
+
+                var listToUpdate = Ids.Intersect(productCategoriesDto);
+
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.ProductCategory.GetItemId(item, true);
+                    itemEntity.ProductId = updateDto.Id;
+                    var dtoEntity = updateDto.ProductCategories.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
+                await _repositoryManager.SaveAsync();
             }
             else
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("selectcategory"), false);
             }
-            if (updateDto.ImagesProduct != null)
+            if (updateDto.Images != null)
             {
-                var categoriesProdId = await _repositoryManager.ImageProduct.GetAllImagesProductId(product.Id, false);
-                if (categoriesProdId.Count() > 0 && categoriesProdId != null)
+                var imageProductId = await _repositoryManager.ImageProduct.GetAllImagesProductId(product.Id, false);
+                var Ids = imageProductId.Select(x => x.Id);
+                var IdsDto = updateDto.Images.Select(x => x.Id);
+                var listToDelete = Ids.Except(IdsDto).ToList();
+
+                await _repositoryManager.ImageProduct.DeleteRowRange(listToDelete);
+
+                var listToAdd = updateDto.Images.Where(x => x.Id == 0);
+
+                var entity = _mapper.Map<List<ProductImage>>(listToAdd);
+                foreach (var item in entity)
                 {
-                    foreach (var category in categoriesProdId)
-                    {
-                        _repositoryManager.ImageProduct.DeleteImageProduct(category);
-                    }
+                    item.ProductId = updateDto.Id;
                 }
-                product.Images.AddRange(_mapper.Map<List<ProductImage>>(updateDto.ImagesProduct));
+                _repositoryManager.ImageProduct.CreatProductCategoryRange(entity);
+
+                var listToUpdate = Ids.Intersect(IdsDto);
+
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.ImageProduct.GetImageProductId(item, true);
+
+                    var dtoEntity = updateDto.Images.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
+                await _repositoryManager.SaveAsync();
             }
             else
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
             }
-            _mapper.Map(updateDto, product);
-            await _repositoryManager.SaveAsync();
+           
             if (updateDto.IsSale == true )
             {
                 var sale = updateDto.ProductSales.First();
@@ -317,10 +341,10 @@ namespace BusinessLogic.ApiClasses
                 {
                     return new BussnessResultModel(null, _locService.GetLocalizedStringValue("StartDateMustBeGaraterThanExpireDate"),false);
                 }
-                var postSeePeopleDto = updateDto.ProductSales.Select(x => x.Id);
-                var sales = await _repositoryManager.Sales.GetAllSalesProductId(updateDto.Id, true);
+                var sales = await _repositoryManager.Sales.GetAllSalesProductId(updateDto.Id, false);
                 var Ids = sales.Select(x => x.Id);
-                var listToDelete = Ids.Except(postSeePeopleDto).ToList();
+                var salesDto = updateDto.ProductSales.Select(x => x.Id);
+                var listToDelete = Ids.Except(salesDto).ToList();
                 await _repositoryManager.Sales.DeleteListSales(listToDelete);
                 var listToAdd = updateDto.ProductSales.Where(x => x.Id == 0);
                 var entity = _mapper.Map<List<ProductSales>>(listToAdd);
@@ -329,6 +353,13 @@ namespace BusinessLogic.ApiClasses
                     item.ProductId = product.Id;
                 }
                 _repositoryManager.Sales.CreateListSales(entity);
+                var listToUpdate = Ids.Intersect(salesDto);
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.Sales.GetItemId(item, true);
+                    var dtoEntity = updateDto.ProductSales.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
                 await _repositoryManager.SaveAsync();
             }
             else 
@@ -358,7 +389,13 @@ namespace BusinessLogic.ApiClasses
                     item.ProductId = product.Id;
                 }
                 _repositoryManager.SpecialProducts.CreateListSpecialProducts(entity);
-                
+                var listToUpdate = Ids.Intersect(postSeePeopleDto);
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.SpecialProducts.GetSpecialId(item, true);
+                    var dtoEntity = updateDto.SpecialProducts.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
                 await _repositoryManager.SaveAsync();
             }
             else
@@ -498,7 +535,7 @@ namespace BusinessLogic.ApiClasses
                 productDto.Rate = Rate(product.Id).Result;
                 productDto.StoreName = product.Store != null ? product.Store.FullName : null;
                 productDto.StoreImage = product.Store == null ? null : _imageBL.GetImageOriginal(Convert.ToInt32(product.Store.ImageId));
-                  
+              
                 return productDto;
             }).ToList();
             return productsDto;

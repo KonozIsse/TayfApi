@@ -2,7 +2,7 @@ namespace Entities.Models
 {
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
-    public class ProductSales : BaseEntity
+    public class ProductSales: BaseEntity
     {
         public decimal DiscountPrice { get; set; }
         public DateTime StartDate { get; set; }

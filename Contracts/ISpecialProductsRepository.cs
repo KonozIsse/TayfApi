@@ -18,5 +18,6 @@ namespace Contracts
         void DeleteSpecialProduct(SpecialProducts special);
         Task DeleteListSpecialProducts(List<int> Ids);
         void CreateListSpecialProducts(List<SpecialProducts> entity);
+        Task<SpecialProducts> GetSpecialId(int id, bool trackChanges);
     }
 }

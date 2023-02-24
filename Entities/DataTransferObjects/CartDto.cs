@@ -50,6 +50,7 @@ namespace Entities.DataTransferObjects
     }
     public class CartAttributeProductDto
     {
+        public int Id { get; set; }
         public int AttributesProductId { get; set; }
     }
 }

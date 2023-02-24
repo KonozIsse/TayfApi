@@ -78,18 +78,6 @@ namespace BusinessLogic
                 return "-1";
             }
         }
-        public  bool DeleteImage(string link)
-        {
-            try
-            {
-                System.IO.File.Delete(link);
-                return true;
-            }
-            catch (Exception)
-            {
-               return false;
-            }
-        }
 
     }
 }

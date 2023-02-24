@@ -159,7 +159,7 @@ namespace BusinessLogic
             });
             CreateMap<CreateImageDto, Image>().ReverseMap();
             //ImageProduct
-            CreateMap<ImageProductDto, ProductImage>().ReverseMap();
+            CreateMap<CreateImageProductDto, ProductImage>().ReverseMap();
             CreateMap<ProductImagesDto, ProductImage>().ReverseMap();
             //MapImageSetting
             CreateMap<ImageSetting, ImageSettingDto>().AfterMap((s, d) => {

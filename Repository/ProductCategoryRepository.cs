@@ -21,6 +21,13 @@ namespace Repository
 
         public void DeleteProductCategory(ProductCategory category)=>Delete(category);
 
+        public async Task DeleteRowRange(List<int> Ids)
+        {
+            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
+            DeleteRange(result);
+        }
+        public void CreatProductCategoryRange(List<ProductCategory> productCategory) => CreateRange(productCategory);
+
         public async Task<IEnumerable<ProductCategory>> GetAllCategoriesProductId(int productId, bool trackChanges, bool isIncluded = false)
         {
              var cats = FindByCondition(c => c.ProductId == productId, trackChanges);
@@ -32,8 +39,9 @@ namespace Repository
         }
         public async Task<IEnumerable<ProductCategory>> GetAllProductsCategory(int catId, bool trackChanges)
          => await FindByCondition(c => c.CategoryId == catId, trackChanges).ToListAsync();
-        
         public async Task<ProductCategory> GetCategoryToPrductId(int productId)
        => await FindByCondition(c => c.ProductId == productId, false).Include(c=>c.Category).SingleOrDefaultAsync();
+        public async Task<ProductCategory> GetItemId(int id , bool trackChanges)
+         => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
     }
 }

@@ -15,6 +15,7 @@ namespace Entities.DataTransferObjects
     } 
     public class CreateProductCategoryDto
     {
+        public int Id { get; set; }
         public int CategoryId { get; set; }
     }
 }

@@ -18,6 +18,9 @@ namespace Repository
         }
         public async Task<ProductSales> CheckFlashExists(int productId , bool trackChanges)
         => await FindByCondition(r => r.ProductId == productId , trackChanges).FirstOrDefaultAsync();
+        public async Task<ProductSales> GetItemId(int id, bool trackChanges)
+       => await FindByCondition(r => r.Id == id, trackChanges).FirstOrDefaultAsync();
+
         public async Task<ProductSales> GetFlashProductId(int productId)
         => await FindByCondition(r => r.ProductId == productId && r.EndDate > DateTime.UtcNow && r.IsStatus == Status.Active,false).FirstOrDefaultAsync();
         public async Task<IEnumerable<ProductSales>> GetAllSalesProductId(int productId, bool trackChanges)

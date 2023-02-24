@@ -11,5 +11,8 @@ namespace Contracts
     {
         Task<List<ProductsCoupon>> GetAllProductsCouponId(int couponId, bool trackChanges);
         void DeleteProductsCoupon(ProductsCoupon productsCoupon);
+        Task DeleteRowRange(List<int> Ids);
+        void CreatProductsCouponRange(List<ProductsCoupon> Products);
+        Task<ProductsCoupon> GetItemId(int id, bool trackChanges);
     }
 }

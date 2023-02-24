@@ -17,9 +17,19 @@ namespace Repository
 
         }
 
+        public void CreatProductsCouponRange(List<ProductsCoupon> Products) => CreateRange(Products);
+
         public void DeleteProductsCoupon(ProductsCoupon productsCoupon)=> Delete(productsCoupon);
+
+        public async Task DeleteRowRange(List<int> Ids)
+        {
+            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
+            DeleteRange(result);
+        }
 
         public async Task<List<ProductsCoupon>> GetAllProductsCouponId(int couponId, bool trackChanges)
         => await FindByCondition(c => c.CouponId == couponId, trackChanges).ToListAsync();
+        public async Task<ProductsCoupon> GetItemId(int id, bool trackChanges)
+      => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
     }
 }

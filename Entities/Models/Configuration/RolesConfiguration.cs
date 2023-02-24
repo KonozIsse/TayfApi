@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Entities.Models.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -18,19 +19,22 @@ namespace Entities.Models.Configuration
             {
                 Id = 1,
                 Name = "Admin",
-                NormalizedName = "ADMIN"
+                NormalizedName = "ADMIN",
+                IsStatus = Status.Active
             },
              new Role
              {
                  Id = 2,
                  Name = "Customer",
-                 NormalizedName = "CUSTOMER"
+                 NormalizedName = "CUSTOMER",
+                 IsStatus = Status.Active
              },
             new Role
             {
                 Id = 3,
                  Name = "Store",
-                NormalizedName = "STORE"
+                NormalizedName = "STORE",
+                IsStatus = Status.Active
             }
             );
         }

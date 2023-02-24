@@ -24,13 +24,13 @@ namespace Entities.Models
         public int TypeId { get; set; }
         public ProductType ProductType { get; set; }
         public List<ProductCategory> ProductCategories { get; set; }
+        public List<ProductSales> ProductSales { get; set; }
+        public List<SpecialProducts> SpecialProducts { get; set; }
         public List<WishList> WishLists { get; set; }
         public List<Review> Reviews { get; set; }
-        public List<SpecialProducts> SpecialProducts { get; set; } 
-        public List<ProductSales> ProductSales { get; set; }
         public List<ProductAttribut> AttributesProducts { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }
-        public List<ProductImage> Images { get; set; }
+        public List<ProductImage> Images  { get; set; }
         public List<Cart> Carts { get; set; }
         public List<ProductsCoupon> ProductsCoupons { get; set; }
     }

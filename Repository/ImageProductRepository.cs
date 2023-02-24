@@ -26,9 +26,21 @@ namespace Repository
             }
             return  await cats.ToListAsync();
         }
+        public async Task<IEnumerable<ProductImage>> GetAllProductsImageId(int imageId, bool trackChanges)
+        {
+            var cats = FindByCondition(c => c.ImageId == imageId, trackChanges);
+            return await cats.ToListAsync();
+        }
         public async Task<ProductImage> GetImageProductId( int id, bool trackChanges)
             => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public void CreateImageProduct(ProductImage image) => Create(image);
         public void DeleteImageProduct(ProductImage image) => Delete(image);
+
+        public async Task DeleteRowRange(List<int> Ids)
+        {
+            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
+            DeleteRange(result);
+        }
+        public void CreatProductCategoryRange(List<ProductImage> productCategory) => CreateRange(productCategory);
     }
 }

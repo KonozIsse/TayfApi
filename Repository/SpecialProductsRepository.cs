@@ -37,5 +37,7 @@ namespace Repository
             var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
             DeleteRange(result);
         }
+        public async Task<SpecialProducts> GetSpecialId(int id, bool trackChanges)
+      => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
     }
 }
