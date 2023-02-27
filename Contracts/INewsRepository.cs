@@ -10,6 +10,7 @@ namespace Contracts
     public interface INewsRepository
     {
         Task<List<News>> SearchNews(string search);
+        Task<List<News>> GetBlogsImage(int imageId);
         Task<List<News>> GetWithComments();
         Task<News> GetBlogById(int id, bool trackChanges, bool Included = false);
         void CreateBlog(News blog);

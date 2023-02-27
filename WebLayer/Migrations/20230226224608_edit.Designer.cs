@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace WebLayer.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230226224608_edit")]
+    partial class edit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -978,6 +980,9 @@ namespace WebLayer.Migrations
                     b.Property<int?>("IsViewed")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NewsCategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -999,9 +1004,55 @@ namespace WebLayer.Migrations
 
                     b.HasIndex("ImgId");
 
+                    b.HasIndex("NewsCategoryId");
+
                     b.HasIndex("VendorId");
 
                     b.ToTable("News");
+                });
+
+            modelBuilder.Entity("Entities.Models.NewsCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ImgId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IsStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MainCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImgId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("NewsCategories");
                 });
 
             modelBuilder.Entity("Entities.Models.Notification", b =>
@@ -1929,8 +1980,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "83ea514f-ebfe-4098-8a73-b397eb4eeb06",
-                            CreatedAt = new DateTime(2023, 2, 26, 13, 50, 14, 299, DateTimeKind.Local).AddTicks(986),
+                            ConcurrencyStamp = "a7f807cf-a365-404a-8e30-682d54748780",
+                            CreatedAt = new DateTime(2023, 2, 26, 12, 46, 5, 970, DateTimeKind.Local).AddTicks(1811),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Admin",
@@ -1939,8 +1990,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "1165758d-b84f-49a0-bea9-5bb6bc5a4a24",
-                            CreatedAt = new DateTime(2023, 2, 26, 13, 50, 14, 299, DateTimeKind.Local).AddTicks(1048),
+                            ConcurrencyStamp = "60d3c85a-4d7d-4d9c-8411-7eb6b2e9b6a7",
+                            CreatedAt = new DateTime(2023, 2, 26, 12, 46, 5, 970, DateTimeKind.Local).AddTicks(1872),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Customer",
@@ -1949,8 +2000,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "90129346-ee35-4656-a50b-85eb98b37101",
-                            CreatedAt = new DateTime(2023, 2, 26, 13, 50, 14, 299, DateTimeKind.Local).AddTicks(1054),
+                            ConcurrencyStamp = "f841b66d-9f06-442d-856c-4700294f0415",
+                            CreatedAt = new DateTime(2023, 2, 26, 12, 46, 5, 970, DateTimeKind.Local).AddTicks(1877),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Store",
@@ -2921,6 +2972,27 @@ namespace WebLayer.Migrations
                         .WithMany()
                         .HasForeignKey("ImgId");
 
+                    b.HasOne("Entities.Models.NewsCategory", "NewsCategory")
+                        .WithMany("News")
+                        .HasForeignKey("NewsCategoryId");
+
+                    b.HasOne("Entities.Models.User", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
+
+                    b.Navigation("Image");
+
+                    b.Navigation("NewsCategory");
+
+                    b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("Entities.Models.NewsCategory", b =>
+                {
+                    b.HasOne("Entities.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImgId");
+
                     b.HasOne("Entities.Models.User", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
@@ -3453,6 +3525,11 @@ namespace WebLayer.Migrations
             modelBuilder.Entity("Entities.Models.News", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Entities.Models.NewsCategory", b =>
+                {
+                    b.Navigation("News");
                 });
 
             modelBuilder.Entity("Entities.Models.Order", b =>

@@ -35,5 +35,7 @@ namespace Repository
             return await langs.ToListAsync();
         }
         public void DeleteLanguage(Language language) => Delete(language);
+        public async Task<IEnumerable<Language>> GetListLanguageImage(int imageId,bool trackChanges)
+      => await FindByCondition(c=>c.ImgId == imageId,trackChanges).ToListAsync();
     }
 }

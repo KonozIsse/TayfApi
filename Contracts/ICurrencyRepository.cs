@@ -9,7 +9,6 @@ namespace Contracts
 {
     public interface ICurrencyRepository
     {
-        Task<List<Currency>> GetActiveCurrencies(bool trackChanges);
         Task<Currency> GetDefaultCurrency(bool trackChanges);
         Task<List<Currency>> GetAllCurrencies(bool trackChanges);
         Task<Currency> GetCurrency(int id, bool trackChanges);

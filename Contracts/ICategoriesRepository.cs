@@ -20,5 +20,6 @@ namespace Contracts
         Task<IEnumerable<Category>> SearchMainCategoriesCP(string search);
         void CreateMainCategory(Category category);
         void DeleteCategory(Category category);
+        Task<IEnumerable<Category>> GetAllCategoriesImageId(int imagId, bool trackChanges);
     }
 }

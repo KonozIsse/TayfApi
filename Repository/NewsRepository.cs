@@ -17,6 +17,8 @@ namespace Repository
         {
 
         }
+        public async Task<List<News>> GetBlogsImage (int imageId)
+        => await FindByCondition(c => c.ImgId == imageId, false).ToListAsync();
         public async Task<List<News>> SearchNews(string search)
         {
             var qury = FindAll(false);

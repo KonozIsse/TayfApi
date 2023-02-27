@@ -20,6 +20,8 @@ namespace Repository
         }
         public async Task<Banner> GetBannerByType( int langId ,string type ,bool trackChanges)
          => await FindByCondition(c => c.LangId == langId &&  c.Type == type, trackChanges).Include(c=>c.Language).FirstOrDefaultAsync();
+        public async Task<Banner> GetBannerImage(int imageId, bool trackChanges)
+        => await FindByCondition(c => c.ImgId == imageId , trackChanges).FirstOrDefaultAsync();
         public async Task<List<Banner>> GetAllBanner(string search, bool trackChanges)
         {
             var banners =  FindAll(trackChanges);
@@ -81,6 +83,8 @@ namespace Repository
         }
        public void DeleteService(Service service) => Delete(service);
 
+        public async Task<Service> GetServiceImageId(int imageId, bool trackChanges)
+        => await FindByCondition(c => c.ImgId == imageId, trackChanges).FirstOrDefaultAsync();
     } 
     public class SliderRepository : RepositoryBase<Sliders>, ISliderRepository
     {
@@ -108,6 +112,9 @@ namespace Repository
         => await FindByCondition(c => c.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
         public void DeleteSlider(Sliders sliders) => Delete(sliders);
         public void AddSlider(Sliders sliders) => Create(sliders);
+
+        public async Task<Sliders> GetSlideImageId(int imageId, bool trackChanges)
+       => await FindByCondition(c => c.ImgId.Equals(imageId), trackChanges).SingleOrDefaultAsync();
     }
    
 }

@@ -3,11 +3,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using BusinessLogic.ApiClasses;
 using Contracts;
 using Entities.Models.Enums;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
@@ -25,18 +27,18 @@ namespace BusinessLogic
             Configuration = configuration;
         }
 
-        public string Upload(IFormFile obj)
+        public string Upload(IFormFile obj , string path)
         {
             if (obj?.Length > 0)
             {
                 try
                 {
                     var fileName = Guid.NewGuid() + Path.GetExtension(obj.FileName);
-                    if (!Directory.Exists(_webHostEnvironment.WebRootPath + "\\img\\"))
+                    if (!Directory.Exists(_webHostEnvironment.WebRootPath + path))
                     {
-                        Directory.CreateDirectory(_webHostEnvironment.WebRootPath + "\\img\\");
+                        Directory.CreateDirectory(_webHostEnvironment.WebRootPath + path);
                     }
-                    using (var stream = System.IO.File.Create(_webHostEnvironment.WebRootPath + "\\img\\" + fileName))
+                    using (var stream = System.IO.File.Create(_webHostEnvironment.WebRootPath + path + fileName))
                     {
                         obj.CopyTo(stream);
                         stream.Flush();
@@ -50,10 +52,10 @@ namespace BusinessLogic
             }
             else
             {
-                return null;
+                return "-1";
             }
         }
-        public string UploadBase64(string base64Image, string fileName)
+        public string UploadBase64(string base64Image, string path, string fileName)
         {
             try
             {
@@ -70,7 +72,7 @@ namespace BusinessLogic
 
                 fileName = Guid.NewGuid() + Path.GetExtension(fileName);
 
-                System.IO.File.WriteAllBytes(_webHostEnvironment.WebRootPath + "\\img\\" + fileName, binData);
+                System.IO.File.WriteAllBytes(_webHostEnvironment.WebRootPath + path + fileName, binData);
                 return fileName;
             }
             catch
@@ -78,6 +80,20 @@ namespace BusinessLogic
                 return "-1";
             }
         }
-
+        public bool DeleteImage(string link)
+        {
+            var file = _webHostEnvironment.WebRootPath + link;
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+                return true;
+            }
+            else 
+            { 
+                return false;
+            }
+        }
     }
+  
+   
 }

@@ -17,8 +17,6 @@ namespace Repository
         {
 
         }
-        public async Task<List<Currency>> GetActiveCurrencies(bool trackChanges)
-        => await FindByCondition(c => c.IsStatus == Status.Active, trackChanges).ToListAsync();
         public async Task<Currency> GetDefaultCurrency(bool trackChanges)
         => await FindByCondition(c => c.IsDefault == 1 && c.IsStatus == Status.Active, trackChanges).SingleOrDefaultAsync();
         public async Task<List<Currency>> GetAllCurrencies(bool trackChanges)

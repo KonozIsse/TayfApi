@@ -15,9 +15,6 @@ namespace Entities.Models
         public string Url { get; set; }
         public short IsFeature { get; set; }
         public int? IsViewed { get; set; }
-        [ForeignKey(nameof(NewsCategory))]
-        public int? NewsCategoryId { get; set; }
-        public NewsCategory NewsCategory { get; set; }
 
         [ForeignKey(nameof(Image))]
         public int? ImgId { get; set; }

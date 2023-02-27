@@ -137,7 +137,7 @@ namespace ControlPanel.Controllers
         [HttpDelete("deleteImageProduct")]
         public async Task<IActionResult> DeleteImageProduct(int id )
         {
-            var result = await _imageBL.DeleteImage(id);
+            var result = await _imageBL.DeleteImageProduct(id);
             if (!result.Success)
             {
                 return BadRequest(result.Message);

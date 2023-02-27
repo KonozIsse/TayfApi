@@ -45,7 +45,6 @@ namespace Entities
         public DbSet<MessageTemplate> MessageTemplate { get; set; }
         public DbSet<MailList> MailLists { get; set; }
         public DbSet<News> News { get; set; }
-        public DbSet<NewsCategory> NewsCategories { get; set; }
         public DbSet<Notification> Notification { get; set; }
         public DbSet<NotificationAction> NotificationAction { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -121,11 +120,15 @@ namespace Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             base.OnModelCreating(modelBuilder);
+
             ConfigureConfiguration(modelBuilder);
             ConfigureSoftDelete(modelBuilder);
             ConfigureSoftDeleteUser(modelBuilder);
             ConfigureAutoMapToTables(modelBuilder);
+
+
             ConfigureDeleteBehavior(modelBuilder);
 
         

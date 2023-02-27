@@ -15,5 +15,6 @@ namespace Contracts
         Task<IEnumerable<Language>> GetListLanguage(bool trackChanges);
         Task<IEnumerable<Language>> GetAllLanguage(string search);
         void DeleteLanguage(Language language);
+        Task<IEnumerable<Language>> GetListLanguageImage(int imageId, bool trackChanges);
     }
 }

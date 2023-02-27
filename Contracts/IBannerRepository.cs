@@ -14,6 +14,7 @@ namespace Contracts
         Task<List<Banner>> GetAllBanner(string search, bool trackChanges);
         Task<Banner> GetBannerById(int id, bool trackChanges);
         Task<Banner> GetBannerId(int id, bool trackChanges);
+        Task<Banner> GetBannerImage(int imageId, bool trackChanges);
     }
     public interface IStaticPagesRepository
     {
@@ -25,6 +26,7 @@ namespace Contracts
     {
         Task<List<Service>> GetAllServices(string search, bool trackChanges);
         Task<Service> GetServiceById(int id, bool trackChanges, bool includeDetails = true);
+        Task<Service> GetServiceImageId(int imageId, bool trackChanges);
         void DeleteService(Service service);
     }
     public interface ISliderRepository
@@ -33,6 +35,7 @@ namespace Contracts
         Task<List<Sliders>> GetSlidersForWeb(string search);
         Task<List<Sliders>> GetSlidersForMobile();
         Task<Sliders> GetSlideById(int id, bool trackChanges);
+        Task<Sliders> GetSlideImageId(int imageId, bool trackChanges);
         void AddSlider(Sliders sliders);
         void DeleteSlider(Sliders sliders);
     }

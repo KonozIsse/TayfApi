@@ -121,7 +121,7 @@ namespace BusinessLogic
             CreateMap<User, CustomerDto>().AfterMap((s, d) => {
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Avater = baseUrl + "/media_files/ " + s.Avater;
+                d.Avater = baseUrl + "/media_files/" + s.Avater;
             });
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             //AdminMap

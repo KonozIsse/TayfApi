@@ -48,8 +48,9 @@ namespace Repository
         }
         public void CreateMainCategory(Category category) => Create(category);
         public void DeleteCategory(Category category) => Delete(category);
-       
-      
+
+        public async Task<IEnumerable<Category>> GetAllCategoriesImageId(int imagId ,bool trackChanges)
+         => await FindByCondition(c => c.ImgId == imagId, trackChanges).ToListAsync();
 
     }
 }
