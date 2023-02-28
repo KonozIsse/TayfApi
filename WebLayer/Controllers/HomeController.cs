@@ -84,7 +84,7 @@ namespace WebLayer.Controllers
         [HttpGet("getActiveReviewsProduct/{productId}")]
         public async Task<IActionResult> GetActiveReviewsProduct(int productId)
         {
-            var result = await _productBL.GetActiveReviews(productId);
+            var result = await _productBL.GetActiveReviews(productId, GetLanguage());
             return Ok(result);
         }
         [HttpGet("getAllMainCategories")]

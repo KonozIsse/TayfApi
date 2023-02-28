@@ -6,6 +6,7 @@ namespace Entities.Models.Enums
         ACTUAL = 1,
         THUMBNAIL ,
         MEDIUM,
-        LARGE
+        LARGE,
+
     }
 }

@@ -102,7 +102,11 @@ namespace BusinessLogic
             CreateMap<CreateAddressDto, Address>().ReverseMap();
             CreateMap<UpdateAddressDto, Address>().ReverseMap();
             //MapReview
-            CreateMap<ReviewDto, Review>().ReverseMap();
+            CreateMap<Review, ReviewDto>().AfterMap((s, d) => {
+                var request = _httpContextAccessor.HttpContext.Request;
+                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                d.CustomerImage = baseUrl + "/media_files/avatars/" + s.Customer.Avater;
+            });
             CreateMap<CreateReviewDto, Review>().ReverseMap(); 
            //MapOrder
             CreateMap<CreateOrderDto, Order>().ReverseMap();
@@ -121,7 +125,7 @@ namespace BusinessLogic
             CreateMap<User, CustomerDto>().AfterMap((s, d) => {
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Avater = baseUrl + "/media_files/" + s.Avater;
+                d.Avater = baseUrl + "/media_files/avatars" + s.Avater;
             });
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             //AdminMap
@@ -155,7 +159,7 @@ namespace BusinessLogic
             CreateMap<Image, ImageDto>().AfterMap((s, d) => {
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Name = baseUrl + "/media_files/" + s.Name;
+                d.Name = baseUrl + "/media_files/original" + s.Name;
             });
             CreateMap<CreateImageDto, Image>().ReverseMap();
             //ImageProduct

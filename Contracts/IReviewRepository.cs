@@ -12,13 +12,9 @@ namespace Contracts
     {
         Task<Review> GetReviewId(int id, bool trackChanges);
         Task<List<Review>> GetReviews();
-        Task<IEnumerable<Review>> Last3Reviews(int productId);
-        Task<IEnumerable<Review>> GetReviewsProductId(int productId);
+        Task<List<Review>> GetAllReviewsProduct(int productId);
         Task<Review> GetReviewProductIdToCustomerId(int productId, int customerId, bool trackChanges);
-        Task<Review> GetActiveReviewProductCustomer(int productId, int customerId, bool trackChanges);
         Task<IEnumerable<Review>> GetReviewsActiveProductId(int productId);
-        int GetReviewsCount(int productId);
-        bool IsReview(int productId, int customerId);
         void DeleteReview(Review review);
         void AddReview(Review review);
     }

@@ -10,10 +10,10 @@ namespace Entities.DataTransferObjects
     {
         public string PricePrefix { get; set; }
         public decimal AttributePrice { get; set; }
-        public short IsDefault { get; set; }
-        public int ProductId { get; set; }
-        public int OptionId { get; set; }
-        public int ValueId { get; set; }
+        public string ProductName { get; set; }
+        public string Option { get; set; }
+        public string OptionType { get; set; }
+        public string Value { get; set; }
     }
     public class CreateAttributeDto
     {

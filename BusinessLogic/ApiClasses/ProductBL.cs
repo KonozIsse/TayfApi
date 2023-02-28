@@ -459,7 +459,7 @@ namespace BusinessLogic.ApiClasses
                         _repositoryManager.WishList.DeleteLike(like);
                     }
                 }
-                var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
+                var reviews = await _repositoryManager.Review.GetAllReviewsProduct(productId);
                 if (reviews != null)
                 {
                     foreach (var review in reviews)
@@ -497,48 +497,56 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<ProductDto>> GetAllActiveAcceptProducts(int? customerId, string lang)
         {
             var products = await _repositoryManager.Product.GetAllAcceptedProducts();
-            var productsDto = products.Select(product =>
+            if(products != null)
             {
-                var productDto = _mapper.Map<ProductDto>(product);
-                var cats = _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false, true).Result;
-                var catsDto = cats.Select(c => new ProductCategoryDto
+                var productsDto = products.Select(product =>
                 {
-                    MainCategoryId = c.Category.MainCategoryId,
-                    CategoryId = c.CategoryId,
-                    CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
-                    CategoryImage = _imageBL.GetImageThumbnail(c.Category.ImgId),
-                }).ToList();
-                productDto.ProductCategories = catsDto;
+                    var productDto = _mapper.Map<ProductDto>(product);
+                    var cats = _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false, true).Result;
+                    var catsDto = cats.Select(c => new ProductCategoryDto
+                    {
+                        MainCategoryId = c.Category.MainCategoryId,
+                        CategoryId = c.CategoryId,
+                        CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
+                        CategoryImage = _imageBL.GetImageThumbnail(c.Category.ImgId),
+                    }).ToList();
+                    productDto.ProductCategories = catsDto;
 
-                var flash = _repositoryManager.Sales.GetFlashProductId(product.Id).Result;
-                if(flash != null)
-                {
-                    productDto.Price =  flash.DiscountPrice;
-                    productDto.IsSale =  true;
-                }
-                var special = _repositoryManager.SpecialProducts.GetSpecialProductId(product.Id).Result;
-                if(special != null)
-                {
-                    productDto.Price =  special.SpecialPrice;
-                    productDto.IsSpecial =  true;
-                }
-                productDto.ImageProduct = _imageBL.GetImageThumbnail(product.Images.First().ImageId);
-                productDto.ProductName = lang == "en" ? product.ProductName : product.ProductNameAr;
-                productDto.Description = lang == "en" ? product.Description : product.DescriptionAr;
-                productDto.Availability = AvailabilityProducts(product.Id);
-                productDto.AttributesProducts = GetAttributsProducts(product.Id).Result;
-                productDto.Images = _imageBL.GetAllImagesToProduct(product.Id).Result;
-                productDto.ShareLink = "http://demotay.com/admin" + "/share.html?id=" + product.Id;
-                productDto.IsFavorite = IsFavourite(Convert.ToInt32(customerId), product.Id).Result;
-                productDto.NumLike = GetFavourite(Convert.ToInt32(customerId), product.Id).Result;
-                productDto.Reviews = GetActiveReviews(product.Id).Result;
-                productDto.Rate = Rate(product.Id).Result;
-                productDto.StoreName = product.Store != null ? product.Store.FullName : null;
-                productDto.StoreImage = product.Store == null ? null : _imageBL.GetImageOriginal(Convert.ToInt32(product.Store.ImageId));
-              
-                return productDto;
-            }).ToList();
-            return productsDto;
+                    var flash = _repositoryManager.Sales.GetFlashProductId(product.Id).Result;
+                    if (flash != null)
+                    {
+                        productDto.Price = flash.DiscountPrice;
+                        productDto.IsSale = true;
+                    }
+                    var special = _repositoryManager.SpecialProducts.GetSpecialProductId(product.Id).Result;
+                    if (special != null)
+                    {
+                        productDto.Price = special.SpecialPrice;
+                        productDto.IsSpecial = true;
+                    }
+                    productDto.ImageProduct = _imageBL.GetImageThumbnail(product.Images.First().ImageId);
+                    productDto.ProductName = lang == "en" ? product.ProductName : product.ProductNameAr;
+                    productDto.Description = lang == "en" ? product.Description : product.DescriptionAr;
+                    productDto.Availability = AvailabilityProducts(product.Id);
+                    productDto.AttributesProducts = GetAttributsProducts(product.Id).Result;
+                    productDto.Images = _imageBL.GetAllImagesToProduct(product.Id).Result;
+                    productDto.ShareLink = "http://demotay.com/admin" + "/share.html?id=" + product.Id;
+                    productDto.IsFavorite = IsFavourite(Convert.ToInt32(customerId), product.Id).Result;
+                    productDto.NumLike = GetFavourite(Convert.ToInt32(customerId), product.Id).Result;
+                    productDto.Reviews = GetActiveReviews(product.Id).Result;
+                    productDto.CountReviews = product.Reviews.Count();
+                    productDto.Rate = Rate(product.Id).Result;
+                    productDto.StoreName = product.Store != null ? product.Store.FullName : null;
+                    productDto.StoreImage = product.Store != null ? _imageBL.GetImageOriginal(Convert.ToInt32(product.Store.ImageId)) : null;
+                    productDto.AttributesProducts = GetAttributsProducts(product.Id).Result;
+                    return productDto;
+                }).ToList();
+                return productsDto;
+            }
+            else
+            {
+                return new List<ProductDto>();
+            }
         }
         public async Task<PagedList<ProductDto>> GetProductsCP(int userId , string search , string lang, PostsParameters postsParameters)
         {
@@ -948,7 +956,7 @@ namespace BusinessLogic.ApiClasses
         }
         
         //ProductType------------------------------------------------
-        public async Task<List<string>> GetProductTypeEnum(string lang)
+        public List<string> GetProductTypeEnum(string lang)
         {
             var names = Enum.GetNames(typeof(ProductsType)).ToList();
             foreach (string type in names)
@@ -994,7 +1002,15 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<AttributeDto>> GetAttributsProducts(int productId)
         {
             var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
-            var attributsDto = _mapper.Map<List<AttributeDto>>(attributs);
+            var attributsDto = attributs.Select(attribut =>
+            {
+               var attributDto = _mapper.Map<AttributeDto>(attribut);
+                attributDto.ProductName = attribut.Product.ProductName;
+                attributDto.Option = attribut.ProductOption.OptionName;
+                attributDto.OptionType = attribut.ProductOption.OptionType;
+                attributDto.Value = attribut.ProductOptionValue.OptionValueName;
+                return attributDto;
+            }).ToList();
             return attributsDto;
         }
         public async Task<BussnessResultModel> AddAttribute (int productId ,CreateAttributeDto createDto)
@@ -1349,71 +1365,33 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(review, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task<bool> IsReview(int productId, int customerId)
-        {
-            var IsReview = false;
-            if (customerId == 0)
-            {
-                return false;
-            }
-            var review = await _repositoryManager.Review.GetActiveReviewProductCustomer(productId , customerId , true);
-            if (review != null)
-            {
-                IsReview = true;
-            }
-            return IsReview;
-        }
-        public async Task<List<ReviewDto>> GetLast3Reviews(int productId)
-        {
-            var reviews = await _repositoryManager.Review.Last3Reviews(productId);
-            var reviewsDto = reviews.Select(review=>new ReviewDto
-            {
-                Id = review.Id,
-                Rating = review.Rating,
-                Text = review.Text,
-                CustomerId = review.CustomerId,
-                CustomerName = review.Customer.FullName,
-                CustomerImage = review.Customer.Avater ?? null,
-                ProductId = productId
-            }).ToList();
-            return reviewsDto;
-        }
-        public async Task<List<ReviewDto>> GetActiveReviews(int productId)
+        public async Task<List<ReviewDto>> GetActiveReviews(int productId , string lang)
         {
             var reviews = await _repositoryManager.Review.GetReviewsActiveProductId(productId);
-            var reviewsDto = reviews.Select(review => new ReviewDto
+            var reviewsDto = reviews.Select(review => 
             {
-                Id = review.Id,
-                Rating = review.Rating,
-                Text = review.Text,
-                CustomerId = review.CustomerId,
-                CustomerName = review.Customer.FullName,
-                CustomerImage = review.Customer.Avater ?? null,
-                ProductName = review.Product.ProductName,
-                ProductId = productId
+                var reviewDto = _mapper.Map<ReviewDto>(review);
+                reviewDto.CustomerName = review.Customer.FullName;
+                reviewDto.ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr
+                return reviewDto;
             }).ToList();
             return reviewsDto;
         } 
         public async Task<PagedList<ReviewDto>> GetAllReviews(string lang , PostsParameters postsParameters)
         {
             var reviews = await _repositoryManager.Review.GetReviews();
-            var reviewsDto = new List<ReviewDto>();
-            foreach(var review in reviews)
+            var reviewsDto = reviews.Select(review => 
             {
-                reviewsDto.Add(new ReviewDto
-                {
-                    Id = review.Id,
-                    ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr,
-                    Text = review.Text,
-                    IsStatus = review.IsStatus,
-                    CreatedAt = review.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
-                });
-            }
+                var reviewDto = _mapper.Map<ReviewDto>(review);
+                reviewDto.ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr;
+                reviewDto.CreatedAt = review.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                return reviewDto;
+            });
             return PagedList<ReviewDto>.ToPagedList(reviewsDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
         public async Task<decimal> Rate(int productId)
         {
-            var reviews = await _repositoryManager.Review.GetReviewsProductId(productId);
+            var reviews = await _repositoryManager.Review.GetReviewsActiveProductId(productId);
             decimal rate = (reviews.Count() > 0 ? Convert.ToDecimal(reviews.Sum(r => r.Rating) / reviews.Count()) : 0);
             return rate;
         }
@@ -1599,36 +1577,6 @@ namespace BusinessLogic.ApiClasses
                 _repositoryManager.Inventory.DeleteInventory(t);
             }
             await _repositoryManager.SaveAsync();
-        }
-        public int AvailabilityProductOption(int productId , int attributeId)
-        {
-            var total = 0;
-            var instock = 0;
-            var outstock = 0;
-
-            var inventories = _repositoryManager.Inventory.GetAllInventoryByProductIdOption(productId, attributeId).Result;
-            if (inventories != null)
-            {
-                foreach (var inventory in inventories)
-                {
-                    if (inventory.StockType == "in")
-                    {
-                        instock += inventory.Stock;
-                    }
-                    if (inventory.StockType == "out")
-                    {
-                        outstock += inventory.Stock;
-                    }
-                }
-            }
-            if ((instock - outstock) > 0)
-            {
-                return total = instock - outstock;
-            }
-            else
-            {
-                return total;
-            }
         }
         public int AvailabilityProducts(int productId)
         {
