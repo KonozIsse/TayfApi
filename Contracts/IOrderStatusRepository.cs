@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Contracts
     {
         Task<OrderStatus> GetOrderStatusById(int id, bool trackChanges);
         Task<List<OrderStatus>> GetOrderStatusesList(bool trackChanges);
-
+        Task<OrderStatus> GetOrderStatusEnum(OrderStatusEnum orderStatus, bool trackChanges);
     } 
   
 }

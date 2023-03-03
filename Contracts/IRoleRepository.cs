@@ -11,6 +11,6 @@ namespace Contracts
     {
         Task<List<Role>> GetRolesAdminStore();
         Task<Role> GetRoleId(int id, bool trackChanges);
-        bool IsExistRole(string name);
+        Task<Role> IsExistRole(string name, bool trackChanges);
     }
 }

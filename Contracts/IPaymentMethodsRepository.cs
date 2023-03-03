@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,6 @@ namespace Contracts
     public interface IPaymentMethodsRepository
     {
         Task<List<PaymentMethods>> GetPaymentMethods(string search);
-        Task<List<PaymentMethods>> GetPaymentsByVendor(int vendorId);
+        Task<PaymentMethods> GetPaymentsStatus(PaymentStatus key);
     }
 }

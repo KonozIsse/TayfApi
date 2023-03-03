@@ -5,6 +5,8 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
+using System.Collections.Generic;
+
 namespace BusinessLogic.ApiClasses
 {
     public class NewsBL
@@ -24,15 +26,15 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<NewsDto>> GetNews(string lang)
         {
             var news = await _repositoryManager.News.GetWithComments();
-            var list = news.Select(x => new NewsDto
+            var list = news.Select(x =>
             {
-                Id = x.Id,
-                Url = x.Url,
-                CountComment = x.Comments.Count(),
-                Title = lang == "en" ? x.Title : x.TitleAr,
-                Decription = lang == "en" ? x.Decription : x.DecriptionAr,
-                CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
-                Image = _imageBL.GetImageOriginal(x.ImgId.Value)
+                var blogDto = _mapper.Map<NewsDto>(x);
+                blogDto.CountComment = x.Comments.Count();
+                blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
+                blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
+                blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");
+                blogDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(x.ImgId));
+                return blogDto;
             }).ToList(); 
             return list;
         }
@@ -110,14 +112,23 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
-        public async Task<PagedList<NewsDto>> GetAllBlogs (int vendorId, string search, PostsParameters postsParameters)
+        public async Task<PagedList<NewsDto>> GetAllBlogs (int vendorId, string lang, string search, PostsParameters postsParameters)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(search);
             if (vendorId != null) 
             { 
                 searchBlog =  searchBlog.Where(c => c.VendorId == vendorId).ToList(); 
             }
-            var newsDto = _mapper.Map<List<NewsDto>>(searchBlog);
+            var newsDto = searchBlog.Select(x =>
+            {
+                var blogDto = _mapper.Map<NewsDto>(x);
+                blogDto.CountComment = x.Comments.Count();
+                blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
+                blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
+                blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");
+                blogDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(x.ImgId));
+                return blogDto;
+            }).ToList();
             return PagedList<NewsDto>.ToPagedList(newsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         //CommentNews------------------------------------------------

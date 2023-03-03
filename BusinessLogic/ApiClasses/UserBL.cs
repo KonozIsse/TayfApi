@@ -80,8 +80,8 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> AddRole(CreateRoleDto create)
         {
-            var IsExists = _repositoryManager.Role.IsExistRole(create.Name);
-            if (IsExists)
+            var IsExists = await _repositoryManager.Role.IsExistRole(create.Name,false);
+            if (IsExists != null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"), false);
             }
@@ -214,7 +214,8 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(store, _locService.GetLocalizedStringValue("EnterValidEmailAddress"), false);
             }
             store.LastName = "Store";
-            store.RoleId = 3;
+            var role = await _repositoryManager.Role.IsExistRole("Store",false);
+            store.RoleId = role.Id;
             store.PhoneNumber = create.PhoneNumber;
             store.UserName = create.Email;
             store.VerifiedCode = 1234;
@@ -311,7 +312,9 @@ namespace BusinessLogic.ApiClasses
                 user.VerifiedCode = new Random().Next(1000, 9999);
                 var country = await _repositoryManager.Country.GetcountryById(Convert.ToInt32(userRegister.CountryId), false);
                 user.CodeMobileCountry = country == null ? null : country.MobileCode;
-                if (userRegister.RoleId == 3)
+                var role = await _repositoryManager.Role.GetRoleId(userRegister.RoleId, false);
+                user.RoleId = userRegister.RoleId;
+                if (role.Name == "Store")
                 {
                     user.UserType = UserType.Store;
                 }
@@ -333,8 +336,6 @@ namespace BusinessLogic.ApiClasses
                         address.Post_Code = zip;
                         _repositoryManager.Address.AddAddress(address);
                     }
-
-                    var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
                     await _userManager.AddClaimAsync(user, new Claim(/*ClaimTypes.Name*/role.Name, user.Email));
 
                     //var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false); //verify emasil
@@ -562,7 +563,8 @@ namespace BusinessLogic.ApiClasses
                     user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
                     user.UserType = UserType.Customer;
                     user.PhoneNumberConfirmed = false;
-                    user.RoleId = 2;
+                    var role = await _repositoryManager.Role.IsExistRole("Customer", false);
+                    user.RoleId = role.Id;
                     user.UserName = userRegister.Email;
                     user.VerifiedCode = new Random().Next(1000, 9999);
                     var country = await _repositoryManager.Country.GetcountryById(Convert.ToInt32(userRegister.CountryId), false);
@@ -576,7 +578,7 @@ namespace BusinessLogic.ApiClasses
                     var result = await _userManager.CreateAsync(user, userRegister.Password);
                     if (result.Succeeded)
                     {
-                        var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
+                        
                         await _userManager.AddClaimAsync(user, new Claim(role.Name, user.FirstName));
                        
                         var device = new Device

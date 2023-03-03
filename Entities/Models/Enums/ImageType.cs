@@ -7,6 +7,5 @@ namespace Entities.Models.Enums
         THUMBNAIL ,
         MEDIUM,
         LARGE,
-
     }
 }

@@ -533,7 +533,7 @@ namespace BusinessLogic.ApiClasses
                     productDto.ShareLink = "http://demotay.com/admin" + "/share.html?id=" + product.Id;
                     productDto.IsFavorite = IsFavourite(Convert.ToInt32(customerId), product.Id).Result;
                     productDto.NumLike = GetFavourite(Convert.ToInt32(customerId), product.Id).Result;
-                    productDto.Reviews = GetActiveReviews(product.Id).Result;
+                    productDto.Reviews = GetActiveReviews(product.Id,lang).Result;
                     productDto.CountReviews = product.Reviews.Count();
                     productDto.Rate = Rate(product.Id).Result;
                     productDto.StoreName = product.Store != null ? product.Store.FullName : null;
@@ -619,7 +619,7 @@ namespace BusinessLogic.ApiClasses
 
                 IsFavorite = await IsFavourite(customerId, product.Id) ,
                 NumLike = await GetFavourite(customerId, product.Id) ,
-                Reviews = await GetActiveReviews(product.Id)??null,
+                Reviews = await GetActiveReviews(product.Id,lang)??null,
                 Rate = await Rate(product.Id) == 0 ? 0 : await Rate(product.Id),
 
                 StoreId =  product.StoreId,
@@ -1372,7 +1372,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var reviewDto = _mapper.Map<ReviewDto>(review);
                 reviewDto.CustomerName = review.Customer.FullName;
-                reviewDto.ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr
+                reviewDto.ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr;
                 return reviewDto;
             }).ToList();
             return reviewsDto;

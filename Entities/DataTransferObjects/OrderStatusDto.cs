@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public string StatusName { get; set; } 
-        public string option { get; set; }
+        public string Option { get; set; }
     }
     public class UpdateOrderStatusDto
     {

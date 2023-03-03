@@ -26,7 +26,7 @@ namespace Repository
             }
             return await payments.ToListAsync();
         }
-        public async Task<List<PaymentMethods>> GetPaymentsByVendor(int vendorId)
-         => await FindByCondition(r => r.IsStatus == Status.Active && r.StoreId == vendorId, false).ToListAsync();
+        public async Task<PaymentMethods> GetPaymentsStatus(PaymentStatus key)
+         => await FindByCondition(r => r.IsStatus == Status.Active && r.PaymentStatus == key, false).FirstOrDefaultAsync();
     }
 }

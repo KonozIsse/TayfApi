@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace WebLayer.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230302204810_editOrderstatus")]
+    partial class editOrderstatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1376,6 +1378,9 @@ namespace WebLayer.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<short>("Environment")
+                        .HasColumnType("smallint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1384,9 +1389,6 @@ namespace WebLayer.Migrations
 
                     b.Property<string>("PaymentMethod")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentStatus")
-                        .HasColumnType("int");
 
                     b.Property<int>("StoreId")
                         .HasColumnType("int");
@@ -1923,8 +1925,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "bd25df95-4451-473c-afad-f34872e4ac0b",
-                            CreatedAt = new DateTime(2023, 3, 2, 12, 31, 7, 557, DateTimeKind.Local).AddTicks(2239),
+                            ConcurrencyStamp = "030ce7d1-e058-484b-a832-5c975d73efe5",
+                            CreatedAt = new DateTime(2023, 3, 2, 10, 48, 9, 623, DateTimeKind.Local).AddTicks(4576),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Admin",
@@ -1933,8 +1935,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "dc4d94a7-54e7-4eeb-8da6-f549ae2c22fb",
-                            CreatedAt = new DateTime(2023, 3, 2, 12, 31, 7, 557, DateTimeKind.Local).AddTicks(2296),
+                            ConcurrencyStamp = "84c090b1-aaa4-40c6-9aaa-5d7feab019f6",
+                            CreatedAt = new DateTime(2023, 3, 2, 10, 48, 9, 623, DateTimeKind.Local).AddTicks(4642),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Customer",
@@ -1943,8 +1945,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "d2dedc6a-10ce-4813-aa4b-1882f1c58c44",
-                            CreatedAt = new DateTime(2023, 3, 2, 12, 31, 7, 557, DateTimeKind.Local).AddTicks(2300),
+                            ConcurrencyStamp = "e87ccd01-8356-438b-8914-7ef8078c1f43",
+                            CreatedAt = new DateTime(2023, 3, 2, 10, 48, 9, 623, DateTimeKind.Local).AddTicks(4648),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Store",

@@ -52,19 +52,21 @@ namespace BusinessLogic.ApiClasses
         //Order------------------------------------------------
         public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
         {
-            decimal total = 0;
             var order = _mapper.Map<Order>(createOrderDto);
+            decimal totalOrder = order.OrderPrice;
             if (createOrderDto != null)
             {
                 var tax = await _locationTaxBL.GetTax(customerId);
                 order.CustomerId = customerId;
-                order.OrderStatusId = 1;
-                order.CurrencyId = 5;
-                order.PaymentMethodsId = 6;
-                order.IsSeen = 0;
+                var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderPending,false);
+                order.OrderStatusId = status.Id;
+                var currency = await _repositoryManager.Currency.GetDefaultCurrency(false);
+                order.CurrencyId = currency.Id;
+                var payment = await _repositoryManager.PaymentMethods.GetPaymentsStatus(PaymentStatus.QatarCharity);
+                order.PaymentMethodsId = payment.Id;
+                order.IsStatus = Status.NotActive;
                 order.TotalTax = tax;
-                order.CodeCoupon = createOrderDto.CouponCode;
-                var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
+               
                 if (createOrderDto.AddressId == 0)
                 {
                     return new BussnessResultModel(null, _locService.GetLocalizedStringValue("EnterField"), false);
@@ -73,6 +75,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ChooseTime"), false);
                 }
+                var carts = await _repositoryManager.Cart.GetCartsToCustomerId(customerId);
                 if (carts.Count == 0 && carts == null)
                 {
                     return new BussnessResultModel(null, _locService.GetLocalizedStringValue("cartIsEmpty"), false);
@@ -82,10 +85,75 @@ namespace BusinessLogic.ApiClasses
                     var orderProducts = new List<OrderProduct>();
                     foreach (var cart in carts)
                     {
-                        order.StoreId = cart.StoreId;
+                        decimal total = 0;
                         var orderAttributs = new List<OrderAttributProduct>();
-                        var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id,false);
-                        if (cartAttributeProducts != null)
+                        order.StoreId = cart.StoreId;
+                        var inventory = await _repositoryManager.Inventory.GetStockProduct(cart.ProdId);
+                        if (inventory == null)
+                        {
+                            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
+                        }
+                        if (createOrderDto.CouponCode != null)
+                        {
+                            var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
+                            order.CouponId = coupon.Id;
+                            if (coupon.CouponAmount > 0 && coupon.CouponAmount > cart.FinalPrice)
+                            {
+                                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CodeGrater"), false);
+                            }
+                            if (coupon != null)
+                            {
+                                if (coupon.DiscountType == DiscountType.CartDiscount)
+                                {
+                                    if (cart.FinalPrice > coupon.CouponAmount)
+                                    {
+                                        total = cart.FinalPrice - Convert.ToDecimal(coupon.CouponAmount);
+                                    }
+                                }
+                                else if (coupon.DiscountType == DiscountType.CartPercentDiscount)
+                                {
+                                    if (cart.FinalPrice > 0)
+                                    {
+                                        total = cart.FinalPrice - (cart.FinalPrice * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
+                                    }
+                                }
+                                else if (coupon.DiscountType == DiscountType.ProductDiscount)
+                                {
+                                    foreach (var item in carts)
+                                    {
+                                        foreach (var productsCoupons in coupon.ProductsCoupons)
+                                        {
+                                            if (productsCoupons.ProductId == item.ProdId)
+                                            {
+                                                var newTotal = Convert.ToDecimal(item.Product.Price) - Convert.ToDecimal(coupon.CouponAmount);
+                                                cart.FinalPrice -= newTotal;
+                                            }
+                                            else
+                                            {
+                                                cart.FinalPrice -= Convert.ToDecimal(item.Product.Price);
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (coupon.DiscountType == DiscountType.ProductPercentDiscount)
+                                {
+                                    var productsCoupons = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(coupon.Id, false);
+                                    foreach (var productCoupon in productsCoupons)
+                                    {
+                                        if (productCoupon.ProductId == cart.ProdId)
+                                        {
+                                            total = cart.FinalPrice - (cart.FinalPrice * coupon.CouponAmount / 100);
+                                        }
+                                        else
+                                        {
+                                            total = cart.FinalPrice;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        var cartAttributeProducts = await _repositoryManager.CartAttributeProduct.CartAttributeProductsCartId(cart.Id, false);
+                        if (cartAttributeProducts.Count > 0)
                         {
                             foreach (var cartAttribute in cartAttributeProducts)
                             {
@@ -100,100 +168,47 @@ namespace BusinessLogic.ApiClasses
                                 });
                             }
                         }
-                        var inventory = await _repositoryManager.Inventory.GetStockProduct(cart.ProdId);
-                        if (inventory == null)
-                        {
-                            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
-                        }
                         orderProducts.Add(new OrderProduct
                         {
                             ProductId = cart.ProdId,
                             Qty = cart.Qty,
-                            FinalPrice = cart.FinalPrice,
+                            FinalPrice = total,
                             OrderAttributesProducts = orderAttributs
                         });
-
-                        total = orderProducts.Sum(c=>c.FinalPrice);
-
+                        totalOrder = orderProducts.Sum(c => c.FinalPrice);
                     }
                     order.OrderProducts = orderProducts;
 
-                    if (createOrderDto.CouponCode != null)
-                    {
-                        var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
-                        if (coupon.CouponAmount > 0 && coupon.CouponAmount > total)
-                        {
-                            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CodeGrater"), false);
-                        }
-                        if (coupon != null)
-                        {
-                            if (coupon.DiscountType == DiscountType.CartDiscount)
-                            {
-                                if (total > coupon.CouponAmount)
-                                {
-                                    total = total - Convert.ToDecimal(coupon.CouponAmount);
-                                }
-                            }
-                            else if (coupon.DiscountType == DiscountType.CartPercentDiscount)
-                            {
-                                if (total > 0)
-                                {
-                                    total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
-                                }
-                            }
-                            else if (coupon.DiscountType == DiscountType.ProductDiscount)
-                            {
-                                total = 0;
-                                foreach (var item in carts)
-                                {
-                                    foreach(var productsCoupons in coupon.ProductsCoupons)
-                                    {
-                                        if (productsCoupons.ProductId == item.ProdId)
-                                        {
-                                            var newTotal = Convert.ToDecimal(item.Product.Price) - Convert.ToDecimal(coupon.CouponAmount);
-                                            total += newTotal;
-                                        }
-                                        else
-                                        {
-                                            total += Convert.ToDecimal(item.Product.Price);
-                                        }
-                                    }
-                                }
-                            }
-                            else if (coupon.DiscountType == DiscountType.ProductPercentDiscount)
-                            {
-                                total = 0;
-                                foreach (var item in carts)
-                                {
-                                    foreach (var productsCoupons in coupon.ProductsCoupons)
-                                    {
-                                        if (productsCoupons.ProductId == item.ProdId)
-                                        {
-                                            decimal newval = Convert.ToDecimal(item.FinalPrice) * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100);
-                                            total = total + newval;
-                                        }
-                                        else
-                                        {
-                                            total = total + Convert.ToDecimal(item.FinalPrice);
-                                        }
-                                    }
-                                  
-                                }
-                            }
-                        }
-                    }
+                   
                 }
                 if (tax != 0)
                 {
-                    total = total + ((total * tax) / 100);
+                    totalOrder = totalOrder + ((totalOrder * tax) / 100);
                 }
-                order.OrderPrice = total;
+                order.OrderPrice = totalOrder;
                 order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
                 _repositoryManager.Order.CreateOrder(order);
                 await _repositoryManager.SaveAsync();
             }
             await DeleteByStore(order.StoreId, customerId);
-            return new BussnessResultModel(total, _locService.GetLocalizedStringValue("PendOrdMsg"));
+            return new BussnessResultModel(totalOrder, _locService.GetLocalizedStringValue("PendOrdMsg"));
+        }
+        public async Task<BussnessResultModel> DeleteByStore(int storeId, int userId)
+        {
+            var carts = await _repositoryManager.Cart.GetCartsToStoreCustomer(storeId, userId);
+            if (carts == null)
+            {
+                return new BussnessResultModel(null, "Please make sure the link", false);
+            }
+            else
+            {
+                foreach (var cart in carts)
+                {
+                    _repositoryManager.Cart.DeleteCart(cart);
+                    await _repositoryManager.SaveAsync();
+                }
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("successDelete"), false);
+            }
         }
         public async Task<PagedList<OrderDto>> GetHistoryOrder(int customerId , Currency currency,PostsParameters postsParameters )
         {
@@ -224,34 +239,37 @@ namespace BusinessLogic.ApiClasses
             }
             return PagedList<OrderDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<List<OrderProductsDto>> GetOrderProducts( int orderId,  string lang)
+        public async Task<List<OrderProductDto>> GetOrderProducts( int orderId,  string lang)
         {
-            var model = new List<OrderProductsDto>();
             var order = await _repositoryManager.Order.GetOrderId(orderId,false);
             if (order != null)
             {
                 var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
                 if (orderProducts.Count() > 0)
                 {
-                    foreach (var orderProduct in orderProducts)
+                    var orderProductsDto = orderProducts.Select(orderProduc =>
                     {
-                        var product = await _repositoryManager.Product.GetProductById(orderProduct.ProductId, false);
-                        model.Add(new OrderProductsDto
-                        {
-                            OrderId = order.Id,
-                            Qty = orderProduct.Qty,
-                            Options = await _productBL.GetOptions(product.Id),
-                            ProductId = product.Id,
-                            ProductName = lang == "en" ? product.ProductName : product.ProductNameAr,
-                            ProductModel = product.ProductModel,
-                            //ProductImage = _imageBL.GetImageMedium(),
-                            CreatedAt = product.CreatedAt,
-                            ProductPrice = product.Price,
-                        }) ;
-                    }
+                        var orderProductDto = _mapper.Map<OrderProductDto>(orderProduc);
+                        var product = _repositoryManager.Product.GetAcceptAdminActiveProduct(orderProduc.ProductId).Result;
+
+                        orderProductDto.ProductName = lang == "en" ? product.ProductName : product.ProductNameAr;
+                        orderProductDto.ProductModel = product.ProductModel;
+                        orderProductDto.ProductImage = _imageBL.GetImageMedium(product.Images.First().ImageId);
+                        orderProductDto.ProductPrice = product.Price;
+                        return orderProductDto;
+                    }).ToList();
+                    return orderProductsDto;
+                }
+                else
+                {
+                    return null;
                 }
             }
-            return model;
+            else
+            {
+                return null;
+            }
+
         }
         public async Task UpdateTotalOrderPrice(int id,int customerId, decimal totalPrice)
         {
@@ -272,7 +290,9 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            order.OrderStatusId = 1;
+
+            var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderPending, false);
+            order.OrderStatusId = status.Id;
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order, _locService.GetLocalizedStringValue("ChangeToPending"));
         }
@@ -283,18 +303,20 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            if (order.OrderStatusId == 2)
+
+            if (order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderCompleted)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("AlreadyComp"), false);
             }
-            if (order.OrderStatusId != 6)
+            if (order.OrderStatus.OrderStatusEnum != OrderStatusEnum.OrderShipped)
             {
                 return new BussnessResultModel(null,  _locService.GetLocalizedStringValue("OrderNottPaid"), false);
             }
             var period = _repositoryManager.Setting.GetPeriod();
-            if (order.OrderStatusId == 6 && order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) <= DateTime.UtcNow)
+            if (order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderShipped && order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) <= DateTime.UtcNow)
             {
-                order.OrderStatusId = 2;
+                var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderCompleted, false);
+                order.OrderStatusId = status.Id;
             }
             var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
             foreach (var OrdPro in orderProducts)
@@ -370,7 +392,8 @@ namespace BusinessLogic.ApiClasses
         public async Task OrderCancal(int id)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            order.OrderStatusId = 5;
+            var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderCanceled, false);
+            order.OrderStatusId = status.Id;
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CancelOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
@@ -394,20 +417,21 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            if (order.OrderStatusId == 3)
+            if (order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderCanceled)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("AlreadyCancel"), false);
             }
-            if (order.OrderStatusId != 1)
+            if (order.OrderStatus.OrderStatusEnum != OrderStatusEnum.OrderPending)
             {
                 var period = _repositoryManager.Setting.GetPeriod();
                 //if order shipped or recieved and allowed period for refund ended
-                if ((order.OrderStatusId == 5 || order.OrderStatusId == 6) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < DateTime.UtcNow))
+                if ((order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderReceived || order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderShipped) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < DateTime.UtcNow))
                 {
                     return new BussnessResultModel(null, "e: You Cann't Reject Order After period about " + period + " days from order", false);
                 }
             }
-            order.OrderStatusId = 4;
+            var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderRejcted, false);
+            order.OrderStatusId = status.Id;
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.RejectOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
@@ -444,7 +468,8 @@ namespace BusinessLogic.ApiClasses
             {
                // return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            order.OrderStatusId = 5;
+            var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderReceived, false);
+            order.OrderStatusId = status.Id;
 
             var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
             foreach (var OrdPro in orderProducts)
@@ -517,13 +542,14 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null,_locService.GetLocalizedStringValue("correctLink") , false);
             }
-            if (order.OrderStatusId != 5 || String.IsNullOrEmpty(order.TransactionId))
+            if (order.OrderStatus.OrderStatusEnum != OrderStatusEnum.OrderReceived || String.IsNullOrEmpty(order.TransactionId))
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notPaid"), false);
             }
-            if (order.OrderStatusId == 5)
+            if (order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderReceived)
             {
-                order.OrderStatusId = 6;
+                var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderShipped, false);
+                order.OrderStatusId = status.Id;
             }
            
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ShippedOrder);
@@ -560,9 +586,10 @@ namespace BusinessLogic.ApiClasses
         public async Task UpdateOrderAfterPay(int id, string PaymentsId , string payment)
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true);
-            if (order.OrderStatusId == 1)
+            if (order.OrderStatus.OrderStatusEnum== OrderStatusEnum.OrderPending)
             {
-                order.OrderStatusId = 5; //recieved order
+                var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderReceived, false);
+                order.OrderStatusId = status.Id;
                 order.DatePurchased = DateTime.UtcNow;
                 order.TransactionId = PaymentsId;
                 order.PaymentMethodsId = Convert.ToInt32(payment);// "Qatar Charity";
@@ -612,42 +639,6 @@ namespace BusinessLogic.ApiClasses
             }
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order, "successDelete");
-        }
-        public async Task UpdateStatusOrder(int id, int adminId, int vendorId = 0)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            //out stock 
-            var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
-            foreach (var item in orderProducts)
-            {
-                var inventory = new Inventory();
-                int attribute = 0;
-                var orderAttributesProducts = await _repositoryManager.OrderAttributesProducts.GetAllOrderAttributesProducts(item.Id, true);
-                if (orderAttributesProducts != null)
-                {
-                    foreach (var option in orderAttributesProducts)
-                    {
-                        attribute = option.ProductAttributId.Value;
-                        inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
-                    }
-                }
-
-                inventory.AddedDate = DateTime.UtcNow.Millisecond;
-                inventory.AdminId = adminId;
-                if (vendorId != 0)
-                {
-                    inventory.VendorId = vendorId;
-                }
-                inventory.Stock = item.Qty;
-                inventory.ProductId = item.ProductId;
-                inventory.TotalPurchasedPrice = item.FinalPrice;
-                inventory.PurchaseCode = item.OrderId.ToString();
-                inventory.StockType = "out";
-                // inventory.AttributesProductId = attribute == 0 ? 0 : attribute;
-                _repositoryManager.Inventory.AddInventory(inventory);
-
-            }
-            await _repositoryManager.SaveAsync();
         }
         public async Task<OrderDto> GetOrder(int id)
         {
@@ -803,12 +794,12 @@ namespace BusinessLogic.ApiClasses
                     city1 = city.ZoneName;
                 }
             }
-            var l = await _repositoryManager.Setting.GetSettingByValue("website_logo",false);
-            // var logo = await _imageBL.GetImageOriginal(l.Value);
+            var setting = await _repositoryManager.Setting.GetSettingByValue("website_logo",false);
+            var logo = _imageBL.GetImageOriginal(Convert.ToInt32(setting.Value));
             var all = "";
             var bb3 = "";
             var m3 = "";
-            var img = "<div style='text-align: center;'><img style='width: 25%;/></div><hr>";//'src='" + logo +"'
+            var img = "<div style='text-align: center;'><img src=" + logo +"style='width: 25%;/></div><hr>";//
             var bdy1 = "<table style='width: -webkit-fill-available;'><tbody style='display: contents;'>" +
                            "<tr><td style='color: #212121;line-height: 1.8;font-size: 20px;font-weight: 500;'>Name</td><td><span style='color: #471267 ;font-size: 20px;'> " + user.FirstName + " " + user.LastName + " </span><br /></td><td style='color: #212121;line-height: 1.8;font-size: 20px;font-weight: 500;'>Order date</td><td style='padding-right: 5%;'>" + "<span style='color: #471267 ;font-size: 20px;' > " + newOrder.CreatedAt.AddHours(3).ToString("MM/dd/yyyy") + " </span><br />" +
                            "<span style='color: #471267 ;font-size: 10px;'> " + newOrder.CreatedAt.AddHours(3).ToString("hh:mm tt") + " </span></td></tr><tr>" +
@@ -844,7 +835,7 @@ namespace BusinessLogic.ApiClasses
                 m3 = m3 + bb3;
             }
             var cop = " ";
-            var copoun = await _repositoryManager.Coupon.GetCouponCodeNotFinished(newOrder.CodeCoupon);
+            var copoun = await _repositoryManager.Coupon.GetCouponIdNotFinished(Convert.ToInt32(newOrder.CouponId));
             if (copoun != null)
             {
                 cop = copoun.CouponCode;
@@ -857,24 +848,6 @@ namespace BusinessLogic.ApiClasses
             all = img + bdy1 + m3 + t;
             return all;
         }
-        public async Task<BussnessResultModel> DeleteByStore(int storeId, int userId)
-        {
-            var carts = await _repositoryManager.Cart.GetCartsToStoreCustomer(storeId, userId);
-            if (carts == null)
-            {
-                return new BussnessResultModel(null, "Please make sure the link", false);
-            }
-            else
-            {
-                foreach (var cart in carts)
-                {
-                    _repositoryManager.Cart.DeleteCart(cart);
-                    await _repositoryManager.SaveAsync();
-                }
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("successDelete"), false);
-            }
-        }
-
         //Coupon------------------------------------------------
         public async Task<BussnessResultModel> AddCoupon(CreateCouponDto createDto, int userId)
         {
@@ -989,7 +962,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     Id = status.Id,
                     StatusName = lang == "en" ? status.StatusName : status.StatusNameAr,
-                    option = lang == "en" ? (status.Option == 1 ? "Yes" : "No") : (status.Option == 1 ? "نعم" : "لا")
+                    Option = lang == "en" ? (status.IsStatus == Status.Active? "Yes" : "No") : (status.IsStatus == Status.Active ? "نعم" : "لا")
                 });
             return PagedList<OrderStatusDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
         }

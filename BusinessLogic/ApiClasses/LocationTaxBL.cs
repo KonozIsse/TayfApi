@@ -26,9 +26,6 @@ namespace BusinessLogic.ApiClasses
         {
             var address = _mapper.Map<Address>(create);
             address.UserId = userId;
-            address.User.FirstName = create.FirstName;
-            address.User.LastName = create.LastName;
-            address.CityName = address.Zone.ZoneName;
             _repositoryManager.Address.AddAddress(address);
             await _repositoryManager.SaveAsync();
             if (create.IsDefault == true)

@@ -16,11 +16,11 @@ namespace Entities.Models
         [ForeignKey(nameof(ShippingMethod))]
         public int? ShippingMethodId { get; set; }
         public ShippingMethods ShippingMethod { get; set; }
-        public short IsSeen { get; set; }
         [ForeignKey(nameof(DeliveryTime))]
         public int DeliveryTimeId { get; set; }
         public DeliveryTime DeliveryTime { get; set; }
-        public string CodeCoupon { get; set; }
+        [ForeignKey(nameof(Coupon))]
+        public int? CouponId { get; set; }
         public Coupon Coupon { get; set; }
 
         [ForeignKey(nameof(PaymentMethods))]

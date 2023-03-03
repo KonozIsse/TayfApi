@@ -29,8 +29,7 @@ namespace Repository
             return await qury.Include(r => r.Image).OrderByDescending(c => c.CreatedAt).ToListAsync();
         }
         public async Task<List<News>> GetWithComments()
-        => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(r => r.Image)
-            .ThenInclude(c=>c.ImageSettings)
+        => await FindByCondition(c => c.IsStatus == Status.Active, false)
             .Include(r => r.Comments).ToListAsync();
         public async Task<News> GetBlogById(int id, bool trackChanges, bool Included = false)
         {
