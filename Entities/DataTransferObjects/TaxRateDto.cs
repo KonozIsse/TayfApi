@@ -2,6 +2,7 @@
 using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ namespace Entities.DataTransferObjects
         public string TaxClassTitle { get; set; }
         public string ZoneName { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string UpdateAt { get; set; }
     }
     public class CreateTaxRateDto
     {
@@ -39,7 +41,9 @@ namespace Entities.DataTransferObjects
     }
     public class CreateTaxClassDto
     {
+        [Required]
         public string Title { get; set; }
+        [Required]
         public string Description { get; set; }
     } 
     public class UpdateTaxClassDto: CreateTaxClassDto

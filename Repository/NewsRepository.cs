@@ -22,11 +22,11 @@ namespace Repository
         public async Task<List<News>> SearchNews(string search)
         {
             var qury = FindAll(false);
-            if (string.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(search))
             {
                 qury = qury.Where(c => c.Title.Contains(search) || c.Decription.Contains(search));
             }
-            return await qury.Include(r => r.Image).OrderByDescending(c => c.CreatedAt).ToListAsync();
+            return await qury.Include(c=>c.Comments).Include(r => r.Image).OrderByDescending(c => c.CreatedAt).ToListAsync();
         }
         public async Task<List<News>> GetWithComments()
         => await FindByCondition(c => c.IsStatus == Status.Active, false)
@@ -54,7 +54,14 @@ namespace Repository
         public async Task<CommentNews> GetCommentId(int id)
         => await FindByCondition(c => c.Id == id, false).FirstOrDefaultAsync();
         public async Task<List<CommentNews>> SearchCommets(int newId, string search)
-        => await FindByCondition(c => c.NewsId == newId && c.Comment.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+        {
+            var qury = FindByCondition(c=>c.NewsId == newId,false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                qury = qury.Where(c => c.Comment.Contains(search));
+            }
+            return await qury.Include(r => r.News).OrderByDescending(c => c.CreatedAt).ToListAsync();
+        }
         public void CreateCommentNews(int newsId, CommentNews commentNews)
         {
             commentNews.NewsId = newsId;

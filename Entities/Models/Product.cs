@@ -20,9 +20,7 @@ namespace Entities.Models
         public int StoreId { get; set; }
         public User Store { get; set; }
         public bool? IsAcceptAdmin { get; set; }
-        [ForeignKey(nameof(ProductType))]
-        public int TypeId { get; set; }
-        public ProductType ProductType { get; set; }
+        public ProductsType ProductType { get; set; }
         public List<ProductCategory> ProductCategories { get; set; }
         public List<ProductSales> ProductSales { get; set; }
         public List<SpecialProducts> SpecialProducts { get; set; }

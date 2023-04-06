@@ -24,7 +24,7 @@ namespace BusinessLogic
             CreateMap<ContactDto, Contact>().ReverseMap();
             CreateMap<CreateContactDto, Contact>().ReverseMap();
             //MapLanguage
-            CreateMap<LanguageDto, Language>().ReverseMap();
+            CreateMap<Language, LanguageDto>().ReverseMap();
             CreateMap<UpdateLanguageDto, Language>().ReverseMap();
             //MapPaymentMethods
             CreateMap<PaymentDto, PaymentMethods>().ReverseMap();
@@ -65,6 +65,7 @@ namespace BusinessLogic
             CreateMap<ZoneDto, Zone>().ReverseMap();
             CreateMap<CreateZoneDto, Zone>().ReverseMap();
             CreateMap<UpdateZoneDto, Zone>().ReverseMap();
+            CreateMap<UpdateZoneDto, ZoneDto>().ReverseMap();
             //MapNews
             CreateMap<NewsDto, News>().ReverseMap();
             CreateMap<CreateNewsDto, News>().ReverseMap();
@@ -125,7 +126,7 @@ namespace BusinessLogic
             CreateMap<User, CustomerDto>().AfterMap((s, d) => {
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Avater = baseUrl + "/media_files/avatars" + s.Avater;
+                d.Avater = baseUrl + "/media_files/avatars/" + s.Avater;
             });
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             //AdminMap
@@ -150,7 +151,8 @@ namespace BusinessLogic
             //MapSliders
             CreateMap<SliderDto, Sliders>().ReverseMap(); 
             CreateMap<CreateSliderDto, Sliders>().ReverseMap();
-            CreateMap<UpdateSliderDto, Sliders>().ReverseMap(); 
+            CreateMap<UpdateSliderDto, Sliders>().ReverseMap();
+            //Page
             CreateMap<PageDto, StaticPages>().ReverseMap();
             //MapBanner
             CreateMap<BannerDto, Banner>().ReverseMap(); 
@@ -159,7 +161,7 @@ namespace BusinessLogic
             CreateMap<Image, ImageDto>().AfterMap((s, d) => {
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Name = baseUrl + "/media_files/original" + s.Name;
+                d.Name = baseUrl + "/media_files/original/" + s.Name;
             });
             CreateMap<CreateImageDto, Image>().ReverseMap();
             //ImageProduct
@@ -175,10 +177,6 @@ namespace BusinessLogic
             CreateMap<UpdateImageSettingDto, ImageSetting>().ReverseMap();
             //MapDeliveryTime
             CreateMap<DeliveryTimeDto, DeliveryTime>().ReverseMap();
-            //MapDevice
-            CreateMap<DeviceDto, Device>().ReverseMap();
-            CreateMap<CreateDeviceDto, Device>().ReverseMap();
-            CreateMap<UpdateDeviceDto, Device>().ReverseMap();
             //MapMailList
             CreateMap<MailListDto, MailList>().ReverseMap();
             CreateMap<SendMailListDto, MailList>().ReverseMap();
@@ -190,6 +188,9 @@ namespace BusinessLogic
             CreateMap<CreateInventoryDto, Inventory>().ReverseMap();
             //MapOrderStatus
             CreateMap<UpdateOrderStatusDto, OrderStatus>().ReverseMap();
+            CreateMap<OrderStatusDto, OrderStatus>().ReverseMap();
+
+
             ForAllMaps((typeMap, m) =>
             {
                 Expression<Action<object, object>> afterFunction = (sourceObj, destObj) => FillEnumDesc(destObj);

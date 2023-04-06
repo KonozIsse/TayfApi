@@ -9,6 +9,7 @@ using Entities.Exception;
 using Entities.RequestFeatures;
 using System;
 using MailKit.Search;
+using System.Diagnostics.Metrics;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -475,7 +476,7 @@ namespace BusinessLogic.ApiClasses
                         _repositoryManager.Attribute.DeleteAttributesProduct(attribut);
                     }
                 }
-                var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+                var inventories = _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
                 if (inventories != null)
                 {
                     foreach (var inventory in inventories)
@@ -493,6 +494,12 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"),false);
             }
            
+        }
+        public async Task<List<ProductDto>> GetAllActiveProducts()
+        {
+            var products = await _repositoryManager.Product.GetAllAcceptedProducts();
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
+            return productsDto;
         }
         public async Task<List<ProductDto>> GetAllActiveAcceptProducts(int? customerId, string lang)
         {
@@ -548,34 +555,31 @@ namespace BusinessLogic.ApiClasses
                 return new List<ProductDto>();
             }
         }
-        public async Task<PagedList<ProductDto>> GetProductsCP(int userId , string search , string lang, PostsParameters postsParameters)
+        public async Task<PagedList<ProductDto>> GetProductsCP(int userId , string search, int? filter, string lang, PostsParameters postsParameters)
         {
-            var products = await _repositoryManager.Product.GetProductsCP(search);
+            var products = await _repositoryManager.Product.GetProductsCP(search, filter);
             var store = await _repositoryManager.User.GetUserId(userId, false);
-            if (store.UserType == UserType.Store)
+            var productsDto = products.Select( item =>
             {
-                products = products.Where(c => c.StoreId == userId).ToList();
-            }
-            var productsDto = products.Select(item =>
-            {
-                var cats = _repositoryManager.ProductCategory.GetAllCategoriesProductId(item.Id, false, true).Result;
-                var catsDto = cats.Select(c => new ProductCategoryDto
-                {
-                    MainCategoryId = c.Category.MainCategoryId,
-                    CategoryId = c.CategoryId,
-                    CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
-                    CategoryImage = _imageBL.GetImageThumbnail(c.Category.ImgId),
-                }).ToList();
                 var productDto = _mapper.Map<ProductDto>(item);
+               
+                if (store.UserType == UserType.Store)
+                {
+                    products = products.Where(c => c.StoreId == userId).ToList();
+                }
+                else
+                {
+                    productDto.AdminId = userId;
+                }
                 productDto.ProductName = lang == "en" ? item.ProductName : item.ProductNameAr;
                 productDto.Description = lang == "en" ? item.Description : item.DescriptionAr;
                 productDto.IsStatus = item.IsStatus.ToString();
                 productDto.ImageProduct = _imageBL.GetImageThumbnail(item.Images.First().ImageId) ?? null;
                 productDto.Availability = AvailabilityProducts(item.Id);
                 productDto.NumLike = item.WishLists.Count();
-                productDto.ProductCategories = catsDto;
+                productDto.CategoryName = lang == "en" ? item.ProductCategories.First().Category.CategoryName : item.ProductCategories.First().Category.CategoryNameAr;
                 return productDto;
-            });
+            }).ToList();
             return PagedList<ProductDto>.ToPagedList(productsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<ProductDto> GetProductDetails(int productId, int customerId, string lang)
@@ -603,7 +607,7 @@ namespace BusinessLogic.ApiClasses
                 ProductName = name,
                 Description = lang == "en" ? product.Description : product.DescriptionAr,
                 ProductModel = product.ProductModel,
-                TypeId = product.TypeId,
+                ProductType = product.ProductType,
                 Price = special != null ? special.SpecialPrice : product.Price ,
                 IsStatus = product.IsStatus.ToString(),
                 ImageProduct = _imageBL.GetImageOriginal(product.Images.First().ImageId) ?? null,
@@ -954,49 +958,13 @@ namespace BusinessLogic.ApiClasses
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
-        
+
+
         //ProductType------------------------------------------------
-        public List<string> GetProductTypeEnum(string lang)
+        public List<string> GetProductTypes()
         {
             var names = Enum.GetNames(typeof(ProductsType)).ToList();
-            foreach (string type in names)
-            {
-                if ( type == ProductsType.Simple.ToString())
-                {
-                    type.Equals ( lang == "en" ? ProductsType.Simple.ToString() : " منتج بسيط");
-                }
-                else if (type == ProductsType.Variable.ToString())
-                {
-                    type.Equals(lang == "en" ? ProductsType.Variable.ToString() : " منتج له سمات");
-                }
-                else
-                {
-                    type.Equals(lang == "en" ? ProductsType.External.ToString() : " منتج خارجي");
-                }
-            }
-            return names;
-        }
-       
-        public async Task<List<ProductType>> GetProductTypes(string lang)
-        {
-            var list = new List<ProductType>();
-            var types = await _repositoryManager.ProductType.GetProductTypes();
-            foreach (var type in types)
-            {
-                if (type.Id == 1)
-                { type.Type = lang == "en" ? type.Type : " منتج بسيط"; }
-                else if (type.Id == 2)
-                { type.Type = lang == "en" ? type.Type : " منتج له سمات"; }
-                else 
-                { type.Type = lang == "en" ? type.Type : " منتج خارجي"; }
-
-                list.Add(new ProductType
-                {
-                    Id = type.Id,
-                    Type = type.Type
-                });
-            }
-            return list;
+            return names.Select(name => _locService.GetLocalizedStringValue(name)).ToList();
         }
         //AttributesProduct------------------------------------------------
         public async Task<List<AttributeDto>> GetAttributsProducts(int productId)
@@ -1024,12 +992,7 @@ namespace BusinessLogic.ApiClasses
                     attribute.ProductId = productId;
                     if (createDto.IsDefault == 1)
                     {
-                        attribute.AttributePrice = 0;
                         attribute.PricePrefix = "+";
-                    }
-                    else
-                    {
-                        attribute.AttributePrice = createDto.AttributePrice;
                     }
                     _repositoryManager.Attribute.AddAttributesProduct(productId, attribute);
                     await _repositoryManager.SaveAsync();
@@ -1219,7 +1182,7 @@ namespace BusinessLogic.ApiClasses
             }
             return total;
         }
-        public async Task<List<OptionDto>> GetOptions(int productId)
+        public async Task<List<OptionDto>> GetOptionsProduct(int productId)
         {
             var attributs = await _repositoryManager.Attribute.GetAttributesProductId(productId);
             var attrs = attributs.GroupBy(x => x.OptionId).Select(x => x.First()).ToList();
@@ -1263,13 +1226,25 @@ namespace BusinessLogic.ApiClasses
             }
             return optionDto;
         }
-        public async Task<PagedList<OptionDto>> GetProductOptions(PostsParameters postsParameters)
+        public async Task<PagedList<OptionDto>> GetAllOptions(PostsParameters postsParameters)
         {
             var options = await _repositoryManager.Option.GetAllOptions();
             var optionsDto = _mapper.Map<List<OptionDto>>(options);
             return PagedList<OptionDto>.ToPagedList(optionsDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
+        public async Task<List<OptionDto>> GetOptions()
+        {
+            var options = await _repositoryManager.Option.GetAllOptions();
+            var optionsDto = _mapper.Map<List<OptionDto>>(options);
+            return optionsDto;
+        }
         //Value------------------------------------------------
+        public async Task<List<ValueDto>> GetAllValuesToOption(int optionId)
+        {
+            var value = await _repositoryManager.Value.GetValuesOPtionId(optionId);
+            var valueDto = _mapper.Map<List<ValueDto>>(value);
+            return valueDto;
+        }
         public async Task<PagedList<ValueDto>> GetListValues(int optionId, PostsParameters postsParameters)
         {
             var value = await _repositoryManager.Value.GetValuesOPtionId(optionId);
@@ -1384,7 +1359,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var reviewDto = _mapper.Map<ReviewDto>(review);
                 reviewDto.ProductName = lang == "en" ? review.Product.ProductName : review.Product.ProductNameAr;
-                reviewDto.CreatedAt = review.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                reviewDto.CreatedAt = review.CreatedAt.AddHours(3).ToString();
                 return reviewDto;
             });
             return PagedList<ReviewDto>.ToPagedList(reviewsDto, postsParameters.PageNumber, postsParameters.PageSize);
@@ -1445,31 +1420,35 @@ namespace BusinessLogic.ApiClasses
             return favId;
         }
         //inventory------------------------------------------------
-        public async Task<PagedList<InventoryDto>> GetAllInventory(int userId ,string lang , PostsParameters postsParameters)
+        public async Task<PagedList<InventoryDto>> GetAllInventory( string search ,int userId ,string lang , PostsParameters postsParameters)
         {
             var stocks = await _repositoryManager.Inventory.GetAllInventory();
             var store = await _repositoryManager.User.GetActiveUserId(userId, false);
             if(store.UserType == UserType.Store)
             {
-                stocks.Where(c => c.VendorId == userId);
+                stocks = stocks.Where(c => c.VendorId == userId);
             }
-            var chatGrouped = stocks.GroupBy(c => c.Product)
+            if(!string.IsNullOrEmpty(search))
+            {
+                stocks = stocks.Where(c => c.Product.ProductName.Contains(search));
+            }
+            var grouped = stocks.GroupBy(c => c.Product)
                 .Select(x => new
                 {
-                    ProductName =  lang == "en" ? x.Key.ProductName : x.Key.ProductNameAr,
+                    ProductId =  x.Key.Id ,
+                    ProductName = lang == "en" ? x.Key.ProductName : x.Key.ProductNameAr,
                     SumStock = AvailabilityProducts(x.Key.Id),
-                }).Distinct();
-            var i = 1;
-            var stocksDto = chatGrouped.Select(stock => new InventoryDto
+                });
+            var stocksDto = grouped.Select(stock => new InventoryDto
             {
-                Id = i++,
-                Stock =  stock.SumStock,
-                ProductName = stock.ProductName,
-            }).ToList();
+                ProductId = stock.ProductId,
+                Stock = stock.SumStock,
+                ProductName = stock.ProductName ,
+            }).DistinctBy(c=>c.ProductId).ToList();
            
             return PagedList<InventoryDto>.ToPagedList((IEnumerable<InventoryDto>)stocksDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<PagedList<InventoryDto>> GetAllOutInventory(int userId, string lang, PostsParameters postsParameters)
+        public async Task<PagedList<InventoryDto>> GetAllOutInventory(string search, int userId, string lang, PostsParameters postsParameters)
         {
             var stocks = await _repositoryManager.Inventory.GetAllInventory();
             var stocksDto = new List<InventoryDto>();
@@ -1477,6 +1456,10 @@ namespace BusinessLogic.ApiClasses
             if (store.UserType == UserType.Store)
             {
                 stocks.Where(c => c.VendorId == userId);
+            }
+            if (!string.IsNullOrEmpty(search))
+            {
+                stocks = stocks.Where(c => c.Product.ProductName.Contains(search));
             }
             foreach (var stock in stocks)
             {
@@ -1498,16 +1481,17 @@ namespace BusinessLogic.ApiClasses
                     {
                         Id = stock.Id,
                         ProductId = stock.ProductId,
+                        ProductImage = _imageBL.GetImageOriginal(stock.Product.Images.First().ImageId),
                         ProductName = lang == "en" ? stock.Product.ProductName : stock.Product.ProductNameAr,
-                        UpdateAt = stock.UpdatedAt.Value.ToString("MM/dd/yyyy hh:mm tt") ?? null
+                        UpdateAt = stock.CreatedAt.ToString("MM/dd/yyyy hh:mm tt") 
                     });
                 }
             }
-            return PagedList<InventoryDto>.ToPagedList((IEnumerable<InventoryDto>)stocksDto.DistinctBy(c => c.ProductId), postsParameters.PageNumber, postsParameters.PageSize);
+            return PagedList<InventoryDto>.ToPagedList(stocksDto.DistinctBy(c => c.ProductId), postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<InventoryDto>> GetAllViewInventory(int userId, string lang, int productId)
         {
-            var stocks = await _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
+            var stocks = _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
             var store = await _repositoryManager.User.GetActiveUserId(userId, false);
             if (store.UserType == UserType.Store)
             {
@@ -1584,7 +1568,7 @@ namespace BusinessLogic.ApiClasses
             var instock = 0;
             var outstock = 0;
 
-            var inventories = _repositoryManager.Inventory.GetAllInventoryByPrductId(productId).Result;
+            var inventories = _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
             if (inventories != null)
             {
                 foreach (var inventory in inventories)

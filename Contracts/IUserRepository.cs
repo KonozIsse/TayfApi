@@ -16,7 +16,7 @@ namespace Contracts
         Task<User> GetCustomerId(int customerId, bool trackChanges);
         Task<List<User>> GetCustomers(bool trackChanges);
         Task<List<User>> GetVendorTotal(string search, bool trackChanges);
-        Task<List<User>> GetAllCustomers(string search, bool trackChanges);
+        Task<List<User>> GetAllCustomers(string search, string filter, bool trackChanges);
         Task<User> VerifiedCodeUser(int id, int code, bool trackChanges);
         Task<User> GetUserDefaultAddress(int userId, int defaultAddressId);
         Task<User> GetCustomerEmail(string email, bool trackChanges);

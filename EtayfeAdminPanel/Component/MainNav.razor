@@ -1,0 +1,198 @@
+﻿@inject HomeBL _homeBL
+@inject LocService SharedLocalize
+@inject ILoginService LoginService
+@inject NavigationManager NavigationManager
+<header class="main-header">
+<nav class="navbar navbar-static-top">
+@*@if (user != null)
+{*@
+    @if (lang != null)
+    {
+                <div id="countdown" style="
+                                    width: 350px;
+                                    margin-top: 13px !important;
+                                    position: absolute;
+                                    font-size: 16px;
+                                    color: #ffffff;
+                                    display: inline-block;
+                                    margin-left: -175px;
+                                    left: 50%;"></div>
+        <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav navHorizontal">
+                <!-- Messages: style can be found in dropdown.less-->
+                <li class="dropdown messages-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-list-ul"></i>
+                       @* <i class="icon-bell" style="font-size: x-large;"></i>*@
+                        <span class="badge badge-default" id="ntCnt" style="margin-top: -31px;margin-left: -5%;"></span>
+
+                    </a>
+                    <ul class="dropdown-menu">
+                        @if (Customers != null)
+                        {
+                            <li class="header">@SharedLocalize.GetLocalizedStringValue("Youhave") @Orders.Count() @SharedLocalize.GetLocalizedStringValue("NewOrders").</li>
+                            <li>
+                                <!-- inner menu: contains the actual data -->
+                                <ul class="menu">
+                                    @foreach (var d in Orders)
+                                    {
+                                        <li>
+                                            <a href="/CP/Orders/View/@d.Id">
+                                                <h4>
+                                                    @d.CustomerName
+                                                    <small><i class="fa fa-clock-o"></i> @d.CreatedAt</small>
+                                                </h4>
+                                                <p> order @d.Id (QAR @d.OrderPrice)</p>
+                                            </a>
+
+                                        </li>
+                                    }
+                                    <!-- end message -->
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </li>
+@*
+                @if (user.UserType == UserType.Admin)
+                {
+                    <li class="dropdown messages-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-users"></i>
+                            <span class="label label-warning">@Customers.Count()</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="header">@Customers.Count() @SharedLocalize.GetLocalizedStringValue("NewCustomer")</li>
+                            <li>
+                                <!-- inner menu: contains the actual data -->
+                                <ul class="menu">
+                                    @foreach (var f in Customers)
+                                    {
+                                        <li>
+                                            <!-- start message -->
+                                            <a href="/CP/Customers">
+                                                <h4>@f.FullName</h4>
+                                            </a>
+                                        </li>
+                                    }
+                                    <!-- end message -->
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                <li class="dropdown user user-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+
+                        <span>@user.FullName </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <!-- User image -->
+                        <li class="user-header" style="@(lang == "ar" ? "height:67px !important;" : "") display: block;">
+
+                            <p>
+                                @user.FullName
+                                <small>@user.UserType</small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer" style="@(lang == "ar" ? "padding: 6px !important;" : "")">
+                            <div class="pull-left">
+                                @if (user.UserType == UserType.Admin)
+                                {
+                                    <a class="btn btn-default btn-flat" href="/CP/Admins/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-default btn-flat" href="/CP/UserAdmins/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
+                                }
+                            </div>
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-flat" @onclick="TryLogout">@SharedLocalize.GetLocalizedStringValue("logout") </a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>*@
+
+
+                @if (Languages != null)
+                {
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown notifications-menu">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    @lang
+                                </a>
+                                <ul class="dropdown-menu ">
+
+                                    @foreach (var lg in Languages)
+                                    {
+                                        <li>
+                                            <a style="color:black;" @onclick="(async ()=>await ChangeLanguage(lg.Id,lg.Code))"> @lg.Name</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </ul>
+        </div>
+
+    }
+@*}*@
+
+</nav>
+</header>
+@code {
+    [Parameter]
+    public List<OrderDto> Orders { get; set; }
+    [Parameter]
+    public List<CustomerDto> Customers { get; set; }  
+    [Parameter]
+    public List<LanguageDto> Languages { get; set; }
+    //[Parameter]
+    //public AdminDto user { get; set; } 
+    [Parameter]
+    public string lang { get; set; }
+
+    private async Task TryLogout()
+    {
+        await LoginService.Logout();
+        NavigationManager.NavigateTo("/login", true);
+    }
+    async Task ChangeLanguage(int id ,string code)
+    {
+        await _homeBL.ChangeDefaultLanugage(id);
+        //var culture = code;
+        //var uri = new Uri(NavigationManager.Uri)
+        //    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+
+        //NavigationManager.NavigateTo($"{Uri.EscapeDataString(culture)}" + "/index" + $"?redirectUri={Uri.EscapeDataString(uri)}", forceLoad: true);
+
+    }
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    private CultureInfo Culture
+    {
+        get => CultureInfo.CurrentCulture;
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(NavigationManager.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                NavigationManager.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
+
+}

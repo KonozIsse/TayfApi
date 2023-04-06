@@ -8,6 +8,7 @@ using System.Linq;
 using Entities.Models.Enums;
 using System.Threading.Tasks;
 using Entities.RequestFeatures;
+using MimeKit.IO;
 
 namespace Repository
 {
@@ -59,27 +60,23 @@ namespace Repository
         => await FindByCondition(c => c.Reviews.Any(), false).Include(p => p.Images).Include(p => p.Reviews).ToListAsync();
 
        
-        public async Task<List<Product>> GetProductsCP(string search)
+        public async Task<List<Product>> GetProductsCP(string search, int? filter)
         {
             var list = FindAll(false);
             if (!string.IsNullOrEmpty(search))
             {
-                list.Where(r => r.ProductName.Contains(search));
+                list = list.Where(r => r.ProductName.Contains(search));
             }
-            return await list.Include(c => c.ProductCategories).Include(c => c.Images).Include(c=>c.WishLists).OrderByDescending(r => r.CreatedAt).ToListAsync();
+            if (filter != 0 && filter != null)
+            {
+                list = list.Where(c=>c.ProductCategories.Any(c => c.CategoryId == Convert.ToInt32(filter)));
+            }
+            return await list.Include(c => c.ProductCategories).ThenInclude(c=>c.Category).Include(c => c.Images).Include(c=>c.WishLists).OrderByDescending(r => r.CreatedAt).ToListAsync();
         }
         public void AddProduct( Product product)=>Create(product);
         public void DeleteProduct(Product product) => Delete(product);
       
 }
 
-    public class ProductTypeRepository : RepositoryBase<ProductType>, IProductTypeRepository
-    {
-        public ProductTypeRepository(RepositoryContext repositoryContext) : base(repositoryContext)
-        {
-
-        }
-        public async Task<List<ProductType>> GetProductTypes()
-        => await FindAll(false).ToListAsync();
-    }
+   
 }

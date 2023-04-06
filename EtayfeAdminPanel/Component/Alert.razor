@@ -1,0 +1,16 @@
+﻿@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="alert alert-@Style" style="margin-left: 1%;margin-right: 1%;">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#fff !important;opacity:1 !important;">
+            <span aria-hidden="true">×</span>
+        </button>
+        @Message
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Message { get; set; }
+    [Parameter]
+    public string Style { get; set; }
+}

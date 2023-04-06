@@ -1,0 +1,71 @@
+﻿@inject ImageBL _imageBL
+@inject LocService SharedLocalize
+<style>
+    img {
+        height: 100% !important;
+        border: none !important;
+    }
+</style>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+    @SharedLocalize.GetLocalizedStringValue("addImg")
+</button>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">@SharedLocalize.GetLocalizedStringValue("addImg")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+                <div class="modal-body">
+                    <ul class="thumbnails image_picker_selector">s
+                        <li>
+                            <span class="emailTable">
+                                <label title="Spreadsheet for accounting">
+                                    <div class="thumbnail">
+                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
+                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
+                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
+                                    </div>
+                                </label>
+                                <label title="Spreadsheet for accounting">
+                                    <div class="thumbnail">
+                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
+                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
+                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
+                                    </div>
+                                </label>
+                                <label title="Spreadsheet for accounting">
+                                    <div class="thumbnail">
+                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
+                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
+                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
+                                    </div>
+                                </label>
+                                <label title="Spreadsheet for accounting">
+                                    <div class="thumbnail">
+                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
+                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
+                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
+                                    </div>
+                                </label>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            
+            <div class="modal-footer">
+                <a href="/Media/Index" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                <a class="btn btn-default refresh-image shownotify newIcon" ><i class="fa fa-refresh"></i></a>
+                <button type="button" class="btn btn-success"  data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+   //[Parameter]
+   // public List<ImageDto> Images { get; set; }
+}

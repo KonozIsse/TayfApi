@@ -1,0 +1,82 @@
+﻿@*@layout LoginLayout*@
+@page "/login"
+@inject UserBL _userBL
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+@inject ILoginService loginService
+@inject LocService SharedLocalize
+<style>
+    input{
+      text-align: left;
+    }
+    span{
+        float:left;
+    }
+</style>
+
+<div class="login-box">
+    <div class="login-logo">
+
+        <img style="width: 50%" src="/logo.png">
+
+        <div style="font-size: 25px;"><b> Welcome</b>To Admin Panel</div>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body" style="padding: 30px !important;">
+        <p class="login-box-msg">@SharedLocalize.GetLocalizedStringValue("Sign")</p>
+<div class="form-horizontal">
+            @if (user == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<EditForm Model="@user" OnValidSubmit="@OnVaild">
+    
+       
+    <div class="form-group has-feedback">
+        <InputText class="form-control col-12" @bind-Value="user.UserName" placeholder="email address" />
+        <ValidationMessage For="@(() => user.UserName)" />
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+    </div>
+      <div class="form-group has-feedback">
+             <InputText type="password" class="form-control col-12" @bind-Value="user.Password" placeholder="password" />
+            <ValidationMessage For="@(() => user.UserName)" />
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+    </div>
+    <div class="row">
+
+        <!-- /.col -->
+        <div>
+            <input id="login" type="submit" value="Login" class="btn btn-primary btn-block btn-flat" />
+        </div>
+        <!-- /.col -->
+    </div>
+</EditForm>
+}
+</div>
+</div>
+</div>
+@code {
+    
+    private UserForAuthenticationDto user = new UserForAuthenticationDto();
+
+    async Task OnVaild()
+    {
+        //var result = await http.PostAsJsonAsync<UserForAuthenticationDto>("api/Account/login", user);
+        //if (result.IsSuccessStatusCode)
+        //{
+        //    BussnessResultModel resultModel = await result.Content.ReadFromJsonAsync<BussnessResultModel>();
+        //    loginService.Login(resultModel.Data.ToString());
+        //    NavigationManager.NavigateTo("/index");
+        //}
+        var result = await _userBL.ValidateUser(user);
+        if (result.Success)
+        {
+           await loginService.Login(result.Data.ToString());
+            NavigationManager.NavigateTo("/index");
+        }
+    }
+}
+

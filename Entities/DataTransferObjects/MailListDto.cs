@@ -12,7 +12,7 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
         public Status IsStatus { get; set; }
         public string Email { get; set; }  
-        public DateTime CreateAt { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     public class SendMailListDto
     {

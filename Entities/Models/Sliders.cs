@@ -24,5 +24,8 @@ namespace Entities.Models
         [ForeignKey(nameof(Image))]
         public int ImgId { get; set; }
         public Image Image { get; set; }
+        [ForeignKey(nameof(Language))]
+        public int? LanguageId { get; set; }
+        public Language Language { get; set; }
     }
 }

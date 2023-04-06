@@ -1,0 +1,253 @@
+﻿@page "/CP/Product/VariableProduct/{ProductId:int}"
+@inject ProductBL _productBL;
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+@inject IJSRuntime js
+@inject HttpClient http
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("AdddefOptionValue") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+@if (Model != null)
+{
+    <section class="content">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("DefaultOptions") </h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#adddefaultattributesmodal">
+                                @SharedLocalize.GetLocalizedStringValue("AdddefOptionValue")
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("OptionName")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("OptionValue")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="contentDefaultAttribute">
+                                        @{
+                                            var i = 0;
+                                        }
+                                        @if (Model.Count() > 0)
+                                        {
+
+                                            foreach (var f in Model)
+                                            {
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@f.Option</td>
+                                                    <td>@f.Value</td>
+
+                                                    <td>
+                                                        <a  title="edit" href="/CP/Products/EditAttr/@f.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a  title="delete" @onclick="(async()=>await Delete(f.Id))"  class="badge bg-red"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6">
+                                                    <strong>
+                                                        @SharedLocalize.GetLocalizedStringValue("noOption")
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- adddefaultattributesmodal -->
+                                <div class="modal fade" id="adddefaultattributesmodal" tabindex="-1" role="dialog" aria-labelledby="addAttributeModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                                <h4 class="modal-title">@SharedLocalize.GetLocalizedStringValue("AdddefOptionValue")</h4>
+                                            </div>
+                                            <EditForm Model="@create" OnValidSubmit="@CreateAttriute">
+                                                <DataAnnotationsValidator />
+                                                <div class="form-horizontal">
+
+                                                    <div class="modal-body">
+
+                                                        <div class="form-group">
+
+                                                            <div class="col-sm-10 col-md-8">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-2 col-md-4 control-label">@SharedLocalize.GetLocalizedStringValue("OptionName")</label>
+                                                                    <div class="col-sm-10 col-md-8">
+
+                                                                        <InputSelect class="form-control"  required="required" name="entry_option" @bind-Value="create.OptionId">
+                                                                            <option value="">@SharedLocalize.GetLocalizedStringValue("OptionName")</option>
+                                                                            @foreach (var c in options)
+                                                                            {
+                                                                                <option value="@c.Id">@c.OptionName</option>
+                                                                            }
+                                                                        </InputSelect>
+                                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("OptionName")</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="option" class="col-sm-2 col-md-4 control-label">@SharedLocalize.GetLocalizedStringValue("OptionValue")</label>
+                                                                    <div class="col-sm-10 col-md-8">
+                                                         
+                                                                            <InputSelect class="form-control" @onclick="(async ()=> await GetAllValues(create.OptionId))" @bind-Value="create.ValueId">
+                                                                                <option value="">@SharedLocalize.GetLocalizedStringValue("OptionName")</option>
+                                                                                @if (values != null)
+                                                                                {
+                                                                                    @foreach (var c in values)
+                                                                                    {
+                                                                                        <option value="@c.Id">@c.OptionValueName</option>
+                                                                                    }
+                                                                                }
+                                                                                
+                                                                            </InputSelect>
+
+                                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("OptionValue")</span>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-2 col-md-4 control-label">@SharedLocalize.GetLocalizedStringValue("DefaultOptions") </label>
+                                                                    <div class="col-sm-10 col-md-8">
+                                                                        <InputSelect class="form-control" @bind-Value="create.IsDefault">
+                                                                            <option value=0>@SharedLocalize.GetLocalizedStringValue("No")</option>
+                                                                            <option value=1>@SharedLocalize.GetLocalizedStringValue("Yes")</option>
+                                                                        </InputSelect>
+                                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
+                                                                            @SharedLocalize.GetLocalizedStringValue("TextOption")
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="name" class="col-sm-2 col-md-4 control-label">@SharedLocalize.GetLocalizedStringValue("price")</label>
+                                                                    <div class="col-xs-4 col-sm-2" style="padding-right: 0 !important;padding-left: 3px !important;">
+                                                                        <InputSelect class="form-control" @bind-Value="create.PricePrefix">
+                                                                            <option value="+">+</option>
+                                                                            <option value="-">-</option>
+                                                                        </InputSelect>
+                                                                    </div>
+
+                                                                    <div class="col-xs-8 col-sm-8 col-md-6">
+                                                                        <InputNumber  class="form-control" required="required"  @bind-Value="create.AttributePrice"></InputNumber>
+                                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("enterPrice")</span>
+                                                                    </div>
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("close")</button>
+                                                        <button type="submit" class="btn btn-primary" id="addDefaultAttribute"  @onclick="@CreateAttriute">@SharedLocalize.GetLocalizedStringValue("add")</button>
+                                                    </div>
+
+                                                </div>
+                                            </EditForm>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- /.box -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    [Parameter]
+    public int ProductId { get; set; }
+    [Parameter]
+    public int filter { get; set; }
+    [Parameter]
+    public string lang { get; set; } 
+    public CreateAttributeDto create { get; set; } 
+    public List<AttributeDto> Model { get; set; } 
+    public List<OptionDto> options { get; set; }
+    public List<ValueDto> values { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        create = new CreateAttributeDto();
+        options = await _productBL.GetOptions();
+        Model = await _productBL.GetAttributsProducts(ProductId);
+    }
+    string message = "";
+    string style = "";
+    public async Task Delete(int id)
+    {
+        var confirm = await js.confirMethod("Are you sure?");
+        if (confirm)
+        {
+            var result = await _productBL.RemoveProduct(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    } 
+    public async Task CreateAttriute()
+    {
+       var result = await _productBL.AddAttribute(ProductId, create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+        NevigateToYourUrl();
+    }
+    public async Task GetAllValues(int id)
+    {
+        values = await _productBL.GetAllValuesToOption(id);
+    }
+   
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/CP/Product/VariableProduct/" + ProductId, true);
+    }
+}

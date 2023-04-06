@@ -1,0 +1,195 @@
+﻿@page "/CP/Reports/SalesRep"
+@inject OrderBL _orderBL
+@inject UserBL _userBL;
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("salesReport") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("salesReport") <small> @SharedLocalize.GetLocalizedStringValue("salesReport")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("salesReport") </li>
+    </ol>
+</section>
+@if (Model != null)
+{
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("salesReport") </h3>
+                    </div>
+                    <div class="box-header">
+                        <div class="container-fluid">
+                            <div class="row">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9 form-inline" id="contact-form">
+                        <form class="registration" method="get">
+                            <div class="input-group-form search-panel ">
+                                <select type="button" class="btn btn-default sele dropdown-toggle form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true" data-toggle="dropdown" @bind="@customerId">
+                                    <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("CustomerName")</option>
+                                    @foreach (var customer in Customers)
+                                    {
+                                        <option value="@customer.Id">@customer.FullName</option>
+                                    }
+                                </select>
+
+                                <select type="button" class="btn btn-default slctt dropdown-toggle form-control" data-toggle="dropdown" @bind="@statusId">
+                                    <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("OrderStatus")</option>
+                                    @foreach (var status in OrderStatuses)
+                                    {
+                                        <option value="@status.Id">@status.StatusName</option>
+                                    }
+                                </select>
+
+                                @if (vendorId == 0)
+                                {
+                                    <select type="button" class="btn btn-default sele dropdown-toggle form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true" data-toggle="dropdown" @bind="@storeId">
+                                        <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("store")</option>
+                                        @foreach (var store in Stores)
+                                        {
+                                            <option value="@store.Id">@store.FirstName</option>
+                                        }
+                                    </select>
+                                }
+                                <input @bind-value="@dateFrom" type="date" title="@SharedLocalize.GetLocalizedStringValue("fromDate")" class="form-control" placeholder="@SharedLocalize.GetLocalizedStringValue("fromDate")">
+
+                                <input @bind-value="@dateTo" type="date" title="@SharedLocalize.GetLocalizedStringValue("toDate")" class="form-control" placeholder="@SharedLocalize.GetLocalizedStringValue("toDate")">
+
+
+                                <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                <button type="button" class="btn btn-primary" @onclick="@GetAllSalesOrders"><i class="oi oi-magnifying-glass"></i></button>
+                                <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="col-lg-3 form-inline" id="contact-form12">
+                        <button onclick="exportTableToExcel('html2_table', 'Sales Report')" class=" btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
+                        <button onclick="printJS('html2_table', 'html')" class="btn btn-primary @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-print"></i> @SharedLocalize.GetLocalizedStringValue("Print")</button>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+                        <div class="row tableDirection">
+                            <div class="col-xs-12">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="html2_table" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderID") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderStatus")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("vendor")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Mobile")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CustomerName") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CreatedDate")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("TotalPurchased")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.Id</td>
+                                                    <td>@item.OrderStatusName</td>
+                                                    <td>@item.StoreName</td>
+                                                    <td>@item.CodeMobileCountry@item.CustomerPhone</td>
+                                                    <td>@item.CustomerName</td>
+                                                    <td>@item.DatePurchased</td>
+
+                                                    <td> <a href="/Orders/Index/@item.Id" target="_blank">QAR @item.OrderPrice</a></td>
+                                                   
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                        <tfoot>
+                                            <tr style="background: #dad9d9;">
+                                                <td class="ttl" colspan="7">@SharedLocalize.GetLocalizedStringValue("TotalPurchasedMoney") </td>
+                                                <td class="ttl">QAR @Model.First().Total</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+   
+    </section>
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    [Parameter]
+    public int customerId { get; set; }
+    [Parameter]
+    public int storeId { get; set; }
+    [Parameter]
+    public int statusId { get; set; }
+    [Parameter]
+    public DateTime? dateFrom { get; set; }
+    [Parameter]
+    public DateTime? dateTo { get; set; } 
+    [Parameter]
+    public string lang { get; set; }
+
+    int vendorId = 0;
+    int admin = 1;
+    public List<OrderDto> Model { get; set; }
+    public List<StoreDto> Stores { get; set; }
+    public List<CustomerDto> Customers { get; set; }
+    public List<OrderStatusDto> OrderStatuses { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        await GetAllSalesOrders();
+        Customers = await _userBL.GetAllCustomer();
+        Stores = await _userBL.GetStores();
+        OrderStatuses = await _orderBL.GetAllOrderStatus(lang);
+    }
+    async Task GetAllSalesOrders()
+    {
+        Model = await _orderBL.GetAllSalesOrders(admin, search,customerId, storeId,statusId ,dateFrom, dateTo);
+    }
+  
+}

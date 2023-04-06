@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface ITaxClassRepository
     {
-        Task<IEnumerable<TaxClass>> GetTaxClasses(string search);
+        Task<IEnumerable<TaxClass>> GetTaxClasses(string search,string filter);
         bool ExistTax(string name);
         Task<TaxClass> GetTaxClassId(int id, bool trackChanges);
         void AddTaxClass(TaxClass taxClass);

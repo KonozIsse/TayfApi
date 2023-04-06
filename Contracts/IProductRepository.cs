@@ -23,12 +23,9 @@ namespace Contracts
         Task<List<Product>> GetLatestPage(int pageSize);
         Task<List<Product>> SpecialsPage(int pageSize);
         Task<List<Product>> DailyDeals();
-        Task<List<Product>> GetProductsCP( string search);
+        Task<List<Product>> GetProductsCP( string search, int? filter);
         void AddProduct(Product product);
         void DeleteProduct(Product product);
     }
-    public interface IProductTypeRepository
-    {
-        Task<List<ProductType>> GetProductTypes();
-    }
+   
 }

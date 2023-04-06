@@ -30,7 +30,6 @@ namespace Contracts
         IMailListRepository MailList { get; }
         IMessageTemplateRepository MessageTemplate { get; }
         IDeliveryTimeRepository DeliveryTime { get; }
-        IDeviceRepository Device { get; }
         ISalesRepository Sales { get; }
         ISettingRepository Setting { get; }
         IStaticPagesRepository StaticPages { get; }
@@ -44,7 +43,6 @@ namespace Contracts
         ITaxClassRepository TaxClass { get; }
         ITaxRateRepository TaxRate { get; }
         IProductRepository Product { get; }
-        IProductTypeRepository ProductType { get; }
         IProductAttributRepository Attribute { get; }
         IProductOptionRepository Option { get; }
         IProductOptionValueRepository Value { get; }

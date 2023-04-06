@@ -12,8 +12,9 @@ namespace Contracts
     {
         Task<IEnumerable<ImageSetting>> GetImageSettings(int imageId);
         Task<ImageSetting> GetImageSettingId(int id, bool trackChanges);
-        Task<ImageSetting> GetByType(int ImgId , ImageType key);
+        ImageSetting GetByType(int ImgId , ImageType key);
         void AddImageSetting(ImageSetting image);
         void DeleteImageSetting(ImageSetting image);
+        Task<IEnumerable<ImageSetting>> GetImageSettingOriginal();
     }
 }

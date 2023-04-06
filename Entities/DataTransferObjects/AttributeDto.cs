@@ -8,6 +8,7 @@ namespace Entities.DataTransferObjects
 {
     public class AttributeDto
     {
+        public int Id { get; set; }
         public string PricePrefix { get; set; }
         public decimal AttributePrice { get; set; }
         public string ProductName { get; set; }

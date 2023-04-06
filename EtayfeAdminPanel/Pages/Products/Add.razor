@@ -1,0 +1,40 @@
+﻿@page "/CP/Product/Add"
+@inject ProductBL _productBL;
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+@inject UserManager<User> _userManager
+@inject IJSRuntime js
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("products") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("products") <small> @SharedLocalize.GetLocalizedStringValue("products")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("products") </li>
+    </ol>
+</section>
+
+@code {
+    public CreateProductDto create { get; set; } 
+    public string lang { get; set; }
+    private List<string> Types; 
+    private List<CategoryDto> categories;
+    string message = "";
+    string style = "";
+    protected override async Task OnInitializedAsync()
+    {
+        create = new CreateProductDto();
+        lang = await _homeBL.GetDefaultLanugage();
+        categories = await _productBL.GetAllSubActiveCategories(lang);
+        Types = _productBL.GetProductTypes();
+    }
+    public async Task AddProduct()
+    {
+        var currentUser = await _userManager.FindByNameAsync("");
+        var result = await _productBL.AddProduct(currentUser.Id,create);
+    }
+    
+}

@@ -486,7 +486,7 @@ namespace BusinessLogic.ApiClasses
             
             else
             {
-                var inventories = await _repositoryManager.Inventory.GetAllInventoryByPrductId(cart.ProdId);
+                var inventories =  _repositoryManager.Inventory.GetAllInventoryByPrductId(cart.ProdId);
                 if (inventories != null && inventories.Count() > 0)
                 {
                     foreach (var inventory in inventories)

@@ -2,6 +2,7 @@
 using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -20,13 +21,14 @@ namespace Entities.DataTransferObjects
     }
     public class CreateZoneDto
     {
-        public string ZoneName { get; set; } 
-        public string ZoneNameAr { get; set; }
+        [Required(ErrorMessage = "enter all filed")]
+        public string ZoneName { get; set; }
+        [Required]
         public string ZoneCode { get; set; }
+        [Required(ErrorMessage = "enter Country")]
         public int CountryId { get; set; } 
     }
     public class UpdateZoneDto : CreateZoneDto
     {
-        public int Id { get; set; }
     }
 }

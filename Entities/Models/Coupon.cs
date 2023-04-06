@@ -7,10 +7,7 @@ namespace Entities.Models
     using System.ComponentModel.DataAnnotations.Schema;
     public class Coupon : BaseEntity
     {
-        public string CouponName { get; set; }
         public string Description { get; set; }
-        public string CouponNameAr { get; set; }
-        public string DescriptionAr { get; set; }
         [Required]
         [StringLength(191)]
         public string CouponCode { get; set; }

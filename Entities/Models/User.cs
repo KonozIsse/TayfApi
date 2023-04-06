@@ -41,7 +41,6 @@ namespace Entities.Models
         [ForeignKey(nameof(Role))]
         public int RoleId { get; set; }
         public Role Role { get; set; }
-        public List<Device> Devices { get; set; }
         public List<Address> Addresses { get; set; }
         public List<Product> Products { get; set; }
         public List<Order> StoreOrders { get; set; }

@@ -1,0 +1,157 @@
+﻿@page "/CP/Comments"
+@page "/CP/Comments/{Id:int}"
+@inject NewsBL _newBL;
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Comments") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Comments") <small> @SharedLocalize.GetLocalizedStringValue("Comments")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-list">@SharedLocalize.GetLocalizedStringValue("News")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("Comments") </li>
+    </ol>
+</section>
+<section class="content">
+    @if (Model != null)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <div class="box-header">
+                        <div class="col-lg-6 form-inline" id="contact-form">
+                            <form class="registration" method="get">
+                                <div class="input-group-form search-panel ">
+
+                                        <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                        <button type="button" class="btn btn-primary" @onclick="@GetAllComments"><i class="oi oi-magnifying-glass"></i></button>
+                                        <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+                                </div>
+                            </form>
+                            <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-xs-12 table-responsive">
+                            @if (Model.Count() > 0)
+                            {
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th> #</th>
+                                            <th style="width: 20%;">@SharedLocalize.GetLocalizedStringValue("Name")</th>
+                                            <th style="width: 30%;">@SharedLocalize.GetLocalizedStringValue("Comments")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("NewsCat")"</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("AddedDate")/@SharedLocalize.GetLocalizedStringValue("updateDate")"</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var i = 0;
+                                        }
+                                        @foreach (var item in Model)
+                                        {
+                                            i += 1;
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>@item.Name</td>
+                                                <td>@item.Email</td>
+                                                <td>@item.Comment</td>
+                                                <td>
+                                                    @SharedLocalize.GetLocalizedStringValue("AddedDate") : @item.CreatedAt
+                                                </td>
+
+                                                <td>
+                                                   <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                    @SharedLocalize.GetLocalizedStringValue("NoRecordfound")
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    @if (Model.Count >= 10)
+    {
+        <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+    }
+    }
+</section>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string search { get; set; }
+    [Parameter]
+    public string lang { get; set; }
+    public List<CommentsDto> Model { get; set; }
+
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        await GetAllComments();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllComments();
+    }
+    async Task GetAllComments()
+    {
+        var pagingResponse = await _newBL.SearchCommetsNews(Id, search, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var result = await _newBL.DeleteNewsComments(id);
+
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+
+    }
+}

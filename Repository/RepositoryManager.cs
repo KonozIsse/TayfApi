@@ -30,7 +30,6 @@ namespace Repository
         private IOrderAttributeProductRepository _orderAttributesProductsRepository;
         private ISettingRepository _settingRepository;
         private IProductRepository _productRepository; 
-        private IProductTypeRepository _productTypeRepository;
         private IProductOptionRepository _productOptionRepository;
         private IProductOptionValueRepository _productOptionValueRepository;
         private ICartRepository _cartRepository;
@@ -53,7 +52,6 @@ namespace Repository
         private IOrderProductsRepository _orderProductsRepository;
         private IImageSettingRepository _imageSettingRepository;
         private IWishListRepository _wishListRepository;
-        private IDeviceRepository _deviceRepository;
         private IReviewRepository _reviewRepository;
         private IZoneRepository _zoneRepository; 
         private IUnitRepository _unitRepository;    
@@ -418,15 +416,7 @@ namespace Repository
                 return _wishListRepository;
             }
         }
-        public IDeviceRepository Device
-        {
-            get
-            {
-                if (_deviceRepository == null)
-                    _deviceRepository = new DeviceRepository(_repositoryContext);
-                return _deviceRepository;
-            }
-        }
+      
         public IReviewRepository Review
         {
             get
@@ -472,17 +462,6 @@ namespace Repository
                 return _unitRepository;
             }
         }
-        public IProductTypeRepository ProductType
-
-        {
-            get
-            {
-                if (_productTypeRepository == null)
-                    _productTypeRepository = new ProductTypeRepository(_repositoryContext);
-                return _productTypeRepository;
-            }
-        } 
-
         public IRoleRepository Role 
         {
             get

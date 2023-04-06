@@ -21,7 +21,7 @@ namespace Repository
             var coupoun = FindAll(false);
             if (!string.IsNullOrEmpty(search))
             {
-                coupoun.Where(c => c.CouponCode.Contains(search));
+                coupoun = coupoun.Where(c => c.CouponCode.Contains(search));
             }
              return await coupoun.ToListAsync(); 
         }

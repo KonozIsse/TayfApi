@@ -1,0 +1,522 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace EtayfeAdminPanel.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+     var lang = "en";
+  
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+     @*kk*@
+    <link href="https://printjs-4de6.kxcdn.com/print.min.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="~/log.png">
+    <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/css/AdminLTE.css" rel="stylesheet" />
+    <link href="/css/image-picker.css" rel="stylesheet" />
+    <link href="/css/bootstrap/assets/styles.css" rel="stylesheet" />
+    <link href="/css/bootstrap/assets/bootstrap.css" rel="stylesheet" />
+    <link href="/css/dist/css/AdminLTE.css" rel="stylesheet" /> 
+
+    <link href="/css/dist/css/skins/_all-skins.min.css" rel="stylesheet" />
+
+    <link href="https://printjs-4de6.kxcdn.com/print.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Cairo" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="EtayfeAdminPanel.styles.css" rel="stylesheet" />
+    <script>
+        window.getCultureLang = () => {
+            return window.localStorage['lang']
+        };
+    </script>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+
+</head>
+<body>
+    @RenderBody()
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="/js/Model.js"></script>
+    <script src="_framework/blazor.server.js" autostart="false"></script>
+    <script>
+        let languageSet = (localStorage.getItem('lang') || 'en');
+        console.log(languageSet);
+        Blazor.start({
+            applicationCulture: languageSet
+        });
+    </script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script src="https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>
+    <script src="https://printjs-4de6.kxcdn.com/print.min.js" type="text/javascript"></script>
+    <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+    <script>
+
+        function exportTableToExcel(tableID, filename = '') {
+            var downloadLink;
+            var dataType = 'application/vnd.ms-excel';
+            var tableSelect = document.getElementById(tableID);
+            var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+
+            // Specify file name
+            filename = filename ? filename + '.xls' : 'excel_data.xls';
+
+            // Create download link element
+            downloadLink = document.createElement("a");
+
+            document.body.appendChild(downloadLink);
+
+            if (navigator.msSaveOrOpenBlob) {
+                var blob = new Blob(['\ufeff', tableHTML], {
+                    type: dataType
+                });
+                navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+                // Create a link to the file
+                downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+
+                // Setting the file name
+                downloadLink.download = filename;
+
+                //triggering the function
+                downloadLink.click();
+            }
+        }
+        $(".exportExcel").click(function () {
+                $("#html_table").table2excel({
+                    exclude: ".noExport",
+                    filename: "Vendors Sales" + new Date(),
+                });
+            });
+
+        $(".exportExcel2").click(function () {
+            $("#html2_table").table2excel({
+                exclude: ".noExport",
+                filename: "Sales Report",
+            });
+        });
+
+       
+
+    </script>
+   @*MailList*@
+    <script>
+         $("#send").click(function () {
+            var checkedIds = [];
+            var weights = [];
+
+            $('table > tbody  > tr').each(function () {
+                if($(this).find('input[type="checkbox"]').is(":checked")){
+                    checkedIds.push($(this).find('input[type="checkbox"]').attr('Id'));   // get id's of user
+                }
+
+            });
+
+            if (checkedIds != null && checkedIds != "") {
+                var UrlPrefix = '@Url.Action("SendMsgs", "MailingList", new {area = "CP",lang = lang})';
+                window.location.replace(UrlPrefix + "?Ids=" + checkedIds);
+
+        } else {
+                alert("Please Select Users");
+        }
+
+        });
+        $("#reff").load(location.href + " #reff");
+
+        function checkAll() {
+            if (document.getElementById('ckb').checked) {
+                $('.ckb:checkbox').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('.ckb:checkbox').each(function () {
+                    this.checked = false;
+                });
+            }
+        }
+         
+    </script>
+    @*Images*@
+    <script>
+        $('#chk').click(function (event) {
+            if (this.checked) {
+                // Iterate each checkbox
+                $('.ckb:checkbox').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('.ckb:checkbox').each(function () {
+                    this.checked = false;
+                });
+            }
+        });
+        function checkAll() {
+            if (document.getElementById('ckb').checked) {
+                $('.ckb:checkbox').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('.ckb:checkbox').each(function () {
+                    this.checked = false;
+                });
+            }
+        }
+       
+        function checkImage() {
+            //if ($(this).is(":checked")) {
+            $(this).find('input[type="checkbox"]').attr('Id')
+            // Iterate each checkbox
+            $("#imgCont").attr("src", $(".imgSrcc").val());
+
+            $(".imgSrcc").val = "";
+            //}
+        };
+       
+        $("input[name='im']").change(function () {
+            var path = $(this).attr('Id');
+            // Iterate each checkbox
+            $("#imgCont").attr("src", path);
+
+            $('.lstt:checkbox').each(function () {
+                if ($('input[name="im"]:checked').length > 1) {
+                    $("input[name='im']:checked").checked = false;
+                } else {
+                    $(this).checked = true
+
+                }
+            });
+        });
+
+        $(".newIcon").click(function () {
+            jQuery("#loader").css("display", "block");
+            $.ajax({
+                type: "GET",
+                url: "/CP/Images",
+                contentType: "application/json; charset=utf-8",
+                datatype: "json",
+                success: function (data) {
+
+                    $('.manufacturer-image-embed').html(data);
+
+                    $('#ModalmanufacturedICone').modal('show');
+                    setTimeout(function () {
+                        jQuery("#loader").css("display", "none");
+                    }, 100);
+                },
+                error: function () {
+                }
+            });
+        });
+
+    </script>
+    <script type="text/javascript">
+       
+
+
+        $(document).ready(function () {
+
+            $(".ds").click(function () {
+                var g = [];
+                var prod = $("#prod").val();
+                var stkk = $("#current_stocks").val();
+                var prc = $("#prc").val();
+                var numOp = $(".numOp").val();
+                var cdd = $("#cdd").val() || 0;
+                if (prod == null || prod == 0 )
+                {
+                    alert("Please Enter All fields");
+                    return;
+                }
+                if (prod != null && prod != "") {
+                    $('ul > li > .nn').each(function () {
+                        if ($(this).find('input[type="radio"]').is(":checked")) {
+                            g.push($(this).find('input[type="radio"]').attr('Id'));   // get id's of user
+                        }
+
+                    });
+
+
+                    if (g.length == numOp) {
+
+                        @*var UrlPrefix = @Url.Action("AddStock", "Inventory", new { area = "CP",lang = lang, entry_prod= prod, values });
+                        window.location.replace(UrlPrefix
+                        +?entry_prod = " + prod + " & values =" + g + "& stock=" + stkk + " &purchase_price=" + prc + " &reference_code=" + cdd);*@
+
+
+
+          window.location.replace("/@lang/CP/Inventory/AddStock/?entry_prod=" + prod + "&values=" + g + "&stock=" + stkk + "&purchase_price=" + prc + "&reference_code=" + cdd);
+                    } else {
+                        alert("Please Enter Value for all Options");
+                    }
+                 }
+            });
+
+            if (window.File && window.FileList && window.FileReader) {
+                $("#files").on("change", function (e) {
+                    var files = e.target.files,
+                      filesLength = files.length;
+                    for (var i = 0; i < filesLength; i++) {
+                        var f = files[i]
+                        var fileReader = new FileReader();
+                        fileReader.onload = (function (e) {
+                            var file = e.target;
+                            $("<span class=\"pip\">" +
+                              "<img class=\"imageThumb\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
+                              "<br/><span class=\"remove\">Remove image</span>" +
+                              "</span>").insertAfter("#files");
+                            $(".remove").click(function () {
+                                $(this).parent(".pip").remove();
+                            });
+
+
+                        });
+                        fileReader.readAsDataURL(f);
+                    }
+                });
+            } else {
+                alert("Your browser doesn't support to File API")
+            }
+        });
+
+        jQuery(document).on("click", ".ConfirmDelete", function () {
+
+
+        var checkedIds = [];
+        var weights = [];
+
+        $('div > .thumbnail').each(function () {
+            if ($(this).find('input[type="checkbox"]').is(":checked")) {
+                checkedIds.push($(this).find('input[type="checkbox"]').attr('Id'));
+
+            }
+
+
+        });
+
+        if (checkedIds == null || checkedIds == 0 || checkedIds == "") {
+            alert("Please choose product");
+            return;
+        }
+            jQuery("#Confirm").modal("show");
+
+            var UrlPrefix = '@Url.Action("Delete", "Media", new {area = "CP",lang = lang})';
+            jQuery("#Confirm .btn-danger").attr("href", (UrlPrefix + "?Ids=" + checkedIds));
+            //jQuery("#Confirm .btn-danger").attr("href","/admin/@lang/CP/Media/Delete/?Ids=" + checkedIds);
+
+
+            return false;
+        });
+
+
+       
+
+     
+
+      
+
+        function getproducts_Stockprice() {
+            jQuery("#loader").css("display", "block");
+            var urlPrefix = getUrlPrefix();
+            jQuery.post( urlPrefix +'CP/Home/getproducts_Stockprice/', {
+                id: jQuery("#prod").val()
+            }, function (data) {
+                jQuery("#attribute").css("display", "block");
+                    jQuery("#attribute").html(data);
+                getCurrent_stocks(jQuery("#prod").val());
+
+            });
+            setTimeout(function () {
+                jQuery("#loader").css("display", "none");
+            }, 200);
+
+        }
+
+        function getCurrent_stocks(id) {
+            jQuery("#loader").css("display", "block");
+            var urlPrefix = getUrlPrefix();
+            jQuery.post( urlPrefix +'CP/Home/getCurrent_stocks/', {
+                id: id
+            }, function (data) {
+                    jQuery("#current_stocks").css("display", "inline");
+                if ($(".numOp").val() > 0) {
+                    jQuery("#current_stocks").val(data);
+                } else {
+                    jQuery("#current_stocks").val(data);
+                }
+                getTotalPrice(jQuery("#prod").val());
+
+            });
+            setTimeout(function () {
+                jQuery("#loader").css("display", "none");
+            }, 200);
+
+        }
+
+        function getTotalPrice(id) {
+            jQuery("#loader").css("display", "block");
+            var urlPrefix = getUrlPrefix();
+            jQuery.post( urlPrefix +'CP/Home/getTotalPrice/', {
+                id: id
+            }, function (data) {
+                jQuery("#total_purchases").css("display", "inline");
+                jQuery("#total_purchases").html(data);
+
+            });
+            setTimeout(function () {
+                jQuery("#loader").css("display", "none");
+            }, 200);
+
+        }
+
+
+        $("#pdf").click(function () {
+            var checkedIds = [];
+            var weights = [];
+
+            $('ul > li  > span > label > div ').each(function () {
+                if ($(this).find('input[type="checkbox"]').is(":checked")) {
+                    alert("");
+                    $(this).css("background", "red");
+                };
+            });
+            });
+
+        function flash(a) {
+            if (a.value == 1) {
+                jQuery("#loader").css("display", "block");
+
+                jQuery(".flash-container").css("display", "block");
+
+                setTimeout(function () {
+                    jQuery("#loader").css("display", "none");
+                }, 300);
+            } else {
+                jQuery(".flash-container").css("display", "none");
+
+            }
+        }
+
+
+        function DefProduct(a) {
+            if (a.value == 1) {
+                jQuery("#loader").css("display", "block");
+                jQuery(".defPrice").css("display", "none");
+
+                setTimeout(function () {
+                    jQuery("#loader").css("display", "none");
+                }, 300);
+            } else {
+                jQuery(".defPrice").css("display", "block");
+
+            }
+        }
+
+        function showList(a) {
+            if (a.value == "fixed_product" || a.value == "percent_product") {
+
+                jQuery("#loader").css("display", "block");
+                jQuery(".flst").css("display", "block");
+
+                setTimeout(function () {
+                    jQuery("#loader").css("display", "none");
+                }, 300);
+            } else {
+                jQuery(".flst").css("display", "none");
+
+            }
+        }
+
+
+        function special(a) {
+            //console.log(a.value);
+            if (a.value == 1) {
+                jQuery("#loader").css("display", "block");
+
+                jQuery(".special-container").css("display", "block");
+
+                setTimeout(function () {
+                    jQuery("#loader").css("display", "none");
+                }, 300);
+            } else {
+                jQuery(".special-container").css("display", "none");
+
+            }
+        }
+
+        function getUrlPrefix() {
+            return window.location.pathname.split("CP")[0];
+        }
+    </script>
+
+   
+    <script id="template-upload" type="text/x-tmpl">
+        {% for (var i=0, file; file=o.files[i]; i++) { %}
+        <tr class="template-upload fade">
+            <td class="name" width="30%"><span>{%=file.name%}</span></td>
+            <td class="size" width="40%"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            {% if (file.error) { %}
+            <td class="error" width="20%" colspan="2"><span class="label label-danger">Error</span> {%=file.error%}</td>
+            {% } else if (o.files.valid && !i) { %}
+            <td>
+                <p class="size">{%=o.formatFileSize(file.size)%}</p>
+                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+                </div>
+            </td>
+            {% } else { %}
+            <td colspan="2"></td>
+            {% } %}
+            <td class="cancel" width="10%" align="right">
+                {% if (!i) { %}
+                <button class="btn btn-sm red cancel">
+                    <i class="fa fa-ban"></i>
+                    <span>Cancel</span>
+                </button>
+                {% } %}
+            </td>
+        </tr>
+        {% } %}
+    </script>
+    <script id="template-download" type="text/x-tmpl">
+        {% for (var i=0, file; file=o.files[i]; i++) { %}
+        <tr class="template-download fade">
+            {% if (file.error) { %}
+            <td class="name" width="30%"><span>{%=file.name%}</span></td>
+            <td class="size" width="40%"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            <td class="error" width="30%" colspan="2"><span class="label label-danger">Error</span> {%=file.error%}</td>
+            {% } else { %}
+            <td class="name" width="30%">
+                <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">{%=file.name%}</a>
+            </td>
+            <td class="size" width="40%"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            <td colspan="2"></td>
+            {% } %}
+            <td class="delete" width="10%" align="right">
+                <button class="btn default btn-sm" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}" {% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}' {% } %}>
+                    <i class="fa fa-times"></i>
+                </button>
+            </td>
+        </tr>
+        {% } %}
+    </script>
+</body>
+
+</html>

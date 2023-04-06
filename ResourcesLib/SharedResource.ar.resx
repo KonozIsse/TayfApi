@@ -939,6 +939,9 @@
   <data name="ExistItem" xml:space="preserve">
     <value>السجل موجود مسبقا</value>
   </data>
+  <data name="External" xml:space="preserve">
+    <value>منتج خارجي</value>
+  </data>
   <data name="Facebook" xml:space="preserve">
     <value>فيسبوك</value>
   </data>
@@ -998,6 +1001,9 @@
   </data>
   <data name="gender" xml:space="preserve">
     <value>الجنس</value>
+  </data>
+  <data name="GoalCompletion" xml:space="preserve">
+    <value>الاهداف </value>
   </data>
   <data name="goBack" xml:space="preserve">
     <value>الرجوع إلى</value>
@@ -1277,6 +1283,9 @@
   </data>
   <data name="NewCustomer" xml:space="preserve">
     <value>مستخدم جديد</value>
+  </data>
+  <data name="NewOrders" xml:space="preserve">
+    <value>ظلبات جديدة</value>
   </data>
   <data name="NewPassword" xml:space="preserve">
     <value>كلمة مرور جديدة</value>
@@ -1626,6 +1635,9 @@
   <data name="receiverName" xml:space="preserve">
     <value>اسم المستقبل</value>
   </data>
+  <data name="RecentlyAddedProducts" xml:space="preserve">
+    <value>المنتجات المضافة حديثا</value>
+  </data>
   <data name="RecentNews" xml:space="preserve">
     <value>اخر الأخبار</value>
   </data>
@@ -1886,6 +1898,12 @@
   </data>
   <data name="showTrainee" xml:space="preserve">
     <value>عرض المتدربين</value>
+  </data>
+  <data name="Sign" xml:space="preserve">
+    <value>سجل الدخول</value>
+  </data>
+  <data name="Simple" xml:space="preserve">
+    <value>منتج بسيط</value>
   </data>
   <data name="slider" xml:space="preserve">
     <value>الشرائح الرئيسية</value>
@@ -2172,6 +2190,9 @@
   <data name="Value" xml:space="preserve">
     <value>القيمة</value>
   </data>
+  <data name="Variable" xml:space="preserve">
+    <value>منتج له سمات</value>
+  </data>
   <data name="VAT" xml:space="preserve">
     <value>ضريبة القيمة المضافة</value>
   </data>
@@ -2192,6 +2213,15 @@
   </data>
   <data name="VerifyMobile" xml:space="preserve">
     <value>يرجى التحقق من رقم الهاتف المحمول ، يجب أن يكون رقم الجوال 14 رقمًا كحد أقصى</value>
+  </data>
+  <data name="ViewAllCustomers" xml:space="preserve">
+    <value>عرض كل الزبائن</value>
+  </data>
+  <data name="ViewAllProducts" xml:space="preserve">
+    <value>عرض كل المنتجات</value>
+  </data>
+  <data name="ViewAllStores" xml:space="preserve">
+    <value>عرض كل المتاجر</value>
   </data>
   <data name="ViewArticle" xml:space="preserve">
     <value>عرض المقالات</value>
@@ -2267,6 +2297,9 @@
   </data>
   <data name="Yes" xml:space="preserve">
     <value>نعم</value>
+  </data>
+  <data name="Youhave" xml:space="preserve">
+    <value>لديك</value>
   </data>
   <data name="YourPersonalDetails" xml:space="preserve">
     <value>تفاصيلك الشخصية</value>

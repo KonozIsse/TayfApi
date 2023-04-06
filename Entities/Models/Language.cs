@@ -12,7 +12,6 @@ namespace Entities.Models
         public string NameAr { get; set; }
         public string Direction { get; set; } 
         public short Sort { get; set; }
-        public short? IsDefault { get; set; }
         public int ImgId { get; set; }
         [ForeignKey(nameof(ImgId))]
         public Image Image { get; set; }

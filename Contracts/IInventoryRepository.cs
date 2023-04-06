@@ -12,7 +12,7 @@ namespace Contracts
         Task<List<Inventory>> GetProductIdOptoinIdInStock(int productId, int option);
         Task<List<Inventory>> GetProductIdOptoinIdOutStock(int productId, int option);
         Task<IEnumerable<Inventory>> GetAllInventoryByProductIdOption(int productId, int option);
-        Task<List<Inventory>> GetAllInventoryByPrductId(int productId);
+        List<Inventory> GetAllInventoryByPrductId(int productId);
         Task<IEnumerable<Inventory>> GetAllInventory();
         Task<List<Inventory>> GetOptionsByProductIdInStock(int productId);
         Task<List<Inventory>> GetAllOutStock();

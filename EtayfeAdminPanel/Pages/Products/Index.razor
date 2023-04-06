@@ -1,0 +1,242 @@
+﻿@page "/CP/Products"
+@inject ProductBL _productBL;
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+@inject IJSRuntime js
+@inject HttpClient http
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("products") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("products") <small> @SharedLocalize.GetLocalizedStringValue("products")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("products") </li>
+    </ol>
+</section>
+@if(Model != null)
+{
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="box-header">
+                            <div class="col-lg-8 form-inline" id="contact-form">
+                                <form class="registration" method="get">
+                                    <div class="input-group-form search-panel ">
+                                        <select type="button" data-toggle="dropdown" @bind="@filter" class="form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                                            <option value="0" selected="" disabled="" hidden="">@SharedLocalize.GetLocalizedStringValue("FilterBy")</option>
+                                            @foreach (var c in categories)
+                                            {
+                                                <option value="@c.Id">@c.CategoryName</option>
+                                            }
+                                        </select>
+                                        <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                        <button type="button" class="btn btn-primary" @onclick="@GetAllProducts"><i class="oi oi-magnifying-glass"></i></button>
+                                        <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+                                    </div>
+                                </form>
+                                <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <a href="/CP/Products/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("Addproducts")</a>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xs-12 table-responsive">
+                                @if (Model != null)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th> #</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("img")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("category")</th>
+                                                <th style="width: 11%;">@SharedLocalize.GetLocalizedStringValue("Name")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Details")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("AddedDate")/@SharedLocalize.GetLocalizedStringValue("updateDate")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("active")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var d in Model)
+                                            {
+                                                i += 1;
+
+                                                <tr>
+                                                    <td>
+                                                        @i
+                                                        @if (d.IsAcceptAdmin == true)
+                                                        {
+                                                            <span class="label label-success">@SharedLocalize.GetLocalizedStringValue("approved")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="label label-warning">@SharedLocalize.GetLocalizedStringValue("waitingApprove")</span>
+                                                        }
+                                                    </td>
+                                                    <td style="width: 10%;"><img style="width: 50%;" src="@d.ImageProduct" /></td>
+                                                    <td style=" width: 15%; ">@d.CategoryName </td>
+                                                    <td style=" word-break: break-all;width: 11%;">@((MarkupString)d.ProductName)</td>
+                                                    <td style=" word-break: break-all; ">@((MarkupString)d.Description)</td>
+                                                    <td>
+                                                        @SharedLocalize.GetLocalizedStringValue("AddedDate") : @d.CreatedAt <br />
+                                                        @SharedLocalize.GetLocalizedStringValue("updateDate") : @d.UpdatedAt
+
+                                                    </td>
+                                                    <td>
+
+                                                        <span class="label label-success">@(d.IsStatus == "Active" ? SharedLocalize.GetLocalizedStringValue("active") : SharedLocalize.GetLocalizedStringValue("notActive")) </span>
+
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-primary" style="width: 100%; margin-bottom: 5px;" href="/CP/Product/@d.Id"> @SharedLocalize.GetLocalizedStringValue("Editproducts")</a>
+
+                                                        @if (d.ProductType == ProductsType.Variable)
+                                                        {
+                                                            <br>
+                                                            <a class="btn btn-info" style="width: 100%;  margin-bottom: 5px;" href="/CP/Product/VariableProduct/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductAttributes")</a>
+                                                        }
+                                                        <br>
+
+                                                        <a class="btn btn-warning" style="width: 100%;  margin-bottom: 5px;" href="/CP/Product/SimpleProd/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductImages")</a>
+
+                                                        @if ( d.AdminId != 0 && d.IsAcceptAdmin == false)
+                                                        {
+                                                            <br>
+
+                                                            <a class="btn btn-default" style="width: 100%; margin-bottom: 5px;" @onclick="(async()=> await ApproveProduct(d.Id))">@SharedLocalize.GetLocalizedStringValue("Approve")</a>
+                                                        }
+                                                        <br />
+
+
+                                                        <a class="btn btn-danger" style="width: 100%;  margin-bottom: 5px;" @onclick="(async()=> await Delete(d.Id))">@SharedLocalize.GetLocalizedStringValue("DeleteProduct")</a>
+                                                    </td>
+
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        @if (Model.Count >= 10)
+        {
+            <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+        }
+    </section>
+}
+
+@code {
+    [Parameter]
+    public string search { get; set; }
+    [Parameter]
+    public int filter { get; set; }
+    [Parameter]
+    public string lang { get; set; }
+
+    int vendorId = 0;
+    int admin = 1;
+    public List<ProductDto> Model { get; set; }
+    public List<CategoryDto> categories;
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        categories = await _productBL.GetAllSubActiveCategories(lang);
+        await GetAllProducts();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllProducts();
+    }
+    async Task GetAllProducts()
+    {
+        // var currentUser = await _userManager.FindByNameAsync("");
+        var pagingResponse = await _productBL.GetProductsCP(1, search, filter, lang, _PostsParameters);
+        //await http.GetFromJsonAsync<PagedList<ProductDto>>($"api/product/allCP?{search}&{_PostsParameters.PageNumber}&{_PostsParameters.PageSize}");
+        
+        Model = pagingResponse.ToList();
+
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    public async Task Delete(int id)
+    {
+        var confirm = await js.confirMethod("Are you sure?");
+        if (confirm)
+        {
+            var result = await _productBL.RemoveProduct(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    public async Task ApproveProduct(int id)
+    {
+        var result = await _productBL.ApproveProduct(id);
+
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+        NevigateToYourUrl();
+    }
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/CP/Products", true);
+    }
+}

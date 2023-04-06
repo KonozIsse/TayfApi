@@ -8,7 +8,6 @@ namespace Entities.Models
         public string NameAr { get; set; }
         public string Position { get; set; }
         public string Symbol { get; set; }
-        [StringLength(1)]
         public string DecimalPlaces { get; set; }
         public double? Value { get; set; }
         public int IsDefault { get; set; }

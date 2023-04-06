@@ -19,11 +19,23 @@ namespace Repository
         }
         public async Task<Contact> GetContactById(int id, bool trackChanges)
          => await FindByCondition(c => c.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
-        public async Task<List<Contact>> GetContacts(string search ,int rows, int pageId = 1)
+        public async Task<List<Contact>> GetContacts(string search , string filter)
         {
-            int SkipCount = rows * (pageId - 1);
-           return await FindByCondition(c=> c.Name.Contains(search) || c.Email.Contains(search), false)
-                .OrderByDescending(x => x.CreatedAt).Skip(SkipCount).Take(rows).ToListAsync();
+            var result = FindAll(false);
+           
+            if (!string.IsNullOrEmpty(search))
+            {
+                result = result.Where(c => c.Name.Contains(search) || c.Email.Contains(search));
+            }
+            if (filter == "0")
+            {
+                result = result.Where(c => c.Name.Contains(search));
+            }
+            if (filter == "1")
+            {
+                result = result.Where(c => c.Email.Contains(search));
+            }
+            return await result.OrderByDescending(x => x.CreatedAt).ToListAsync();
         }
         public int GetCountContacts() => FindAll(false).Count();
         public void CreateContact(Contact contact) => Create(contact);

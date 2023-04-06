@@ -17,7 +17,7 @@ namespace Entities.DataTransferObjects
         public string Symbol { get; set; }
         public string DecimalPlaces { get; set; }
         public double? Value { get; set; }
-        public string IsDefault { get; set; }
+        public int IsDefault { get; set; }
     }
     public class CreateCurrencyDto
     {

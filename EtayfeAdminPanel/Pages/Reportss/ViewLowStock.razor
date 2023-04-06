@@ -1,0 +1,117 @@
+﻿@page "/CP/Reports/ViewLowStock"
+@page "/CP/Reports/ViewLowStock/{ProductId:int}"
+@inject ProductBL _productBL
+@inject LocService SharedLocalize
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("StockInHistory") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("StockInHistory") <small> @SharedLocalize.GetLocalizedStringValue("StockInHistory")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("StockInHistory") </li>
+    </ol>
+</section>
+@if (Model != null)
+{
+        <section class="invoice" style="margin: 15px;margin-top: 4%;" id="html_table">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("ProductName") :@Model.First().ProductName </h3>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+
+                            <div class="row">
+                                @if (Model.Count() > 0)
+                                {
+                                    <div class="col-xs-12">
+                                        <table id="example1" class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("AddedBy")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("AddedDate")</th>
+                                                    <th>@SharedLocalize.GetLocalizedStringValue("stock")</th>
+                                                    <th>@SharedLocalize.GetLocalizedStringValue("Code") <span style="color:#4800ff;">(in)</span>/@SharedLocalize.GetLocalizedStringValue("OrderID") <span style="color:#15ae29;">(out)</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                  @{
+                                                      var i = 0;
+                                                    }
+                                                    @foreach (var item in Model)
+                                                    {
+                                                        i += 1;
+                                                        <tr>
+                                                            <td>@i</td>
+                                                            <td>@item.AddedBy</td>
+                                                            <td>@item.CreatedAt</td>
+                                                            <td>
+                                                                @item.Stock (
+                                                                @if (item.StockType == "in")
+                                                                {
+                                                                   <span style="color:#4800ff;font-weight:bold;">@item.StockType</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                   <span style="color:#15ae29;font-weight:bold;">@item.StockType</span>
+
+                                                                }
+                                                                )
+                                                            </td>
+                                                            <td>@item.PurchaseCode</td>
+
+                                                        </tr>
+                                                      
+
+                                                    }
+
+                                                    <tr>
+                                                        <td colspan="3" style="text-align: right;">
+                                                        @SharedLocalize.GetLocalizedStringValue("total")
+                                                        </td>
+
+
+                                                        <td colspan="4">
+                                                            @Model.First().Total
+                                                        </td>
+                                                    </tr>
+                                                
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")" style="font-size: 17px;">
+                                    @SharedLocalize.GetLocalizedStringValue("NoStock").
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.col -->
+            </div>
+    </section>
+}
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+    string lang = "ar";
+
+    public List<InventoryDto> Model { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await _productBL.GetAllViewInventory(1, lang, ProductId);
+    }
+
+}

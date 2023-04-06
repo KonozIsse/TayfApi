@@ -16,15 +16,19 @@ namespace Repository
         public ImageRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         {
         }
-        public async Task<Image> GetImage(int id, bool trackChanges,bool included = false)
+        public Image GetImage(int id, bool trackChanges,bool included = false)
         {
             var image = FindByCondition(c => c.Id == id && c.IsStatus == Status.Active, trackChanges);
             if (included == true)
             {
                 image = image.Include(c => c.ProductImages);
             }
-            return await image.FirstOrDefaultAsync();
+            return image.FirstOrDefault();
         }
+        public Image GetImageId(int id)
+        =>  FindByCondition(c => c.Id == id , false).FirstOrDefault();
+        public async Task<List<Image>> GetAllImages()
+        => await FindByCondition(c => c.IsStatus == Status.Active, false).OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<List<Image>> GetImages(ImageCategory? category)
         {
             var images = FindByCondition(c => c.IsStatus == Status.Active,false);

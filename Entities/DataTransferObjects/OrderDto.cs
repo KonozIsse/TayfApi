@@ -26,12 +26,12 @@ namespace Entities.DataTransferObjects
         public int AddressId { get; set; }
         public string AddressName { get; set; }
         public string AddressDetail { get; set; }
-        public int CustomerId { get; set; }
         public int OrderStatusId { get; set; }
-        public int CurrencyId { get; set; }
         public string CustomerName { get; set; }
+        public int CustomerId { get; set; }
         public string CustomerEmail { get; set; }
         public string CustomerPhone { get; set; }
+        public string CodeMobileCountry { get; set; }
         public int StoreId { get; set; }
         public string StoreName { get; set; }
         public string StoreEmail { get; set; }
@@ -43,6 +43,7 @@ namespace Entities.DataTransferObjects
         public string ShippingMethods { get; set; } 
         public decimal ShippingCost { get; set; }
         public decimal DisCount { get; set; }
+        public OrderStatusEnum OrderStatusEnum { get; set; }
         public List<OrderProductDto> OrderProducts { get; set; }
     } 
     public class CreateOrderDto

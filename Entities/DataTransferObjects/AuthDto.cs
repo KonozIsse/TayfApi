@@ -37,8 +37,4 @@ namespace Entities.DataTransferObjects
         public string Email { get; set; }
     }
    
-    public class UpdatePhotoUserDto
-    {
-        public IFormFile Photo { get; set; }
-    }
 }

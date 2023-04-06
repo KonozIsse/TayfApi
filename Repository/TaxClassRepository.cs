@@ -17,12 +17,24 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<TaxClass>> GetTaxClasses(string search)
+        public async Task<IEnumerable<TaxClass>> GetTaxClasses(string search, string filter)
         {
             var taxes = FindAll(false);
             if (!string.IsNullOrEmpty(search))
             {
-                taxes.Where(c => c.Title.Contains(search) || c.Description.Contains(search));
+                if(filter == "0")
+                {
+                    taxes = taxes.Where(c => c.Title.Contains(search));
+                }
+                else if(filter == "1")
+                {
+                    taxes = taxes.Where(c => c.Description.Contains(search));
+                }
+                else
+                {
+                    taxes = taxes.Where(c => c.Title.Contains(search) || c.Description.Contains(search));
+                }
+               
             }
             return await taxes.ToListAsync();
         }

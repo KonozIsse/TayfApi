@@ -28,7 +28,8 @@ namespace BusinessLogic.StartUp
                          options.AddPolicy("CorsPolicy", builder =>
                          builder.AllowAnyOrigin()
                          .AllowAnyMethod()
-                         .AllowAnyHeader());
+                         .AllowAnyHeader()
+                         .WithExposedHeaders("X-Pagination"));
                      });
         public static void ConfigureAuthenticationManagerService(this IServiceCollection services) =>
          services.AddScoped<IAuthenticationManager, AuthenticationManager>();
@@ -61,7 +62,7 @@ namespace BusinessLogic.StartUp
         {
             var builder = services.AddIdentityCore<User>(o =>
             {
-                o.Password.RequireDigit = true;
+                o.Password.RequireDigit = false;
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
                 o.Password.RequireNonAlphanumeric = false;
@@ -96,7 +97,7 @@ namespace BusinessLogic.StartUp
         {
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(
                configuration.GetConnectionString("SqlConnection"),
-                  x => x.MigrationsAssembly("WebLayer")));
+                  x => x.MigrationsAssembly("EtayfeAdminPanel")));
         }
         public static void ConfigureFcmNotification(this IServiceCollection services, IConfiguration configuration)
         {
@@ -115,7 +116,8 @@ namespace BusinessLogic.StartUp
                 options.FallBackToParentCultures = true;
                 options.ApplyCurrentCultureToResponseHeaders = true;
             });
-        } 
+
+        }
         public static void ConfigureAddQuartz(this IServiceCollection services)
         {
             services.AddQuartz(q =>

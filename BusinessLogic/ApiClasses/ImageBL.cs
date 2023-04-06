@@ -223,7 +223,7 @@ namespace BusinessLogic.ApiClasses
         {
             foreach (var id in ids)
             {
-                var image = await _repositoryManager.Image.GetImage(id, true);
+                var image =  _repositoryManager.Image.GetImage(id, true);
                 if (image != null)
                 {
                     var sliders = await _repositoryManager.Slider.GetSlideImageId(id, false);
@@ -297,7 +297,7 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null , _locService.GetLocalizedStringValue("is null"),false);
             }
-            var image = await _repositoryManager.Image.GetImage(itemFromDB.ImgId, true);
+            var image = _repositoryManager.Image.GetImage(itemFromDB.ImgId, true);
             string folder = ""; string path = "";
             if (update.ImageType == ImageType.THUMBNAIL)
             {
@@ -375,10 +375,10 @@ namespace BusinessLogic.ApiClasses
         }
         public string GetImageMedium(int imageId)
         {
-            var image = _repositoryManager.Image.GetImage(imageId, false,true).Result;
+            var image = _repositoryManager.Image.GetImage(imageId, false,true);
             if (image != null)
             {
-                var imageMedium = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.MEDIUM).Result;
+                var imageMedium = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.MEDIUM);
                 if (imageMedium != null)
                 {
                     var dto = _mapper.Map<ImageSettingDto>(imageMedium);
@@ -393,10 +393,10 @@ namespace BusinessLogic.ApiClasses
         }
         public string GetImageThumbnail(int imageId)
         {
-            var image = _repositoryManager.Image.GetImage(imageId, false,true).Result;
+            var image = _repositoryManager.Image.GetImage(imageId, false,true);
             if (image != null)
             {
-                var imageThumbnail = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.THUMBNAIL).Result;
+                var imageThumbnail = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.THUMBNAIL);
                 if (imageThumbnail != null)
                 {
                     var dto = _mapper.Map<ImageSettingDto>(imageThumbnail);
@@ -411,10 +411,10 @@ namespace BusinessLogic.ApiClasses
         }
         public string GetImageOriginal(int imageId)
         {
-            var image = _repositoryManager.Image.GetImage(imageId, false,true).Result;
+            var image = _repositoryManager.Image.GetImage(imageId, false, true);
             if (image != null)
             {
-                var imageOriginal = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.ACTUAL).Result;
+                var imageOriginal = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.ACTUAL);
                 if (imageOriginal != null)
                 {
                     var dto = _mapper.Map<ImageSettingDto>(imageOriginal);
@@ -438,12 +438,28 @@ namespace BusinessLogic.ApiClasses
             var imagesDto =  _mapper.Map<List<ImageDto>>(images);
             return PagedList<ImageDto>.ToPagedList(imagesDto, postsParameters.PageNumber, postsParameters.PageSize); 
         }
+        public async Task<List<ImageDto>> GetAllImages()
+        {
+            var images = await _repositoryManager.Image.GetAllImages();
+            var imagesDto = _mapper.Map<List<ImageDto>>(images);
+            return imagesDto ;
+        }
         public async Task<List<ImageSettingDto>> GetImageSettingImg(int imgId)
         {
             var images =  await _repositoryManager.ImageSetting.GetImageSettings(imgId);
             var imagesDto = _mapper.Map<List<ImageSettingDto>>(images);
             return imagesDto;
-        } 
+        }
+        public async Task<List<ImageSettingDto>> GetAllImageSettingOriginal(int userId)
+        {
+            var images = await _repositoryManager.ImageSetting.GetImageSettingOriginal();
+            if (userId != 0)
+            {
+                images = images.Where(s=>s.Image.VendId== userId);
+            }
+            var imagesDto = _mapper.Map<List<ImageSettingDto>>(images);
+            return imagesDto;
+        }
         public async Task<BussnessResultModel> EditMediaSetting(SettingImageVM update)
         {
             PropertyInfo[] properties = update.GetType().GetProperties();
@@ -455,7 +471,6 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(update, _locService.GetLocalizedStringValue("successSave"))??
                  new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"));
-
         } 
         public async Task<IEnumerable<SettingDto>> GetMediaSetting()
         {

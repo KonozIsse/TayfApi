@@ -1,0 +1,152 @@
+﻿@page "/CP/TaxRates/Add"
+@inject LocationTaxBL _locationTaxBL;
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("addtaxes") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("taxclass")<small>@SharedLocalize.GetLocalizedStringValue("addtaxes")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("taxclass")</li>
+
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("addtaxes")</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("addtaxes")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                <EditForm Model="@create" OnValidSubmit="@AddTaxRate">
+                                    <DataAnnotationsValidator />
+                                    <div class="form-horizontal">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">
+                                                    @SharedLocalize.GetLocalizedStringValue("zone")<span style="color:red;">*</span>
+
+                                                </label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <InputSelect @bind-Value="@create.ZoneId">
+                                                        @if (zones!= null)
+                                                        {
+                                                            <option value="0"> @SharedLocalize.GetLocalizedStringValue("zone")</option>
+                                                            @foreach (var zone in zones)
+                                                            {
+                                                                <option value="@zone.Id">@zone.ZoneName</option>
+                                                            }
+                                                        }
+                                                       
+                                                    </InputSelect>
+                                                    <ValidationMessage For="@(() => create.ZoneId)" />
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">
+                                                    @SharedLocalize.GetLocalizedStringValue("taxclass")<span style="color:red;">*</span>
+
+                                                </label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <InputSelect @bind-Value="@create.TaxClassId">
+                                                        @if (taxes != null)
+                                                        {
+                                                            <option value="0"> @SharedLocalize.GetLocalizedStringValue("taxclass")</option>
+                                                            @foreach (var tax in taxes)
+                                                            {
+                                                                <option value="@tax.Id">@tax.Title</option>
+                                                            }
+                                                        }
+                                                    </InputSelect>
+                                                    <ValidationMessage For="@(() => create.TaxClassId)" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">
+                                                    @SharedLocalize.GetLocalizedStringValue("taxrate")<span style="color:red;">*</span>
+
+                                                </label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <InputNumber class="form-control" @bind-Value="create.Tax_Rate" />
+                                                    <ValidationMessage For="@(() => create.Tax_Rate)" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc")<span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <InputTextArea class="form-control" @bind-Value="create.Description" />
+                                                    <ValidationMessage For="@(() => create.Description)" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="box-footer text-center">
+                                            <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                            <a href="/CP/TaxRates" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                        </div>
+
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+</section>
+@code {
+    public CreateTaxRateDto create { get; set; }
+    private List<ZoneDto> zones;
+    private List<TaxClassDto> taxes;
+    string lang = "en";
+    protected override async Task OnInitializedAsync()
+    {
+        create = new CreateTaxRateDto();
+        zones = await _locationTaxBL.GetZones(); 
+        taxes = await _locationTaxBL.GetTaxes(lang);
+    }
+    int storeId = 3;
+    string message = "";
+    string style = "";
+    async Task AddTaxRate()
+    {
+        var result = await _locationTaxBL.AddTaxRate(storeId, create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+}

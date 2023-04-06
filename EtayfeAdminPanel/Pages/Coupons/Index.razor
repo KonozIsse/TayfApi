@@ -1,0 +1,183 @@
+﻿@page "/coupons/Index"
+@inject OrderBL _orderBL
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Coupons")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Coupons") <small>@SharedLocalize.GetLocalizedStringValue("Coupons")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("Coupons")</li>
+    </ol>
+</section>
+
+<!--  content -->
+@if (Model != null)
+{
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="col-lg-6 form-inline" id="contact-form">
+                            <form class="registration" method="get">
+                                <div class="input-group-form search-panel ">
+                                    <select type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown" @bind="@filter">
+                                        <option value="-1" selected="" disabled="" hidden="">@SharedLocalize.GetLocalizedStringValue("FilterBy")</option>
+                                        <option value="0" >@SharedLocalize.GetLocalizedStringValue("Code")</option>
+                                    </select>
+                                    <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                    <button type="button" class="btn btn-primary" @onclick="@GetAllCoupons"><i class="oi oi-magnifying-glass"></i></button>
+                                    <a @onclick="NevigateToYourUrl" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+                                </div>
+                            </form>
+                            <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                        </div>
+                        <div class="box-tools pull-right">
+
+                            <a href="/coupons/add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddCoupons")</a>
+                        </div>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12 table-responsive">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th># </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Code") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CouponType") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CouponAmount")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("desc") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("ExpiryDate") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>
+                                                        @item.CouponCode
+                                                    </td>
+                                                    <td>@item.DiscountType</td>
+                                                    <td>@item.CouponAmount</td>
+                                                    <td>@item.Description</td>
+                                                    <td>@item.ExpiryDate</td>
+                                                    <td>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="coupons/edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <DeleteMessage  OnDelete="@Delete" Id="@item.Id"></DeleteMessage>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound")"
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+        <!-- deletelanguagesModal -->
+        <div class="modal fade" id="Confirmlang" tabindex="-1" role="dialog" aria-labelledby="deleteLanguagesModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="deleteLanguagesModalLabel">@SharedLocalize.GetLocalizedStringValue("delete") @SharedLocalize.GetLocalizedStringValue("lang")</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>@SharedLocalize.GetLocalizedStringValue("ConfirmMsgDeleteLang")</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger">@SharedLocalize.GetLocalizedStringValue("Yes")</a>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!--  row -->
+        <!-- /.row -->
+    </section>
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    public string filter { get; set; }
+    string lang = "en";
+    public List<CouponDto> Model { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllCoupons();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllCoupons();
+    }
+    async Task GetAllCoupons()
+    {
+        var pagingResponse = await _orderBL.GetAllCoupons(search, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var result = await _orderBL.DeleteCoupon(id);
+
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+        NevigateToYourUrl();
+    }
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/coupons/Index", true);
+    }
+}

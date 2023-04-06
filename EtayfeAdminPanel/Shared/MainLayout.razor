@@ -1,0 +1,86 @@
+﻿@inherits LayoutComponentBase
+@inject LocService SharedLocalize
+@inject ILoginService LoginService
+@inject NavigationManager NavigationManager
+@using System.Globalization
+@inject HomeBL _homeBL
+@inject HttpClient http
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+
+            @*<AuthorizeView>
+                <NotAuthorized>
+                    NotAut
+                </NotAuthorized>
+                <Authorized>*@
+                  @* <MainNav Orders="@Orders" Customers="@Customers" Languages="@Languages" lang="@lang"></MainNav>*@
+               @* </Authorized>
+                <Authorizing>
+                    <p>Authorizing...</p>
+                </Authorizing>
+            </AuthorizeView>
+
+           *@
+                <LanguageSelector />
+           <a>About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+@code {
+    public List<CustomerDto> Customers { get; set; }
+    public List<OrderDto> Orders { get; set; }
+    public List<LanguageDto> Languages { get; set; }
+    //public AdminDto user { get; set; }
+    public string lang { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Account/GetLanguages");
+        //user = await _homeBL.GetCurrentUser(1);
+        //await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        Customers = await http.GetFromJsonAsync<List<CustomerDto>>("api/Home/getNewCustomers");
+        Orders = await http.GetFromJsonAsync<List<OrderDto>>("api/Home/getNewOrders");
+    }
+    private CultureInfo[] supportedCultures = new[]
+    {
+        new CultureInfo("en"),
+        new CultureInfo("ar"),
+    };
+
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    private CultureInfo Culture
+    {
+        get => CultureInfo.CurrentCulture;
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(NavigationManager.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                NavigationManager.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
+
+}

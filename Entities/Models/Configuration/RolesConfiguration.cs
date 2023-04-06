@@ -32,7 +32,7 @@ namespace Entities.Models.Configuration
             new Role
             {
                 Id = 3,
-                 Name = "Store",
+                Name = "Store",
                 NormalizedName = "STORE",
                 IsStatus = Status.Active
             }

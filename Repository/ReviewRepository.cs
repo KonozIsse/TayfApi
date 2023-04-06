@@ -19,7 +19,7 @@ namespace Repository
         public async Task<Review> GetReviewId(int id , bool trackChanges)
        => await FindByCondition(c => c.Id == id , trackChanges).FirstOrDefaultAsync();
         public async Task<List<Review>> GetAllReviewsProduct(int productId)
-      => await FindByCondition(c=>c.ProductId == productId,false).ToListAsync();
+      => await FindByCondition(c=>c.ProductId == productId,false).Include(c => c.Customer).Include(c => c.Product).ToListAsync();
         public async Task<List<Review>> GetReviews()
        =>await FindAll(false).Include(c => c.Customer).Include(c => c.Product).ToListAsync();
         public async Task<IEnumerable<Review>> GetReviewsActiveProductId(int productId)

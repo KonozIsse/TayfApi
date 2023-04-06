@@ -1,0 +1,128 @@
+﻿@page "/MailingList/Message"
+@inject HomeBL _homeBL
+@inject LocService SharedLocalize
+@inject HttpClient http
+@inject IJSRuntime js
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("emailTemp")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("emailTemp") <small>@SharedLocalize.GetLocalizedStringValue("emailTemp")</small> </h1>
+    <ol class="breadcrumb">
+        <li class = "fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("emailTemp") </li>
+    </ol>
+</section>
+@*@if (string.IsNullOrEmpty(userName))
+{
+    <p><a href="/login">Login</a></p>
+}
+else
+{
+   <p>Hello @userName</p>
+}*@
+@if (Model != null)
+{
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="box-header">
+                        </div>
+
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xs-12 table-responsive">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th> #</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Name")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("subjcet")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Message")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.Name</td>
+                                                    <td>@item.Subject</td>
+                                                    <td style="word-break:break-all;width:50%;">
+                                                        @item.Message
+                                                    </td>
+                                                    <td>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Name" href="/MailingList/Edit/@item.Id" class="btn btn-success">
+                                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                                        </a>
+
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+
+    </section>
+}
+@code {
+    string lang = "ar"; 
+    string userName = "";
+    string userData = "";
+    public List<MessageTemplateDto> Model { get; set; }
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Model= await _homeBL.GetAllMessageTemplates();
+        
+        Model = await http.GetFromJsonAsync<List<MessageTemplateDto>>("api/MailingList/getTemplate");
+    }
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        userData = await js.InvokeAsync<string>("localStorage.getItem", "user").ConfigureAwait(false);
+    //        if (!string.IsNullOrWhiteSpace(userData))
+    //        {
+    //            var dataArray = userData.Split(";", 2);
+    //            userName = dataArray[0];
+    //            var responseMessage = new HttpRequestMessage(HttpMethod.Get, "/api/MailingList");
+    //            responseMessage.Headers.Add("Authorization", "Bearer " + dataArray[1]);
+    //            var resp = await http.SendAsync(responseMessage);
+    //            if (resp.IsSuccessStatusCode)
+    //                Model = await responseMessage.Content.ReadFromJsonAsync<List<MessageTemplateDto>>();
+    //        }
+    //    }
+    //}
+}

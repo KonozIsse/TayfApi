@@ -1,0 +1,177 @@
+﻿@page "/CP/SettingWeb/EditSlide"
+@page "/CP/SettingWeb/EditSlide/{id:int}"
+@inject HomeBL _homeBL
+@inject LocService SharedLocalize
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("editSlider")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("slider")<small>@SharedLocalize.GetLocalizedStringValue("editSlider")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("slider")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("editSlider")</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("editSlider")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                <EditForm Model="@create" OnValidSubmit="@UpdateSlider">
+                                                <DataAnnotationsValidator />
+
+                                    <div class="form-horizontal">
+                                        <!-- form start -->
+                                        <div class="box-body">
+
+                                            <div class="row">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("title") (en) </label>
+                                                    <div class="col-md-8">
+                                                        <InputText class="form-control" @bind-Value="@create.Title" />
+                                                        <ValidationMessage For="@(() => create.Title)" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc") (en)</label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        <InputTextArea class="form-control" @bind-Value="@create.Decription" />
+                                                        <ValidationMessage For="@(() => create.Decription)" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("title") (ar) </label>
+                                                    <div class="col-md-8">
+                                                        <InputText class="form-control" @bind-Value="@create.TitleAr" />
+                                                        <ValidationMessage For="@(() => create.TitleAr)" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc") (ar)</label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        <InputTextArea class="form-control" @bind-Value="@create.DecriptionAr" />
+                                                        <ValidationMessage For="@(() => create.DecriptionAr)" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("link") </label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        <InputText class="form-control" @bind-Value="@create.Url" />
+                                                        <ValidationMessage For="@(() => create.Url)" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="imageIcone">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <!-- Modal -->
+                                                        <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                                        <h3 class="modal-title text-primary" id="myModalLabel">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
+                                                                    </div>
+                                                                    <div class="modal-body manufacturer-image-embed">
+                                                                    </div>
+                                                                    <div class="modal-footer">
+
+
+                                                                        <a class="btn btn-primary pull-left" target="_blank" href="CP/Media/">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                        <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
+                                                                        <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="imageselected">
+                                                            <input value="Sliders" hidden id="typeImg" />
+                                                            <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                            <br>
+                                                            <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
+                                                            <div class="closimage">
+                                                                <button type="button" class="close pull-left image-close " id="image-Icone" style="display: none; position: absolute;left: 105px; top: 54px; background-color: black; color: white; opacity: 2.2; " aria-label="Close">
+                                                                    <span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+
+                                                        <img id="imgCont" width="80px" src="@create.Image">
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("UploadYourImages")</span>
+
+                                                        <br>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="box-footer text-center">
+                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                                <a href="/CP/SettingWeb/Sliders" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+
+                                        </div>
+
+
+
+                                    </div>
+
+                                    </EditForm>
+                            </div>
+
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.col -->
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+    <!-- Main row -->
+    <!-- /.row -->
+</section>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    UpdateSliderDto create = new UpdateSliderDto();
+    string message;
+    string style;
+    string lang = "en";
+    int storeId = 3;
+    protected override async Task OnInitializedAsync()
+    {
+        create = new UpdateSliderDto();
+        create = await _homeBL.GetSliderId(id);
+    }
+
+    async Task UpdateSlider()
+    {
+        create.Id = id;
+        var result = await _homeBL.UpdateSlider(storeId,create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+   
+}

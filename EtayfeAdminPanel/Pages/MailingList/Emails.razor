@@ -1,0 +1,172 @@
+﻿@page "/MailingList/Show"
+@inject HomeBL _homeBL
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+@inject IJSRuntime js
+@inject HttpClient http
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("NewsLetter")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("NewsLetter") <small>@SharedLocalize.GetLocalizedStringValue("NewsLetter")...</small> </h1>
+    <ol class="breadcrumb">
+        <li>@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("NewsLetter")</li>
+    </ol>
+</section>
+@if (emailsDtos != null)
+{
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="box-header">
+                            <div class="col-lg-6 form-inline" id="contact-form">
+                                <form class="registration" method="get">
+                                    <div class="input-group-form search-panel ">
+
+                                        <input type="text" class="form-control input-group-form " autofocus value="search"
+                                           name="search" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" id="parameter">
+                                        <button class="btn btn-primary " id="submit" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+
+                                        <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+                                    </div>
+                                </form>
+
+                                <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <a  target="_blank" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("EditEmailMessage")</a>
+
+                            </div>
+
+                            <div style="margin-right:162px;margin-left: 1%;" class="box-tools pull-left">
+                                <button id="send" type="button" class="btn btn-block btn-success">@SharedLocalize.GetLocalizedStringValue("Send")</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xs-12 table-responsive">
+                                @if (emailsDtos.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th> #</th>
+                                                <th>
+                                                    <input style="width: 20px;height: 20px;position: unset !important;" id="ckb" type="checkbox" onclick="checkAll()" />
+                                                </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Email")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("SendDate")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in emailsDtos)
+                                            {
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td id="iid" hidden>@item.Id</td>
+                                                    <td width="5%"><input type="checkbox" class="ckb" value="@item.Id" style="z-index: 100000 !important;opacity: 1 !important;width: 17px;height: 20px;" /></td>
+                                                    <td>@item.Email</td>
+                                                    <td>
+                                                        @item.CreatedAt
+                                                    </td>
+                                                    <td>
+                                                      <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+
+
+    </section>
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+    string lang = "ar";
+    public List<MailListDto> emailsDtos { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEmails();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetEmails();
+    }
+    async Task GetEmails()
+    {
+        emailsDtos = await http.GetFromJsonAsync<List<MailListDto>>("/api/MailingList/getEmails");
+        //var pagingResponse =await _homeBL.GetMailLists(search, _PostsParameters);
+        //emailsDtos = pagingResponse.ToList();
+        //MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var result = await _homeBL.RemoveMailList(id);
+
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+        NevigateToYourUrl();
+    }
+
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/MailingList/Show", true);
+    }
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        await js.InvokeVoidAsync("onClickHandler");
+    //    }
+    //}
+
+}

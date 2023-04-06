@@ -18,12 +18,23 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<TaxRate>> GetTaxRates(string seach)
+        public async Task<IEnumerable<TaxRate>> GetTaxRates(string seach, string filter)
         {
             var taxes = FindAll(false);
             if (!string.IsNullOrEmpty(seach))
             {
-                taxes.Where(c => c.Zone.ZoneName.Contains(seach)|| c.Description.Contains(seach));
+                if (filter == "0")
+                {
+                    taxes = taxes.Where(c => c.Zone.ZoneName.Contains(seach));
+                }
+                else if (filter == "1")
+                {
+                    taxes = taxes.Where(c => c.Zone.ZoneName.Contains(seach));
+                }
+                else
+                {
+                    taxes = taxes.Where(c => c.Zone.ZoneName.Contains(seach) || c.Description.Contains(seach));
+                }
             }
            return await taxes.OrderByDescending(x => x.CreatedAt).Include(c=>c.TaxClass).Include(c=>c.Zone).ToListAsync();
         }

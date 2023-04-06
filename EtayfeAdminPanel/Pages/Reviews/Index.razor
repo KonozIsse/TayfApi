@@ -1,0 +1,155 @@
+﻿@page "/CP/Reviews"
+@inject ProductBL _productBL
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Reviews1") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<Alert Message="@message" Style="@style"></Alert>
+
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Reviews1") <small>@SharedLocalize.GetLocalizedStringValue("Reviews1")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("Reviews1")</li>
+    </ol>
+</section>
+
+@if (Model != null)
+{
+<section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12 table-responsive">
+                            @if (Model.Count() > 0)
+                            {
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("ProductName") </th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Reviews1") </th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("AddedDate")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var i = 0;
+                                        }
+                                        @foreach (var item in Model)
+                                        {
+                                            i++;
+
+                                            <tr>
+                                                <td>
+                                                    @i
+                                                    @if (item.IsStatus == Status.Active)
+                                                    {
+                                                        <span class="label label-success">@SharedLocalize.GetLocalizedStringValue("active")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="label label-danger">@SharedLocalize.GetLocalizedStringValue("Deactivate")</span>
+                                                    }
+                                                </td>
+                                                <td>@item.ProductName</td>
+                                                <td width="40%">@item.Text</td>
+                                                <td>@item.CreatedAt</td>
+                                                <td>
+                                                    <button class="btn btn-success" style="width: 100%; margin-bottom: 5px;" @onclick="(async()=>await ActiveReview(item.Id))">@SharedLocalize.GetLocalizedStringValue("active")</button>
+                                                     <br>
+                                                    <button class="btn btn-danger" style="width: 100%;  margin-bottom: 5px;" @onclick="(async()=>await DeactiveReview(item.Id))">
+                                                        @SharedLocalize.GetLocalizedStringValue("Deactivate")</button>
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                    @SharedLocalize.GetLocalizedStringValue("NoRecordfound")
+                                </div>
+                            }
+                            <div class="col-xs-12 text-right">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+
+    </section>
+}
+@code {
+    private List<ReviewDto> Model;
+    string lang = "ar";
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetReviews();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetReviews();
+    }
+    async Task GetReviews()
+    {
+        var pagingResponse = await _productBL.GetAllReviews(lang, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task DeactiveReview(int id)
+    {
+        var result = await _productBL.DeactiveReview(id);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+    async Task ActiveReview(int id)
+    {
+        var result = await _productBL.ActiveReview(id);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/CP/Reviews", true);
+    }
+}

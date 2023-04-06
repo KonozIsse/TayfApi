@@ -22,14 +22,22 @@ namespace Repository
          => await FindByCondition(c => c.LangId == langId &&  c.Type == type, trackChanges).Include(c=>c.Language).FirstOrDefaultAsync();
         public async Task<Banner> GetBannerImage(int imageId, bool trackChanges)
         => await FindByCondition(c => c.ImgId == imageId , trackChanges).FirstOrDefaultAsync();
-        public async Task<List<Banner>> GetAllBanner(string search, bool trackChanges)
+        public async Task<List<Banner>> GetAllBanner(string search, string filter, bool trackChanges)
         {
             var banners =  FindAll(trackChanges);
             if (!string.IsNullOrEmpty(search))
             {
-                banners.Where(c => c.Title.Contains(search));
+                if (filter == "0")
+                {
+                    banners = banners.Where(c => c.Title.Contains(search));
+                }
+                else
+                {
+                    banners = banners.Where(c => c.Title.Contains(search)|| c.Language.Name.Contains(search));
+                }
+               
             }
-            return await banners.Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(c => c.CreatedAt).ToListAsync();
+            return await banners.Include(c=>c.Language).Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(c => c.CreatedAt).ToListAsync();
         } 
         public async Task<Banner> GetBannerById(int id, bool trackChanges)
             => await FindByCondition(c => c.Id.Equals(id) , trackChanges).Include(x => x.Image).Include(x => x.Image.ImageSettings).FirstOrDefaultAsync();
@@ -47,12 +55,20 @@ namespace Repository
          => await FindByCondition(c => c.Id.Equals(id), trackChanges).FirstOrDefaultAsync(); 
         public async Task<StaticPages> GetTypePage(PageType type, bool trackChanges)
          => await FindByCondition(c => c.PageType == type, trackChanges).FirstOrDefaultAsync();
-        public async Task<IEnumerable<StaticPages>> GetAllPages(string search ,bool trackChanges)
+        public async Task<IEnumerable<StaticPages>> GetAllPages(string search ,string filter, bool trackChanges)
         {
             var pages = FindAll(trackChanges);
             if (!string.IsNullOrEmpty(search))
             {
-                pages.Where(c => c.Title.Contains(search));
+                if(filter == "0")
+                {
+                    pages =  pages.Where(c => c.Title.Contains(search));
+                }
+                else
+                {
+                    pages = pages.Where(c => c.Title.Contains(search) ||  c.Description.Contains(search));
+                }
+               
             }
             return await pages.ToListAsync();
         }
@@ -68,7 +84,7 @@ namespace Repository
             var servies = FindAll(trackChanges);
             if (!string.IsNullOrEmpty(search))
             {
-                servies.Where(c => c.Title.Contains(search)|| c.Description.Contains(search));
+                servies = servies.Where(c => c.Title.Contains(search)|| c.Description.Contains(search));
             }
             return await servies.OrderByDescending(e => e.CreatedAt).Include(x => x.Image).Include(x => x.Image.ImageSettings).ToListAsync();
         }
@@ -96,18 +112,31 @@ namespace Repository
        => await FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Web, false)
             .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToListAsync();
         
-        public async Task<List<Sliders>>  GetSlidersForWeb(string search)
+        public async Task<List<Sliders>>  GetSlidersForWeb(string search,string filter)
         {
             var sliders = FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Web, false);
             if (!string.IsNullOrEmpty(search))
             {
-                sliders = sliders.Where(c => c.Title.Contains(search));
+                if(filter == "0")
+                {
+                    sliders = sliders.Where(c => c.Title.Contains(search));
+                }
+                else
+                {
+                    sliders = sliders.Where(c => c.Title.Contains(search)|| c.Decription.Contains(search));
+                }
             }
            return await sliders.Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToListAsync();
         }
-        public async Task<List<Sliders>>  GetSlidersForMobile()
-      => await FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Mobile, false)
-                .Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToListAsync();
+        public async Task<List<Sliders>>  GetSlidersForMobile(string search)
+        {
+            var sliders = FindByCondition(c => c.IsStatus == Status.Active && c.Type == SlidersImageType.Mobile, false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                sliders = sliders.Where(c => c.Title.Contains(search) || c.Decription.Contains(search));
+            }
+            return await sliders.Include(x => x.Image).Include(x => x.Image.ImageSettings).OrderByDescending(e => e.CreatedAt).ToListAsync();
+        }
         public async Task<Sliders> GetSlideById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
         public void DeleteSlider(Sliders sliders) => Delete(sliders);

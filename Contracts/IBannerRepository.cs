@@ -11,7 +11,7 @@ namespace Contracts
     public interface IBannerRepository
     {
         Task<Banner> GetBannerByType(int langId, string type, bool trackChanges);
-        Task<List<Banner>> GetAllBanner(string search, bool trackChanges);
+        Task<List<Banner>> GetAllBanner(string search, string filter, bool trackChanges);
         Task<Banner> GetBannerById(int id, bool trackChanges);
         Task<Banner> GetBannerId(int id, bool trackChanges);
         Task<Banner> GetBannerImage(int imageId, bool trackChanges);
@@ -20,7 +20,7 @@ namespace Contracts
     {
         Task<StaticPages> GetPage(int id, bool trackChanges);
         Task<StaticPages> GetTypePage(PageType type, bool trackChanges);
-        Task<IEnumerable<StaticPages>> GetAllPages(string search ,bool trackChanges);
+        Task<IEnumerable<StaticPages>> GetAllPages(string search, string filter, bool trackChanges);
     } 
     public interface IServicesRepository
     {
@@ -32,8 +32,8 @@ namespace Contracts
     public interface ISliderRepository
     {
         Task<List<Sliders>> GetSliders(); 
-        Task<List<Sliders>> GetSlidersForWeb(string search);
-        Task<List<Sliders>> GetSlidersForMobile();
+        Task<List<Sliders>> GetSlidersForWeb(string search, string filter);
+        Task<List<Sliders>> GetSlidersForMobile(string search);
         Task<Sliders> GetSlideById(int id, bool trackChanges);
         Task<Sliders> GetSlideImageId(int imageId, bool trackChanges);
         void AddSlider(Sliders sliders);

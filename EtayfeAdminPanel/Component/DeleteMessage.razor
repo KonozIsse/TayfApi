@@ -1,0 +1,33 @@
+﻿@inject LocService SharedLocalize
+                                   
+<a  data-placement="bottom" class="badge bg-red"  title="@Id" data-toggle="modal" data-target="#exampleModal">
+    <i class="fa fa-trash" aria-hidden="true"></i>
+</a>
+
+ <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title" id="deleteLanguagesModalLabel">@SharedLocalize.GetLocalizedStringValue("delete")</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+               
+                </div>
+                <div class="modal-body">
+                <p>@SharedLocalize.GetLocalizedStringValue("ConfirmMsgDelete")</p>
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <a  class="btn btn-danger" @onclick="async()=> await OnDelete.InvokeAsync(Id)">@SharedLocalize.GetLocalizedStringValue("Yes")</a>
+                       
+                    </div>
+            </div>
+        </div>
+ </div>
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public EventCallback<int> OnDelete{ get; set; }
+    
+}

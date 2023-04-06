@@ -47,7 +47,14 @@ namespace Repository
         public async Task<MailList> GetEmail(string email)
         => await FindByCondition(c => c.Email == email, false).FirstOrDefaultAsync();
         public async Task<List<MailList>> GetMailListEmail(string search)
-        => await FindByCondition(c => c.Email.Contains(search) , false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+        {
+            var result = FindAll(false);
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                result = result.Where(c => c.Email.Contains(search));
+            }
+            return await result.OrderByDescending(c => c.CreatedAt).ToListAsync();
+        }
         public void SendUserEmail(MailList sendEmail) => Create(sendEmail);
         public void RemoveMailList(MailList email) => Delete(email);
     }

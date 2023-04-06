@@ -18,9 +18,10 @@ namespace Entities.DataTransferObjects
         public int CountReviews { get; set; }
         public int NumLike { get; set; }
         public int StoreId { get; set; }
+        public int AdminId { get; set; }
         public string StoreName { get; set; }
         public string StoreImage { get; set; }
-        public int TypeId { get; set; }
+        public ProductsType ProductType { get; set; }
         public string ShareLink { get; set; }
         public bool IsFavorite { get; set; } 
         public short IsFeature { get; set; }
@@ -29,6 +30,9 @@ namespace Entities.DataTransferObjects
         public short IsPopular { get; set; }
         public bool IsSpecial { get; set; }
         public bool IsSale { get; set; }
+        public bool IsAcceptAdmin { get; set; }
+        public string CategoryName { get; set; }
+        public string CategoryImage { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; }
         public List<ReviewDto> Reviews { get; set; }

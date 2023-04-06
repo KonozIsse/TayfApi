@@ -22,17 +22,28 @@ namespace Repository
         public async Task<Language> GetCodeLanguageId(int id, bool trackChanges)
        => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
         public async Task<Language> GetDefaultLanguage(bool trackChanges)
-        => await FindByCondition(c => c.IsDefault == 1, trackChanges).FirstOrDefaultAsync();
+        => await FindByCondition(c => c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();
         public async Task<IEnumerable<Language>> GetListLanguage(bool trackChanges)
         => await FindAll(trackChanges).ToListAsync();
-        public async Task<IEnumerable<Language>> GetAllLanguage(string search)
+        public async Task<IEnumerable<Language>> GetAllLanguage(string search ,string filter)
         { 
             var langs =  FindAll(false);
             if (!string.IsNullOrEmpty(search))
             {
-                langs.Where(c => c.Name.Contains(search) || c.Code.Contains(search));
+                if(filter== "0")
+                {
+                    langs = langs.Where(c => c.Name.Contains(search));
+                }
+                else if(filter == "1")
+                {
+                    langs = langs.Where(c => c.Code.Contains(search));
+                }
+                else
+                {
+                    langs = langs.Where(c => c.Name.Contains(search) || c.Code.Contains(search));
+                }
             }
-            return await langs.ToListAsync();
+            return await langs.Include(c=>c.Image).ToListAsync();
         }
         public void DeleteLanguage(Language language) => Delete(language);
         public async Task<IEnumerable<Language>> GetListLanguageImage(int imageId,bool trackChanges)

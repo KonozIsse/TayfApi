@@ -1,0 +1,265 @@
+﻿@page "/CP/Customers"
+
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+@inject UserBL _userBL
+@inject IJSRuntime js
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Customers") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("Customers")<small> @SharedLocalize.GetLocalizedStringValue("Customers").</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("Customers") </li>
+    </ol>
+</section>
+@if (Model != null)
+{
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-6 form-inline" id="contact-form">
+                                    <form class="registration">
+                                        <div class="input-group-form search-panel ">
+                                            <select type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown" @bind="@filter">
+                                                <option value="-1" selected="" disabled="" hidden="">@SharedLocalize.GetLocalizedStringValue("FilterBy")</option>
+                                                <option value="0">@SharedLocalize.GetLocalizedStringValue("Name")</option>
+                                                <option value="1" >@SharedLocalize.GetLocalizedStringValue("Email")</option>
+                                                <option value="2">@SharedLocalize.GetLocalizedStringValue("Mobile")</option>
+                                            </select>
+                                            <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                            <button type="button" class="btn btn-primary" @onclick="@GetCustomers"><i class="oi oi-magnifying-glass"></i></button>
+
+                                            <a href="" type="button" class="btn btn-default" @onclick="@NevigateToYourUrl" @onclick:preventDefault><i class="fa fa-refresh"></i></a>
+                                        </div>
+                                    </form>
+                                    <div class="col-lg-4 form-inline"></div>
+                                </div>
+
+                                <div class="box-tools pull-right">
+
+                                    <a href="/CP/Customer/Add" type="button" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("AddCustomer")</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 table-responsive">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Name") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Email") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Mobile")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("status") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CreatedDate")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.FullName </td>
+                                                    <td>@item.Email</td>
+                                                    <td>@item.PhoneNumber</td>
+                                                    <td>
+                                                        @if (item.Status == Status.Active)
+                                                        {
+                                                            <span class="label label-success"> @SharedLocalize.GetLocalizedStringValue("active") </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="label label-warning">@SharedLocalize.GetLocalizedStringValue("notActive")</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @item.CreatedAt
+                                                    </td>
+                                                    <td>
+                                                        <ul class="nav table-nav">
+                                                            <li class="dropdown">
+                                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                                                    @SharedLocalize.GetLocalizedStringValue("Actions") 
+                                                                </a>
+                                                                <ul class="dropdown-menu">
+                                                                    <li role="presentation">
+                                                                        <a role="menuitem" tabindex="-1" href="/CP/Customer/Edit/@item.Id" title="@SharedLocalize.GetLocalizedStringValue("edit")">@SharedLocalize.GetLocalizedStringValue("edit")</a>
+                                                                    </li>
+
+                                                                    <li role="presentation" class="divider"></li>
+                                                                    <li role="presentation">
+                                                                        <a title="@item.FullName" @onclick="(async ()=> await Delete(item))">@SharedLocalize.GetLocalizedStringValue("delete") </a>
+                                                                    </li>
+                                                                    @if (item.Status == Status.Active)
+                                                                    {
+                                                                        <li role="presentation" class="divider"></li>
+                                                                        <li role="presentation">
+                                                                            <a title="@item.FullName" @onclick="(async ()=> await Deactive(item))">@SharedLocalize.GetLocalizedStringValue("Deactivate") </a>
+                                                                        </li>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <li role="presentation" class="divider"></li>
+                                                                        <li role="presentation">
+                                                                            <a title="@item.FullName" @onclick="(async ()=> await Active(item))">@SharedLocalize.GetLocalizedStringValue("Activated") </a>
+                                                                        </li>
+
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+                                <div class="col-xs-12 text-right">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+       
+        <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content notificationContent">
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    public string filter { get; set; }
+    string lang = "ar";
+
+    public List<CustomerDto> Model { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //lang = _homeBL.GetDefaultLanugage();
+        await GetCustomers();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetCustomers();
+    }
+    async Task GetCustomers()
+    {
+        var pagingResponse = await _userBL.GetCustomers(search,filter,  _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    public async Task Delete(CustomerDto customer)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {customer.FullName}?");
+        @if (confirm)
+        {
+            var result = await _userBL.RemoveUser(customer.Id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+        NevigateToYourUrl();
+    }
+    public async Task Active(CustomerDto customer)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure ?");
+        @if (confirm)
+        {
+            var result = await _userBL.ActiveCustomer(customer.Id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+        NevigateToYourUrl();
+    }
+    public async Task Deactive(CustomerDto customer)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure ?");
+        @if (confirm)
+        {
+            var result = await _userBL.DeactiveCustomer(customer.Id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+        NevigateToYourUrl();
+    }
+   
+   
+
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/CP/Customers", true);
+    }
+}

@@ -20,16 +20,32 @@ namespace Repository
 
         }
         public async Task<List<Country>> GetCountries()
-        => await FindAll(false).Include(x => x.Zones).Include(c=>c.Image).ToListAsync();
+        => await FindAll(false).Include(x => x.Zones).ToListAsync();
         public async Task<List<Country>> GetCountriesImage(int ImageId)
        => await FindByCondition(c=>c.ImgId== ImageId,false).ToListAsync();
-        public async Task<IEnumerable<Country>> GetAllCountries(string search)
+        public async Task<IEnumerable<Country>> GetAllCountries(string search , string filter)
         { 
             var countries = FindAll(false);
-            if (!String.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(search))
             {
-                countries.Where(c=>c.CountryName.Contains(search) || c.CountryCode2.Contains(search)
-                || c.CountryCode3.Contains(search)).ToList();
+                if(filter == "0")
+                {
+                    countries = countries.Where(c => c.CountryName.Contains(search));
+                }
+                else if (filter == "1")
+                {
+                    countries = countries.Where(c => c.CountryCode2.Contains(search));
+                }
+                else if (filter == "2")
+                {
+                    countries = countries.Where(c => c.CountryCode3.Contains(search));
+                }
+                else
+                {
+                    countries = countries.Where(c => c.CountryName.Contains(search) || c.CountryCode2.Contains(search)
+                      || c.CountryCode3.Contains(search));
+                }
+              
             }
             return await countries.Include(x => x.Zones).Include(c => c.Image).ToListAsync();
         }
@@ -48,19 +64,35 @@ namespace Repository
         }
        
         public async Task<List<Zone>> GetZonesByCountryId(int countryId)
-        => await FindByCondition(c => c.CountryId == countryId, false).ToListAsync();
+        => await FindByCondition(c => c.CountryId == countryId, false).Include(c=>c.Country).ToListAsync();
         public async Task<Zone> GetZoneId (int id, bool trackChanges)
          => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
-       public async Task<List<Zone>> GetAllZones(string search)
+       public async Task<List<Zone>> GetAllZones(string search, string filter)
         {
             var zones = FindAll(false);
             if (!string.IsNullOrEmpty(search))
             {
-                zones.Where(c => c.ZoneName.Contains(search) || c.ZoneCode.Contains(search) || c.Country.CountryName.Contains(search));
+                if (filter == "0")
+                {
+                    zones = zones.Where(c => c.ZoneName.Contains(search));
+                }
+                else if (filter == "1")
+                {
+                    zones = zones.Where(c => c.ZoneCode.Contains(search));
+                }
+                else if (filter == "2")
+                {
+                    zones = zones.Where(c => c.Country.CountryName.Contains(search));
+                }
+                else
+                {
+                    zones = zones.Where(c => c.ZoneName.Contains(search) || c.ZoneCode.Contains(search) || c.Country.CountryName.Contains(search));
+                }
             }
-           return await zones.Include(c => c.Country).ToListAsync();
+            return await zones.Include(c => c.Country).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         }
-
+        public async Task<List<Zone>> GetZones()
+        => await FindAll(false).Include(c => c.Country).OrderByDescending(c => c.CreatedAt).ToListAsync();
         public void AddZone(int countryId, Zone zone) 
         { 
             zone.CountryId = countryId;

@@ -1,0 +1,22 @@
+﻿
+@page "/Logout"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime js
+
+
+
+<text>Login out...</text>
+
+@code {
+    protected async override Task OnInitializedAsync()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.InvokeVoidAsync("localStorage.removeItem", "user").ConfigureAwait(false);
+        }
+    }
+}

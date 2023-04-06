@@ -24,7 +24,19 @@ namespace WebLayer.Controllers
         public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
-
+        [HttpPost("addImages")]
+        public async Task<IActionResult> CreateImages([FromForm] CreateImageDto create)
+        {
+            var result = await _imageBL.CreateImages(GetCurrentUserId(), create);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
         {

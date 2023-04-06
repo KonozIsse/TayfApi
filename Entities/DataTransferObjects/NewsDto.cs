@@ -2,6 +2,7 @@
 using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entities.DataTransferObjects
 {
@@ -22,16 +23,18 @@ namespace Entities.DataTransferObjects
 }
     public class CreateNewsDto
     {
+        [Required]
         public string TitleAr { get; set; }
         public string DecriptionAr { get; set; }
         public string Title { get; set; }
         public string Decription { get; set; }
         public Status IsStatus { get; set; }
-        public int ImageId { get; set; }
+       // public int ImageId { get; set; }
     }
     public class UpdateNewsDto : CreateNewsDto
     {
-        public int NewsId { get; set; }
+        public int Id { get; set; }
+        public string Image { get; set; }
     } 
     public class CreateCommentDto
     {

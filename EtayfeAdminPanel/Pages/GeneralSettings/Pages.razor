@@ -1,0 +1,134 @@
+﻿@page "/settings/pages"
+@inject HomeBL _homeBL
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("staticPages") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("staticPages") <small>Listing All The @SharedLocalize.GetLocalizedStringValue("staticPages").</small> </h1>
+    <ol class="breadcrumb">
+        <li><a href="/">@SharedLocalize.GetLocalizedStringValue("dashboard")</a></li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("staticPages")</li>
+    </ol>
+</section> 
+@if (Model != null)
+{
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="box-header">
+                            <div class="col-lg-6 form-inline" id="contact-form">
+                                <form class="registration" method="get">
+                                    <div class="input-group-form search-panel ">
+                                        <select type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown" @bind="@filter">
+                                            <option value="-1" selected="" disabled="" hidden="">@SharedLocalize.GetLocalizedStringValue("FilterBy")</option>
+                                            <option value="0">@SharedLocalize.GetLocalizedStringValue("mainTitle")</option>
+                                        </select>
+                                        <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                        <button type="button" class="btn btn-primary" @onclick="@GetPages"><i class="oi oi-magnifying-glass"></i></button>
+                                        <a href="" type="button" class="btn btn-default" @onclick="@NevigateToYourUrl" @onclick:preventDefault><i class="fa fa-refresh"></i></a>
+                                    </div>
+                                </form>
+                                <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th> #</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("mainTitle")</th>
+                                                <th style="width: 68%;">@SharedLocalize.GetLocalizedStringValue("desc")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.Title</td>
+                                                    <td class="tdDes">@((MarkupString)item.Description)</td>
+
+                                                    <td>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Title" href="/pages/edit/@item.Id"class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        @if (Model.Count >= 10)
+        {
+            <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+        }
+
+    </section>
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    public string filter { get; set; }
+    string lang = "ar";
+
+    public List<PageDto> Model { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPages();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetPages();
+    }
+    async Task GetPages()
+    {
+        var pagingResponse = await _homeBL.GetAllPages(search, filter, lang, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/pages/Index", true);
+    }
+}

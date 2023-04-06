@@ -13,7 +13,7 @@ namespace Contracts
         Task<Country> GetcountryById(int id, bool trackChanges);
         bool ExistCountry(string countryName, string code);
         Task<List<Country>> GetCountriesImage(int ImageId);
-        Task<IEnumerable<Country>> GetAllCountries(string search);
+        Task<IEnumerable<Country>> GetAllCountries(string search, string filter);
         void AddCountry(Country country);
         void DeleteCountry(Country country);
     }
@@ -22,8 +22,9 @@ namespace Contracts
         bool ExistZone(string zoneName, string code);
         Task<List<Zone>> GetZonesByCountryId(int countryId);
         Task<Zone> GetZoneId(int id, bool trackChanges);
-        Task<List<Zone>> GetAllZones(string search);
+        Task<List<Zone>> GetAllZones(string search , string filter);
         void AddZone(int countryId ,Zone zone);
         void DeleteZone(Zone zone);
+        Task<List<Zone>> GetZones();
     }
 }

@@ -429,12 +429,6 @@ namespace WebLayer.Migrations
                         .HasMaxLength(191)
                         .HasColumnType("nvarchar(191)");
 
-                    b.Property<string>("CouponName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CouponNameAr")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -442,9 +436,6 @@ namespace WebLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DescriptionAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DiscountType")
@@ -486,8 +477,7 @@ namespace WebLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DecimalPlaces")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
@@ -554,63 +544,6 @@ namespace WebLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DeliveryTimes");
-                });
-
-            modelBuilder.Entity("Entities.Models.Device", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceModel")
-                        .HasMaxLength(191)
-                        .HasColumnType("nvarchar(191)");
-
-                    b.Property<string>("DeviceToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeviceType")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("FcmToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<short>("IsNotify")
-                        .HasColumnType("smallint");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Location")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("OperatingSystem")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Devices");
                 });
 
             modelBuilder.Entity("Entities.Models.Image", b =>
@@ -793,9 +726,6 @@ namespace WebLayer.Migrations
 
                     b.Property<int>("ImgId")
                         .HasColumnType("int");
-
-                    b.Property<short?>("IsDefault")
-                        .HasColumnType("smallint");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1493,10 +1423,10 @@ namespace WebLayer.Migrations
                     b.Property<string>("ProductNameAr")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StoreId")
+                    b.Property<int>("ProductType")
                         .HasColumnType("int");
 
-                    b.Property<int>("TypeId")
+                    b.Property<int>("StoreId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1505,8 +1435,6 @@ namespace WebLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("StoreId");
-
-                    b.HasIndex("TypeId");
 
                     b.ToTable("Products");
                 });
@@ -1794,37 +1722,6 @@ namespace WebLayer.Migrations
                     b.ToTable("ProductsCoupon");
                 });
 
-            modelBuilder.Entity("Entities.Models.ProductType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductTypes");
-                });
-
             modelBuilder.Entity("Entities.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -1923,8 +1820,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "bd25df95-4451-473c-afad-f34872e4ac0b",
-                            CreatedAt = new DateTime(2023, 3, 2, 12, 31, 7, 557, DateTimeKind.Local).AddTicks(2239),
+                            ConcurrencyStamp = "41608283-931a-4c9b-959e-4e8c960042da",
+                            CreatedAt = new DateTime(2023, 4, 4, 14, 34, 8, 739, DateTimeKind.Local).AddTicks(9530),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Admin",
@@ -1933,8 +1830,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "dc4d94a7-54e7-4eeb-8da6-f549ae2c22fb",
-                            CreatedAt = new DateTime(2023, 3, 2, 12, 31, 7, 557, DateTimeKind.Local).AddTicks(2296),
+                            ConcurrencyStamp = "e098e446-2799-489a-a3f8-2a6ee6535026",
+                            CreatedAt = new DateTime(2023, 4, 4, 14, 34, 8, 739, DateTimeKind.Local).AddTicks(9588),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Customer",
@@ -1943,8 +1840,8 @@ namespace WebLayer.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "d2dedc6a-10ce-4813-aa4b-1882f1c58c44",
-                            CreatedAt = new DateTime(2023, 3, 2, 12, 31, 7, 557, DateTimeKind.Local).AddTicks(2300),
+                            ConcurrencyStamp = "b56f846a-ac90-41fb-a840-88f4157f7676",
+                            CreatedAt = new DateTime(2023, 4, 4, 14, 34, 8, 739, DateTimeKind.Local).AddTicks(9593),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Store",
@@ -2118,6 +2015,9 @@ namespace WebLayer.Migrations
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
+                    b.Property<int?>("LanguageId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -2141,6 +2041,8 @@ namespace WebLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ImgId");
+
+                    b.HasIndex("LanguageId");
 
                     b.HasIndex("VendorId");
 
@@ -2571,9 +2473,6 @@ namespace WebLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ZoneNameAr")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
@@ -2832,17 +2731,6 @@ namespace WebLayer.Migrations
                     b.Navigation("Store");
                 });
 
-            modelBuilder.Entity("Entities.Models.Device", b =>
-                {
-                    b.HasOne("Entities.Models.User", "User")
-                        .WithMany("Devices")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Entities.Models.Image", b =>
                 {
                     b.HasOne("Entities.Models.User", "Admin")
@@ -3084,14 +2972,6 @@ namespace WebLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entities.Models.ProductType", "ProductType")
-                        .WithMany("Products")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ProductType");
-
                     b.Navigation("Store");
                 });
 
@@ -3252,11 +3132,17 @@ namespace WebLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Entities.Models.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId");
+
                     b.HasOne("Entities.Models.User", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
 
                     b.Navigation("Image");
+
+                    b.Navigation("Language");
 
                     b.Navigation("Vendor");
                 });
@@ -3502,11 +3388,6 @@ namespace WebLayer.Migrations
                     b.Navigation("Values");
                 });
 
-            modelBuilder.Entity("Entities.Models.ProductType", b =>
-                {
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("Entities.Models.Role", b =>
                 {
                     b.Navigation("Permissions");
@@ -3524,8 +3405,6 @@ namespace WebLayer.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("CustomerOrders");
-
-                    b.Navigation("Devices");
 
                     b.Navigation("Products");
 

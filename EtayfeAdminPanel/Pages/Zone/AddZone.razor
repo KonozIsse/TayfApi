@@ -1,0 +1,131 @@
+﻿@page "/zone/create"
+@inject LocationTaxBL _locationTaxBL
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("RegionsAdd")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("Regions")<small>@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</li>
+
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</li>
+    </ol>
+</section>
+@if (create == null)
+{
+    <p>Loading Zone</p>
+}
+else
+{
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</h3>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="box box-info">
+                                    <br>
+                                    <div class="form-horizontal">
+                                        <div class="box-body">
+                                            <EditForm Model="@create" OnValidSubmit="@CreateZone">
+                                                <DataAnnotationsValidator />
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">
+                                                        @SharedLocalize.GetLocalizedStringValue("Country")
+                                                    </label>
+                                                    <InputSelect class="form-control" @bind-Value="create.CountryId">
+                                                        @if (countries == null)
+                                                        {
+                                                            <p>Loading</p>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option  value="">Country</option>
+                                                            @foreach (var country in countries)
+                                                            {
+                                                                <option value="@country.Id">@country.CountryName</option>
+                                                            }
+                                                        }
+                                                    </InputSelect>
+                                                    <ValidationMessage For="@(() => create.CountryId)" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">
+                                                        @SharedLocalize.GetLocalizedStringValue("RegionName")<span style="color:red;">*</span>
+
+                                                    </label>
+                                                   
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control" @bind-Value="create.ZoneName" />
+                                                        <ValidationMessage For="@(() => create.ZoneName)" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">
+                                                        @SharedLocalize.GetLocalizedStringValue("RegionCode")<span style="color:red;"></span>
+                                                    </label>
+                                                    <InputText class="form-control" @bind-Value="create.ZoneCode" />
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <ValidationMessage For="@(() => create.ZoneCode)" />
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="box-footer text-center">
+                                                    <button type="submit" class="btn btn-primary" >@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                                    <a href="/CP/Zones" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                </div>
+                                            </EditForm>
+                                        </div>
+
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@code {
+
+    public CreateZoneDto create { get; set; }
+    private List<CountryDto> countries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        create = new CreateZoneDto();
+        countries = await _locationTaxBL.GetAllCountries();
+    }
+    string message = "";
+    string style = "";
+    async Task CreateZone()
+    {
+        var result =  await _locationTaxBL.AddZone(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+
+   
+}

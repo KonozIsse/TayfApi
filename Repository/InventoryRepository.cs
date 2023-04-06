@@ -23,10 +23,10 @@ namespace Repository
          => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == option && r.StockType == "out", false).ToListAsync();
         public async Task<IEnumerable<Inventory>> GetAllInventoryByProductIdOption (int productId, int attributeId)
          => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == attributeId, false).ToListAsync();
-        public async Task<List<Inventory>> GetAllInventoryByPrductId(int productId)
-         => await FindByCondition(r => r.ProductId == productId, false).ToListAsync();
+        public List<Inventory> GetAllInventoryByPrductId(int productId)
+         => FindByCondition(r => r.ProductId == productId, false).Include(c => c.Product).ToList();
         public async Task<IEnumerable<Inventory>> GetAllInventory() 
-            => await FindAll(false).Include(c=>c.Product).OrderByDescending(c=>c.CreatedAt)
+            => await FindAll(false).Include(c=>c.Product).ThenInclude(c=>c.Images).OrderByDescending(c=>c.CreatedAt)
             .ToListAsync();
         public async Task<List<Inventory>> GetOptionsByProductIdInStock(int productId)
         => await FindByCondition(r => r.ProductId == productId && r.StockType == "in", false).ToListAsync();

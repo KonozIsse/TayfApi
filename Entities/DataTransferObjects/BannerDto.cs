@@ -17,6 +17,7 @@ namespace Entities.DataTransferObjects
         public string Url { get; set; }
         public string LangName { get; set; }
         public string Img { get; set; }
+        public string CreatedAt { get; set; }
     }
     public class UpdateBannerDto
     {

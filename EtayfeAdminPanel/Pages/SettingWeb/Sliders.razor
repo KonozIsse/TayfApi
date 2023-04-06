@@ -1,0 +1,167 @@
+﻿@page "/CP/SettingWeb/Sliders"
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("slider") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message"  Style="@style"></Alert>
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("slider") <small> @SharedLocalize.GetLocalizedStringValue("slider")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+       <li class="active"> @SharedLocalize.GetLocalizedStringValue("slider") </li>
+    </ol>
+</section>
+
+<!--  content -->
+<section class="content">
+    @if(Model != null)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <div class="box-header">
+                        <div class="col-lg-6 form-inline" id="contact-form">
+                            <form class="registration" method="get">
+                                <div class="input-group-form search-panel ">
+                                    <select type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown" @bind="@filter">
+                                        <option value="-1" selected="" disabled="" hidden="">@SharedLocalize.GetLocalizedStringValue("FilterBy")</option>
+                                        <option value="0">@SharedLocalize.GetLocalizedStringValue("sliderTitle")</option>
+                                    </select>
+                                    <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                    <button type="button" class="btn btn-primary" @onclick="@GetSliderWeb"><i class="oi oi-magnifying-glass"></i></button>
+                                    <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+                                </div>
+                            </form>
+                            <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                        </div>
+                        <div class="box-tools pull-right">
+
+                            <a href="/CP/SettingWeb/AddSlide" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addSlider")</a>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @if (Model.Count() > 0)
+                            {
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th> #</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("mainTitle")</th>
+                                            <th style="width: 28%;">@SharedLocalize.GetLocalizedStringValue("img")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("desc")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("AddedDate")/@SharedLocalize.GetLocalizedStringValue("updateDate")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var i = 0;
+                                        }
+                                        @foreach (var item in Model)
+                                        {
+                                            i += 1;
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>@item.Title</td>
+                                                <td><img style="width: 25%;" src="@item.Image" /></td>
+                                                    <td style="width:20%;">@((MarkupString)item.Decription)</td>
+                                                <td>
+                                                    @SharedLocalize.GetLocalizedStringValue("AddedDate") : @item.CreatedAt
+                                                </td>
+                                                <td>
+                                                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/SettingWeb/EditSlide/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <DeleteMessage OnDelete="@Delete" Id="@item.Id"> </DeleteMessage>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                    @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    @if (Model.Count >= 10)
+    {
+        <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+    }
+ }
+
+</section>
+
+@code {
+    [Parameter]
+    public string search { get; set; }
+    [Parameter]
+    public string filter { get; set; }
+    [Parameter]
+    public string lang { get; set; }
+
+    int vendorId = 0;
+    int admin = 1;
+    public List<SliderDto> Model { get; set; }
+   
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        await GetSliderWeb();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetSliderWeb();
+    }
+    async Task GetSliderWeb()
+    {
+        var pagingResponse = await _homeBL.GetSliderWeb(search, filter, lang, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var result = await _homeBL.DeleteSlide(id);
+
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+
+    }
+}

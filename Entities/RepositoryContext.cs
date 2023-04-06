@@ -34,7 +34,6 @@ namespace Entities
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<Device> Devices { get; set; }
         public DbSet<DeliveryTime> DeliveryTimes { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<ImageSetting> ImageSettings { get; set; }
@@ -59,7 +58,6 @@ namespace Entities
         public DbSet<ProductOption> ProductOptions { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<ProductSales> ProductSales { get; set; }
-        public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Setting> Settings { get; set; }
@@ -127,8 +125,6 @@ namespace Entities
             ConfigureSoftDelete(modelBuilder);
             ConfigureSoftDeleteUser(modelBuilder);
             ConfigureAutoMapToTables(modelBuilder);
-
-
             ConfigureDeleteBehavior(modelBuilder);
 
         
@@ -141,6 +137,7 @@ namespace Entities
 
             modelBuilder.Entity<User>().HasMany(customer => customer.CustomerOrders)
                          .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId);
+
         }
 
         private static void ConfigureDeleteBehavior(ModelBuilder modelBuilder)

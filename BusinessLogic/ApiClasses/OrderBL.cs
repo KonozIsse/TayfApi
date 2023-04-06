@@ -10,6 +10,9 @@ using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Identity;
 using System.Text;
 using System.Security.Cryptography;
+using Microsoft.Owin.BuilderProperties;
+using Org.BouncyCastle.Utilities;
+
 namespace BusinessLogic.ApiClasses
 {
     public class OrderBL 
@@ -696,70 +699,56 @@ namespace BusinessLogic.ApiClasses
             }
             return orderDto;
         }
-        public async Task<List<OrderDto>> GetAllSalesOrders(int userId , string search , DateTime? dateFrom, DateTime? dateTo)
+        public async Task<List<OrderDto>> GetAllSalesOrders(int userId , string search, int customerId, int storeId, int statusId, DateTime? dateFrom, DateTime? dateTo)
         {
-            var orders = await _repositoryManager.Order.GetAllSalesOrders(search , dateFrom, dateTo);
+            var orders = await _repositoryManager.Order.GetAllSalesOrders(search, customerId, storeId, statusId, dateFrom, dateTo);
           
             var store = await _repositoryManager.User.GetActiveUserId(userId,false);
             if(store.UserType == UserType.Store)
             {
-                orders.Where(c => c.StoreId == userId);
+                orders = orders.Where(c => c.StoreId == userId).ToList();
             }
-            var ordersDto = orders.Select(order=> new OrderDto
+            var ordersDto = orders.Select(order=> 
             {
-                Id = order.Id,
-                CustomerName = order.Customer.FullName,
-                Currency = order.Currency.Symbol,
-                CustomerPhone = order.Customer.PhoneNumber,
-                StoreName = store.FullName,
-                StorePhone = store.PhoneNumber,
-                CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
-                TotalTax = order.TotalTax,
-                OrderStatusName = order.OrderStatus.StatusName ?? null,
-                OrderPrice = order.OrderPrice,
-                Total = orders.Sum(c=>c.OrderPrice)
+                var orderDto = _mapper.Map<OrderDto>(order);
+                orderDto.CustomerName = order.Customer.FullName;
+                orderDto.CodeMobileCountry = order.Customer.CodeMobileCountry;
+                orderDto.Currency = order.Currency.Symbol;
+                orderDto.CustomerPhone = order.Customer.PhoneNumber;
+                orderDto.StoreName = order.Store.FullName;
+                orderDto.StorePhone = order.Store.PhoneNumber;
+                orderDto.CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                orderDto.OrderStatusName = order.OrderStatus.StatusName ?? null;
+                orderDto.Total = orders.Sum(c => c.OrderPrice);
+                return orderDto;
            }).ToList();
             return ordersDto;
         } 
-        public async Task<PagedList<OrderDto>> GetAllOrders( string search ,PostsParameters postsParameters)
+        public async Task<PagedList<OrderDto>> GetAllOrders(int userId  ,string search ,PostsParameters postsParameters)
         {
-            var ordersDto = new List<OrderDto>();
             var orders = await _repositoryManager.Order.GetAllOrders(search);
-            foreach (var order in orders)
+            var store = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (store.UserType == UserType.Store)
             {
-                var store = await _repositoryManager.User.GetStoreId(order.StoreId);
-                if (store != null)
-                {
-                    var products = await _repositoryManager.Product.GetProductsTOStoreId(store.Id);
-                    var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
-                    var currency = await _repositoryManager.Currency.GetCurrency(order.CurrencyId, false);
-                    var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                    var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-
-                    ordersDto.Add(new OrderDto
-                    {
-                    Id = order.Id,
-                    CustomerName = customer.FullName,
-                    Currency = currency.Symbol,
-                    CustomerEmail = customer.Email,
-                    CustomerPhone =  customer.PhoneNumber,
-                    StoreName = ( store.FullName),
-                    StoreEmail = store.Email,
-                    StorePhone = store.PhoneNumber,
-                    AddressId = order.AddressId,
-                    CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt"),
-                    DatePurchased = (!String.IsNullOrEmpty(order.DatePurchased.ToString()) ? order.DatePurchased.Value.AddHours(3).ToString("dd/MM/yyyy HH:mm:ss tt") : ""),
-                    DeliveryTimeName = time.Time??null,
-                    DeliveryTimeId = order.DeliveryTimeId,
-                    TotalTax = order.TotalTax,
-                    OrderStatusId = order.OrderStatusId,
-                    OrderStatusName = states.StatusName??null,
-                    Notes = order.Notes,
-                    CountProduct = products.Count(),
-                    OrderPrice = order.OrderPrice
-                });
-             }
+                orders = orders.Where(c => c.StoreId == userId).ToList();
             }
+            var ordersDto = orders.Select(order =>
+            {
+                var orderDto = _mapper.Map<OrderDto>(order);
+                orderDto.CustomerName = order.Customer.FullName;
+                orderDto.Currency = order.Currency.Symbol;
+                orderDto.CustomerEmail = order.Customer.Email;
+                orderDto.CustomerPhone = order.Customer.PhoneNumber;
+                orderDto.StoreName = order.Store.FirstName;
+                orderDto.StoreEmail = order.Store.Email;
+                orderDto.StorePhone = order.Store.PhoneNumber;
+                orderDto.CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                orderDto.DatePurchased = (!String.IsNullOrEmpty(order.DatePurchased.ToString()) ? order.DatePurchased.Value.AddHours(3).ToString("dd/MM/yyyy HH:mm:ss tt") : "");
+                orderDto.DeliveryTimeName = order.DeliveryTime.Time ?? null;
+                orderDto.OrderStatusName = order.OrderStatus.StatusName ?? null;
+                orderDto.CountProduct = order.OrderProducts.Count();
+                return orderDto;
+            }).ToList();
             return PagedList<OrderDto>.ToPagedList(ordersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<string> InvoiceOrder(int id)
@@ -849,6 +838,12 @@ namespace BusinessLogic.ApiClasses
             return all;
         }
         //Coupon------------------------------------------------
+        public async Task<List<ProductDto>> GetAllPrductsToCoupon()
+        {
+            var products = await _repositoryManager.Product.GetAllProducts();
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
+            return productsDto;
+        }
         public async Task<BussnessResultModel> AddCoupon(CreateCouponDto createDto, int userId)
         {
             var IsExists = _repositoryManager.Coupon.CheckExistCoupon(createDto.CouponCode);
@@ -950,7 +945,27 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<CouponDto>> GetAllCoupons(string search , PostsParameters postsParameters)
         {
             var coupons = await _repositoryManager.Coupon.GetCoupons(search);
-            var couponsDto = _mapper.Map<List<CouponDto>>(coupons);
+            var couponsDto = coupons.Select(coupon =>
+            {
+                var couponDto = _mapper.Map<CouponDto>(coupon);
+                if (coupon.DiscountType == DiscountType.CartDiscount)
+                {
+                    couponDto.DiscountType = _locService.GetLocalizedStringValue("CartDiscount");
+                }
+                else if (coupon.DiscountType == DiscountType.CartPercentDiscount)
+                {
+                    couponDto.DiscountType = _locService.GetLocalizedStringValue("Cart2Discount");
+                }
+                else if (coupon.DiscountType == DiscountType.ProductDiscount)
+                {
+                    couponDto.DiscountType = _locService.GetLocalizedStringValue("ProductDiscount");
+                }
+                else
+                {
+                    couponDto.DiscountType = _locService.GetLocalizedStringValue("Product2Discount");
+                }
+                return couponDto;
+            }).ToList();
             return PagedList<CouponDto>.ToPagedList(couponsDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
        
@@ -958,13 +973,26 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<OrderStatusDto>> GetOrderStatus(string lang  , PostsParameters postsParameters)
         {
             var orderStatuses = await _repositoryManager.OrderStatus.GetOrderStatusesList(false);
-            var model = orderStatuses.Select(status=>new OrderStatusDto
+            var model = orderStatuses.Select(status=>
                 {
-                    Id = status.Id,
-                    StatusName = lang == "en" ? status.StatusName : status.StatusNameAr,
-                    Option = lang == "en" ? (status.IsStatus == Status.Active? "Yes" : "No") : (status.IsStatus == Status.Active ? "نعم" : "لا")
-                });
+                    var statusDto = _mapper.Map<OrderStatusDto>(status);
+                    statusDto.StatusName = lang == "en" ? status.StatusName : status.StatusNameAr;
+                    statusDto.Option = lang == "en" ? (status.IsStatus == Status.Active ? "Yes" : "No") : (status.IsStatus == Status.Active ? "نعم" : "لا");
+                    return statusDto;
+                }).ToList();
             return PagedList<OrderStatusDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task<List<OrderStatusDto>> GetAllOrderStatus(string lang)
+        {
+            var orderStatuses = await _repositoryManager.OrderStatus.GetOrderStatusesList(false);
+            var model = orderStatuses.Select(status =>
+            {
+                var statusDto = _mapper.Map<OrderStatusDto>(status);
+                statusDto.StatusName = lang == "en" ? status.StatusName : status.StatusNameAr;
+                statusDto.Option = lang == "en" ? (status.IsStatus == Status.Active ? "Yes" : "No") : (status.IsStatus == Status.Active ? "نعم" : "لا");
+                return statusDto;
+            }).ToList();
+            return model;
         }
         public async Task<BussnessResultModel> EditOrderStatus(UpdateOrderStatusDto update)
         {

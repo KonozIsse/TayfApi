@@ -121,6 +121,6 @@
     <value>Active</value>
   </data>
   <data name="NotActive" xml:space="preserve">
-    <value>NotActive</value>
+    <value>Not Active</value>
   </data>
 </root>

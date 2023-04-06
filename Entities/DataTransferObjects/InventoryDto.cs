@@ -14,7 +14,8 @@ namespace Entities.DataTransferObjects
         public int Id { get; set; }
         public int Stock { get; set; }
         public int ProductId { get; set; }
-        public string ProductName { get; set; } 
+        public string ProductName { get; set; }
+        public string ProductImage { get; set; }
         public string AddedBy { get; set; } 
         public string StockType { get; set; }
         public string PurchaseCode { get; set; }
@@ -26,7 +27,6 @@ namespace Entities.DataTransferObjects
     {
         public int Stock { get; set; }
         public int ProductId { get; set; }
-        public decimal TotalPurchasedPrice { get; set; }
         public string PurchaseCode { get; set; }
         public int? AttributesProductId { get; set; }
     }

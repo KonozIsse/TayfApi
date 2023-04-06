@@ -1,0 +1,332 @@
+﻿@inject HomeBL _homeBL
+@inject LocService SharedLocalize
+@inject HttpClient http
+<div class="top-row pl-4 navbar navbar-dark">
+    @*@if(user != null)
+    {
+        <a class="navbar-brand" href="/index"> <b>@user.RoleName</b></a>
+    }*@
+    <button class="navbar-toggler" @onclick="() => ToggleNavMenu(navSubmenu)">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => ToggleNavMenu(NavSubmenu.None)" href="index" Match="NavLinkMatch.All">
+                <span class="oi oi-dashboard" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Dashboard")
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.First)">
+                <span class="oi oi-image" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Media")  
+            </NavLink>
+        </li>
+        @if (navSubmenu == NavSubmenu.First)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Media">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("Media")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Media/Setting">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>   @SharedLocalize.GetLocalizedStringValue("MediaSetting")
+                </NavLink>
+            </li>
+        }
+       
+        
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="CP/Languages">
+                <span class="oi oi-transfer" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Langauge")
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="CP/Currencies">
+                <span class="oi oi-dollar" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Currency")
+            </NavLink>
+        </li>
+
+      
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Second)">
+                <span class="oi oi-location" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Loaction/Tax")
+            </NavLink>
+        </li>
+
+        @if (navSubmenu == NavSubmenu.Second)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Countries">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("Countries")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Zones">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("zones")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Taxes">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("TaxClass") 
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/TaxRates">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("TaxRates") 
+                </NavLink>
+            </li>
+        }
+
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Third)">
+                <span class="oi oi-person" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Manage Admins")
+            </NavLink>
+        </li>
+
+        @if (navSubmenu == NavSubmenu.Third)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Admins">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("admins")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Roles">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("roles")
+                </NavLink>
+            </li>
+           
+        }
+       
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Forth)">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("Catalog")
+            </NavLink>
+        </li>
+
+        @if (navSubmenu == NavSubmenu.Forth)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Categories">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Categories")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Options">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Products Option")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Products">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Products")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Stocks">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Inventory") 
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reviews">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Reviews")
+                </NavLink>
+            </li>
+
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Fifth)">
+                <span class="oi oi-aperture" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Setting(WebSite)")
+            </NavLink>
+        </li>
+
+        @if (navSubmenu == NavSubmenu.Fifth)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/SettingWeb/Sliders">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Slider Images")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/SettingWeb/Services">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Services")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/SettingWeb/Banners">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Banners")
+                </NavLink>
+            </li>
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Sixth)">
+                <span class="oi oi-clipboard" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Reports")
+            </NavLink>
+        </li>
+        @if (navSubmenu == NavSubmenu.Sixth)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reports/LowStock">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("In Stock Products")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reports/OutStock">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Out Stock Products")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reports/CustomerReport">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Customer Orders")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reports/LikedProducts">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Products Liked")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reports/VendorsSales">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Vendors Sales")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reports/SalesRep">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Sales Report")
+                </NavLink>
+            </li>
+        }
+
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Seventh)">
+                <span class="oi oi-aperture" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Setting(Mobile)")
+            </NavLink>
+        </li>
+         
+        @if (navSubmenu == NavSubmenu.Seventh)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/SettingMob/Sliders">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Slider Images")
+                </NavLink>
+            </li>
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="CP/Vendors">
+                <span class="oi oi-basket" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Manage Vendors")
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Eight)">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("General Settings")
+            </NavLink>
+        </li>
+
+        @if (navSubmenu == NavSubmenu.Eight)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="/settings/Index">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Store Settings") 
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="settings/Index">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Settings")
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="settings/pages">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Static Pages")
+                </NavLink>
+            </li>
+        }
+
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="CP/Customers">
+                <span class="oi oi-people" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Customers")
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="coupons/Index">
+                <span class="oi oi-box" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Coupons")
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="CP/BLogs">
+                <span class="oi oi-bookmark" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Blogs")
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Ninth)">
+                <span class="oi oi-list" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Mailing List") 
+            </NavLink>
+        </li>
+
+        @if (navSubmenu == NavSubmenu.Ninth)
+        {
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="MailingList/Show">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Show MailingList") 
+                </NavLink>
+            </li>
+            <li class="nav-item px-5">
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="MailingList/Message">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Email Message")
+                </NavLink>
+            </li>
+           
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="contacts">
+                <span class="oi oi-envelope-closed" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Contacts")
+            </NavLink>
+        </li>
+        
+    </ul>
+</div>
+
+@code {
+    private enum NavSubmenu
+    {
+        None,
+        First,
+        Second,
+        Third,
+        Forth,
+        Fifth,
+        Sixth,
+        Seventh,
+        Eight,
+        Ninth
+    }
+    string lang = "en";
+    //_homeBL.GetDefaultLanugage();
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private NavSubmenu navSubmenu = NavSubmenu.None;
+    private bool collapseNavMenu = true;
+
+    private AdminDto user { get; set; }
+
+    private void ToggleNavMenu(NavSubmenu? submenu = null)
+    {
+        collapseNavMenu = !collapseNavMenu;
+        navSubmenu = submenu ?? navSubmenu;
+
+    }
+    private void TogleSubmenu(NavSubmenu submenu)
+    {
+        if (navSubmenu == submenu)
+            navSubmenu = NavSubmenu.None;
+        else
+            navSubmenu = submenu;
+    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    //user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+    //    user = await _homeBL.GetCurrentUser(1);
+    //}
+
+    
+}

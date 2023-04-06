@@ -12,22 +12,20 @@ namespace Entities.DataTransferObjects
     public class LanguageDto
     {
         public int Id { get; set; }
-        public Status IsStatus { get; set; }
+        public bool IsDefault { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
-        public short? IsDefault { get; set; }
        public string Image { get; set; }
         public short Sort { get; set; }
     }
 
     public class UpdateLanguageDto
     {
-        public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; } 
         public string NameAr { get; set; }
         public string Direction { get; set; }
-        public int? ImgId { get; set; }
+        public string Image { get; set; }
     }
     
 }

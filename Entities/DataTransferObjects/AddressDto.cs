@@ -29,17 +29,27 @@ namespace Entities.DataTransferObjects
     }
     public class CreateAddressDto
     {
+        [Required]
         public string AddressTitle { get; set; }
+        [Required]
         public string Address1 { get; set; }
-        public string Address2 { get; set; } 
+        public string Address2 { get; set; }
+        [Required]
         public string FirstName { get; set; }
+        [Required]
         public string LastName { get; set; }
+        [Required]
         public string Street { get; set; }
+        [Required]
         public string Post_Code { get; set; }
+        [Required]
         public string CityName { get; set; }
+        [Required]
         public string Flat { get; set; }
         public bool IsDefault { get; set; }
+        [Required]
         public int ZoneId { get; set; }
+        [Required]
         public int CountryId { get; set; }
     }
     public class UpdateAddressDto: CreateAddressDto

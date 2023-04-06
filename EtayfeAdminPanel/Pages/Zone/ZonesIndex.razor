@@ -1,0 +1,171 @@
+﻿@page "/CP/Zones"
+@inject LocationTaxBL _locationTaxBL
+@inject LocService SharedLocalize
+@inject NavigationManager _navigationManager
+@inject HomeBL _homeBL
+@inject IJSRuntime js
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Regions") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Regions") <small>Listing All The @SharedLocalize.GetLocalizedStringValue("Regions").</small> </h1>
+    <ol class="breadcrumb">
+        <li><a href="/">@SharedLocalize.GetLocalizedStringValue("dashboard")</a></li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("Regions")</li>
+    </ol>
+</section>
+
+<!--  content -->
+<div class="content">
+ @if (zoneDtos == null)
+{
+      <p>Loading.....</p>
+        <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+            @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+        </div>
+}
+else
+{
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="box-header">
+                            <div class="col-lg-6 form-inline" id="contact-form">
+                                <form class="registration" method="get">
+                                    <div class="input-group-form search-panel ">
+                                        <select type="button" class="btn btn-default  dropdown-toggle form-control" data-toggle="dropdown" @bind="@filter">
+                                            <option value="-1" selected="" disabled="" hidden="">@SharedLocalize.GetLocalizedStringValue("FilterBy")</option>
+                                            <option value="0" >@SharedLocalize.GetLocalizedStringValue("RegionName")</option>
+                                            <option value="1" >@SharedLocalize.GetLocalizedStringValue("RegionCode")</option>
+                                            <option value="2" >@SharedLocalize.GetLocalizedStringValue("CountryName")</option>
+                                        </select>
+                                        <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                        <button type="button" class="btn btn-primary" @onclick="@GetZones"><i class="oi oi-magnifying-glass"></i></button>
+
+                                        <a  type="button" class="btn btn-default" @onclick="@NevigateToYourUrl" @onclick:preventDefault><i class="fa fa-refresh"></i></a>
+                                    </div>
+                                </form>
+                                <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <a href="/zone/create" type="button" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th> #</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("RegionName")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("RegionCode")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CountryName")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        @{
+                                            var i = 0;
+                                        }
+                                            @foreach (var item in zoneDtos)
+                                            {
+
+                                                i += 1;
+                                            <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.ZoneName</td>
+                                                    <td>@item.ZoneCode</td>
+                                                    <td>@item.CountryName</td>
+                                                    <td>
+                                                    <a title="@item.ZoneName" href="/zone/edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                    <a title="@item.ZoneName" @onclick="(async ()=> await Delete(item))"  class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i> </a>
+                                                 @*  <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>*@
+                                                   
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (zoneDtos.Count >= 10)
+        {
+            <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+        }
+ }
+
+   
+</div>
+@code {
+
+    [Parameter]
+    public string search { get; set; }
+    public string filter { get; set; }
+    string lang = "ar";
+
+    public List<ZoneDto>  zoneDtos { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //lang = _homeBL.GetDefaultLanugage();
+        await GetZones();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetZones();
+    }
+    async Task GetZones()
+    {
+        var pagingResponse = await _locationTaxBL.GetAllZones(search,filter, lang, _PostsParameters);
+        zoneDtos = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    public async Task Delete(ZoneDto zone)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {zone.ZoneName}?");
+        @if (confirm)
+        {
+            var result = await _locationTaxBL.DeleteZone(zone.Id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+        NevigateToYourUrl();
+    }
+    void NevigateToYourUrl()
+    {
+        _navigationManager.NavigateTo("/CP/Zones", true);
+    }
+    
+}

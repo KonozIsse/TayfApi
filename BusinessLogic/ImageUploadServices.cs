@@ -19,12 +19,10 @@ namespace BusinessLogic
     {
         protected readonly IWebHostEnvironment _webHostEnvironment;
         protected readonly ILoggerManager _logger;
-        protected readonly  IConfiguration Configuration;
-        public  ImageUploadServices (IWebHostEnvironment webHostEnvironment , ILoggerManager logger, IConfiguration configuration)
+        public  ImageUploadServices (IWebHostEnvironment webHostEnvironment , ILoggerManager logger)
         {
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
-            Configuration = configuration;
         }
 
         public string Upload(IFormFile obj , string path)
@@ -70,7 +68,7 @@ namespace BusinessLogic
                 }
                 var binData = Convert.FromBase64String(base64Image);
 
-                fileName = Guid.NewGuid() + Path.GetExtension(fileName);
+               // fileName = Guid.NewGuid() + Path.GetExtension(fileName);
 
                 System.IO.File.WriteAllBytes(_webHostEnvironment.WebRootPath + path + fileName, binData);
                 return fileName;

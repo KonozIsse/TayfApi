@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.DataTransferObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,8 @@ namespace Entities.RequestFeatures
 
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
+
+     
     }
 }
 

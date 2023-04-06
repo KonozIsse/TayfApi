@@ -48,17 +48,17 @@ namespace BusinessLogic.ApiClasses
             newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId.Value);
             return newsDto;
         }
-        public async Task<BussnessResultModel> AddNews (int storeId,CreateNewsDto create)
+        public async Task<UpdateNewsDto> GetBlogId(int blogId)
         {
-            if (create.TitleAr == null || create.TitleAr == null)
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"),false);
-            }
-            if (create.ImageId == 0)
-            { 
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"),false);
-            }
+            var blog = await _repositoryManager.News.GetBlogById(blogId, false, false);
+            var newsDto = _mapper.Map<UpdateNewsDto>(blog);
+            newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId.Value);
+            return newsDto;
+        }
+        public async Task<BussnessResultModel> AddNews (int storeId, int im,CreateNewsDto create)
+        {
             var blog = _mapper.Map<News>(create);
+            blog.ImgId = im;
             blog.IsFeature = 1;
             blog.IsViewed = 0;
             blog.VendorId = storeId ;
@@ -68,7 +68,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> EditNews (int storeId,UpdateNewsDto updateDto)
         {
-            var blog = await _repositoryManager.News.GetBlogById(updateDto.NewsId, true);
+            var blog = await _repositoryManager.News.GetBlogById(updateDto.Id, true);
             if(blog == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
@@ -77,14 +77,13 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
             }
-            blog.Id = updateDto.NewsId;
             blog.IsFeature = 1;
             blog.IsViewed = 0;
             blog.VendorId = storeId ;
-            if (updateDto.ImageId != 0)
-            {
-                blog.ImgId = updateDto.ImageId;
-            }
+            //if (updateDto.ImageId != 0)
+            //{
+            //    blog.ImgId = updateDto.ImageId;
+            //}
             _mapper.Map(updateDto, blog);
 
             await _repositoryManager.SaveAsync();
@@ -112,17 +111,38 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
         }
+        public async Task<List<NewsDto>> GetAllBlogstest(int vendorId, string lang)
+        {
+            var searchBlog = await _repositoryManager.News.SearchNews("");
+            var user = await _repositoryManager.User.GetActiveUserId(vendorId,false);
+            if (user.UserType == UserType.Store)
+            {
+                searchBlog = searchBlog.Where(c => c.VendorId == vendorId).ToList();
+            }
+            var newsDto = searchBlog.Select(x =>
+            {
+                var blogDto = _mapper.Map<NewsDto>(x);
+                //blogDto.CountComment = x.Comments.Count();
+                blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
+                blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
+                blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");
+                blogDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(x.ImgId));
+                return blogDto;
+            }).ToList();
+            return newsDto;
+        }
+
         public async Task<PagedList<NewsDto>> GetAllBlogs (int vendorId, string lang, string search, PostsParameters postsParameters)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(search);
-            if (vendorId != null) 
+            if (vendorId != 0) 
             { 
                 searchBlog =  searchBlog.Where(c => c.VendorId == vendorId).ToList(); 
             }
             var newsDto = searchBlog.Select(x =>
             {
                 var blogDto = _mapper.Map<NewsDto>(x);
-                blogDto.CountComment = x.Comments.Count();
+                //blogDto.CountComment = x.Comments.Count();
                 blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
                 blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
                 blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");

@@ -23,20 +23,16 @@ namespace BusinessLogic.Services.Jobs
             var notify = await _repositoryManager.Notification.GetNotifications(true);
             foreach (var item in notify)
             {
-                var token = await _repositoryManager.Device.GetDeviceUserId(item.UserId);
-                if (token != null)
+                var result = await _notificationService.SendNotification(new NotificationModel
                 {
-                    var result = await _notificationService.SendNotification(new NotificationModel
-                    {
-                        Body = item.Body,
-                        DeviceId = token.FcmToken,
-                        IsAndroiodDevice = true,
-                        Title = item.Subject
-                    });
-                    if (result.IsSuccess)
-                    {
-                        item.Status = NotificationStatus.Notifified;
-                    }
+                    Body = item.Body,
+                    DeviceId ="",
+                    IsAndroiodDevice = true,
+                    Title = item.Subject
+                });
+                if (result.IsSuccess)
+                {
+                    item.Status = NotificationStatus.Notifified;
                 }
             }
             await _repositoryManager.SaveAsync();

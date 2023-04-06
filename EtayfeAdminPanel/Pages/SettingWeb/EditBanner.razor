@@ -1,0 +1,134 @@
+﻿
+@page "/CP/SettingWeb/EditBanner"
+@page "/CP/SettingWeb/EditBanner/{Id:int}"
+@inject HomeBL _homeBL;
+@inject LocService SharedLocalize
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("editbanners") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("banners")<small>@SharedLocalize.GetLocalizedStringValue("editbanners")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("banners")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("editbanners")</li>
+    </ol>
+</section>
+
+<section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("editbanners")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                <EditForm>
+                                    <div class="form-horizontal">
+                                        <div class="box-body">
+
+                                            @*<div class="row">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("lang")<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        @Html.DropDownListFor(model => model.LangId, (SelectList)ViewBag.Langs2, htmlAttributes: new { @class = "select2_demo_1 form-control col-md-8 float-right" })
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("mainTitle") <span style="color:red;">*</span></label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { required = "required", @class = "form-control number-validate", type = "text" } })
+                                                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("link") <span style="color:red;">*</span></label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        @Html.EditorFor(model => model.Url, new { htmlAttributes = new { required = "required", @class = "form-control number-validate", type = "text" } })
+                                                        @Html.ValidationMessageFor(model => model.Url, "", new { @class = "text-danger" })
+
+                                                    </div>
+                                                </div>
+                                                @{
+                                                    int imgId = 0;
+                                                    string img = Model.ImgId.ToString();
+
+                                                }
+                                                <div class="form-group" id="imageIcone">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <!-- Modal -->
+                                                        <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                                        <h3 class="modal-title text-primary" id="myModalLabel">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
+                                                                    </div>
+                                                                    <div class="modal-body manufacturer-image-embed">
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <a class="btn btn-primary pull-left" target="_blank" href='@Url.Action("", "Media", new {area = "CP", lang = lang})'>@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                         <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
+                                                                        <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="imageselected">
+                                                            <input value="Banners" hidden id="typeImg" />
+                                                            <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                            <br>
+                                                            <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
+                                                            <div class="closimage">
+                                                                <button type="button" class="close pull-left image-close " id="image-Icone" style="display: none; position: absolute;left: 105px; top: 54px; background-color: black; color: white; opacity: 2.2; " aria-label="Close">
+                                                                    <span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <img width="80px" src="/@filesRootPath@img">
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">Upload category image.</span>
+
+                                                        <br>
+                                                    </div>
+                                                </div>
+                                            </div>*@
+
+
+
+                                            <div class="box-footer text-center">
+                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                                <a href="/CP/SettingWeb/Banners" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.col -->
+            </div>
+        </div>
+    </div>
+</section>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+}
