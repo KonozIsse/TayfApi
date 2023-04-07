@@ -1,9 +1,4 @@
 ﻿@page "/CP/Admins"
-@inject HttpClient http;
-@inject ImageBL _imageBL;
-@inject NavigationManager _navigationManager;
-@inject LocService SharedLocalize
-@inject IJSRuntime js;
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("admins") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 @if (Model != null)
@@ -148,7 +143,7 @@
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Admins", true);
+        NavigationManager.NavigateTo("/CP/Admins", true);
     }
 }
 

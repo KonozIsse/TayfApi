@@ -1,18 +1,18 @@
-﻿@page "/CP/Blog/Edit"
-@page "/CP/Blog/Edit/{Id:int}"
-
-<PageTitle>@SharedLocalize.GetLocalizedStringValue("Comments") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+﻿
+@page "/CP/Categories/{mainId:int}/EditSubCategories/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("editCountry") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
-
 <section class="content-header">
-    <h1>@SharedLocalize.GetLocalizedStringValue("News")<small>@SharedLocalize.GetLocalizedStringValue("addnews")</small> </h1>
+    <h1>@SharedLocalize.GetLocalizedStringValue("EditSubCategories")<small>@SharedLocalize.GetLocalizedStringValue("EditSubCategories")</small> </h1>
     <ol class="breadcrumb">
-        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
-        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("News")</li>
-
-        <li class="active">@SharedLocalize.GetLocalizedStringValue("addnews")</li>
+        <li class="fa fa-dashboard"><a href="/">@SharedLocalize.GetLocalizedStringValue("dashboard")</a></li>
+        <li class="fa fa-users"><a href="/CP/">@SharedLocalize.GetLocalizedStringValue("categories")</a></li>
+        <li class="fa fa-users"><a href="/CP/Categories/SubCategories/@mainId">@SharedLocalize.GetLocalizedStringValue("categories")</a> </li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("EditSubCategories")</li>
     </ol>
 </section>
+
+<!-- Main content -->
 <section class="content">
     <!-- Info boxes -->
     <!-- /.row -->
@@ -21,7 +21,7 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("editnews")</h3>
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("EditSubCategories")</h3>
                 </div>
 
                 <!-- /.box-header -->
@@ -30,41 +30,28 @@
                         <div class="col-xs-12">
                             <div class="box box-info">
                                 <br>
-                                <EditForm Model="@create" OnValidSubmit="@EditNews">
-                                        <DataAnnotationsValidator />
+                                
                                     <div class="form-horizontal">
+                                        <EditForm Model="create" OnInvalidSubmit="EditCategory">
+                                                     <DataAnnotationsValidator />
                                         <div class="box-body">
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("title") (en)</label>
-                                                <div class="col-md-8">
-                                                    <InputText class="form-control" @bind-Value="create.TitleAr" />
-                                                    <ValidationMessage For="@(() => create.TitleAr)" />
-                                                </div>
+                                            
+                                        <div class="form-group">
+                                            <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Name") <span style="color:red;">*</span> (en)</label>
+                                            <div class="col-md-8">
+                                                <InputText @bind-Value="create.CategoryName"  class="form-control" />
+                                                    <ValidationMessage For="@(() => create.CategoryName)" />
                                             </div>
-                                            <div class="form-group">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc") </label>
-                                                <div class="col-sm-10 col-md-8">
-                                                    <InputTextArea class="form-control" @bind-Value="create.Decription" />
-                                                    <ValidationMessage For="@(() => create.Decription)" />
-                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Name") <span style="color:red;">*</span> (ar)</label>
+                                            <div class="col-md-8">
+                                                <InputText @bind-Value="create.CategoryNameAr"  class="form-control" />
+                                                    <ValidationMessage For="@(() => create.CategoryNameAr)" />
                                             </div>
-                                            <div class="form-group">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("title") (ar)</label>
-                                                <div class="col-md-8">
-                                                    <InputText class="form-control" @bind-Value="create.TitleAr" />
-                                                    <ValidationMessage For="@(() => create.TitleAr)" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc") </label>
-                                                <div class="col-sm-10 col-md-8">
-                                                    <InputTextArea class="form-control" @bind-Value="create.DecriptionAr" />
-                                                    <ValidationMessage For="@(() => create.DecriptionAr)" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group" id="imageIcone">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img") <span style="color:red;">*</span></label>
+                                        </div>
+                                           @* <div class="form-group" id="imageIcone">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
                                                 <div class="col-sm-10 col-md-4">
                                                     <!-- Modal -->
                                                     <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -77,7 +64,7 @@
                                                                 <div class="modal-body manufacturer-image-embed">
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <a href="Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                <a href="/CP/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                                     <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
                                                                     <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
                                                                 </div>
@@ -85,7 +72,7 @@
                                                         </div>
                                                     </div>
                                                     <div id="imageselected">
-                                                        <input value="Blogs" hidden id="typeImg" />
+                                                        <input value="Categories" hidden id="typeImg" />
                                                         <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                         <br>
                                                         <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
@@ -96,66 +83,68 @@
                                                         </div>
                                                     </div>
                                                     <br />
-                                                    <img id="imgCont" width="80" src="@create.Image">
-                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">Upload category image.</span>
+                                                    <img id="imgCont" width="80px" src="@create.ImgId">
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("addImg")</span>
 
                                                     <br>
                                                 </div>
-                                            </div>
-
-
+                                            </div>*@
 
                                             <div class="form-group">
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")</label>
-                                                <div class="col-sm-10 col-md-8">
-                                                    <InputSelect class="form-control" name="news_status" @bind-Value="create.IsStatus">
-                                                        <option value="@Status.Active" >@SharedLocalize.GetLocalizedStringValue("active")</option>
-                                                        <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
-                                                    </InputSelect>
-
+                                                <div class="col-sm-10 col-md-4">
+                                                <InputSelect class="form-control" @bind-Value="create.IsStatus">
+                                                    <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                    <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                </InputSelect>
+                                                    <ValidationMessage For="@(() => create.IsStatus)" />
                                                     <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
                                                         @SharedLocalize.GetLocalizedStringValue("chooseStatus")
                                                     </span>
                                                 </div>
                                             </div>
-
-
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Blogs" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a class="btn btn-defult" href="/CP/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
-
+                                    </EditForm>
                                     </div>
-                                </EditForm>
+                               
                             </div>
                         </div>
 
                     </div>
+                    <!-- /.box-body -->
                 </div>
+                <!-- /.box -->
             </div>
+            <!-- /.col -->
         </div>
     </div>
 </section>
 @code {
     [Parameter]
-    public int Id { get; set; }
-    UpdateNewsDto create = new UpdateNewsDto();
+    public int Id { get; set; } 
+    [Parameter]
+    public int mainId { get; set; }
+    UpdateCategoryDto create = new UpdateCategoryDto();
     string message;
     string style;
     string lang = "en";
     int storeId = 3;
     protected override async Task OnInitializedAsync()
     {
-        create = new UpdateNewsDto();
-        create = await _newBL.GetBlogId(Id);
+        create = new UpdateCategoryDto();
+        create = await _productBL.GetCategoryId(Id);
     }
 
-    async Task EditNews()
+    async Task EditCategory()
     {
         create.Id = Id;
-        var result = await _newBL.EditNews(storeId,create);
+        create.ImgId = 5;
+        var result = await _productBL.EditCategory(create);
         if (result.Success)
         {
             message = result.Message;
@@ -167,5 +156,4 @@
             style = "danger";
         }
     }
-
 }

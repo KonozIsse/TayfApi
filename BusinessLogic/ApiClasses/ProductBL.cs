@@ -35,7 +35,7 @@ namespace BusinessLogic.ApiClasses
                 Id = category.Id,
                 CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
                 ImageId = _imageBL.GetImageMedium(category.ImgId),
-                IsStatus = category.IsStatus == Status.Active ? _locService.GetLocalizedStringValue("active") : _locService.GetLocalizedStringValue("notActive"),
+                IsStatus = category.IsStatus.ToString(),
                 CreatedAt = category.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
             }).ToList();
             return PagedList<CategoryDto>.ToPagedList(mainCategoryDto, postsParameters.PageNumber, postsParameters.PageSize);
@@ -98,15 +98,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<BussnessResultModel> CreateCategory(CreateCategoryDto create)
         {
             var category = _mapper.Map<Category>(create);
-            if (create.ImgId == 0)
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"),false); 
-            }
-
-            if (create.CategoryNameAr == null)
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"),false); 
-            }
+          
             if (create.MainCategoryId != null)
             {
                 category.MainCategoryId = create.MainCategoryId.Value;
@@ -155,22 +147,22 @@ namespace BusinessLogic.ApiClasses
             }
             else
             {
-                if (updateDto.CategoryNameAr == null)
-                {
-                    return new BussnessResultModel(category, _locService.GetLocalizedStringValue("enterallfiled"), false);
-                }
-                if (updateDto.MainCategoryId == null)
-                {
-                    category.MainCategoryId = 0;
-                }
-                else
-                {
-                    category.MainCategoryId = updateDto.MainCategoryId.Value;
-                }
                 _mapper.Map(updateDto, category);
                 await _repositoryManager.SaveAsync();
                 return new BussnessResultModel(category, _locService.GetLocalizedStringValue("successSave"));
             }
+        }
+        public async Task<UpdateCategoryDto> GetCategoryId(int id)
+        {
+            var MainCategory = await _repositoryManager.Categories.GetCategoryById(id, false);
+            var categoryDto = _mapper.Map<UpdateCategoryDto>(MainCategory);
+            return categoryDto;
+        }
+        public async Task<CategoryDto> GetCategory(int id)
+        {
+            var MainCategory = await _repositoryManager.Categories.GetCategoryById(id, false);
+            var categoryDto = _mapper.Map<CategoryDto>(MainCategory);
+            return categoryDto;
         }
 
         //Product------------------------------------------------

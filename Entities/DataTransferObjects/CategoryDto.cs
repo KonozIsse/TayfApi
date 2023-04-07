@@ -3,6 +3,7 @@ using Entities.Models.Enums;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -33,10 +34,13 @@ namespace Entities.DataTransferObjects
     }
     public class CreateCategoryDto
     {
+        [Required]
         public string CategoryName { get; set; }
+        [Required]
         public string CategoryNameAr { get; set; }
         public int? MainCategoryId { get; set; }
         public int? ImgId { get; set; }
+        [Required]
         public Status IsStatus { get; set; }
     }
 

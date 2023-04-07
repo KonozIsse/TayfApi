@@ -1,7 +1,5 @@
 ﻿@page "/CP/Countries"
 @inject LocationTaxBL _locationTaxBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
 @inject HomeBL _homeBL
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Country") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
@@ -155,7 +153,7 @@
                 message = result.Message;
                 style = "danger";
             }
-        _navigationManager.NavigateTo("/CP/Countries", true);
+        NavigationManager.NavigateTo("/CP/Countries", true);
         }
 
     }

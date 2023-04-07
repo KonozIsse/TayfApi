@@ -1,6 +1,4 @@
 ﻿@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject HttpClient http
 <div class="top-row pl-4 navbar navbar-dark">
     @*@if(user != null)
     {
@@ -14,7 +12,7 @@
 <div class="@NavMenuCssClass">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" @onclick="() => ToggleNavMenu(NavSubmenu.None)" href="index" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" @onclick="() => ToggleNavMenu(NavSubmenu.None)" href="CP/{lang}/" Match="NavLinkMatch.All">
                 <span class="oi oi-dashboard" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Dashboard")
             </NavLink>
         </li>
@@ -111,7 +109,7 @@
         {
             <li class="nav-item px-5">
                 <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Categories">
-                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Categories")
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("categories")
                 </NavLink>
             </li>
             <li class="nav-item px-5">
@@ -121,17 +119,17 @@
             </li>
             <li class="nav-item px-5">
                 <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Products">
-                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Products")
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("products")
                 </NavLink>
             </li>
             <li class="nav-item px-5">
                 <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Stocks">
-                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Inventory") 
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("inventory")
                 </NavLink>
             </li>
             <li class="nav-item px-5">
                 <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/Reviews">
-                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Reviews")
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("Reviews1")
                 </NavLink>
             </li>
 
@@ -146,7 +144,7 @@
         {
             <li class="nav-item px-5">
                 <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="CP/SettingWeb/Sliders">
-                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Slider Images")
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("sliders")
                 </NavLink>
             </li>
             <li class="nav-item px-5">
@@ -301,7 +299,8 @@
         Eight,
         Ninth
     }
-    string lang = "en";
+    [Parameter]
+    public string lang { get; set; }
     //_homeBL.GetDefaultLanugage();
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private NavSubmenu navSubmenu = NavSubmenu.None;
@@ -322,11 +321,12 @@
         else
             navSubmenu = submenu;
     }
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    //user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
-    //    user = await _homeBL.GetCurrentUser(1);
-    //}
+    protected override async Task OnInitializedAsync()
+    {
+        lang = "en";
+        //user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+      //  user = await _homeBL.GetCurrentUser(1);
+    }
 
     
 }

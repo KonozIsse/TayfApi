@@ -1,7 +1,5 @@
 ﻿@page "/"
-@inject LocService SharedLocalize
 @inject HomeBL _homeBL
-@inject HttpClient http
 <PageTitle> @SharedLocalize.GetLocalizedStringValue("dashboard")</PageTitle>
 @if (home != null)
 {
@@ -389,6 +387,8 @@
 }
 
 @code {
+    [Parameter]
+    public string lang { get; set; }
     public List<ProductDto> prods { get; set; }
     public List<StoreDto> vend { get; set; }
     public List<CustomerDto> usrs { get; set; }
@@ -398,6 +398,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // lang = await _homeBL.GetDefaultLanugage();
+        //await http.GetFromJsonAsync<string>("api/Language/getDefaultLang");
+        lang = "en";
         home = await http.GetFromJsonAsync<HomeCPVM>("api/Home/GetTotalOrdersProducts"); 
         prods = await http.GetFromJsonAsync<List<ProductDto>>("api/Home/getRecentProducts");
         vend = await http.GetFromJsonAsync<List<StoreDto>>("api/Home/getNewStores");

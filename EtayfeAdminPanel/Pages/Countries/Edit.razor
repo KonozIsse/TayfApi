@@ -2,7 +2,6 @@
 @page "/CP/Country/Edit/{Id:int}"
 @inject LocationTaxBL _locationTaxBL;
 @inject HomeBL _homeBL;
-@inject LocService SharedLocalize
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editCountry") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">

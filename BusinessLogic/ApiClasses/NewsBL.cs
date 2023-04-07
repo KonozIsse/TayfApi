@@ -61,7 +61,11 @@ namespace BusinessLogic.ApiClasses
             blog.ImgId = im;
             blog.IsFeature = 1;
             blog.IsViewed = 0;
-            blog.VendorId = storeId ;
+            var user = await _repositoryManager.User.GetActiveUserId(storeId, false);
+            if (user.UserType == UserType.Store)
+            {
+                blog.VendorId = storeId;
+            }
             _repositoryManager.News.CreateBlog(blog);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(blog, _locService.GetLocalizedStringValue("successAdd"));
@@ -79,11 +83,12 @@ namespace BusinessLogic.ApiClasses
             }
             blog.IsFeature = 1;
             blog.IsViewed = 0;
-            blog.VendorId = storeId ;
-            //if (updateDto.ImageId != 0)
-            //{
-            //    blog.ImgId = updateDto.ImageId;
-            //}
+            var user = await _repositoryManager.User.GetActiveUserId(storeId, false);
+            if (user.UserType == UserType.Store)
+            {
+                blog.VendorId = storeId;
+            }
+           
             _mapper.Map(updateDto, blog);
 
             await _repositoryManager.SaveAsync();
@@ -132,12 +137,13 @@ namespace BusinessLogic.ApiClasses
             return newsDto;
         }
 
-        public async Task<PagedList<NewsDto>> GetAllBlogs (int vendorId, string lang, string search, PostsParameters postsParameters)
+        public async Task<PagedList<NewsDto>> GetAllBlogs (int userId, string lang, string search, PostsParameters postsParameters)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(search);
-            if (vendorId != 0) 
+            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (user.UserType == UserType.Store) 
             { 
-                searchBlog =  searchBlog.Where(c => c.VendorId == vendorId).ToList(); 
+                searchBlog =  searchBlog.Where(c => c.VendorId == userId).ToList(); 
             }
             var newsDto = searchBlog.Select(x =>
             {

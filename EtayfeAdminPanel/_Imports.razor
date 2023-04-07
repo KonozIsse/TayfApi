@@ -21,3 +21,15 @@
 @using Entities.Exception
 @using Microsoft.AspNetCore.Identity
 @using System.Globalization
+
+@inject LocService SharedLocalize
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+@inject IJSRuntime js
+
+@inject ProductBL _productBL
+@inject ImageBL _imageBL
+@inject HomeBL _homeBL
+@inject OrderBL _orderBL
+@inject UserBL _userBL
+@inject NewsBL _newBL

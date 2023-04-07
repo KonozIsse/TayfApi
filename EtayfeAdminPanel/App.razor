@@ -24,3 +24,9 @@
         </LayoutView>
     </NotFound>
 </Router>
+@*@code {
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        args.Path  "/CP/{lang}";
+    } OnNavigateAsync="@OnNavigateAsync"
+}*@

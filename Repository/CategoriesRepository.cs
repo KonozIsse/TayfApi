@@ -35,7 +35,7 @@ namespace Repository
         public async Task<IEnumerable<Category>> SearchSubCategories(int mainId , string search)
         {
              var query = FindByCondition(c => c.MainCategoryId == mainId, false);
-            if (string.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(c => c.CategoryName.Contains(search));
             }
@@ -43,7 +43,11 @@ namespace Repository
         }
         public async Task<IEnumerable<Category>> SearchMainCategoriesCP(string search)
         {
-            var query = FindByCondition(c => c.MainCategoryId == 0 && c.CategoryName.Contains(search), false);
+            var query = FindByCondition(c => c.MainCategoryId == 0, false);
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(c => c.CategoryName.Contains(search));
+            }
             return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
         }
         public void CreateMainCategory(Category category) => Create(category);

@@ -328,7 +328,6 @@ namespace BusinessLogic.ApiClasses
                         address.Post_Code = zip;
                         _repositoryManager.Address.AddAddress(address);
                     }
-                    await _userManager.AddClaimAsync(user, new Claim(/*ClaimTypes.Name*/role.Name, user.Email));
 
                     //var temp = await _repositoryManager.MessageTemplate.GetTemplateById(2, false); //verify emasil
                     //var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";

@@ -1,8 +1,6 @@
 ﻿@page "/CP/Admin/Add"
 @inject UserBL _userBL
 @inject LocationTaxBL _locationTaxBL
-@inject LocService SharedLocalize
-@inject HttpClient http
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addAdmin") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -41,16 +39,18 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("AdminType")</label>
                                                     <div class="col-sm-10 col-md-4">
-                                                    @if (roles != null)
-                                                    {
+                                                   
                                                         <InputSelect class="form-control" @bind-Value="create.RoleId">
                                                             <option value="">@SharedLocalize.GetLocalizedStringValue("AdminType")</option>
+                                                        @if (roles != null)
+                                                        {
                                                             @foreach (var c in roles)
                                                             {
                                                                 <option value="@c.Id">@c.Name</option>
                                                             }
+                                                        }
                                                         </InputSelect>
-                                                    }
+                                                    
                                                     <ValidationMessage For="@(() => create.RoleId)" />
                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
                                                             @SharedLocalize.GetLocalizedStringValue("plzchooseType")
@@ -92,7 +92,7 @@
                                                 <h4>@SharedLocalize.GetLocalizedStringValue("AddressInfo")</h4>
                                                 <hr>
 
-                                                @*<div class="form-group">
+                                                <div class="form-group">
                                                     <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("StreetAddress")</label>
                                                     <div class="col-sm-10 col-md-4">
                                                         <InputText class="form-control field-validate" @bind-Value="@street"></InputText>
@@ -106,43 +106,47 @@
                                                         <InputText class="form-control field-validate" @bind-Value="@zip"></InputText>
                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("enterZip")</span>
                                                     </div>
-                                                </div>*@
+                                                </div>
 
                                                 <div class="form-group">
                                                     <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Country")</label>
                                                     <div class="col-sm-10 col-md-4">
-                                                        @if (countries != null)
-                                                        {
+                                                       
                                                             <InputSelect class="form-control"  @bind-Value="create.CountryId" >
-                                                                <option value="">@SharedLocalize.GetLocalizedStringValue("enterCountry")</option>
+                                                            <option value="" selected>@SharedLocalize.GetLocalizedStringValue("enterCountry")</option>
+                                                             @if (countries != null)
+                                                        {
                                                                 @foreach (var c in countries)
                                                                 {
                                                                     <option value="@c.Id">@c.CountryName</option>
                                                                 }
-                                                            </InputSelect>
                                                         }
+                                                            </InputSelect>
+                                                        
                                                         <ValidationMessage For="@(() => create.CountryId)" />
                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("enterCountry")</span>
                                                     </div>
                                                 </div>
 
-                                              @*  <div class="form-group">
-                                                    <label for="area" class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("state")</label>
+                                                <div class="form-group">
+                                                    <label for="area" class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("zone")</label>
                                                     <div class="col-sm-10 col-md-4">
-                                                        @if (zones != null)
-                                                        {
+                                                       
                                                             <InputSelect class="form-control"  @bind-Value="zoneId">
-                                                                <option value="">@SharedLocalize.GetLocalizedStringValue("state")</option>
+                                                            <option value="" selected>@SharedLocalize.GetLocalizedStringValue("zone")</option>
+                                                             @if (zones != null)
+                                                             {
                                                                 @foreach (var c in zones)
                                                                 {
                                                                     <option value="@c.Id">@c.ZoneName</option>
                                                                 }
+                                                             }
                                                             </InputSelect>
-                                                        }
+                                                        
                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("enterState")</span>
                                                     </div>
                                                 </div>
-*@
+
                                                 <hr>
                                                 <h4>@SharedLocalize.GetLocalizedStringValue("LoginInfo")</h4>
                                                 <hr>
@@ -170,8 +174,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status") </label>
                                                     <div class="col-sm-10 col-md-4">
-                                                        <InputSelect class="form-control" @bind-Value="create.Status">
-                                                            <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                    <InputSelect class="form-control" @bind-Value="create.Status">
+                                                        <option value="@Status.Active" selected>@SharedLocalize.GetLocalizedStringValue("active")</option>
                                                             <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
                                                         </InputSelect>
                                                         <ValidationMessage For="@(() => create.Status)" />
@@ -204,9 +208,14 @@
 </section>
 @code {
     [Parameter]
+    public string? lang { get; set; }
+    [Parameter]
     public CreateAdminDto create { get; set; }
+    [Parameter]
     public int zoneId { get; set; }
+    [Parameter]
     public string street { get; set; }
+    [Parameter]
     public string zip { get; set; }
 
     private List<ZoneDto> zones;
@@ -216,7 +225,7 @@
     protected override async Task OnInitializedAsync()
     {
         create = new CreateAdminDto();
-
+        lang = await http.GetFromJsonAsync<string>("api/Language/getDefaultLang");
         countries = await _locationTaxBL.GetAllCountries();
         //http.GetFromJsonAsync<List<CountryDto>>("api/Country/GetCountries");
         roles = await _userBL.GetTypesStoreAdmin();
@@ -229,7 +238,6 @@
     string style = "";
      async Task AddAdmin()
     {
-        street = "street 1"; zip = "079"; zoneId = 1;
         var result = await _userBL.RegisterUser(create, zoneId, street, zip);
         if (result.Success)
         {

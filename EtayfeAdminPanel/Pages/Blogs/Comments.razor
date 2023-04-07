@@ -1,8 +1,5 @@
 ﻿@page "/CP/Comments"
 @page "/CP/Comments/{Id:int}"
-@inject NewsBL _newBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Comments") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>

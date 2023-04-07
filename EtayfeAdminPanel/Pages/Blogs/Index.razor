@@ -1,9 +1,4 @@
 ﻿@page "/CP/Blogs"
-@inject NewsBL _newBL
-@inject LocService SharedLocalize
-@inject HomeBL _homeBL
-@inject HttpClient http
-@inject IJSRuntime js
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("News") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -117,12 +112,11 @@
                 </div>
                 <!-- /.box -->
             </div>
-            <!-- /.col -->
         </div>
-   @* @if (Model.Count >= 10)
+    @if (Model.Count >= 10)
     {
         <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
-    }*@
+    }
  }
 
 </section>
@@ -134,8 +128,6 @@
     [Parameter]
     public string lang { get; set; }
 
-    int vendorId = 0;
-    int admin = 1;
     public List<NewsDto> Model { get; set; }
 
     public MetaData MetaData { get; set; } = new MetaData();
@@ -153,10 +145,10 @@
     }
     async Task GetAllBlogs()
     {
-        Model = await http.GetFromJsonAsync<List<NewsDto>>("api/Blog/getblogsTest");
-        //var pagingResponse = await _newBL.GetAllBlogs(vendorId,lang,search, _PostsParameters);
-        //Model = pagingResponse.ToList();
-        //MetaData = pagingResponse.MetaData;
+       // Model = await http.GetFromJsonAsync<List<NewsDto>>("api/Blog/getblogsTest");
+        var pagingResponse = await _newBL.GetAllBlogs(3,lang,search, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
     }
     string message = "";
     string style = "";

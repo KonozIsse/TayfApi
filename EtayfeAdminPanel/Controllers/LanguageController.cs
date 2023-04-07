@@ -36,6 +36,12 @@ namespace EtayfeAdminPanel.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
+        [HttpGet("getDefaultLang")]
+        public async Task<IActionResult> GetDefaultLanugage()
+        {
+            var result = await _homeBL.GetDefaultLanugage();
+            return Ok(result);
+        }
 
         [HttpPut("update")]
         public async Task<IActionResult> UpdateLanguage(int id ,UpdateLanguageDto update)

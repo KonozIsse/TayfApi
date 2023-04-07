@@ -151,7 +151,6 @@ internal class Program
         //CultureInfo.DefaultThreadCurrentCulture = culture;
         //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-
         var options = ((IApplicationBuilder)app).ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
         app.UseRequestLocalization(options.Value);
 

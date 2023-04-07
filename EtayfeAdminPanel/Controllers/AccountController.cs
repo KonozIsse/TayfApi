@@ -17,7 +17,7 @@ namespace EtayfeAdminPanel.Controllers
         [HttpGet("currentUser")]
         public async Task<IActionResult> GetCurrentUserHome()
         {
-            var result = await _homeBL.GetCurrentUser(GetCurrentUserId());
+            var result = await _homeBL.GetCurrentUser(3);
              return Ok(result);
         }
 
