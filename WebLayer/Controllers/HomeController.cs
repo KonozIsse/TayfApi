@@ -23,7 +23,7 @@ namespace WebLayer.Controllers
         [HttpGet("getHome")]
         public async Task<IActionResult> GetHome()
         {
-            var result = await _homeBL.GetHome(GetCurrentUserId(), GetCurrentCurrency(), GetLanguage());
+            var result = await _homeBL.GetHome(GetCurrentUserId(), GetCurrentCurrencyId(), GetLanguage());
             return Ok(result);
         } 
         [HttpGet("getAllAddressesToCustomer")]

@@ -80,10 +80,10 @@ namespace EtayfeAdminPanel.Controllers
         }
      
         [NonAction]
-        public Currency GetCurrentCurrency()
+        public int GetCurrentCurrencyId()
         {
             var currency = _repositoryManager.Currency.GetDefaultCurrency(false).Result;
-            return currency;
+            return currency.Id;
         }
         [NonAction]
         public string GetLanguage()

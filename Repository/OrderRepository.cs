@@ -17,27 +17,23 @@ namespace Repository
         {
 
         }
-        public async Task<Order> GetOrderId(int id, bool trackChanges)
-         => await FindByCondition(c => c.Id == id, trackChanges).SingleOrDefaultAsync();
-        public async Task<List<Order>> GetAllOrders(string search)
+        public async Task<Order> GetOrderId(int id, bool trackChanges, bool included = false)
         {
-            var orders = FindAll(false);
-            if (!string.IsNullOrEmpty(search))
+            var result =  FindByCondition(c => c.Id == id, trackChanges);
+            if (included)
             {
-                orders = orders.Where(c => c.Customer.FullName.Contains(search) || c.Store.FirstName.Contains(search)
-                || c.OrderStatus.StatusName.Contains(search) || c.Id.ToString().Contains(search));
+                result = result.Include(c => c.OrderProducts).ThenInclude(c => c.Product).ThenInclude(c => c.Images);
             }
-            return await orders.Include(c => c.Customer).Include(c => c.OrderStatus).Include(c=>c.Currency)
-                .Include(c => c.DeliveryTime).Include(c => c.Store).OrderByDescending(r => r.CreatedAt).ToListAsync();
+            return await result.SingleOrDefaultAsync();
         }
         public async Task<List<Order>> GetOrders(bool trackChanges)
-         => await FindAll(trackChanges).Include(c => c.Customer).Include(c => c.OrderStatus).Include(c => c.Currency)
+         => await FindAll(trackChanges).Include(c => c.Customer).Include(c => c.OrderStatus)
                 .Include(c => c.DeliveryTime).Include(c => c.Store).OrderByDescending(r => r.CreatedAt).ToListAsync();
         
         public async Task<List<Order>> GetOrdersToStore(int storeId)
           => await FindByCondition(c => c.StoreId == storeId, false).ToListAsync(); 
         public async Task<List<Order>> GetsAllTransactionOrders()
-         => await FindByCondition(c => c.TransactionId != null, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
+         => await FindByCondition(c => c.Transaction != null, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<List<Order>> GetOrdersToCustomer(int customerId)
         => await FindByCondition(c => c.CustomerId == customerId, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<Order> GetCustomerNewOlderByStore(int vendorId, int customerId)
@@ -45,7 +41,7 @@ namespace Repository
          public void DeleteOrder(Order order) => Delete(order);
          public void CreateOrder(Order order) => Create(order);
 
-        public async Task<List<Order>> GetAllSalesOrders(string search, int customerId,int storeId,int statusId, DateTime? dateFrom, DateTime? dateTo)
+        public async Task<List<Order>> GetAllOrders(string search, int customerId,int storeId,int statusId, DateTime? dateFrom, DateTime? dateTo)
         {
             var orders = FindAll(false);
             if (!string.IsNullOrEmpty(search))
@@ -73,8 +69,9 @@ namespace Repository
             {
                 orders = orders.Where(x => x.OrderStatusId == statusId);
             }
-            return await orders.Include(c => c.Customer).Include(c=>c.Store).Include(c => c.OrderStatus).Include(c => c.Currency).Include(c => c.DeliveryTime)
-                .Take(100).OrderByDescending(r => r.CreatedAt).ToListAsync();
+            return await orders.Include(c => c.Customer).Include(c=>c.Store).Include(c => c.OrderStatus)
+                .Include(c => c.DeliveryTime).Include(c => c.OrderProducts)
+                .OrderByDescending(r => r.CreatedAt).ToListAsync();
         }
         public async Task<List<Order>> GetAllCansalOrders(bool trackChanges)
        => await FindByCondition(c => c.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderCanceled, trackChanges).ToListAsync();

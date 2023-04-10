@@ -29,7 +29,7 @@ namespace BusinessLogic.ApiClasses
             _productBL = productBL;
             _userBL = userBL;
         }
-        public async Task<HomeVM> GetHome(int customerId, Currency cod, string lang )
+        public async Task<HomeVM> GetHome(int customerId, int currencyId, string lang )
         {
             var languge = await _repositoryManager.Language.GetCodeLanguage(lang, false);
             var model = new HomeVM
@@ -59,7 +59,7 @@ namespace BusinessLogic.ApiClasses
             var complete = await _repositoryManager.Order.GetAllCompleteOrders(false);
             var products = await _repositoryManager.Product.GetAllProducts();
             var stocks = await _repositoryManager.Inventory.GetAllOutStock();
-            var ordersTransaction = orders.Where(c => c.TransactionId != null);
+            var ordersTransaction = orders.Where(c => c.Transaction != null);
             var countCustomers = await _repositoryManager.User.GetCustomers(false);
             var carts = await _repositoryManager.Cart.GetAllCarts(false);
 

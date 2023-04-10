@@ -1,11 +1,7 @@
-﻿@*@layout LoginLayout*@
-@page "/login"
-@inject UserBL _userBL
-@inject HttpClient http
-@inject IJSRuntime js
-@inject NavigationManager NavigationManager
+﻿@layout LoginLayout
+@page "/"
 @inject ILoginService loginService
-@inject LocService SharedLocalize
+@inject AuthenticationStateProvider _stateProvider
 <style>
     input{
       text-align: left;
@@ -26,11 +22,7 @@
     <div class="login-box-body" style="padding: 30px !important;">
         <p class="login-box-msg">@SharedLocalize.GetLocalizedStringValue("Sign")</p>
 <div class="form-horizontal">
-            @if (user == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
+ @if (user != null)
 {
 <EditForm Model="@user" OnValidSubmit="@OnVaild">
     
@@ -54,13 +46,28 @@ else
         <!-- /.col -->
     </div>
 </EditForm>
+                @if (!string.IsNullOrEmpty(message))
+                {
+                    <p>@message</p>
+                }
 }
+
 </div>
 </div>
 </div>
 @code {
-    
+
     private UserForAuthenticationDto user = new UserForAuthenticationDto();
+    string message;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await _stateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/index");
+        }
+    }
+
 
     async Task OnVaild()
     {
@@ -74,9 +81,28 @@ else
         var result = await _userBL.ValidateUser(user);
         if (result.Success)
         {
-           await loginService.Login(result.Data.ToString());
+            await loginService.Login(result.Data.ToString());
             NavigationManager.NavigateTo("/index");
         }
+        else
+        {
+            message = result.Message;
+        }
     }
+
+    
+    //private async Task OnVaild()
+    //{
+    //    var result = await loginService.Login(user);
+    //    if (result.Success)
+    //    {
+    //        NavigationManager.NavigateTo("/index", true);
+    //    }
+    //}
+
+   
+
+   
+}
 }
 

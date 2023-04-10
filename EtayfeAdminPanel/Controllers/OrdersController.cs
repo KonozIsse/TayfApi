@@ -35,17 +35,17 @@ namespace EtayfeAdminPanel.Controllers
             }
         }
         [HttpGet("get-all-orders")]
-        public async Task<IActionResult> GetAllOrders( string search , [FromQuery] PostsParameters postsParameters)
+        public async Task<IActionResult> GetAllOrders( string search ,int customerId, int storeId, int statusId,[FromQuery] PostsParameters postsParameters)
         {
-            var result = await _orderBL.GetAllOrders(GetCurrentUserId(),search , postsParameters);
+            var result = await _orderBL.GetAllOrders(GetCurrentUserId(), customerId, storeId, statusId, search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
 
-        [HttpGet("get-order/{id}")]
+        [HttpGet("GetViewOrder/{id}")]
         public async Task<IActionResult> GetViewOrder(int id)
         {
-            var result = await _orderBL.GetOrder(id);
+            var result = await _orderBL.GetOrder(id, GetCurrentCurrencyId());
             return Ok(result);
         }
         [HttpPut("pending-order")]

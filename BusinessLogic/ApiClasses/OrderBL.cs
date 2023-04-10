@@ -39,19 +39,7 @@ namespace BusinessLogic.ApiClasses
             _signInManager = signInManager;
            // _logger = logger;
         }
-        public string ComputeSha256Hash(string rawData)
-        {
-            using (SHA256 Sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = Sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                var builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
+        
         //Order------------------------------------------------
         public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
         {
@@ -63,10 +51,6 @@ namespace BusinessLogic.ApiClasses
                 order.CustomerId = customerId;
                 var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderPending,false);
                 order.OrderStatusId = status.Id;
-                var currency = await _repositoryManager.Currency.GetDefaultCurrency(false);
-                order.CurrencyId = currency.Id;
-                var payment = await _repositoryManager.PaymentMethods.GetPaymentsStatus(PaymentStatus.QatarCharity);
-                order.PaymentMethodsId = payment.Id;
                 order.IsStatus = Status.NotActive;
                 order.TotalTax = tax;
                
@@ -88,19 +72,21 @@ namespace BusinessLogic.ApiClasses
                     var orderProducts = new List<OrderProduct>();
                     foreach (var cart in carts)
                     {
-                        decimal total = 0;
+                        decimal total = cart.FinalPrice;
                         var orderAttributs = new List<OrderAttributProduct>();
                         order.StoreId = cart.StoreId;
+
                         var inventory = await _repositoryManager.Inventory.GetStockProduct(cart.ProdId);
                         if (inventory == null)
                         {
                             return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notAvOp"), false);
                         }
+
                         if (createOrderDto.CouponCode != null)
                         {
                             var coupon = await _repositoryManager.Coupon.GetCouponCodeNotFinished(createOrderDto.CouponCode);
                             order.CouponId = coupon.Id;
-                            if (coupon.CouponAmount > 0 && coupon.CouponAmount > cart.FinalPrice)
+                            if (coupon.CouponAmount > 0 && coupon.CouponAmount > total)
                             {
                                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CodeGrater"), false);
                             }
@@ -108,16 +94,16 @@ namespace BusinessLogic.ApiClasses
                             {
                                 if (coupon.DiscountType == DiscountType.CartDiscount)
                                 {
-                                    if (cart.FinalPrice > coupon.CouponAmount)
+                                    if (total > coupon.CouponAmount)
                                     {
-                                        total = cart.FinalPrice - Convert.ToDecimal(coupon.CouponAmount);
+                                        total = total - Convert.ToDecimal(coupon.CouponAmount);
                                     }
                                 }
                                 else if (coupon.DiscountType == DiscountType.CartPercentDiscount)
                                 {
-                                    if (cart.FinalPrice > 0)
+                                    if (total > 0)
                                     {
-                                        total = cart.FinalPrice - (cart.FinalPrice * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
+                                        total = total - (total * Convert.ToDecimal(Convert.ToDecimal(coupon.CouponAmount) / 100));
                                     }
                                 }
                                 else if (coupon.DiscountType == DiscountType.ProductDiscount)
@@ -129,11 +115,11 @@ namespace BusinessLogic.ApiClasses
                                             if (productsCoupons.ProductId == item.ProdId)
                                             {
                                                 var newTotal = Convert.ToDecimal(item.Product.Price) - Convert.ToDecimal(coupon.CouponAmount);
-                                                cart.FinalPrice -= newTotal;
+                                                total -= newTotal;
                                             }
                                             else
                                             {
-                                                cart.FinalPrice -= Convert.ToDecimal(item.Product.Price);
+                                                total -= Convert.ToDecimal(item.Product.Price);
                                             }
                                         }
                                     }
@@ -145,11 +131,11 @@ namespace BusinessLogic.ApiClasses
                                     {
                                         if (productCoupon.ProductId == cart.ProdId)
                                         {
-                                            total = cart.FinalPrice - (cart.FinalPrice * coupon.CouponAmount / 100);
+                                            total = total - (total * coupon.CouponAmount / 100);
                                         }
                                         else
                                         {
-                                            total = cart.FinalPrice;
+                                            total = total;
                                         }
                                     }
                                 }
@@ -189,7 +175,6 @@ namespace BusinessLogic.ApiClasses
                     totalOrder = totalOrder + ((totalOrder * tax) / 100);
                 }
                 order.OrderPrice = totalOrder;
-                order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
                 _repositoryManager.Order.CreateOrder(order);
                 await _repositoryManager.SaveAsync();
             }
@@ -213,38 +198,24 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("successDelete"), false);
             }
         }
-        public async Task<PagedList<OrderDto>> GetHistoryOrder(int customerId , Currency currency,PostsParameters postsParameters )
+        public async Task<PagedList<OrderDto>> GetHistoryOrder(int customerId , int currencyId,PostsParameters postsParameters )
         {
-            var model = new List<OrderDto>();
             var orders = await _repositoryManager.Order.GetOrdersToCustomer(customerId);
-            foreach (var order in orders)
+            var currency = await _repositoryManager.Currency.GetCurrency(currencyId,false);
+            var ordersDto = orders.Select(order => 
             {
-                if (order.StoreId != 0)
-                {
-                    order.CustomerId = customerId;
-                    var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(order.Id);
-                    var customer = await _repositoryManager.User.GetCustomerId(customerId, false);
-                    var orderStatus = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                   
-                    model.Add(new OrderDto
-                    {
-                        Id = order.Id,
-                        IsStatus = order.IsStatus,
-                        OrderPrice = Convert.ToDecimal(order.OrderPrice),
-                        Currency = currency.Symbol,
-                        CountProduct = orderProducts.Count(),
-                        CustomerName = customer.FullName,
-                        OrderStatusId = order.OrderStatusId,
-                        OrderStatusName = orderStatus.StatusName,
-                        CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
-                    });
-                }
-            }
-            return PagedList<OrderDto>.ToPagedList(model, postsParameters.PageNumber, postsParameters.PageSize);
+                var orderDto = _mapper.Map<OrderDto>(order);
+                orderDto.CountProduct = order.OrderProducts.Count();
+                orderDto.CustomerName = order.Customer.FullName;
+                orderDto.OrderStatusName = order.OrderStatus.StatusName;
+                orderDto.CreatedAt = order.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                return orderDto;
+            });
+            return PagedList<OrderDto>.ToPagedList(ordersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<List<OrderProductDto>> GetOrderProducts( int orderId,  string lang)
         {
-            var order = await _repositoryManager.Order.GetOrderId(orderId,false);
+            var order = await _repositoryManager.Order.GetOrderId(orderId,false,true);
             if (order != null)
             {
                 var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
@@ -276,19 +247,18 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task UpdateTotalOrderPrice(int id,int customerId, decimal totalPrice)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true,false);
             if (order == null)
             {
                 // return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
             order.OrderPrice = totalPrice;
             order.CustomerId = customerId;
-            order.HashedCtpAndPayment = ComputeSha256Hash(string.Format("CSP={0};Amount={1}", order.Id, order.OrderPrice.ToString("0.00")));
             await _repositoryManager.SaveAsync();
         }
         public async Task<BussnessResultModel> OrderPending(int id)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true ,false);
             if(order == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
@@ -301,7 +271,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> OrderComplete(int id)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true, false);
             if (order == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
@@ -394,7 +364,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task OrderCancal(int id)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true, false);
             var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderCanceled, false);
             order.OrderStatusId = status.Id;
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CancelOrder);
@@ -415,26 +385,17 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> OrderReject(int id)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true, false);
             if (order == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            if (order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderCanceled)
+            var status = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
+            if (status.OrderStatusEnum == OrderStatusEnum.OrderPending)
             {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("AlreadyCancel"), false);
+                var status1 = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderRejcted, false);
+                order.OrderStatusId = status1.Id;
             }
-            if (order.OrderStatus.OrderStatusEnum != OrderStatusEnum.OrderPending)
-            {
-                var period = _repositoryManager.Setting.GetPeriod();
-                //if order shipped or recieved and allowed period for refund ended
-                if ((order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderReceived || order.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderShipped) && (order.DatePurchased.Value.AddDays(Convert.ToInt32(period)) < DateTime.UtcNow))
-                {
-                    return new BussnessResultModel(null, "e: You Cann't Reject Order After period about " + period + " days from order", false);
-                }
-            }
-            var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderRejcted, false);
-            order.OrderStatusId = status.Id;
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.RejectOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
@@ -448,25 +409,25 @@ namespace BusinessLogic.ApiClasses
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);
-            string msgEm1 = await InvoiceOrder(id);
-            var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderRejected);
-            var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
-            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-            try
-            {
-                var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
-                _emailSender.SendEmail(message);
-            }
-            catch (Exception exp)
-            {
-                //  _logger.LogError("could not send a rejection email to customer, order id =" + id, exp);
-            }
+            //string msgEm1 = await InvoiceOrder(id);
+            //var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderRejected);
+            //var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
+            //var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            //try
+            //{
+            //    var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
+            //    _emailSender.SendEmail(message);
+            //}
+            //catch (Exception exp)
+            //{
+            //    //  _logger.LogError("could not send a rejection email to customer, order id =" + id, exp);
+            //}
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order, _locService.GetLocalizedStringValue("OrderRejected"));
         }
         public async Task OrderReceived(int id)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true, false);
             if (order == null)
             {
                // return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
@@ -540,12 +501,12 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> ShippedOrder(int id)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
+            var order = await _repositoryManager.Order.GetOrderId(id, true, false);
             if (order == null)
             {
                 return new BussnessResultModel(null,_locService.GetLocalizedStringValue("correctLink") , false);
             }
-            if (order.OrderStatus.OrderStatusEnum != OrderStatusEnum.OrderReceived || String.IsNullOrEmpty(order.TransactionId))
+            if (order.OrderStatus.OrderStatusEnum != OrderStatusEnum.OrderReceived || String.IsNullOrEmpty(order.Transaction))
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("notPaid"), false);
             }
@@ -586,22 +547,9 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order,  _locService.GetLocalizedStringValue("Toshipped"));
         }
-        public async Task UpdateOrderAfterPay(int id, string PaymentsId , string payment)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id, true);
-            if (order.OrderStatus.OrderStatusEnum== OrderStatusEnum.OrderPending)
-            {
-                var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderReceived, false);
-                order.OrderStatusId = status.Id;
-                order.DatePurchased = DateTime.UtcNow;
-                order.TransactionId = PaymentsId;
-                order.PaymentMethodsId = Convert.ToInt32(payment);// "Qatar Charity";
-                await _repositoryManager.SaveAsync();
-            }
-        }
         public async Task GetFailOrder(int orderId)
         {
-            var order = await _repositoryManager.Order.GetOrderId(orderId, false);
+            var order = await _repositoryManager.Order.GetOrderId(orderId, false, false);
             if (order != null)
             {
                 var user = await _repositoryManager.User.GetUserId(order.CustomerId,false);
@@ -613,7 +561,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> DeleteOrder(int orderId)
         {
-            var order = await _repositoryManager.Order.GetOrderId(orderId, false);
+            var order = await _repositoryManager.Order.GetOrderId(orderId, false, false);
             if (order.OrderStatusId != 1)
             {
                 return new BussnessResultModel(null, "Cann't Delete This Order", false);
@@ -643,9 +591,9 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order, "successDelete");
         }
-        public async Task<OrderDto> GetOrder(int id)
+        public async Task<OrderDto> GetOrder(int id, int currencyId)
         {
-            var order = await _repositoryManager.Order.GetOrderId(id , false);
+            var order = await _repositoryManager.Order.GetOrderId(id , false,true);
             var orderDto = _mapper.Map<OrderDto>(order);
             var store = await _repositoryManager.User.GetStoreId(order.StoreId);
             if (store != null)
@@ -653,7 +601,7 @@ namespace BusinessLogic.ApiClasses
                 decimal subTotal = 0;
                 var products = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
                 var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
-                var currency = await _repositoryManager.Currency.GetCurrency(order.CurrencyId, false);
+                var currency = await _repositoryManager.Currency.GetCurrency(currencyId, false);
                 var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
                 var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
                 var address = await _repositoryManager.Address.GetDefaultAddressCustomer(order.CustomerId);
@@ -662,18 +610,21 @@ namespace BusinessLogic.ApiClasses
                 foreach(var c in products)
                 {
                     var attributes = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(id,c.ProductId);
+                   
                     var attributesOrder = attributes.Select(c => new OrderAttributProductDto
                     {
                         Option = c.ProductAttribut.ProductOption.OptionName,
+                        OptionType = c.ProductAttribut.ProductOption.OptionType,
                         Value = c.ProductAttribut.ProductOptionValue.OptionValueName,
                     }).ToList();
+                    var image = await _repositoryManager.ImageProduct.GetAllImagesProductId(c.ProductId, false, true);
                     orderProducts.Add(new OrderProductDto
                     {
                         Qty = c.Qty,
                         ProductName = c.Product.ProductName,
                         ProductModel = c.Product.ProductModel,
                         ProductPrice = c.Product.Price,
-                        ProductImage = _imageBL.GetImageOriginal(c.Product.Images.First().ImageId),
+                        ProductImage = _imageBL.GetImageOriginal(image.First().ImageId),
                         OrderAttributesProducts = attributesOrder ?? null
                     });
                     subTotal = subTotal + c.Qty * c.Product.Price;
@@ -689,19 +640,18 @@ namespace BusinessLogic.ApiClasses
                 orderDto.StorePhone = store.PhoneNumber;
                 orderDto.DeliveryTimeName = time.Time ?? null;
                 orderDto.OrderStatusName = states.StatusName ?? null;
-                orderDto.ShippingMethods = order.ShippingMethod == null ? null : order.ShippingMethod.ShippingMethod;
-                orderDto.ShippingCost = order.ShippingMethod == null ? 0 : order.ShippingMethod.ShippingCost;
                 orderDto.OrderProducts = orderProducts ?? null;
                 orderDto.OrderPrice = subTotal;
                 orderDto.TotalTax = order.TotalTax;
-                orderDto.DisCount = order.Coupon == null ? 0 : order.Coupon.CouponAmount;
+                orderDto.CouponAmount = order.Coupon == null ? 0 : order.Coupon.CouponAmount;
+                orderDto.CouponCode = order.Coupon == null ? "" : order.Coupon.CouponCode;
                 orderDto.Total = order.OrderPrice;
             }
             return orderDto;
         }
         public async Task<List<OrderDto>> GetAllSalesOrders(int userId , string search, int customerId, int storeId, int statusId, DateTime? dateFrom, DateTime? dateTo)
         {
-            var orders = await _repositoryManager.Order.GetAllSalesOrders(search, customerId, storeId, statusId, dateFrom, dateTo);
+            var orders = await _repositoryManager.Order.GetAllOrders(search, customerId, storeId, statusId, dateFrom, dateTo);
           
             var store = await _repositoryManager.User.GetActiveUserId(userId,false);
             if(store.UserType == UserType.Store)
@@ -713,7 +663,7 @@ namespace BusinessLogic.ApiClasses
                 var orderDto = _mapper.Map<OrderDto>(order);
                 orderDto.CustomerName = order.Customer.FullName;
                 orderDto.CodeMobileCountry = order.Customer.CodeMobileCountry;
-                orderDto.Currency = order.Currency.Symbol;
+                orderDto.Currency = "$";
                 orderDto.CustomerPhone = order.Customer.PhoneNumber;
                 orderDto.StoreName = order.Store.FullName;
                 orderDto.StorePhone = order.Store.PhoneNumber;
@@ -721,12 +671,12 @@ namespace BusinessLogic.ApiClasses
                 orderDto.OrderStatusName = order.OrderStatus.StatusName ?? null;
                 orderDto.Total = orders.Sum(c => c.OrderPrice);
                 return orderDto;
-           }).ToList();
+           }).Take(100).ToList();
             return ordersDto;
         } 
-        public async Task<PagedList<OrderDto>> GetAllOrders(int userId  ,string search ,PostsParameters postsParameters)
+        public async Task<PagedList<OrderDto>> GetAllOrders(int userId  ,int customerId  ,int storeId ,int statusId  ,string search ,PostsParameters postsParameters)
         {
-            var orders = await _repositoryManager.Order.GetAllOrders(search);
+            var orders = await _repositoryManager.Order.GetAllOrders(search, customerId,storeId, statusId, null,null);
             var store = await _repositoryManager.User.GetActiveUserId(userId, false);
             if (store.UserType == UserType.Store)
             {
@@ -736,7 +686,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var orderDto = _mapper.Map<OrderDto>(order);
                 orderDto.CustomerName = order.Customer.FullName;
-                orderDto.Currency = order.Currency.Symbol;
+                orderDto.Currency = "$";
                 orderDto.CustomerEmail = order.Customer.Email;
                 orderDto.CustomerPhone = order.Customer.PhoneNumber;
                 orderDto.StoreName = order.Store.FirstName;
@@ -746,6 +696,7 @@ namespace BusinessLogic.ApiClasses
                 orderDto.DatePurchased = (!String.IsNullOrEmpty(order.DatePurchased.ToString()) ? order.DatePurchased.Value.AddHours(3).ToString("dd/MM/yyyy HH:mm:ss tt") : "");
                 orderDto.DeliveryTimeName = order.DeliveryTime.Time ?? null;
                 orderDto.OrderStatusName = order.OrderStatus.StatusName ?? null;
+                orderDto.OrderStatusEnum = order.OrderStatus.OrderStatusEnum; 
                 orderDto.CountProduct = order.OrderProducts.Count();
                 return orderDto;
             }).ToList();
@@ -754,7 +705,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> InvoiceOrder(int id)
         {
             decimal sub = 0;
-            var newOrder = await _repositoryManager.Order.GetOrderId(id, false);
+            var newOrder = await _repositoryManager.Order.GetOrderId(id, false, false);
             var MyOrders = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
 
             var user = await _repositoryManager.User.GetUserId(newOrder.CustomerId, false);

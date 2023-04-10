@@ -1,0 +1,318 @@
+﻿@page "/CP/Orders"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Orders") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<style>
+    .select2 {
+        width: 24% !important;
+    }
+</style>
+<section class="content-header">
+    <h1> @SharedLocalize.GetLocalizedStringValue("Orders") <small> @SharedLocalize.GetLocalizedStringValue("Orders")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("Orders") </li>
+    </ol>
+</section>
+
+@if (Model != null)
+{
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                    </div>
+                    <div class="box-header">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-12 form-inline" id="contact-form">
+                                    <form class="registration">
+                                        <div class="input-group-form search-panel ">
+
+                                            <select type="button" class="btn btn-default sele dropdown-toggle form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true" data-toggle="dropdown" @bind="@customerId">
+                                                <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("CustomerName")</option>
+                                                @if (customers != null)
+                                                {
+                                                    @foreach (var sm in customers)
+                                                    {
+                                                        <option value="@sm.Id">@sm.FullName</option>
+                                                    }
+                                                }
+                                            </select>
+
+                                            <select type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown" @bind="@statusId">
+                                                <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("OrderStatus")</option>
+                                                @if (states != null)
+                                                {
+                                                    @foreach (var sm in states)
+                                                    {
+                                                        <option value="@sm.Id">@sm.StatusName</option>
+                                                    }
+                                                }
+                                            </select>
+
+                                            <select type="button" class="btn btn-default sele dropdown-toggle form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true" data-toggle="dropdown" @bind="@storeId">
+                                                <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("store")</option>
+                                                @if (stores != null)
+                                                {
+                                                    @foreach (var sm in stores)
+                                                    {
+                                                        <option value="@sm.Id">@sm.FirstName</option>
+                                                    }
+                                                }
+                                            </select>
+
+                                            <input type="text" class="form-control input-group-form" placeholder="@SharedLocalize.GetLocalizedStringValue("search")" @bind-value="@search" />
+                                            <button type="button" class="btn btn-primary" @onclick="@GetAllOrders"><i class="oi oi-magnifying-glass"></i></button>
+                                            <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+
+                                        </div>
+                                    </form>
+                                    <div class="col-lg-4 form-inline"></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 table-responsive">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderID")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("store")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CustomerName") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("total") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("CreatedDate")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("status") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.Id</td>
+                                                    <td>@item.StoreName</td>
+                                                    <td>@item.CustomerName</td>
+                                                    <td>@item.Currency @item.OrderPrice </td>
+                                                    <td>@item.CreatedAt</td>
+                                                    @if (item.OrderStatusEnum == OrderStatusEnum.OrderPending)
+                                                    {
+                                                        <td><span class="label label-warning">@item.OrderStatusName</span></td>
+
+                                                    }
+                                                    else if (item.OrderStatusEnum == OrderStatusEnum.OrderCompleted)
+                                                    {
+                                                        <td><span class="label label-success">@item.OrderStatusName</span></td>
+                                                    }
+                                                    else if (item.OrderStatusEnum == OrderStatusEnum.OrderCanceled)
+                                                    {
+                                                        <td><span class="label label-danger">@item.OrderStatusName</span></td>
+                                                    }
+                                                    else if (item.OrderStatusEnum == OrderStatusEnum.OrderRejcted)
+                                                    {
+                                                        <td><span class="label label-danger">@item.OrderStatusName</span></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><span class="label label-info">@item.OrderStatusName</span></td>
+                                                    }
+                                                    <td>
+
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("ViewOrder")" href="/CP/Order/View/@item.Id" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
+
+                                                        @if (item.OrderStatusEnum != OrderStatusEnum.OrderPending && item.OrderStatusEnum != OrderStatusEnum.OrderCompleted && item.OrderStatusEnum != OrderStatusEnum.OrderRejcted && item.OrderStatusEnum != OrderStatusEnum.OrderCanceled && item.OrderStatusEnum != OrderStatusEnum.OrderShipped)
+                                                        {
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Shipped")" @onclick="(async()=>await Shipped(item.Id))" class="badge bg-purple-active "><i class="fa fa-tasks" aria-hidden="true"></i></a>
+                                                        }
+                                                        @if (item.OrderStatusEnum == OrderStatusEnum.OrderReceived || item.OrderStatusEnum == OrderStatusEnum.OrderShipped)
+                                                        {
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Complete")" @onclick="(async()=>await Complete(item.Id))" class="badge bg-green "><i class="fa fa-check" aria-hidden="true"></i></a>
+                                                        }
+                                                        @if (item.OrderStatusEnum == OrderStatusEnum.OrderPending)
+                                                        {
+                                                            <a title=" @SharedLocalize.GetLocalizedStringValue("Reject")" @onclick="(async()=>await Reject(item.Id))" class="badge bg-orange "><i class="fa fa-ban" aria-hidden="true"></i></a>
+                                                        }
+                                                        @if (item.OrderStatusEnum == OrderStatusEnum.OrderPending)
+                                                        {
+                                                            <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick="(async()=>await Delete(item.Id))" class="badge bg-red "><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                        }
+
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+                                <div class="col-xs-12 text-right">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+
+
+        <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content notificationContent">
+                </div>
+            </div>
+        </div>
+
+       @if (Model.Count() >= 10)
+        {
+            <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+        }
+    </section>
+}
+@code {
+    [Parameter]
+    public string search { get; set; }
+    [Parameter]
+    public int customerId { get; set; }
+    [Parameter]
+    public int storeId { get; set; }
+    [Parameter]
+    public int statusId { get; set; }
+    [Parameter]
+    public string lang { get; set; }
+    public List<CustomerDto> customers { get; set; }
+    public List<StoreDto> stores { get; set; } 
+    public List<OrderStatusDto> states { get; set; }
+    public List<OrderDto> Model { get; set; }
+
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        customers = await _userBL.GetAllCustomer();
+        stores = await _userBL.GetStores();
+        states = await _orderBL.GetAllOrderStatus("en");
+        await GetAllOrders();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllOrders();
+    }
+    async Task GetAllOrders()
+    {
+        var pagingResponse = await _orderBL.GetAllOrders(3,customerId,storeId,statusId, search, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _orderBL.DeleteOrder(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task Complete(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _orderBL.OrderComplete(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task Reject(int id)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure ?");
+        if (confirm)
+        {
+            var result = await _orderBL.OrderReject(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task Shipped(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _orderBL.ShippedOrder(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    void NevigateToYourUrl()
+    {
+        NavigationManager.NavigateTo("/CP/Orders", true);
+    }
+}

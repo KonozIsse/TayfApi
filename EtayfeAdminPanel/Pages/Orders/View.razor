@@ -1,0 +1,320 @@
+﻿@page "/CP/Order/View/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("ViewOrder") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("ViewOrder") <small> @SharedLocalize.GetLocalizedStringValue("ViewOrder")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+
+        <li> class = "fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("Orders")</li>
+
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("ViewOrder") </li>
+    </ol>
+</section>
+
+<button onclick="printJS('html_table', 'html')" class="btn btn-default @(lang=="en"?"pull-right":"pull-left")" style="@(lang=="en"? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-print"></i> @SharedLocalize.GetLocalizedStringValue("Print")</button>
+
+<!-- Main content -->
+@if(Model != null)
+{
+
+    <section class="invoice" style="margin: 15px;margin-top: 4%;" id="html_table">
+        <!-- title row -->
+        <div class="row">
+            <div class="col-xs-6" style="float: @(lang == "en" ? "left":"right")">
+                <h2 class="page-header" style="padding-bottom: 25px; margin-top:0;">
+                    <img src="/logo.png" title="remart" alt="remart" class="img-responsive" style="margin-bottom: 4%;" />
+                    @SharedLocalize.GetLocalizedStringValue("OrderID") # @Model.Id
+                    <small style="display: @(lang == "en"? "inline-block" :"contents;")">@SharedLocalize.GetLocalizedStringValue("OrderedDate"): @Model.CreatedAt</small>
+                </h2>
+            </div>
+            <div class="col-xs-6" style="@(lang == "en"? "float:right;text-align:right;" : "float:left;text-align:left;")">
+                @if (Model.OrderStatusId != 2 && Model.OrderStatusId != 4 && Model.OrderStatusId != 3 && Model.OrderStatusId != 6)
+                {
+                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Shipped")" class="badge bg-purple-active Confirmx"><i class="fa fa-tasks" aria-hidden="true"></i></a>
+
+                }
+                @if (Model.OrderStatusId == 5 || Model.OrderStatusId == 6)
+                {
+                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Complete")" class="badge bg-green Confirmx"><i class="fa fa-check" aria-hidden="true"></i></a>
+                }
+                @if (Model.OrderStatusId == 1)
+                {
+                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("Reject")" class="badge bg-orange Confirmx"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                }
+                @if (Model.OrderStatusId == 1)
+                {
+                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
+                }
+                <!-- /.col -->
+            </div>
+        </div>
+        <!-- info row -->
+        <div class="row invoice-info">
+            <div class="col-sm-4 invoice-col">
+                @SharedLocalize.GetLocalizedStringValue("CustomerInfo"):
+
+                <address>
+                    <strong>@Model.CustomerName </strong><br>
+                    @if (Model.AddressName != null)
+                    {
+                        <div>
+                            @Model.AddressName <br>
+                            @Model.AddressDetail<br>
+                        </div>
+                    }
+                    <strong>@SharedLocalize.GetLocalizedStringValue("Mobile"): </strong>@Model.CustomerPhone<br>
+                    <strong>@SharedLocalize.GetLocalizedStringValue("Email"): </strong>@Model.CustomerEmail
+                </address>
+
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-4 invoice-col">
+                @SharedLocalize.GetLocalizedStringValue("ShippingInfo")
+                <address>
+                    <strong>@SharedLocalize.GetLocalizedStringValue("OrderTime") : </strong>@Model.DeliveryTimeName<br>
+                    @if (Model.AddressName != null)
+                    {
+                        <strong>@Model.CustomerName</strong>
+
+                        <br>
+                    }
+                    @if (Model.AddressName != null)
+                    {
+                        <div>
+                            @Model.AddressName  <br>
+                            @Model.AddressDetail<br>
+                        </div>
+                    }
+                    <strong>@SharedLocalize.GetLocalizedStringValue("Mobile"): @Model.CustomerPhone </strong><br>
+                    <strong>@SharedLocalize.GetLocalizedStringValue("shippingMethods"):</strong> freeShipping <br>
+                    <strong>@SharedLocalize.GetLocalizedStringValue("ShippingCost"):</strong>QAR  0.00   <br>
+                </address>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-4 invoice-col">
+                @SharedLocalize.GetLocalizedStringValue("BillingInfo")
+                <address>
+                    @if (Model.AddressName != null)
+                    {
+                        <strong>@Model.CustomerName </strong>
+
+                        <br>
+                    }
+                    @if (Model.AddressName != null)
+                    {
+                        <div>
+                            @Model.AddressName  <br>
+                            @Model.AddressDetail<br>
+                        </div>
+                    }
+                    <strong>@SharedLocalize.GetLocalizedStringValue("Mobile"): @Model.CustomerPhone  </strong><br>
+                </address>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+        <hr>
+
+        <!-- Table row -->
+        <div class="row">
+            <div class="col-xs-12 table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>@SharedLocalize.GetLocalizedStringValue("qty")</th>
+                            <th>@SharedLocalize.GetLocalizedStringValue("img")</th>
+                            <th>@SharedLocalize.GetLocalizedStringValue("ProductName")</th>
+                            <th>@SharedLocalize.GetLocalizedStringValue("ProductsModel")</th>
+                            <th>@SharedLocalize.GetLocalizedStringValue("Options")</th>
+                            <th>@SharedLocalize.GetLocalizedStringValue("ProductsPrice")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.OrderProducts)
+                        {
+                            <tr>
+                                <td>@i.Qty</td>
+                                <td>
+                                    <img src="@i.ProductImage" width="60px"> <br>
+                                </td>
+                                <td width="30%">
+                                    @((MarkupString)i.ProductName)<br>
+                                </td>
+                                <td>@i.ProductModel</td>
+                                <td>
+                                    @{
+                                        if (i.OrderAttributesProducts != null)
+                                        {
+                                            foreach (var t in i.OrderAttributesProducts)
+                                            {
+                                                if (t != null)
+                                                {
+                                                    <div class="ac-md attribDir" style="margin: 0 !important;">
+                                                        @if (t.Option == "color")
+                                                        {
+                                                            <span style="color:#0026ff;"> @t.Option : </span>
+
+                                                            <span style="color:@t.Value ;font-size:12px;"> @t.Option</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span style="color:#0026ff;">@t.Option: </span>
+
+                                                            <span>@t.Option</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+                                </td>
+                                @if (i.Qty > 0)
+                                {
+                                    <td>
+                                        @Model.Currency @i.ProductPrice<br>
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.col -->
+
+        </div>
+        <!-- /.row -->
+
+        <div class="row ">
+            <!-- accepted payments column -->
+            <!-- /.col -->
+            <div class="col-xs-5" style="float: right;">
+                <!--<p class="lead"></p>-->
+
+                <div class="table-responsive ">
+                    <table class="table order-table">
+                        <tbody>
+                            <tr>
+                                <th style="width:50%">@SharedLocalize.GetLocalizedStringValue("SubTotal"):</th>
+                                <td>QAR  @Model.OrderPrice  </td>
+                            </tr>
+                            <tr>
+                                <th>@SharedLocalize.GetLocalizedStringValue("EcoTax"):</th>
+                                <td>QAR @Model.TotalTax  </td>
+                            </tr>
+                            <tr>
+                                <th>@SharedLocalize.GetLocalizedStringValue("Discount"):</th>
+                                @if (Model.CouponId != 0)
+                                {
+                                    <td>QAR/% @Model.CouponAmount (@SharedLocalize.GetLocalizedStringValue("Code") : @Model.CouponCode)  </td>
+                                }
+                                else
+                                {
+                                    <td>QAR/% 0.00  </td>
+
+                                }
+                            </tr>
+                            <tr>
+                                <th>@SharedLocalize.GetLocalizedStringValue("ShippingCost"):</th>
+                                <td>QAR  0.00   </td>
+                            </tr>
+                            <tr>
+                                <th>@SharedLocalize.GetLocalizedStringValue("total"):</th>
+                                <td>QAR  @Model.Total </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+
+    </section>
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public string lang { get; set; }
+    public OrderDto Model { get; set; }
+    string message;
+    string style;
+
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        Model = await http.GetFromJsonAsync<OrderDto>("api/Orders/GetViewOrder/"+Id);
+    }
+    async Task Complete(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _orderBL.OrderComplete(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task Reject(int id)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure ?");
+        if (confirm)
+        {
+            var result = await _orderBL.OrderReject(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task Shipped(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _orderBL.ShippedOrder(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    void NevigateToYourUrl()
+    {
+        NavigationManager.NavigateTo("/CP/Order/View/"+Id, true);
+    }
+}

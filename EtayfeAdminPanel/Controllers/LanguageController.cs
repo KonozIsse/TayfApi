@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace EtayfeAdminPanel.Controllers
 {
@@ -14,20 +15,11 @@ namespace EtayfeAdminPanel.Controllers
         public LanguageController(IServiceProvider provider) : base(provider)
         {
         }
-        
-
-        [HttpGet("SetLanguage/{lang}")]
-        public IActionResult SetLanguage(string lang)
+        [HttpGet("GetLanguages")]
+        public async Task<IActionResult> GetLanguages()
         {
-            if(lang == "ar")
-            {
-                return Redirect("/?lang=ar");
-            }
-            else
-            {
-                return Redirect("/?lang=en");
-            }
-           
+            var result = await _homeBL.GetLanguages(GetLanguage());
+            return Ok(result);
         }
         [HttpGet("get")]
         public async Task<IActionResult> GetAllLanguages(string search ,string filter,[FromQuery] PostsParameters postsParameters)

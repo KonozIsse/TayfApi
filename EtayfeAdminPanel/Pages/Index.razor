@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/index"
 @inject HomeBL _homeBL
 <PageTitle> @SharedLocalize.GetLocalizedStringValue("dashboard")</PageTitle>
 @if (home != null)
@@ -186,16 +186,12 @@
                                     <tbody>
                                         @foreach (var d in ords)
                                         {
-                                            string nm = d.CustomerName;
-
-
-
                                             <tr>
                                                 <td>
                                                     <a href="/CP/Orders" data-toggle="tooltip" data-placement="bottom" title="Go to detail">@d.Id</a>
                                                 </td>
 
-                                                <td>@nm</td>
+                                                <td>@d.CustomerName</td>
                                                 <td>
                                                     QAR @d.OrderPrice
                                                 </td>
@@ -234,7 +230,6 @@
                         <div class="box-footer clearfix">
                             <a href="/CP/Orders" class="btn btn-sm btn-default btn-flat pull-right" data-toggle="tooltip" data-placement="bottom" title="View All Orders">@SharedLocalize.GetLocalizedStringValue("ViewAllOrders")</a>
 
-                            @*<a href="/admin/@lang/CP/Orders/" class="btn btn-sm btn-default btn-flat pull-right" data-toggle="tooltip" data-placement="bottom" title="View All Orders">@SharedLocalize.GetLocalizedStringValue("")ViewAllOrders</a>*@
                         </div>
                     }
                     <!-- /.box-footer -->
@@ -264,7 +259,6 @@
                                     <tbody>
                                         @foreach (var d in vend)
                                         {
-
                                             <tr>
                                                 <td><img src="@d.Image" style="width: 50px !important;border-radius: 50% !important;"></td>
                                                 <td>@d.FirstName</td>
@@ -287,7 +281,6 @@
                         <div class="box-footer clearfix">
                             <a href="/CP/Vendors" class="btn btn-sm btn-default btn-flat pull-right" data-toggle="tooltip" data-placement="bottom" title="View All Orders">@SharedLocalize.GetLocalizedStringValue("ViewAllStores")</a>
 
-                            @*<a href="/admin/@lang/CP/ManageVendors/" class="btn btn-sm btn-default btn-flat pull-right" data-toggle="tooltip" data-placement="bottom" title="View All Orders">@SharedLocalize.GetLocalizedStringValue("")ViewAllStores</a>*@
                         </div>
                     }
                     <!-- /.box-footer -->
@@ -357,7 +350,7 @@
 
                                     <li class="item">
                                         <div class="product-img">
-                                            <img src="@p.ImageProduct" alt="" width=" 100px" height="100px">
+                                            <img src="@p.ImageProduct" alt="" width="100px" height="100px">
                                         </div>
                                         <div class="product-info">
 

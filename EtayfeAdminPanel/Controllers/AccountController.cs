@@ -22,12 +22,7 @@ namespace EtayfeAdminPanel.Controllers
         }
 
        
-        [HttpGet("GetLanguages")]
-        public async Task<IActionResult> GetLanguages()
-        {
-            var result = await _homeBL.GetLanguages("en");
-            return Ok(result);
-        }
+       
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] UserForAuthenticationDto user)
         {

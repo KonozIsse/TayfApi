@@ -32,7 +32,7 @@ namespace BusinessLogic.ApiClasses
       
         public async Task<decimal> GetTotalOrder (int customerId, int orderId )
         {
-            var order = await _repositoryManager.Order.GetOrderId(orderId, false);
+            var order = await _repositoryManager.Order.GetOrderId(orderId, false ,false);
             if (order != null)
             {
                 var orderProducts = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(orderId);
@@ -129,7 +129,7 @@ namespace BusinessLogic.ApiClasses
                 productPrice = flash.DiscountPrice;
             }
             var attributes = await _repositoryManager.Attribute.GetAttributesProductId(createDto.ProductId);
-            if (attributes != null)
+            if (attributes != null && attributes.Count > 0 )
             {
                 if (createDto.CartAttributeProducts != null)
                 {
@@ -595,7 +595,7 @@ namespace BusinessLogic.ApiClasses
             }).ToList();
             return cartsDto;
         }
-        public async Task<CheckoutVM> CheckoutCart(int storeId, int CustomerId, Currency code, string coupon = null)
+        public async Task<CheckoutVM> CheckoutCart(int storeId, int CustomerId, Currency code, string? coupon)
         {
             var usr = await _repositoryManager.User.GetActiveUserId(CustomerId, false);
             var model = new CheckoutVM

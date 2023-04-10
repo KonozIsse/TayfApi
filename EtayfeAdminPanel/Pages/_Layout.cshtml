@@ -11,7 +11,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
      @*kk*@
@@ -32,11 +31,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link href="EtayfeAdminPanel.styles.css" rel="stylesheet" />
-    <script>
-        window.getCultureLang = () => {
-            return window.localStorage['lang']
-        };
-    </script>
+  
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 
@@ -56,14 +51,7 @@
     </div>
 
     <script src="/js/Model.js"></script>
-    <script src="_framework/blazor.server.js" autostart="false"></script>
-    <script>
-        let languageSet = (localStorage.getItem('lang') || 'en');
-        console.log(languageSet);
-        Blazor.start({
-            applicationCulture: languageSet
-        });
-    </script>
+    <script src="_framework/blazor.server.js" ></script>
     <script type="text/javascript" src="/js/jquery.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>
     <script src="https://printjs-4de6.kxcdn.com/print.min.js" type="text/javascript"></script>

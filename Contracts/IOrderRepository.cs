@@ -10,9 +10,8 @@ namespace Contracts
     public interface IOrderRepository
     {
         Task<List<Order>> GetOrders(bool trackChanges);
-        Task<Order> GetOrderId(int id, bool trackChanges);
-        Task<List<Order>> GetAllOrders(string search);
-        Task<List<Order>> GetAllSalesOrders(string search, int customerId, int storeId, int statusId, DateTime? dateFrom, DateTime? dateTo);
+        Task<Order> GetOrderId(int id, bool trackChanges, bool included = false);
+        Task<List<Order>> GetAllOrders(string search, int customerId, int storeId, int statusId, DateTime? dateFrom, DateTime? dateTo);
         Task<List<Order>> GetsAllTransactionOrders();
         Task<List<Order>> GetOrdersToCustomer(int customerId);
         Task<List<Order>> GetOrdersToStore(int storeId);

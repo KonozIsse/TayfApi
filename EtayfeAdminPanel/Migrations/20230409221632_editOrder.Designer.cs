@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EtayfeAdminPanel.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230409221632_editOrder")]
+    partial class editOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1802,8 +1804,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "7634a8b4-0b10-411a-a238-1be3284a56e8",
-                            CreatedAt = new DateTime(2023, 4, 9, 15, 4, 7, 615, DateTimeKind.Local).AddTicks(3009),
+                            ConcurrencyStamp = "cdfd40f9-1cf5-47c0-85d3-150c59874957",
+                            CreatedAt = new DateTime(2023, 4, 9, 12, 16, 30, 608, DateTimeKind.Local).AddTicks(5532),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Admin",
@@ -1812,8 +1814,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "13e77ea3-59a9-4e36-a5f8-dd8d7695acd8",
-                            CreatedAt = new DateTime(2023, 4, 9, 15, 4, 7, 615, DateTimeKind.Local).AddTicks(3074),
+                            ConcurrencyStamp = "af3c5323-3caa-4b8d-b4c1-7eda3214fa88",
+                            CreatedAt = new DateTime(2023, 4, 9, 12, 16, 30, 608, DateTimeKind.Local).AddTicks(5585),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Customer",
@@ -1822,8 +1824,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "b74f0891-67fa-4eb8-a668-bf10b4bfef6c",
-                            CreatedAt = new DateTime(2023, 4, 9, 15, 4, 7, 615, DateTimeKind.Local).AddTicks(3081),
+                            ConcurrencyStamp = "185ffcdc-4663-4083-9fbc-5c7eaa8303a6",
+                            CreatedAt = new DateTime(2023, 4, 9, 12, 16, 30, 608, DateTimeKind.Local).AddTicks(5590),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Store",
@@ -2285,9 +2287,6 @@ namespace EtayfeAdminPanel.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FcmToken")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
@@ -2326,16 +2325,19 @@ namespace EtayfeAdminPanel.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RefreshTokenExpiryTime")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("ResetPasswordCode")
+                        .HasColumnType("int");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SocialId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SocialImage")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")

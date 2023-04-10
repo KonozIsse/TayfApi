@@ -19,11 +19,8 @@ namespace Entities.Models
         public string CodeMobileCountry { get; set; }
         public bool? IsSubscribe { get; set; }
         public int? VerifiedCode { get; set; }
-        public int? ResetPasswordCode { get; set; }
         public string Url { get; set; }
-        public string SocialImage { get; set; }
         public string AdressInfo { get; set; }
-        public string SocialId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
@@ -45,5 +42,9 @@ namespace Entities.Models
         public List<Product> Products { get; set; }
         public List<Order> StoreOrders { get; set; }
         public List<Order> CustomerOrders { get; set; }
+        //Token----------------
+        public DateTime RefreshTokenExpiryTime { get; set; }
+        public string RefreshToken { get; set; }
+        public string FcmToken { get; set; }
     }
 }

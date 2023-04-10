@@ -1,0 +1,132 @@
+﻿@page "/CP/Status"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("OrderStatus") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("OrderStatus") <small> @SharedLocalize.GetLocalizedStringValue("OrderStatus")</small> </h1>
+    <ol class="breadcrumb">
+        <li>@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("OrderStatus") </li>
+    </ol>
+</section>
+
+@if (Model != null)
+{
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title"> </h3>
+                    </div>
+                    <div class="box-header">
+                        <div class="container-fluid">
+                            <div class="row">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (Model.Count() > 0)
+                                {
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderStatus") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("DefaultOptions") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @{
+                                                var i = 0;
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+
+
+                                                i += 1;
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.StatusName</td>
+                                                    <td>@item.Option</td>
+
+                                                    <td>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="CP/Orders/EditStatus/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                    </div>
+                                }
+                                <div class="col-xs-12 text-right">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+
+        <!-- /.row -->
+
+        <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content notificationContent">
+                </div>
+            </div>
+        </div>
+
+        <!-- Main row -->
+        <!-- /.row -->
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public string lang { get; set; }
+    public List<OrderStatusDto> Model { get; set; }
+
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lang = await _homeBL.GetDefaultLanugage();
+        await GetOrderStatus();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetOrderStatus();
+    }
+    async Task GetOrderStatus()
+    {
+        var pagingResponse = await _orderBL.GetOrderStatus(lang, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+}

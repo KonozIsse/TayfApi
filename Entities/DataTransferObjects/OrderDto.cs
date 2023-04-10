@@ -23,7 +23,7 @@ namespace Entities.DataTransferObjects
         public decimal Total { get; set; }
         public string Notes { get; set; }
         public int DeliveryTimeId { get; set; }
-        public int AddressId { get; set; }
+        public int AddressId { get; set; } 
         public string AddressName { get; set; }
         public string AddressDetail { get; set; }
         public int OrderStatusId { get; set; }
@@ -42,7 +42,9 @@ namespace Entities.DataTransferObjects
         public string DeliveryTimeName { get; set; }
         public string ShippingMethods { get; set; } 
         public decimal ShippingCost { get; set; }
-        public decimal DisCount { get; set; }
+        public int CouponId { get; set; } 
+        public string CouponCode { get; set; }
+        public decimal CouponAmount { get; set; }
         public OrderStatusEnum OrderStatusEnum { get; set; }
         public List<OrderProductDto> OrderProducts { get; set; }
     } 
@@ -69,6 +71,7 @@ namespace Entities.DataTransferObjects
     public class OrderAttributProductDto
     {
         public string Option { get; set; }
+        public string OptionType { get; set; }
         public string Value { get; set; }
     }
 

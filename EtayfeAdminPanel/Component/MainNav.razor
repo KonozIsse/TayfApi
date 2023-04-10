@@ -164,35 +164,13 @@
     async Task ChangeLanguage(int id ,string code)
     {
         await _homeBL.ChangeDefaultLanugage(id);
-        //var culture = code;
-        //var uri = new Uri(NavigationManager.Uri)
-        //    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
-
-        //NavigationManager.NavigateTo($"{Uri.EscapeDataString(culture)}" + "/index" + $"?redirectUri={Uri.EscapeDataString(uri)}", forceLoad: true);
-
+        var uri = new Uri(NavigationManager.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var cultureEscaped = Uri.EscapeDataString(code);
+        var uriEscaped = Uri.EscapeDataString(uri);
+        NavigationManager.NavigateTo(
+            $"/?culture={cultureEscaped}",
+            forceLoad: true);
     }
-    protected override void OnInitialized()
-    {
-        Culture = CultureInfo.CurrentCulture;
-    }
-
-    private CultureInfo Culture
-    {
-        get => CultureInfo.CurrentCulture;
-        set
-        {
-            if (CultureInfo.CurrentCulture != value)
-            {
-                var uri = new Uri(NavigationManager.Uri)
-                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
-                var cultureEscaped = Uri.EscapeDataString(value.Name);
-                var uriEscaped = Uri.EscapeDataString(uri);
-
-                NavigationManager.NavigateTo(
-                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
-                    forceLoad: true);
-            }
-        }
-    }
+    
 
 }

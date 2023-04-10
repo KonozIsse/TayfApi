@@ -134,14 +134,14 @@ namespace WebLayer.Controllers
         [HttpGet("getHistoryAllMyOrders")]
         public async Task<IActionResult> GetHistoryMyOrders([FromQuery]PostsParameters postsParameters)
         {
-            var result = await _orderBL.GetHistoryOrder(GetCurrentUserId(), GetCurrentCurrency(),postsParameters);
+            var result = await _orderBL.GetHistoryOrder(GetCurrentUserId(), GetCurrentCurrencyId(),postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         } 
         [HttpGet("getDetailsHistoryOrderToCustomer")]
         public async Task<IActionResult> GetInvoiceOrder(int orderId)
         {
-            var result = await _orderBL.GetOrder(orderId);
+            var result = await _orderBL.GetOrder(orderId,GetCurrentCurrencyId());
             if(result.CustomerId == GetCurrentUserId())
             {
                 return Ok(result);

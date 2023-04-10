@@ -115,41 +115,6 @@ internal class Program
             app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
-        //app.Use(async (context, next) =>
-        //{
-        //    if (context.Request.Query.Count() > 0 &&
-        //    context.Request.Query["culture"].ToString() != "")
-        //    {
-        //        System.Threading.Thread.CurrentThread.CurrentCulture =
-        //         System.Threading.Thread.CurrentThread.CurrentUICulture
-        //        = new CultureInfo(context.Request.Query["culture"].ToString());
-        //        //save cuurrent culture in cookie
-        //        context.Response.Cookies.Append(
-        //            CookieRequestCultureProvider.DefaultCookieName,
-        //            CookieRequestCultureProvider.MakeCookieValue
-        //            (new RequestCulture(context.Request.Query["culture"].ToString()))
-        //            , new CookieOptions() { Expires = DateTime.Now.AddYears(1) }
-        //            );
-        //    }
-
-        //    await next.Invoke();
-        //});
-
-
-        //var jsInterop = app.Services.GetRequiredService<IJSRuntime>();
-        //var result = await jsInterop.InvokeAsync<string>("cultureInfo.get");
-        //CultureInfo culture;
-        //if (result != null)
-        //{
-        //    culture = new CultureInfo(result);
-        //}
-        //else
-        //{
-        //    culture = new CultureInfo("en-US");
-        //    await jsInterop.InvokeVoidAsync("cultureInfo.set", "en-US");
-        //}
-        //CultureInfo.DefaultThreadCurrentCulture = culture;
-        //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
         var options = ((IApplicationBuilder)app).ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
         app.UseRequestLocalization(options.Value);

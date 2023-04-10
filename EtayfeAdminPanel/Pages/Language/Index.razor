@@ -1,6 +1,4 @@
 ﻿@page "/CP/Languages"
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
 @inject HomeBL _homeBL
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("lang")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -145,7 +143,7 @@
   
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Languages", true);
+        NavigationManager.NavigateTo("/CP/Languages", true);
     }
   
    

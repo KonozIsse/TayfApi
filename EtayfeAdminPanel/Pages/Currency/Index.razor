@@ -86,7 +86,8 @@
                                                         <a data-toggle="tooltip" data-placement="bottom" title=" @item.Name" href="/CP/Currency/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         @if (item.IsDefault != 1)
                                                         {
-                                                            <DeleteMessage Message="@message" OnDelete="@Delete" Id="@item.Id"></DeleteMessage>
+                                                            <a  title=" @item.Name" @onclick="(async()=> await Delete(item))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
                                                         }
                                                     </td>
 
@@ -144,39 +145,25 @@
     }
     string message = "";
     string style = "";
-    //public async Task Delete(CurrencyDto customer)
-    //{
-    //    var confirm = await js.confirMethod($"Are you sure ? ");
-    //    @if (confirm)
-    //    {
-    //        var result = await _homeBL.DeleteCurrency(customer.Id);
-
-    //        if (result.Success)
-    //        {
-    //            message = result.Message;
-    //        }
-    //        else
-    //        {
-    //            message = result.Message;
-    //        }
-
-    //    }
-    //    NevigateToYourUrl();
-    //} 
-    public async Task Delete(int id)
+    public async Task Delete(CurrencyDto customer)
     {
-        var result = await _homeBL.DeleteCurrency(id);
+        var confirm = await js.confirMethod($"Are you sure ? ");
+        @if (confirm)
+        {
+            var result = await _homeBL.DeleteCurrency(customer.Id);
 
-        if (result.Success)
-        {
-            message = result.Message;
-        }
-        else
-        {
-            message = result.Message;
+            if (result.Success)
+            {
+                message = result.Message;
+            }
+            else
+            {
+                message = result.Message;
+            }
+
         }
         NevigateToYourUrl();
-    }
+    } 
     void NevigateToYourUrl()
     {
         _navigationManager.NavigateTo("/CP/Currencies", true);

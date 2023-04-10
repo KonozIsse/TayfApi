@@ -21,16 +21,13 @@
                     NotAut
                 </NotAuthorized>
                 <Authorized>*@
-                  @* <MainNav Orders="@Orders" Customers="@Customers" Languages="@Languages" lang="@lang"></MainNav>*@
+                   <MainNav Orders="@Orders" Customers="@Customers" Languages="@Languages" lang="@lang"></MainNav>
                @* </Authorized>
                 <Authorizing>
                     <p>Authorizing...</p>
                 </Authorizing>
             </AuthorizeView>
-
            *@
-                <LanguageSelector />
-           <a>About</a>
         </div>
 
         <article class="content px-4">
@@ -47,17 +44,12 @@
     protected override async Task OnInitializedAsync()
     {
         lang = await _homeBL.GetDefaultLanugage();
-        Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Account/GetLanguages");
+        Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
         //user = await _homeBL.GetCurrentUser(1);
         //await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         Customers = await http.GetFromJsonAsync<List<CustomerDto>>("api/Home/getNewCustomers");
         Orders = await http.GetFromJsonAsync<List<OrderDto>>("api/Home/getNewOrders");
     }
-    private CultureInfo[] supportedCultures = new[]
-    {
-        new CultureInfo("en"),
-        new CultureInfo("ar"),
-    };
 
    
 }
