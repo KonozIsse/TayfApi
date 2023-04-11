@@ -52,6 +52,8 @@ namespace Entities.DataTransferObjects
         public string ValueHexModel { get; set; }
         public string OptionValueName { get; set; }
         public int OptionId { get; set; }
+        public string OptionName { get; set; }
+        public string OptionType{ get; set; }
     }
     public class CreateValueDto
     {

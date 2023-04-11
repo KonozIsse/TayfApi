@@ -7,6 +7,7 @@ using Contracts;
 using Entities.Exception;
 using Entities.RequestFeatures;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -387,7 +388,6 @@ namespace BusinessLogic.ApiClasses
         public async Task<BussnessResultModel> AddContact(CreateContactDto createContactDto)
         {
             var contact = _mapper.Map<Contact>(createContactDto);
-            contact.IsRead = false;
             contact.IsStatus = Status.NotActive;
             _repositoryManager.Contact.CreateContact(contact);
             await _repositoryManager.SaveAsync();
@@ -488,8 +488,6 @@ namespace BusinessLogic.ApiClasses
             {
                 var languageDto = _mapper.Map<LanguageDto>(language);
                 languageDto.Name = lang == "en" ? language.Name : language.NameAr;
-                languageDto.Image = _imageBL.GetImageOriginal(language.ImgId);
-                languageDto.IsDefault = language.IsStatus == Status.Active ? true : false;
                 return languageDto;
             }).ToList();
             return languagesDto;
@@ -626,7 +624,6 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(currency, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Notification------------------------------------------------
-
         public async Task<BussnessResultModel> CreateNotification(CreateNotificationDto create)
         {
 
@@ -699,17 +696,31 @@ namespace BusinessLogic.ApiClasses
         {
             var page = await _repositoryManager.StaticPages.GetTypePage(type, false);
             var pageDto = _mapper.Map<PageDto>(page);
-            pageDto.Title = lang == "en" ? page.Title : page.TitleAr;
-            pageDto.Description = lang == "en" ? page.Description : page.DescriptionAr;
+            if (page.Names.ContainsKey(lang))
+            {
+                pageDto.Title = page.Names[lang];
+            }
+            if (page.Descriptions.ContainsKey(lang))
+            {
+                pageDto.Description = page.Descriptions[lang];
+            }
             return pageDto;
         }
         public async Task<PagedList<PageDto>> GetAllPages(string search,string filter, string lang, PostsParameters postsParameters)
         {
             var pages = await _repositoryManager.StaticPages.GetAllPages(search, filter, false);
-            var pagesDto = pages.Select(page => new PageDto
+            var pagesDto = pages.Select(page => 
             {
-                Title = lang == "en" ? page.Title : page.TitleAr,
-                Description = lang == "en" ? page.Description : page.DescriptionAr,
+                var pageDto = _mapper.Map<PageDto>(page);
+                if (page.Names.ContainsKey(lang))
+                {
+                    pageDto.Title =  page.Names[lang];
+                }
+                if (page.Descriptions.ContainsKey(lang))
+                {
+                    pageDto.Description = page.Descriptions[lang];
+                }
+                return pageDto;
             }).ToList();
             return PagedList<PageDto>.ToPagedList(pagesDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
@@ -720,10 +731,19 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            _mapper.Map(update, page);
+            page.Id = update.Id;
+            page.Names = update.Names;
+            page.Descriptions = update.Descriptions;
+            //_mapper.Map(update, page);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(page, _locService.GetLocalizedStringValue("successSave"));
         }
+        //public async Task<EditPageDto> GetPageId(int id)
+        //{
+        //    var page = await _repositoryManager.StaticPages.GetPage(id, false);
+        //    var pageDto = _mapper.Map<EditPageDto>(page);
+        //    return pageDto;
+        //}
         //setting------------------------------------------------------
         public async Task<IEnumerable<SettingDto>> GetAllSettings()
         {

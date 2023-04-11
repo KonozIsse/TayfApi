@@ -1,0 +1,105 @@
+﻿@page "/CP/EditStatus/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("editStatus")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("OrderStatus")<small>@SharedLocalize.GetLocalizedStringValue("editStatus")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("Orders")</li>
+
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("editStatus")</li>
+    </ol>
+</section>
+<Alert Message="@message" Style="@style"></Alert>
+<!-- Main content -->
+<section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("editStatus")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                <EditForm Model="@create" OnValidSubmit="@EditOrderStatus">
+                                    <DataAnnotationsValidator />
+                                    <div class="form-horizontal">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("OrderStatus") <span style="color:red;">*</span> (en)</label>
+                                                <div class="col-md-8">
+                                                    <InputText class="form-control" @bind-Value="create.StatusName" />
+                                                    <ValidationMessage For="@(() => create.StatusName)" />
+                                                </div>
+                                            </div> 
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("OrderStatus") <span style="color:red;">*</span> (ar)</label>
+                                                <div class="col-md-8">
+                                                    <InputText class="form-control" @bind-Value="create.StatusNameAr" />
+                                                    <ValidationMessage For="@(() => create.StatusNameAr)" />
+                                                </div>
+                                            </div>
+                                            <div class="box-footer text-center">
+                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                                <a href="/OrderStatus" class="btn btn-default"> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+    <!-- /.row -->
+    <!-- Main row -->
+    <!-- /.row -->
+</section>
+@code {
+    // onClick="window.location.reload()"
+    [Parameter]
+    public int Id { get; set; }
+    UpdateOrderStatusDto create = new UpdateOrderStatusDto();
+    string message;
+    string style;
+    protected override async Task OnInitializedAsync()
+    {
+        create = new UpdateOrderStatusDto();
+        if (Id != 0)
+        {
+            create = await _orderBL.GetUpdateOrderStatus(Id);
+        }
+    }
+
+    public async Task EditOrderStatus()
+    {
+        create.Id = Id;
+        var result = await _orderBL.EditOrderStatus(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+}

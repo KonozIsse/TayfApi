@@ -1,0 +1,158 @@
+﻿@page "/CP/Options"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Options") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Options") <small>@SharedLocalize.GetLocalizedStringValue("Options")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("Options") </li>
+    </ol>
+</section>
+
+@if(Model != null)
+{
+    @if(user != null)
+    {
+    <section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <div class="box-header">
+                        <div class="box-tools pull-right">
+                            @if (user.UserType == UserType.Admin)
+                            {
+                                <a href="/CP/Option/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddOptions")</a>
+
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-xs-12 table-responsive">
+                            @if (Model.Count() > 0)
+                            {
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th> #</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Options")</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var i = 0;
+                                        }
+                                        @foreach (var item in Model)
+                                        {
+
+                                            i += 1;
+
+                                            <tr>
+                                                <td>@i</td>
+                                                <td dir="@(lang == "ar" ? "rtl": "ltr")">
+                                                    <strong>@item.OptionName </strong>
+                                                    <br>
+                                                    <a href="/CP/Option/Values/@item.Id">  @SharedLocalize.GetLocalizedStringValue("ManageOptions")</a>
+
+                                                </td>
+
+
+                                                <td>
+                                                    <a style="padding:1%;" data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")" href="/CP/Option/Values/@item.Id" class="badge bg-light-blue"><i class="fa fa-list" aria-hidden="true"></i> @SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")</a>
+
+
+                                                    @if (user.UserType == UserType.Admin)
+                                                    {
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick = "(async()=> await Delete(item.Id))" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                    }
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                    @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+
+</section>
+    }
+}
+@code {
+    [Parameter]
+    public string lang { get; set; } 
+    public AdminDto user { get; set; }
+    public List<OptionDto> Model { get; set; }
+
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _homeBL.GetCurrentUser(3);
+        lang = await _homeBL.GetDefaultLanugage();
+        await GetAllOptions();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllOptions();
+    }
+    async Task GetAllOptions()
+    {
+        var pagingResponse = await _productBL.GetAllOptions(_PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _productBL.DeleteOptionProduct(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    void NevigateToYourUrl()
+    {
+        NavigationManager.NavigateTo("/CP/Options", true);
+    }
+}

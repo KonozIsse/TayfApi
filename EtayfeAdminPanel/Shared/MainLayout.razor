@@ -45,8 +45,7 @@
     {
         lang = await _homeBL.GetDefaultLanugage();
         Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
-        //user = await _homeBL.GetCurrentUser(1);
-        //await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        //user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         Customers = await http.GetFromJsonAsync<List<CustomerDto>>("api/Home/getNewCustomers");
         Orders = await http.GetFromJsonAsync<List<OrderDto>>("api/Home/getNewOrders");
     }

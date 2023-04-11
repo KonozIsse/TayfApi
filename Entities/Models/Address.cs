@@ -7,12 +7,10 @@ namespace Entities.Models
         public string AddressTitle { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
-        [Required]
         public string Street { get; set; }
         public string Post_Code { get; set; }
         public string CityName { get; set; }
         public string Flat { get; set; }
-        public bool IsDefault { get; set; }
         [Required]
         [ForeignKey(nameof(Zone))]
         public int ZoneId { get; set; }

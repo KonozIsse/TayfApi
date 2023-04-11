@@ -4,10 +4,7 @@ using Entities.DataTransferObjects;
 using Entities.Exception;
 using Entities.Models;
 using Entities.RequestFeatures;
-using System.Collections.Generic;
-using System.Web.Mvc;
-using Twilio.Base;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Entities.Models.Enums;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -30,6 +27,7 @@ namespace BusinessLogic.ApiClasses
         {
             var address = _mapper.Map<Address>(create);
             address.UserId = userId;
+            address.IsStatus = create.IsDefault == true ? Status.Active : Status.NotActive;
             _repositoryManager.Address.AddAddress(address);
             await _repositoryManager.SaveAsync();
             if (create.IsDefault == true)
@@ -58,7 +56,7 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
             var user = await _repositoryManager.User.GetUserId(customerId, true);
-            if (user != null && address.IsDefault == true)
+            if (user != null && address.IsStatus == Entities.Models.Enums.Status.Active)
             {
                 user.DefaultAddressId = 0;
             }

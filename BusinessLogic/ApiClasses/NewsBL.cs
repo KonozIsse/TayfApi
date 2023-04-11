@@ -59,8 +59,6 @@ namespace BusinessLogic.ApiClasses
         {
             var blog = _mapper.Map<News>(create);
             blog.ImgId = im;
-            blog.IsFeature = 1;
-            blog.IsViewed = 0;
             var user = await _repositoryManager.User.GetActiveUserId(storeId, false);
             if (user.UserType == UserType.Store)
             {
@@ -81,8 +79,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
             }
-            blog.IsFeature = 1;
-            blog.IsViewed = 0;
             var user = await _repositoryManager.User.GetActiveUserId(storeId, false);
             if (user.UserType == UserType.Store)
             {

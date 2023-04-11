@@ -1,0 +1,32 @@
+﻿@page "/dict"
+    @foreach (var kvp in _dict)
+    {
+    <div>
+        <label>@kvp.Key</label>
+        <input @bind=_dict[kvp.Key] />
+        <label>Key:@kvp.Key|Value:@kvp.Value</label>
+        </div>
+    }
+    
+    @code {
+        private Dictionary<string, string> _dict = new()
+        {
+            ["1"] = "One",
+            ["2"] = "Two",
+            ["3"] = "Three",
+            ["4"] = "Four",
+            ["5"] = "Five",
+        };
+         
+    //@if(item.Value.GetType() == typeof(Dictionary<string, dynamic>))
+    //{
+    //    //dowork
+    //}
+    //else if(item.Value.GetType() == typeof(List<dynamic>))
+    //{
+    //    //do more work
+    //}
+    //else
+    //{}
+    }
+    

@@ -13,8 +13,6 @@ namespace Entities.Models
         public string TitleAr { get; set; }
         public string DecriptionAr { get; set; }
         public string Url { get; set; }
-        public short IsFeature { get; set; }
-        public int? IsViewed { get; set; }
 
         [ForeignKey(nameof(Image))]
         public int? ImgId { get; set; }

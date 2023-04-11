@@ -8,10 +8,6 @@ using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Identity;
-using System.Text;
-using System.Security.Cryptography;
-using Microsoft.Owin.BuilderProperties;
-using Org.BouncyCastle.Utilities;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -39,8 +35,67 @@ namespace BusinessLogic.ApiClasses
             _signInManager = signInManager;
            // _logger = logger;
         }
-        
+
         //Order------------------------------------------------
+        public async Task<OrderDto> GetOrder(int id, int currencyId)
+        {
+            var order = await _repositoryManager.Order.GetOrderId(id, false, true);
+            var orderDto = _mapper.Map<OrderDto>(order);
+            var store = await _repositoryManager.User.GetStoreId(order.StoreId);
+            if (store != null)
+            {
+                decimal subTotal = 0;
+                var products = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
+                var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
+                var currency = await _repositoryManager.Currency.GetCurrency(currencyId, false);
+                var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
+                var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+                var address = await _repositoryManager.Address.GetDefaultAddressCustomer(order.CustomerId);
+
+                var orderProducts = new List<OrderProductDto>();
+                foreach (var c in products)
+                {
+                    var attributes = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(id, c.ProductId);
+
+                    var attributesOrder = attributes.Select(c => new OrderAttributProductDto
+                    {
+                        Option = c.ProductAttribut.ProductOption.OptionName,
+                        OptionType = c.ProductAttribut.ProductOption.OptionType,
+                        Value = c.ProductAttribut.ProductOptionValue.OptionValueName,
+                    }).ToList();
+                    var image = await _repositoryManager.ImageProduct.GetAllImagesProductId(c.ProductId, false, true);
+                    orderProducts.Add(new OrderProductDto
+                    {
+                        Qty = c.Qty,
+                        ProductName = c.Product.ProductName,
+                        ProductModel = c.Product.ProductModel,
+                        ProductPrice = c.Product.Price,
+                        ProductImage = _imageBL.GetImageOriginal(image.First().ImageId),
+                        OrderAttributesProducts = attributesOrder ?? null
+                    });
+                    subTotal = subTotal + c.Qty * c.Product.Price;
+                }
+                orderDto.CustomerName = customer.FullName;
+                orderDto.CustomerEmail = customer.Email;
+                orderDto.CustomerPhone = customer.PhoneNumber;
+                orderDto.AddressName = address != null ? address.AddressTitle : null;
+                orderDto.AddressDetail = address != null ? $" {address.Address1} , {address.CityName} , {address.Street} ,  {address.Flat} " : null;
+                orderDto.Currency = currency.Symbol;
+                orderDto.StoreName = store.FirstName;
+                orderDto.StoreEmail = store.Email;
+                orderDto.StorePhone = store.PhoneNumber;
+                orderDto.DeliveryTimeName = time.Time ?? null;
+                orderDto.OrderStatusName = states.StatusName ?? null;
+                orderDto.OrderProducts = orderProducts ?? null;
+                orderDto.OrderPrice = subTotal;
+                orderDto.TotalTax = order.TotalTax;
+                orderDto.CouponAmount = order.Coupon == null ? 0 : order.Coupon.CouponAmount;
+                orderDto.CouponCode = order.Coupon == null ? "" : order.Coupon.CouponCode;
+                orderDto.Total = order.OrderPrice; 
+                orderDto.OrderStatusEnum = states.OrderStatusEnum;
+            }
+            return orderDto;
+        }
         public async Task<BussnessResultModel> AddOrder(int customerId, CreateOrderDto createOrderDto)
         {
             var order = _mapper.Map<Order>(createOrderDto);
@@ -591,64 +646,7 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order, "successDelete");
         }
-        public async Task<OrderDto> GetOrder(int id, int currencyId)
-        {
-            var order = await _repositoryManager.Order.GetOrderId(id , false,true);
-            var orderDto = _mapper.Map<OrderDto>(order);
-            var store = await _repositoryManager.User.GetStoreId(order.StoreId);
-            if (store != null)
-            {
-                decimal subTotal = 0;
-                var products = await _repositoryManager.OrderProducts.GetAllProductsToOrderId(id);
-                var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
-                var currency = await _repositoryManager.Currency.GetCurrency(currencyId, false);
-                var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
-                var address = await _repositoryManager.Address.GetDefaultAddressCustomer(order.CustomerId);
-               
-                var orderProducts = new List<OrderProductDto>();
-                foreach(var c in products)
-                {
-                    var attributes = await _repositoryManager.OrderAttributesProducts.GetAttributesOrderProduct(id,c.ProductId);
-                   
-                    var attributesOrder = attributes.Select(c => new OrderAttributProductDto
-                    {
-                        Option = c.ProductAttribut.ProductOption.OptionName,
-                        OptionType = c.ProductAttribut.ProductOption.OptionType,
-                        Value = c.ProductAttribut.ProductOptionValue.OptionValueName,
-                    }).ToList();
-                    var image = await _repositoryManager.ImageProduct.GetAllImagesProductId(c.ProductId, false, true);
-                    orderProducts.Add(new OrderProductDto
-                    {
-                        Qty = c.Qty,
-                        ProductName = c.Product.ProductName,
-                        ProductModel = c.Product.ProductModel,
-                        ProductPrice = c.Product.Price,
-                        ProductImage = _imageBL.GetImageOriginal(image.First().ImageId),
-                        OrderAttributesProducts = attributesOrder ?? null
-                    });
-                    subTotal = subTotal + c.Qty * c.Product.Price;
-                }
-                orderDto.CustomerName = customer.FullName; 
-                orderDto.CustomerEmail = customer.Email; 
-                orderDto.CustomerPhone = customer.PhoneNumber;
-                orderDto.AddressName = address != null ? address.AddressTitle : null; 
-                orderDto.AddressDetail = address != null ? $" {address.Address1} , {address.CityName} , {address.Street} ,  {address.Flat} "   : null;
-                orderDto.Currency = currency.Symbol;
-                orderDto.StoreName = store.FirstName;
-                orderDto.StoreEmail = store.Email;
-                orderDto.StorePhone = store.PhoneNumber;
-                orderDto.DeliveryTimeName = time.Time ?? null;
-                orderDto.OrderStatusName = states.StatusName ?? null;
-                orderDto.OrderProducts = orderProducts ?? null;
-                orderDto.OrderPrice = subTotal;
-                orderDto.TotalTax = order.TotalTax;
-                orderDto.CouponAmount = order.Coupon == null ? 0 : order.Coupon.CouponAmount;
-                orderDto.CouponCode = order.Coupon == null ? "" : order.Coupon.CouponCode;
-                orderDto.Total = order.OrderPrice;
-            }
-            return orderDto;
-        }
+       
         public async Task<List<OrderDto>> GetAllSalesOrders(int userId , string search, int customerId, int storeId, int statusId, DateTime? dateFrom, DateTime? dateTo)
         {
             var orders = await _repositoryManager.Order.GetAllOrders(search, customerId, storeId, statusId, dateFrom, dateTo);
@@ -940,7 +938,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var statusDto = _mapper.Map<OrderStatusDto>(status);
                 statusDto.StatusName = lang == "en" ? status.StatusName : status.StatusNameAr;
-                statusDto.Option = lang == "en" ? (status.IsStatus == Status.Active ? "Yes" : "No") : (status.IsStatus == Status.Active ? "نعم" : "لا");
+                statusDto.Option = status.IsStatus == Status.Active ? _locService.GetLocalizedStringValue("Yes") : _locService.GetLocalizedStringValue("No");
                 return statusDto;
             }).ToList();
             return model;
@@ -952,13 +950,15 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink") , false); 
             }
-            if (update.StatusName == null)
-            {
-                return new BussnessResultModel(status, _locService.GetLocalizedStringValue("enterallfiled") , false); 
-            }
             _mapper.Map(update, status);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(status, _locService.GetLocalizedStringValue("successSave"));
+        }
+        public async Task<UpdateOrderStatusDto> GetUpdateOrderStatus(int id)
+        {
+            var status = await _repositoryManager.OrderStatus.GetOrderStatusById(id, false);
+            var statusDto = _mapper.Map<UpdateOrderStatusDto>(status);
+            return statusDto;
         }
         //Payment------------------------------------------------
         public async Task<PagedList<PaymentDto>> GetAllPayments(string search, PostsParameters postsParameters)

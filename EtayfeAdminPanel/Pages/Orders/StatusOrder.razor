@@ -1,4 +1,4 @@
-﻿@page "/CP/Status"
+﻿@page "/OrderStatus"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("OrderStatus") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -63,7 +63,7 @@
                                                     <td>@item.Option</td>
 
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="CP/Orders/EditStatus/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/EditStatus/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
 
                                                     </td>
                                                 </tr>

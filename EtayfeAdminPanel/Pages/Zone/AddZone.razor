@@ -13,11 +13,7 @@
         <li class="active">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</li>
     </ol>
 </section>
-@if (create == null)
-{
-    <p>Loading Zone</p>
-}
-else
+@if (create != null)
 {
     <!-- Main content -->
     <section class="content">

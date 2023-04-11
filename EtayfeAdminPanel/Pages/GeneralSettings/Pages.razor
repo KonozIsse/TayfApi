@@ -1,4 +1,4 @@
-﻿@page "/settings/pages"
+﻿@page "/CP/Pages"
 @inject HomeBL _homeBL
 @inject LocService SharedLocalize
 @inject NavigationManager _navigationManager
@@ -73,7 +73,7 @@
                                                     <td class="tdDes">@((MarkupString)item.Description)</td>
 
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Title" href="/pages/edit/@item.Id"class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Title" href="/CP/Page/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                     </td>
                                                 </tr>
                                             }
@@ -106,7 +106,7 @@
     [Parameter]
     public string search { get; set; }
     public string filter { get; set; }
-    string lang = "ar";
+    string lang = "";
 
     public List<PageDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
@@ -114,6 +114,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        lang = await _homeBL.GetDefaultLanugage();
         await GetPages();
     }
     private async Task SelectedPage(int page)
@@ -129,6 +130,6 @@
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/pages/Index", true);
+        _navigationManager.NavigateTo("/CP/Pages", true);
     }
 }

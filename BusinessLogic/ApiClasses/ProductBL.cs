@@ -10,6 +10,7 @@ using Entities.RequestFeatures;
 using System;
 using MailKit.Search;
 using System.Diagnostics.Metrics;
+using Microsoft.Extensions.Options;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -1099,6 +1100,12 @@ namespace BusinessLogic.ApiClasses
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"),false);
             }
         }
+        public async Task<OptionDto> GetOptionId(int id)
+        {
+            var option = await _repositoryManager.Option.GetOptionId(id, false);
+            var optionsDto = _mapper.Map<OptionDto>(option);
+            return optionsDto;
+        }
         public async Task<BussnessResultModel> DeleteOptionProduct(int id)
         {
             var option = await _repositoryManager.Option.GetOptionId(id, false);
@@ -1239,9 +1246,14 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<PagedList<ValueDto>> GetListValues(int optionId, PostsParameters postsParameters)
         {
-            var value = await _repositoryManager.Value.GetValuesOPtionId(optionId);
-            if (value == null) { return null; } 
-            var valueDto = _mapper.Map<List<ValueDto>>(value);
+            var values = await _repositoryManager.Value.GetValuesOPtionId(optionId);
+            var valueDto = values.Select(value =>
+            {
+              var valueDto  = _mapper.Map<ValueDto>(value);
+                valueDto.OptionName = value.ProductOption.OptionName;
+                valueDto.OptionType = value.ProductOption.OptionType;
+                return valueDto;
+            }).ToList();
             return PagedList<ValueDto>.ToPagedList(valueDto, postsParameters.PageNumber, postsParameters.PageSize);
             
         }

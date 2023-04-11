@@ -1,13 +1,13 @@
 ﻿@page "/CP/Order/View/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("ViewOrder") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
-
+<Alert Message="@message" Style="@style"></Alert>
 
 <section class="content-header">
     <h1>@SharedLocalize.GetLocalizedStringValue("ViewOrder") <small> @SharedLocalize.GetLocalizedStringValue("ViewOrder")</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
 
-        <li> class = "fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("Orders")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("Orders")</li>
 
         <li class="active">@SharedLocalize.GetLocalizedStringValue("ViewOrder") </li>
     </ol>
@@ -30,22 +30,22 @@
                 </h2>
             </div>
             <div class="col-xs-6" style="@(lang == "en"? "float:right;text-align:right;" : "float:left;text-align:left;")">
-                @if (Model.OrderStatusId != 2 && Model.OrderStatusId != 4 && Model.OrderStatusId != 3 && Model.OrderStatusId != 6)
+                @if (Model.OrderStatusEnum != OrderStatusEnum.OrderCompleted && Model.OrderStatusEnum != OrderStatusEnum.OrderRejcted && Model.OrderStatusEnum != OrderStatusEnum.OrderCanceled && Model.OrderStatusEnum != OrderStatusEnum.OrderShipped)
                 {
-                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Shipped")" class="badge bg-purple-active Confirmx"><i class="fa fa-tasks" aria-hidden="true"></i></a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Shipped")" @onclick="(async()=>await Shipped(Model.Id))" class="badge bg-purple-active"><i class="fa fa-tasks" aria-hidden="true"></i></a>
 
                 }
-                @if (Model.OrderStatusId == 5 || Model.OrderStatusId == 6)
+                @if (Model.OrderStatusEnum == OrderStatusEnum.OrderReceived || Model.OrderStatusEnum == OrderStatusEnum.OrderShipped)
                 {
-                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Complete")" class="badge bg-green Confirmx"><i class="fa fa-check" aria-hidden="true"></i></a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("Complete")" @onclick="(async()=>await Complete(Model.Id))" class="badge bg-green "><i class="fa fa-check" aria-hidden="true"></i></a>
                 }
-                @if (Model.OrderStatusId == 1)
+                @if (Model.OrderStatusEnum == OrderStatusEnum.OrderPending)
                 {
-                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("Reject")" class="badge bg-orange Confirmx"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("Reject")" @onclick="(async()=>await Reject(Model.Id))" class="badge bg-orange "><i class="fa fa-ban" aria-hidden="true"></i></a>
                 }
-                @if (Model.OrderStatusId == 1)
+                @if (Model.OrderStatusEnum == OrderStatusEnum.OrderPending)
                 {
-                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick="(async()=>await Delete(Model.Id))" class="badge bg-red "><i class="fa fa-trash" aria-hidden="true"></i></a>
 
                 }
                 <!-- /.col -->
@@ -258,6 +258,24 @@
     {
         lang = await _homeBL.GetDefaultLanugage();
         Model = await http.GetFromJsonAsync<OrderDto>("api/Orders/GetViewOrder/"+Id);
+    }
+    async Task Delete(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _orderBL.DeleteOrder(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
     }
     async Task Complete(int id)
     {

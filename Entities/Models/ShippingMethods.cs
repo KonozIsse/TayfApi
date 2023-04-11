@@ -8,6 +8,5 @@ namespace Entities.Models
         public string Name { get; set; }
         public string ShippingMethod { get; set; }
         public decimal ShippingCost { get; set; }
-        public short IsDefault { get; set; }
     }
 }

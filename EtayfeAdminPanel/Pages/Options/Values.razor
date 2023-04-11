@@ -1,0 +1,217 @@
+﻿@page "/CP/Option/Values/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Orders") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Options") <small>@SharedLocalize.GetLocalizedStringValue("Options")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("Options")</li>
+
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("OptionsValues") </li>
+    </ol>
+</section>
+@if(Model != null)
+{
+    @if(user != null)
+{
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                        <h3 class="box-title"> @SharedLocalize.GetLocalizedStringValue("OptionsValues") :   <strong>
+                                @if (option != null)
+                                {
+                                    @option.OptionName
+                                }
+                            </strong></h3>
+                    </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" style=@(user.UserType == UserType.Admin  ? "":"display:none;")>
+                                <h4>@SharedLocalize.GetLocalizedStringValue("AddOptionValue")</h4>
+                           <EditForm Model="create" OnValidSubmit="@AddValue">
+                                <DataAnnotationsValidator />
+                                <div class="form-group">
+                                    <label class="col-sm-5 col-md-5 control-label">@SharedLocalize.GetLocalizedStringValue("OptionsValues") </label>
+                                    <div class="col-sm-7 col-md-7">
+                                   <InputText class="form-control" @bind-Value="@create.OptionValueName"></InputText>
+
+                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("enterOptionVal")  </span>
+                                        <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("enterOptionVal")</span>
+                                    </div>
+                                </div>
+
+                                    @if (option != null)
+                                    {
+                                        @if (option.OptionType == "color")
+                                        {
+                                            <div class="form-group">
+                                                <label class="col-sm-5 col-md-5 control-label">@SharedLocalize.GetLocalizedStringValue("PropertyColor")</label>
+                                                <div class="col-sm-7 col-md-7">
+
+                                                    <input type="color" class="form-control field-validate"  name="hex_val_mob">
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("TypeColorEnter")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("TypeColorEnter")</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    <div class="box-footer text-center">
+                                    <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                    <a class="btn btn-defult" href="/CP/Options"> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                </div>
+                            </EditForm>
+                        </div>
+                        <div class="col-md-6">
+                            @if (Model.Count() > 0)
+                            {
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>@SharedLocalize.GetLocalizedStringValue("Value")</th>
+                                            @if (user.UserType == UserType.Admin)
+                                            {
+                                                <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var i = 0;
+                                        }
+                                        @foreach (var item in Model)
+                                        {
+
+                                            i += 1;
+                                            <tr id="tr_parent_2">
+                                                <td>@i</td>
+                                                <td dir="@(lang == "ar" ? "rtl": "ltr")">
+
+                                                    <p>
+                                                        <strong>@item.OptionValueName</strong>
+                                                        <br>
+                                                    </p>
+
+                                                </td>
+                                                @if (user.UserType == UserType.Admin)
+                                                {
+                                                    <td>
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/Option/EditVal/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick="(async()=> await Delete(item.Id))" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                    </td>
+                                                }
+                                            </tr>
+
+                                        }
+                                    </tbody>
+
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                                    @SharedLocalize.GetLocalizedStringValue("NoRecordfound")
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- /.box-body -->
+
+            </div>
+
+            <!-- /.box -->
+
+        </div>
+
+        <!-- /.col -->
+
+    </div>
+ </section>
+}
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; } 
+    [Parameter]
+    public string lang { get; set; }
+    public AdminDto user { get; set; } 
+    public OptionDto option { get; set; } 
+    public List<ValueDto> Model { get; set; }
+    public CreateValueDto create { get; set; }
+
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        create = new CreateValueDto();
+        lang = await _homeBL.GetDefaultLanugage();
+        option = await _productBL.GetOptionId(Id);
+        await GetAllValues();
+    }
+    
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllValues();
+    }
+    async Task GetAllValues()
+    {
+        var pagingResponse = await _productBL.GetListValues(Id, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var confirm = await js.confirMethod("are you sure");
+        if (confirm)
+        {
+            var result = await _productBL.DeleteValueProduct(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task AddValue()
+    {
+        var result = await _productBL.AddValue(Id,create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+    void NevigateToYourUrl()
+    {
+        NavigationManager.NavigateTo("CP/Values", true);
+    }
+}

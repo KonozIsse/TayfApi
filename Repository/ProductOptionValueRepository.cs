@@ -22,7 +22,7 @@ namespace Repository
        => await FindByCondition(x => x.Id == optionId, false).FirstOrDefaultAsync();
 
         public async Task<List<ProductOptionValue>> GetValuesOPtionId(int optionId)
-        => await FindByCondition(x => x.OptionId == optionId, false).ToListAsync();
+        => await FindByCondition(x => x.OptionId == optionId, false).Include(c=>c.ProductOption).ToListAsync();
         public async Task<List<ProductOptionValue>> GetValues()
        => await FindAll(false).ToListAsync();
         public void CreateValue(ProductOptionValue value) => Create(value);
