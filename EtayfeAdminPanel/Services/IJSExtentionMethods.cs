@@ -18,7 +18,7 @@ namespace EtayfeAdminPanel.Services
           => await js.InvokeVoidAsync("localStorage.setItem",key, content );
 
         public static async ValueTask<string> GetFromLocalStorage(this IJSRuntime js, string key)
-            => await js.InvokeAsync<string>("localStorage.getItem", key );
+            => await js.InvokeAsync<string>("localStorage.getItem", key ); 
 
         public static async ValueTask RemoveItem(this IJSRuntime js, string key)
             => await js.InvokeVoidAsync("localStorage.removeItem", key);

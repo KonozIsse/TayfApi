@@ -1,5 +1,6 @@
 ﻿using Entities.DataTransferObjects;
 using Entities.Exception;
+using EtayfeAdminPanel.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,8 @@ namespace EtayfeAdminPanel.Services
 {
     public interface ILoginService
     {
-        Task Login(string token);
+        Task<TokenResponse> Login(UserForAuthenticationDto token);
         Task Logout();
-        //Task<string> RefreshToken1();
-
-        //Task<string> TryRefreshToken();
-
-        //Task<string> TryForceRefreshToken();
-
+        Task<string> RefreshToken();
     }
 }

@@ -60,7 +60,7 @@ namespace BusinessLogic.ApiClasses
                     var attributesOrder = attributes.Select(c => new OrderAttributProductDto
                     {
                         Option = c.ProductAttribut.ProductOption.OptionName,
-                        OptionType = c.ProductAttribut.ProductOption.OptionType,
+                        OptionType = c.ProductAttribut.ProductOption.OptionType.ToString(),
                         Value = c.ProductAttribut.ProductOptionValue.OptionValueName,
                     }).ToList();
                     var image = await _repositoryManager.ImageProduct.GetAllImagesProductId(c.ProductId, false, true);

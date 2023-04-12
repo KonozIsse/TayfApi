@@ -1,8 +1,5 @@
 ﻿@page "/CP/ManageVendors/Edit"
 @page "/CP/ManageVendors/Edit/{Id:int}"
-@inject UserBL _userBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditVendor") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>

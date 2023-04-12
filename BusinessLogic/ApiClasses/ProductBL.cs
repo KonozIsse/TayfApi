@@ -968,7 +968,7 @@ namespace BusinessLogic.ApiClasses
                var attributDto = _mapper.Map<AttributeDto>(attribut);
                 attributDto.ProductName = attribut.Product.ProductName;
                 attributDto.Option = attribut.ProductOption.OptionName;
-                attributDto.OptionType = attribut.ProductOption.OptionType;
+                attributDto.OptionType = attribut.ProductOption.OptionType.ToString();
                 attributDto.Value = attribut.ProductOptionValue.OptionValueName;
                 return attributDto;
             }).ToList();
@@ -1106,6 +1106,12 @@ namespace BusinessLogic.ApiClasses
             var optionsDto = _mapper.Map<OptionDto>(option);
             return optionsDto;
         }
+        public async Task<UpdateOptionDto> GetEditOption(int id)
+        {
+            var option = await _repositoryManager.Option.GetOptionId(id, false);
+            var optionsDto = _mapper.Map<UpdateOptionDto>(option);
+            return optionsDto;
+        }
         public async Task<BussnessResultModel> DeleteOptionProduct(int id)
         {
             var option = await _repositoryManager.Option.GetOptionId(id, false);
@@ -1218,7 +1224,7 @@ namespace BusinessLogic.ApiClasses
                     {
                         Id = option.Id,
                         OptionName = option.OptionName,
-                        OptionType = option.OptionType,
+                        OptionType = option.OptionType.ToString(),
                         Values = valuesVM,
                     });
                 }
@@ -1251,13 +1257,13 @@ namespace BusinessLogic.ApiClasses
             {
               var valueDto  = _mapper.Map<ValueDto>(value);
                 valueDto.OptionName = value.ProductOption.OptionName;
-                valueDto.OptionType = value.ProductOption.OptionType;
+                valueDto.OptionType = value.ProductOption.OptionType.ToString();
                 return valueDto;
             }).ToList();
             return PagedList<ValueDto>.ToPagedList(valueDto, postsParameters.PageNumber, postsParameters.PageSize);
             
         }
-        public async Task<BussnessResultModel> AddValue(int optionId ,CreateValueDto createValueDto , string ValueHexModel = "#000000")
+        public async Task<BussnessResultModel> AddValue(int optionId ,CreateValueDto createValueDto)
         {
             var option = await _repositoryManager.Option.GetOptionId(optionId, false);
             if (option == null)
@@ -1266,7 +1272,7 @@ namespace BusinessLogic.ApiClasses
             }
             var value = _mapper.Map<ProductOptionValue>(createValueDto);
             value.OptionId = optionId;
-            value.ValueHexModel = (option.OptionType == "radio" ? "" : ValueHexModel);
+            value.ValueHexModel = (option.OptionType == OptionType.Radio ? "" : createValueDto.ValueHexModel);
             _repositoryManager.Value.CreateValue(value);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(value, _locService.GetLocalizedStringValue("successAdd"));
@@ -1281,6 +1287,12 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.Value.DeleteValue(value);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(value, _locService.GetLocalizedStringValue("successDelete"));
+        }
+        public async Task<UpdateValueDto> GetValueId(int id)
+        {
+            var value = await _repositoryManager.Value.GetValueId(id, false);
+            var valueDto = _mapper.Map<UpdateValueDto>(value);
+            return valueDto;
         }
         public async Task<BussnessResultModel> UpdateValue(UpdateValueDto updateDto)
         {

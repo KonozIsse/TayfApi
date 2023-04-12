@@ -1,5 +1,103 @@
-﻿<h3>AddOption</h3>
+﻿@page "/CP/Option/Add"
+
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("AddOptions") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("Options")<small>@SharedLocalize.GetLocalizedStringValue("AddOptions")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("Options")</li>
+
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("AddOptions")</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("AddOptions")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                <EditForm Model="create" OnValidSubmit="CreateOption">
+                                    <div class="form-horizontal">
+                                        <div class="box-body">
+
+                                        <div class="form-group">
+
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Name") </label>
+                                            <div class="col-md-4">
+                                                <InputText @bind-Value="create.OptionName" class="form-control" ></InputText>
+                                            </div>
+                                        </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("typeOption") (for mobile)</label>    
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputSelect class="form-control" @bind-Value="create.OptionType">
+                                                        <option value="@OptionType.Color">Color</option>
+                                                        <option value="@OptionType.Radio">Radio</option>
+                                                    </InputSelect>
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
+                                                        @SharedLocalize.GetLocalizedStringValue("chooseCat")
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="box-footer text-center">
+                                                <input type="submit" class="btn btn-primary" value="@SharedLocalize.GetLocalizedStringValue("Submit")" />
+                                            <a class="btn btn-defult" href="/CP/Options"> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                        </div>
+
+                                        </div>
+
+                                    </div>
+                               </EditForm>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+
+</section>
 
 @code {
-
+    public CreateOptionDto create { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        create = new CreateOptionDto();
+    }
+    string message = "";
+    string style = "";
+    async Task CreateOption()
+    {
+        var result = await _productBL.AddOption(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
 }

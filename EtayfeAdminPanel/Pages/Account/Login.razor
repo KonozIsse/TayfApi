@@ -78,28 +78,38 @@
         //    loginService.Login(resultModel.Data.ToString());
         //    NavigationManager.NavigateTo("/index");
         //}
-        var result = await _userBL.ValidateUser(user);
-        if (result.Success)
+        var result = await loginService.Login(user);
+        if (result.IsAuthSuccessful)
         {
-            await loginService.Login(result.Data.ToString());
+            
             NavigationManager.NavigateTo("/index");
         }
         else
         {
-            message = result.Message;
-        }
+            message = result.ErrorMessage;
+        } 
+        // var result = await _userBL.ValidateUser(user);
+        //if (result.Success)
+        //{
+            
+        //    NavigationManager.NavigateTo("/index");
+        //}
+        //else
+        //{
+        //    message = result.Message;
+        //}
     }
 
     
-    //private async Task OnVaild()
+    //var result = await loginService.Login(user);
+    //if (!result.IsAuthSuccessful)
     //{
-    //    var result = await loginService.Login(user);
-    //    if (result.Success)
-    //    {
-    //        NavigationManager.NavigateTo("/index", true);
-    //    }
+    //    message = result.ErrorMessage;
     //}
-
+    //else
+    //{
+    //    NavigationManager.NavigateTo("/");
+    //}
    
 
    

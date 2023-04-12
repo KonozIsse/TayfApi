@@ -387,10 +387,12 @@
     public List<CustomerDto> usrs { get; set; }
     public List<OrderDto> ords { get; set; }
     public HomeCPVM home { get; set; }
-
+    //[Inject]
+    //public HttpInterceptorService Interceptor { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        //Interceptor.RegisterEvent();
         // lang = await _homeBL.GetDefaultLanugage();
         //await http.GetFromJsonAsync<string>("api/Language/getDefaultLang");
         lang = "en";
@@ -400,7 +402,7 @@
         usrs = await http.GetFromJsonAsync<List<CustomerDto>>("api/Home/getNewCustomers");
         ords = await http.GetFromJsonAsync<List<OrderDto>>("api/Home/getNewOrders");
     }
-   
+    //public void Dispose() => Interceptor.DisposeEvent(); 
 }
 
    

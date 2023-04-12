@@ -53,7 +53,7 @@
                         }
                     </ul>
                 </li>
-@*
+
                 @if (user.UserType == UserType.Admin)
                 {
                     <li class="dropdown messages-menu">
@@ -112,7 +112,7 @@
                             </div>
                         </li>
                     </ul>
-                </li>*@
+                </li>
 
 
                 @if (Languages != null)
@@ -151,15 +151,15 @@
     public List<CustomerDto> Customers { get; set; }  
     [Parameter]
     public List<LanguageDto> Languages { get; set; }
-    //[Parameter]
-    //public AdminDto user { get; set; } 
+    [Parameter]
+    public AdminDto user { get; set; } 
     [Parameter]
     public string lang { get; set; }
 
     private async Task TryLogout()
     {
         await LoginService.Logout();
-        NavigationManager.NavigateTo("/login", true);
+        NavigationManager.NavigateTo("/", true);
     }
     async Task ChangeLanguage(int id ,string code)
     {

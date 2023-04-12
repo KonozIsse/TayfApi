@@ -12,6 +12,8 @@ using EtayfeAdminPanel.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.Globalization;
+using Blazored.LocalStorage;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 internal class Program
 {
@@ -50,16 +52,19 @@ internal class Program
         }).CreateMapper());
         //----------------------
         //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44360/") });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44360/") }.EnableIntercept(sp));
+        
+        builder.Services.AddHttpClientInterceptor();
+        builder.Services.AddScoped<HttpInterceptorService>();
         builder.Services.AddHttpClient();
-
         builder.Services.AddAuthorizationCore();
+
         builder.Services.AddScoped<JWTAuthenticationProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider, JWTAuthenticationProvider>(
             provider => provider.GetRequiredService<JWTAuthenticationProvider>());
         builder.Services.AddScoped<ILoginService, JWTAuthenticationProvider>(
             provider => provider.GetRequiredService<JWTAuthenticationProvider>());
-
+        builder.Services.AddScoped<RefreshTokenService>();
 
         builder.Services.AddControllers().AddJsonOptions(
                      options =>

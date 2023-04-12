@@ -38,16 +38,17 @@
                                                     @foreach (var m in langs)
                                                     {
                                                         <div class="form-group">
-                                                            <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("title") (@m.Code) </label>
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("title") (@m.Name) </label>
                                                             <div class="col-md-8">
-                                                                <input @onchange="@(c => create.Names[m.Code] = c.Value.ToString())" value=@create.Names  class="form-control"/>
+                                                            <input @bind="@names[m.Code]" required="required" class="form-control" />
+                                                            
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc") (@m.Code)  </label>
+                                                            <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc") (@m.Name)  </label>
                                                             <div class="col-sm-10 col-md-8">
-                                                            <textarea @onchange="@(c => create.Descriptions[m.Code] = c.Value.ToString())" value=@create.Descriptions></textarea>
-                                                            </div>
+                                                            <textarea @bind="@descriptions[m.Code]" name="Descriptions[@m.Code]" cols="50" rows="10" required="required" class="ckeditor form-control"></textarea>
+                                                           </div>
                                                         </div>
                                                     }
                                                 }
@@ -99,10 +100,23 @@
         lang = await _homeBL.GetDefaultLanugage();
         langs = await _homeBL.GetLanguages(lang);
     }
-
+    private Dictionary<string, string> names = new()
+    {
+            ["en"] = "",
+            ["ar"] = "",
+    };
+    private Dictionary<string, string> descriptions = new()
+        {
+            ["en"] = "",
+            ["ar"] = "",
+    };
     async Task UpdatePage()
     {
+
         create.Id = Id;
+        create.Names = names;
+        create.Descriptions = descriptions;
+
         var result = await _homeBL.EditPage(create);
         if (result.Success)
         {

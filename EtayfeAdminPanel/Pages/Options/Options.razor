@@ -66,13 +66,13 @@
                                                 <td dir="@(lang == "ar" ? "rtl": "ltr")">
                                                     <strong>@item.OptionName </strong>
                                                     <br>
-                                                    <a href="/CP/Option/Values/@item.Id">  @SharedLocalize.GetLocalizedStringValue("ManageOptions")</a>
+                                                    <a href="/CP/Values/@item.Id">  @SharedLocalize.GetLocalizedStringValue("ManageOptions")</a>
 
                                                 </td>
 
 
                                                 <td>
-                                                    <a style="padding:1%;" data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")" href="/CP/Option/Values/@item.Id" class="badge bg-light-blue"><i class="fa fa-list" aria-hidden="true"></i> @SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")</a>
+                                                    <a style="padding:1%;" data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")" href="/CP/Values/@item.Id" class="badge bg-light-blue"><i class="fa fa-list" aria-hidden="true"></i> @SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")</a>
 
 
                                                     @if (user.UserType == UserType.Admin)
