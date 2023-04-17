@@ -1,7 +1,4 @@
-﻿@page "/CP/Stocks"
-@inject ProductBL _productBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
+﻿@page "/Stocks"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditEmailMessage")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -136,7 +133,7 @@
     string style = "";
     async Task AddInventory()
     {
-        var result = await _productBL.AddInventory(2,create);
+        var result = await _productBL.AddInventory(3,create);
         if (result.Success)
         {
             message = result.Message;

@@ -1,11 +1,8 @@
-﻿@inject HomeBL _homeBL
-
-@inject ILoginService LoginService
-
+﻿
 <header class="main-header">
 <nav class="navbar navbar-static-top">
-@*@if (user != null)
-{*@
+@if (user != null)
+{
     @if (lang != null)
     {
                 <div id="countdown" style="
@@ -37,7 +34,7 @@
                                     @foreach (var d in Orders)
                                     {
                                         <li>
-                                            <a href="/CP/Orders/View/@d.Id">
+                                            <a href="/Order/View/@d.Id">
                                                 <h4>
                                                     @d.CustomerName
                                                     <small><i class="fa fa-clock-o"></i> @d.CreatedAt</small>
@@ -70,7 +67,7 @@
                                     {
                                         <li>
                                             <!-- start message -->
-                                            <a href="/CP/Customers">
+                                            <a href="/Customers">
                                                 <h4>@f.FullName</h4>
                                             </a>
                                         </li>
@@ -100,11 +97,11 @@
                             <div class="pull-left">
                                 @if (user.UserType == UserType.Admin)
                                 {
-                                    <a class="btn btn-default btn-flat" href="/CP/Admins/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
+                                   <a class="btn btn-default btn-flat" href="/Admin/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
                                 }
                                 else
                                 {
-                                    <a class="btn btn-default btn-flat" href="/CP/UserAdmins/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
+                                    <a class="btn btn-default btn-flat" href="/UserAdmins/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
                                 }
                             </div>
                             <div class="pull-right">
@@ -140,7 +137,7 @@
         </div>
 
     }
-@*}*@
+}
 
 </nav>
 </header>

@@ -1,5 +1,5 @@
-﻿@page "/CP/Blog/Edit"
-@page "/CP/Blog/Edit/{Id:int}"
+﻿@page "/Blog/Edit"
+@page "/Blog/Edit/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editnews") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -122,7 +122,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Blogs" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Blogs" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -144,8 +144,6 @@
     UpdateNewsDto create = new UpdateNewsDto();
     string message;
     string style;
-    string lang = "en";
-    int storeId = 3;
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateNewsDto();
@@ -155,7 +153,7 @@
     async Task EditNews()
     {
         create.Id = Id;
-        var result = await _newBL.EditNews(storeId,create);
+        var result = await _newBL.EditNews(3,create);
         if (result.Success)
         {
             message = result.Message;

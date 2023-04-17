@@ -1,7 +1,4 @@
-﻿@page "/CP/Country/Add"
-@inject LocationTaxBL _locationTaxBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/Country/Add"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addCountry") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -120,7 +117,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Countries" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Countries" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -142,12 +139,10 @@
 </section>
 @code {
     public CreateCountryDto create { get; set; }
-    string lang = "en";
     protected override async Task OnInitializedAsync()
     {
         create = new CreateCountryDto();
     }
-    int storeId = 3;
     string message = "";
     string style = "";
     async Task AddCountry()

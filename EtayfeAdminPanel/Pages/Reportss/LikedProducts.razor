@@ -1,10 +1,4 @@
-﻿@page "/CP/Reports/LikedProducts"
-@inject ProductBL _productBL
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject UserManager<User> _userManager
-@attribute [Authorize]
-
+﻿@page "/Reports/LikedProducts"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("LikedProducts") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -85,7 +79,7 @@
                                                         <td>@item.ProductName</td>
                                                         <td>@item.NumLike</td>
                                                         <td>
-                                                            <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Products/Edit/@item.Id" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                                            <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Product/Edit/@item.Id" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
                                                         </td>
                                                     </tr>
 
@@ -134,7 +128,8 @@
    
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetLikedProducts();
     }
     private async Task SelectedPage(int page)

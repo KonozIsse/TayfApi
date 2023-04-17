@@ -82,10 +82,8 @@ namespace BusinessLogic
             CreateMap<ProductCategoryDto, ProductCategory>().ReverseMap();
             //MapProductSales
             CreateMap<SaleDto, ProductSales>().ReverseMap();
-            CreateMap<CreateSaleDto, ProductSales>().ReverseMap();
             //MapSpecialProducts
             CreateMap<SpecialDto, SpecialProducts>().ReverseMap();
-            CreateMap<CreateSpecialDto, SpecialProducts>().ReverseMap();
             //MapAttribute
             CreateMap<AttributeDto, ProductAttribut>().ReverseMap();
             CreateMap<CreateAttributeDto, ProductAttribut>().ReverseMap();
@@ -104,9 +102,9 @@ namespace BusinessLogic
             CreateMap<UpdateAddressDto, Address>().ReverseMap();
             //MapReview
             CreateMap<Review, ReviewDto>().AfterMap((s, d) => {
-                var request = _httpContextAccessor.HttpContext.Request;
-                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.CustomerImage = baseUrl + "/media_files/avatars/" + s.Customer.Avater;
+                //var request = _httpContextAccessor.HttpContext.Request;
+                //var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                d.CustomerImage =  "/avatars/" + s.Customer.Avater;
             });
             CreateMap<CreateReviewDto, Review>().ReverseMap(); 
            //MapOrder
@@ -124,9 +122,9 @@ namespace BusinessLogic
             CreateMap<CreateCustomerDto, User>().ReverseMap(); 
             CreateMap<CreateCustomerCPDto, User>().ReverseMap();
             CreateMap<User, CustomerDto>().AfterMap((s, d) => {
-                var request = _httpContextAccessor.HttpContext.Request;
-                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-                d.Avater = baseUrl + "/media_files/avatars/" + s.Avater;
+                //var request = _httpContextAccessor.HttpContext.Request;
+                //var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                d.Avater ="/avatars/" + s.Avater;
             });
             CreateMap<UpdateCustomerDto, User>().ReverseMap();
             //AdminMap

@@ -1,6 +1,4 @@
-﻿@page "/CP/Categories"
-@inject ProductBL _productBL
-
+﻿@page "/Categories"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("categories") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 
@@ -43,7 +41,7 @@
                                 @if (user.UserType == UserType.Admin)
                                 {
                                     <div class="box-tools pull-right">
-                                        <a href="/CP/Categories/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addcategory")</a>
+                                        <a href="/Categories/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addcategory")</a>
 
                                     </div>
                                 }
@@ -103,15 +101,15 @@
                                                         @if (user.UserType == UserType.Admin)
                                                         {
                                                             <td>
-                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" href="/CP/Categories/SubCategories/@item.Id"  class="badge bg-light-blue">@SharedLocalize.GetLocalizedStringValue("SubCategories")</a>
-                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName"  href="/CP/Categories/Edit/@item.Id"  class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" href="/Categories/SubCategories/@item.Id"  class="badge bg-light-blue">@SharedLocalize.GetLocalizedStringValue("SubCategories")</a>
+                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName"  href="/Categories/Edit/@item.Id"  class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                                 <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" @onclick="(async()=>await Delete(item.Id))" class="badge bg-red "><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                             </td>
                                                         }
                                                         else
                                                         {
                                                             <td>
-                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" href="/CP/Categories/SubCategories/@item.Id" class="badge bg-light-blue">@SharedLocalize.GetLocalizedStringValue("SubCategories")</a>
+                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" href="/Categories/SubCategories/@item.Id" class="badge bg-light-blue">@SharedLocalize.GetLocalizedStringValue("SubCategories")</a>
                                                             </td>
                                                         }
                                                     </tr>
@@ -142,11 +140,11 @@
     }
 }
 @code {
-    string lang = "en";
     string message = "";
     string style = "";
     [Parameter]
     public string search { get; set; }
+    public string lang { get; set; }
     public string filter { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
@@ -154,7 +152,8 @@
     public AdminDto user { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GethMainCategories();
     }
@@ -187,7 +186,7 @@
                 style = "danger";
             }
         }
-        NavigationManager.NavigateTo("/CP/Categories", true);
+        NavigationManager.NavigateTo("/Categories", true);
     }
    
    

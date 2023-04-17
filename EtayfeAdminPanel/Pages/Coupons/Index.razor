@@ -1,7 +1,4 @@
-﻿@page "/coupons/Index"
-@inject OrderBL _orderBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
+﻿@page "/Coupons"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Coupons")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -38,7 +35,7 @@
                         </div>
                         <div class="box-tools pull-right">
 
-                            <a href="/coupons/add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddCoupons")</a>
+                            <a href="/Coupon/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddCoupons")</a>
                         </div>
                     </div>
 
@@ -83,8 +80,9 @@
                                                     <td>@item.Description</td>
                                                     <td>@item.ExpiryDate</td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="coupons/edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <DeleteMessage  OnDelete="@Delete" Id="@item.Id"></DeleteMessage>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Coupon/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                       <a data-toggle="tooltip" data-placement="bottom" title="delete" @onclick="(async()=>await Delete(item.Id))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                       
                                                     </td>
 
                                                 </tr>
@@ -107,44 +105,21 @@
             </div>
             <!-- /.col -->
         </div>
-        <!-- /.row -->
-        <!-- deletelanguagesModal -->
-        <div class="modal fade" id="Confirmlang" tabindex="-1" role="dialog" aria-labelledby="deleteLanguagesModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title" id="deleteLanguagesModalLabel">@SharedLocalize.GetLocalizedStringValue("delete") @SharedLocalize.GetLocalizedStringValue("lang")</h4>
-                    </div>
-
-                    <div class="modal-body">
-                        <p>@SharedLocalize.GetLocalizedStringValue("ConfirmMsgDeleteLang")</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <a class="btn btn-danger">@SharedLocalize.GetLocalizedStringValue("Yes")</a>
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!--  row -->
-        <!-- /.row -->
     </section>
 }
 @code {
     [Parameter]
     public string search { get; set; }
     public string filter { get; set; }
-    string lang = "en";
+    public string lang { get; set; }
     public List<CouponDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
 
     protected override async Task OnInitializedAsync()
     {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetAllCoupons();
     }
     private async Task SelectedPage(int page)
@@ -178,6 +153,6 @@
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/coupons/Index", true);
+        NavigationManager.NavigateTo("/CP/Coupons", true);
     }
 }

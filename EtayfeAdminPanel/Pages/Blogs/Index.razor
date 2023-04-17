@@ -1,4 +1,4 @@
-﻿@page "/CP/Blogs"
+﻿@page "/Blogs"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("News") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -34,7 +34,7 @@
                             </div>
                             <div class="box-tools pull-right">
 
-                                <a href="/CP/Blog/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addnews")</a>
+                                <a href="/Blog/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addnews")</a>
 
 
                             </div>
@@ -89,8 +89,8 @@
                                                     </td>
 
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("Comments")" href="/CP/Comments/@item.Id" class="badge bg-light-blue">@SharedLocalize.GetLocalizedStringValue("Comments")</a>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/Blog/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("Comments")" href="/Comments/@item.Id" class="badge bg-light-blue">@SharedLocalize.GetLocalizedStringValue("Comments")</a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Blog/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a title="@SharedLocalize.GetLocalizedStringValue("delete")" class="badge bg-red" @onclick="(async ()=> await Delete(item))"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
 
@@ -135,7 +135,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetAllBlogs();
     }
     private async Task SelectedPage(int page)

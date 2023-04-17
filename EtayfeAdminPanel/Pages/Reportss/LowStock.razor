@@ -1,7 +1,4 @@
-﻿@page "/CP/Reports/LowStock"
-@inject ProductBL _productBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
+﻿@page "/Reports/LowStock"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("LowofStock") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -79,7 +76,7 @@
                                                 <td>@item.ProductName</td>
 
                                                 <td>
-                                                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("viewStock")" href="/CP/Reports/ViewLowStock/@item.ProductId" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                                    <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("viewStock")" href="/Reports/ViewLowStock/@item.ProductId" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
                                                    </td>
                                             </tr>
                                         }
@@ -124,7 +121,7 @@
 
     [Parameter]
     public string search { get; set; }
-    string lang = "ar";
+    public string lang { get; set; }
 
     public List<InventoryDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
@@ -132,7 +129,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetLowInventory();
     }
     private async Task SelectedPage(int page)
@@ -142,7 +140,7 @@
     }
     async Task GetLowInventory()
     {
-        var pagingResponse = await _productBL.GetAllInventory(search,1, lang, _PostsParameters);
+        var pagingResponse = await _productBL.GetAllInventory(search,3, lang, _PostsParameters);
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }

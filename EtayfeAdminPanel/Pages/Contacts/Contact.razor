@@ -1,9 +1,4 @@
-﻿@page "/contacts"
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject HomeBL _homeBL
-@inject IJSRuntime js
-@inject HttpClient http
+﻿@page "/Contacts"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("contactUs")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -121,7 +116,7 @@
     [Parameter]
     public string search { get; set; }
     public string filter { get; set; }
-    string lang = "en";
+    public string lang { get; set; }
     string message = "";
     string style = "";
     public List<ContactDto> Model { get; set; }
@@ -130,6 +125,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetContact();
     }
     private async Task SelectedPage(int page)
@@ -161,6 +158,6 @@
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/contacts", true);
+        NavigationManager.NavigateTo("/contacts", true);
     }
 }

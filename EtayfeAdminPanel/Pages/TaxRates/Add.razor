@@ -1,7 +1,4 @@
-﻿@page "/CP/TaxRates/Add"
-@inject LocationTaxBL _locationTaxBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/TaxRates/Add"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addtaxes") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -104,7 +101,7 @@
 
                                         <div class="box-footer text-center">
                                             <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                            <a href="/CP/TaxRates" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            <a href="/TaxRates" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                         </div>
 
                                     </div>

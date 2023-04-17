@@ -8,7 +8,26 @@ using System.Threading.Tasks;
 
 namespace Entities.DataTransferObjects
 {
-   
+    public class ResetPasswordDto
+    {
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
+
+        public string Email { get; set; }
+        public string Code { get; set; }
+    }
+    public class UserForAuthenticationDto
+    {
+        [Required(ErrorMessage = "User name is required")]
+        public string UserName { get; set; }
+        [Required(ErrorMessage = "Password name is required")]
+        public string Password { get; set; }
+    }
     public class ChangePasswordDto
     {
         [Required]
@@ -18,18 +37,6 @@ namespace Entities.DataTransferObjects
         [Required]
         public string ConfirmPassword { get; set; }
 
-    }
-    public class AdminForRegisterDto
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        [Required(ErrorMessage = "Username is required")]
-        public string UserName { get; set; }
-        [Required(ErrorMessage = "Password is required")]
-        public string Password { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public ICollection<string> Roles { get; set; }
     }
     public class ForgetPasswordDto
     {

@@ -1,8 +1,5 @@
-﻿@page "/CP/Taxes/Edit"
-@page "/CP/Taxes/Edit/{Id:int}"
-@inject LocationTaxBL _locationTaxBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/Taxes/Edit"
+@page "/Taxes/Edit/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("edittaxes") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -54,7 +51,7 @@
                                             </div>
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Taxes" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Taxes" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -79,10 +76,12 @@
     UpdateTaxClassDto create = new UpdateTaxClassDto();
     string message;
     string style;
-    string lang = "en";
-    int storeId = 3;
+    public string lang { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         create = new UpdateTaxClassDto();
         create = await _locationTaxBL.GetTaxClassId(Id);
     }
@@ -90,7 +89,7 @@
     async Task EditTaxClass()
     {
         create.Id = Id;
-        var result = await _locationTaxBL.EditTaxClass(storeId, create);
+        var result = await _locationTaxBL.EditTaxClass(3, create);
         if (result.Success)
         {
             message = result.Message;

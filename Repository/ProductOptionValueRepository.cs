@@ -17,7 +17,7 @@ namespace Repository
 
         }
         public async Task<ProductOptionValue> GetValueId(int id, bool trackChanges)
-        => await FindByCondition(x => x.Id == id, trackChanges).FirstOrDefaultAsync();
+        => await FindByCondition(x => x.Id == id, trackChanges).SingleOrDefaultAsync();
         public async Task<ProductOptionValue> GetOptionValue(int optionId)
        => await FindByCondition(x => x.Id == optionId, false).FirstOrDefaultAsync();
 

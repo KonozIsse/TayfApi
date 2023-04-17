@@ -1,10 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject LocService SharedLocalize
-@inject ILoginService LoginService
-@inject NavigationManager NavigationManager
-@using System.Globalization
-@inject HomeBL _homeBL
-@inject HttpClient http
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -16,17 +10,17 @@
     <main>
         <div class="top-row px-4">
 
-            <AuthorizeView>
+           @* <AuthorizeView>
                 <NotAuthorized>
                     NotAut
                 </NotAuthorized>
-                <Authorized>
+                <Authorized>*@
             <MainNav Orders="@Orders" Customers="@Customers" Languages="@Languages" user="user" lang="@lang"></MainNav>
-               </Authorized>
+             @*  </Authorized>
                 <Authorizing>
                     <p>Authorizing...</p>
                 </Authorizing>
-            </AuthorizeView>
+            </AuthorizeView>*@
            
         </div>
 
@@ -43,7 +37,8 @@
     public string lang { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         Customers = await http.GetFromJsonAsync<List<CustomerDto>>("api/Home/getNewCustomers");

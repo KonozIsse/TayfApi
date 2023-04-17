@@ -1,7 +1,5 @@
-﻿@layout LoginLayout
-@page "/"
-@inject ILoginService loginService
-@inject AuthenticationStateProvider _stateProvider
+﻿@*@layout LoginLayout*@
+@page "/Lo"
 <style>
     input{
       text-align: left;
@@ -78,7 +76,7 @@
         //    loginService.Login(resultModel.Data.ToString());
         //    NavigationManager.NavigateTo("/index");
         //}
-        var result = await loginService.Login(user);
+        var result = await LoginService.Login(user);
         if (result.IsAuthSuccessful)
         {
             

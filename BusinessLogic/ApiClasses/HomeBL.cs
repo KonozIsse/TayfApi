@@ -100,14 +100,7 @@ namespace BusinessLogic.ApiClasses
         {
             var user = await _repositoryManager.User.GetUserId(id, false);
             var userDto = _mapper.Map<AdminDto>(user);
-            if(user.UserType == UserType.Admin)
-            {
-                userDto.RoleName = _locService.GetLocalizedStringValue("admin");
-            }
-            else
-            {
-                userDto.RoleName = _locService.GetLocalizedStringValue("vendor");
-            }
+            
             return userDto;
         }
         public async Task<List<CustomerDto>> GetNewCustomers()
@@ -511,7 +504,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            language.ImgId = Convert.ToInt32(updateDto.Image);
             _mapper.Map(updateDto, language);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(language, _locService.GetLocalizedStringValue("successSave"));
@@ -532,17 +524,10 @@ namespace BusinessLogic.ApiClasses
                 await _repositoryManager.SaveAsync();
             }
         }
-        public async Task<string> GetDefaultLanugage()
-        {
-            var language = await _repositoryManager.Language.GetDefaultLanguage(false);
-            return language.Code;
-        }
         public async Task<UpdateLanguageDto> GetLanugage(int id)
         {
             var language = await _repositoryManager.Language.GetCodeLanguageId(id, false);
             var langDto = _mapper.Map<UpdateLanguageDto>(language);
-            var image = _repositoryManager.Image.GetImageId(language.ImgId);
-            langDto.Image = $"/media_files/medium/{image.Name}";
             return langDto;
         }
         //Currency------------------------------------------------

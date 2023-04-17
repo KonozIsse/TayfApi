@@ -1,11 +1,4 @@
-﻿@page "/CP/Product/VariableProduct/{ProductId:int}"
-@inject ProductBL _productBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject IJSRuntime js
-@inject HttpClient http
-
+﻿@page "/Product/VariableProduct/{ProductId:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("AdddefOptionValue") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 @if (Model != null)
@@ -57,7 +50,7 @@
                                                     <td>@f.Value</td>
 
                                                     <td>
-                                                        <a  title="edit" href="/CP/Products/EditAttr/@f.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a  title="edit" href="/Products/EditAttr/@f.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a  title="delete" @onclick="(async()=>await Delete(f.Id))"  class="badge bg-red"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
 
@@ -248,6 +241,6 @@
    
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Product/VariableProduct/" + ProductId, true);
+        NavigationManager.NavigateTo("/Product/VariableProduct/" + ProductId, true);
     }
 }

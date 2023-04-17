@@ -1,4 +1,4 @@
-﻿ @page "/CP/Settings"
+﻿ @page "/Settings"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Setting") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -22,7 +22,7 @@
                         <div class="page-toolbar">
                             <div class="btn-group pull-right">
 
-                                <a style="text-transform:unset;" href="/CP/Setting/Edit" class="btn btn-success pull-right">
+                                <a style="text-transform:unset;" href="/Setting/Edit" class="btn btn-success pull-right">
                                     <i class="fa fa-edit"></i>
                                     @SharedLocalize.GetLocalizedStringValue("EditSetting")
                                 </a>
@@ -87,10 +87,6 @@
         </div>
         <!-- /.col -->
     </div>
-    <!-- /.row -->
-    <!-- deletelanguagesModal -->
-    <!--  row -->
-    <!-- /.row -->
 </section>
 }
 @code {
@@ -100,11 +96,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         Model = await http.GetFromJsonAsync<List<SettingDto>>("api/Settings/getSettings");
     }
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("/CP/Settings", true);
+        NavigationManager.NavigateTo("/Settings", true);
     }
 }

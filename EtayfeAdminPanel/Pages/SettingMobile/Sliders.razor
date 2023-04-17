@@ -1,6 +1,4 @@
-﻿@page "/CP/SettingMob/Sliders"
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/SettingMob/Sliders"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("slider") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message"  Style="@style"></Alert>
@@ -37,7 +35,7 @@
                             <div class="col-lg-4 form-inline" id="contact-form12"></div>
                         </div>
                         <div class="box-tools pull-right">
-                            <a href="/CP/SettingMob/AddSlide" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addSlider")</a>
+                            <a href="/SettingMob/AddSlide" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addSlider")</a>
 
                         </div>
                     </div>
@@ -83,7 +81,7 @@
                                                 <td>@SharedLocalize.GetLocalizedStringValue("AddedDate") : @item.CreatedAt
                                                 </td>
                                                 <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/SettingMob/EditSlide/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/SettingMob/EditSlide/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                     <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")"  class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                 </td>
                                             </tr>
@@ -130,7 +128,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetSliderMobile();
     }
     private async Task SelectedPage(int page)

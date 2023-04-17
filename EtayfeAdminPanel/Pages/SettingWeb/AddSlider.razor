@@ -1,6 +1,4 @@
-﻿@page "/CP/SettingWeb/AddSlide"
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/SettingWeb/AddSlide"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addSlider") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -137,7 +135,7 @@
 
                                                 <div class="box-footer text-center">
                                                     <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                    <a href="/CP/SettingWeb/Sliders" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                    <a href="/SettingWeb/Sliders" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                                 </div>
 
 
@@ -162,10 +160,12 @@
 @code {
     public CreateSliderDto create { get; set; }
     private List<LanguageDto> languges;
-    string lang = "en";
+    public string lang { get; set; }
     protected override async Task OnInitializedAsync()
     {
         create = new CreateSliderDto();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         languges = await _homeBL.GetLanguages(lang);
     }
     int storeId = 3;

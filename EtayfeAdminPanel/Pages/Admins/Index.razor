@@ -1,4 +1,4 @@
-﻿@page "/CP/Admins"
+﻿@page "/Admins"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("admins") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 @if (Model != null)
@@ -10,7 +10,7 @@
                     <div class="box-header">
                         <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("admins") </h3>
                         <div class="box-tools pull-right">
-                            <a href="/CP/Admin/Add" type="button" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddAdmins")</a>
+                            <a href="/Admin/Add" type="button" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddAdmins")</a>
                         </div>
                     </div>
 
@@ -63,7 +63,7 @@
 
                                                     <td>
 
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/Admin/Edit/@item.Id " class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Admin/Edit/@item.Id " class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         @if (item.UserType != UserType.Admin)
                                                         {
                                                             <a title="@SharedLocalize.GetLocalizedStringValue("delete")" @onclick="(async ()=> await Delete(item))" class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i> </a>
@@ -114,6 +114,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
         Model = await http.GetFromJsonAsync<List<AdminDto>>("api/Admin/get-admins-stores");
     }
     async Task Delete(AdminDto admin)

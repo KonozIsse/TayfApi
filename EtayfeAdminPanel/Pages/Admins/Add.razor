@@ -1,6 +1,5 @@
-﻿@page "/CP/Admin/Add"
-@inject UserBL _userBL
-@inject LocationTaxBL _locationTaxBL
+﻿@page "/Admin/Add"
+
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addAdmin") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -188,7 +187,7 @@
                                                 <!-- /.box-body -->
                                                 <div class="box-footer text-center">
                                                     <input type="submit" class="btn btn-primary" value="@SharedLocalize.GetLocalizedStringValue("Submit")">
-                                                    <a href="/CP/Admins" class="btn btn-defult" type="submit"> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                    <a href="/Admins" class="btn btn-defult" type="submit"> @SharedLocalize.GetLocalizedStringValue("back")</a>
                                                 </div>
                                         </div>
                                 </EditForm>
@@ -208,8 +207,6 @@
 </section>
 @code {
     [Parameter]
-    public string? lang { get; set; }
-    [Parameter]
     public CreateAdminDto create { get; set; }
     [Parameter]
     public int zoneId { get; set; }
@@ -225,13 +222,10 @@
     protected override async Task OnInitializedAsync()
     {
         create = new CreateAdminDto();
-        lang = await http.GetFromJsonAsync<string>("api/Language/getDefaultLang");
-        countries = await _locationTaxBL.GetAllCountries();
-        //http.GetFromJsonAsync<List<CountryDto>>("api/Country/GetCountries");
-        roles = await _userBL.GetTypesStoreAdmin();
-        //http.GetFromJsonAsync<List<RoleDto>>("api/Admin/get-roles");
-        zones = await _locationTaxBL.GetZones();
-        //http.GetFromJsonAsync<List<ZoneDto>>("api/Zone/GetZones");
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        countries = await http.GetFromJsonAsync<List<CountryDto>>("api/Country/GetCountries");
+        roles = await http.GetFromJsonAsync<List<RoleDto>>("api/Admin/get-roles");
+        zones = await http.GetFromJsonAsync<List<ZoneDto>>("api/Zone/GetZones");
 
     }
     string message = "";

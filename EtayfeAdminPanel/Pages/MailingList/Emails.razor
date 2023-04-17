@@ -1,9 +1,4 @@
 ﻿@page "/MailingList/Show"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject IJSRuntime js
-@inject HttpClient http
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("NewsLetter")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -89,7 +84,9 @@
                                                         @item.CreatedAt
                                                     </td>
                                                     <td>
-                                                      <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>
+                                                        <a class="badge bg-red" title="@item.Email" @onclick="(async() => await Delete(item.Id))">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             }
@@ -142,31 +139,28 @@
     string style = "";
     async Task Delete(int id)
     {
-        var result = await _homeBL.RemoveMailList(id);
+        var confirm = await js.confirMethod("Are you sure?");
+        if (confirm)
+        {
+            var result = await _homeBL.RemoveMailList(id);
 
-        if (result.Success)
-        {
-            message = result.Message;
-            style = "success";
-        }
-        else
-        {
-            message = result.Message;
-            style = "danger";
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
         }
         NevigateToYourUrl();
     }
 
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/MailingList/Show", true);
+        NavigationManager.NavigateTo("/MailingList/Show", true);
     }
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        await js.InvokeVoidAsync("onClickHandler");
-    //    }
-    //}
 
 }

@@ -414,6 +414,12 @@ namespace BusinessLogic.ApiClasses
             var customers = await _repositoryManager.User.GetCustomers(false);
             var customersDto = _mapper.Map<List<CustomerDto>>(customers);
             return customersDto;
+        } 
+        public async Task<UpdateCustomerDto> GetCustomerId(int id)
+        {
+            var customer = await _repositoryManager.User.GetCustomerId(id,false);
+            var customerDto = _mapper.Map<UpdateCustomerDto>(customer);
+            return customerDto;
         }
         public async Task<BussnessResultModel> VerifyCustomer (int userId, int code)
         {
@@ -538,7 +544,6 @@ namespace BusinessLogic.ApiClasses
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("VerifyMobile"), false);
                     }
-                    user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
                     user.UserType = UserType.Customer;
                     user.PhoneNumberConfirmed = false;
                     var role = await _repositoryManager.Role.IsExistRole("Customer", false);
@@ -547,11 +552,6 @@ namespace BusinessLogic.ApiClasses
                     user.VerifiedCode = new Random().Next(1000, 9999);
                     var country = await _repositoryManager.Country.GetcountryById(Convert.ToInt32(userRegister.CountryId), false);
                     user.CodeMobileCountry = country == null ? null : country.MobileCode;
-                    string emailRules = @"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
-                    if (!Regex.IsMatch(userRegister.Email, emailRules))
-                    {
-                        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("VerifyEmail"), false);
-                    }
 
                     var result = await _userManager.CreateAsync(user, userRegister.Password);
                     if (result.Succeeded)
@@ -584,10 +584,6 @@ namespace BusinessLogic.ApiClasses
         {
 
             var user = _mapper.Map<User>(userRegister);
-
-
-            user.PhoneNumber = userRegister.PhoneNumber.StartsWith("0") ? userRegister.PhoneNumber.Substring(1) : userRegister.PhoneNumber;
-
             user.UserType = UserType.Customer;
             user.PhoneNumberConfirmed = false;
             user.TypeRegister = TypeRegister.Normal;
@@ -601,21 +597,6 @@ namespace BusinessLogic.ApiClasses
             var result = await _userManager.CreateAsync(user, userRegister.Password);
             if (result.Succeeded)
             {
-                var role = await _repositoryManager.Role.GetRoleId(user.RoleId, false);
-                await _userManager.AddClaimAsync(user, new Claim(role.Name, user.FirstName));
-                var validat = new UserForAuthenticationDto
-                {
-                    UserName = userRegister.Email,
-                    Password = userRegister.Password
-                };
-                if (!await _authManager.ValidateUser(validat))
-                {
-                    _logger.LogWarn($" Authentication failed. Wrong user name or password.");
-                }
-                var token = await _authManager.CreateToken();
-              
-
-
                 var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.VerificationEmail);
                 var msgem = "Hello " + userRegister.FirstName + " ," + "<br>" + temp.Message + "<br> Here is your code: " + user.VerifiedCode + "<br> <br> The E-Tayf account team <br> Thank You";
 

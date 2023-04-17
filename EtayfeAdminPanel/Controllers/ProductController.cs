@@ -49,19 +49,19 @@ namespace EtayfeAdminPanel.Controllers
                return BadRequest(result.Message);
             }
         }
-        [HttpPut("updateProduct")]
-        public async Task<IActionResult> UpdateProduct( UpdateProductDto update)
-        {
-            var result = await _productBL.EditProduct(GetCurrentUserId(),update);
-            if (result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
-        }
+        //[HttpPut("updateProduct")]
+        //public async Task<IActionResult> UpdateProduct( UpdateProductDto update)
+        //{
+        //    var result = await _productBL.EditProduct(GetCurrentUserId(),update);
+        //    if (result.Success)
+        //    {
+        //        return Ok(result.Message);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(result.Message);
+        //    }
+        //}
         [HttpPut("acceptProduct")]
         public async Task<IActionResult> AcceptProduct(int productId)
         {

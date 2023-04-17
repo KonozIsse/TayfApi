@@ -1,4 +1,4 @@
-﻿@page "/CP/Orders"
+﻿@page "/Orders"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Orders") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <style>
@@ -93,7 +93,7 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderID")</th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderId")</th>
                                                 <th>@SharedLocalize.GetLocalizedStringValue("store")</th>
                                                 <th>@SharedLocalize.GetLocalizedStringValue("CustomerName") </th>
                                                 <th>@SharedLocalize.GetLocalizedStringValue("total") </th>
@@ -140,7 +140,7 @@
                                                     }
                                                     <td>
 
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("ViewOrder")" href="/CP/Order/View/@item.Id" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("ViewOrder")" href="/Order/View/@item.Id" class="badge bg-light-blue-gradient"><i class="fa fa-eye" aria-hidden="true"></i></a>
 
                                                         @if (item.OrderStatusEnum != OrderStatusEnum.OrderPending && item.OrderStatusEnum != OrderStatusEnum.OrderCompleted && item.OrderStatusEnum != OrderStatusEnum.OrderRejcted && item.OrderStatusEnum != OrderStatusEnum.OrderCanceled && item.OrderStatusEnum != OrderStatusEnum.OrderShipped)
                                                         {
@@ -220,10 +220,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         customers = await _userBL.GetAllCustomer();
         stores = await _userBL.GetStores();
-        states = await _orderBL.GetAllOrderStatus("en");
+        states = await _orderBL.GetAllOrderStatus(lang);
         await GetAllOrders();
     }
     private async Task SelectedPage(int page)
@@ -313,6 +314,6 @@
     }
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("CP/Orders", true);
+        NavigationManager.NavigateTo("/Orders", true);
     }
 }

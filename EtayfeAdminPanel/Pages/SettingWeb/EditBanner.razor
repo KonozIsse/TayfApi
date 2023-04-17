@@ -1,8 +1,4 @@
-﻿
-@page "/CP/SettingWeb/EditBanner"
-@page "/CP/SettingWeb/EditBanner/{Id:int}"
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/SettingWeb/EditBanner/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editbanners") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -110,7 +106,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/SettingWeb/Banners" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/SettingWeb/Banners" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>

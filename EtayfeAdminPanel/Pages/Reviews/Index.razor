@@ -1,7 +1,4 @@
-﻿@page "/CP/Reviews"
-@inject ProductBL _productBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
+﻿@page "/Reviews"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Reviews1") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -98,12 +95,14 @@
 }
 @code {
     private List<ReviewDto> Model;
-    string lang = "ar";
+    public string lang { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
 
     protected override async Task OnInitializedAsync()
     {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetReviews();
     }
     private async Task SelectedPage(int page)
@@ -150,6 +149,6 @@
 
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Reviews", true);
+        NavigationManager.NavigateTo("/Reviews", true);
     }
 }

@@ -1,8 +1,4 @@
-﻿@page "/coupons/add"
-@inject OrderBL _orderBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject IJSRuntime js
+﻿@page "/Coupon/Add"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Coupons")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <Alert Message="@message" Style="@style"></Alert>
@@ -112,7 +108,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/coupons/Index" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Coupons" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>

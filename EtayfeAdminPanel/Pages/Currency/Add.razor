@@ -1,7 +1,4 @@
-﻿@page "/CP/Currency/Add"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
+﻿@page "/Currency/Add"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addCurrency")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <Alert Message="@message" Style="@style"></Alert>
@@ -119,7 +116,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/currency/Index" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Currencies" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>

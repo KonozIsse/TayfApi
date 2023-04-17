@@ -1,4 +1,4 @@
-﻿@page "/CP/Blog/Add"
+﻿@page "/Blog/Add"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Comments") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 
@@ -124,7 +124,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Blogs" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Blogs" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -145,13 +145,12 @@
 </section>
 @code {
     public CreateNewsDto create { get; set; }
-    string lang = "en";
     public List<ImageSettingDto> images;
 
     protected override async Task OnInitializedAsync()
     {
         create = new CreateNewsDto();
-        images = await _imageBL.GetAllImageSettingOriginal(0);
+        images = await _imageBL.GetAllImageSettingOriginal(3);
     }
     int im;
     string message = "";

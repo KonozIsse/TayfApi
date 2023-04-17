@@ -26,10 +26,12 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient http
 @inject IJSRuntime js
-
+@inject ILoginService LoginService 
+@inject AuthenticationStateProvider _stateProvider
 @inject ProductBL _productBL
 @inject ImageBL _imageBL
 @inject HomeBL _homeBL
 @inject OrderBL _orderBL
 @inject UserBL _userBL
 @inject NewsBL _newBL
+@inject LocationTaxBL _locationTaxBL

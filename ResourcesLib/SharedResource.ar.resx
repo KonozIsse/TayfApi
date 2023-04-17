@@ -252,6 +252,9 @@
   <data name="Addproducts" xml:space="preserve">
     <value>إضافة منيج</value>
   </data>
+  <data name="AddProductstoCart" xml:space="preserve">
+    <value>أضف المنتجات إلى عربة التسوق</value>
+  </data>
   <data name="addProperty" xml:space="preserve">
     <value>اضافة عقار</value>
   </data>
@@ -438,6 +441,9 @@
   <data name="cancel" xml:space="preserve">
     <value>إلغاء الأمر</value>
   </data>
+  <data name="CanceledOrders" xml:space="preserve">
+    <value>الطلبات الملغاة</value>
+  </data>
   <data name="CannotDeleteImage" xml:space="preserve">
     <value>لا يمكن حذف صورة مستخدمة مسبقا</value>
   </data>
@@ -452,6 +458,9 @@
   </data>
   <data name="cartUpdate" xml:space="preserve">
     <value>تم تحديث عربة التسوق بنجاح</value>
+  </data>
+  <data name="Catalog" xml:space="preserve">
+    <value>إدارة المنتجات</value>
   </data>
   <data name="categories" xml:space="preserve">
     <value>التصنيفات</value>
@@ -537,6 +546,9 @@
   <data name="compare" xml:space="preserve">
     <value>قارن</value>
   </data>
+  <data name="CompleteOrders" xml:space="preserve">
+    <value>الطلبات الكاملة</value>
+  </data>
   <data name="Confirm" xml:space="preserve">
     <value>تأكيد</value>
   </data>
@@ -569,6 +581,9 @@
   </data>
   <data name="ContactForm" xml:space="preserve">
     <value>نموذج الاتصال</value>
+  </data>
+  <data name="Contacts" xml:space="preserve">
+    <value>قائمة التواصل</value>
   </data>
   <data name="contactUs" xml:space="preserve">
     <value>تواصل معنا</value>
@@ -624,6 +639,9 @@
   <data name="CountryNameEn" xml:space="preserve">
     <value>اسم الدولة بالانجليزية</value>
   </data>
+  <data name="Coupons" xml:space="preserve">
+    <value>كوبونات الخصم</value>
+  </data>
   <data name="Course" xml:space="preserve">
     <value>الدورات التدريبية</value>
   </data>
@@ -650,6 +668,15 @@
   </data>
   <data name="Customer" xml:space="preserve">
     <value>عميل</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>اسم الزبون</value>
+  </data>
+  <data name="CustomerRegistrations" xml:space="preserve">
+    <value>تسجيلات العملاء</value>
+  </data>
+  <data name="CustomerReport" xml:space="preserve">
+    <value>إجمالي طلبات العملاء</value>
   </data>
   <data name="Customers" xml:space="preserve">
     <value>الزبائن</value>
@@ -867,6 +894,9 @@
   <data name="EditUnits" xml:space="preserve">
     <value>تعديل وحدة قياس</value>
   </data>
+  <data name="editValue" xml:space="preserve">
+    <value>تعديل القيمة</value>
+  </data>
   <data name="EditYourAccountInformation" xml:space="preserve">
     <value>تحرير معلومات حسابك</value>
   </data>
@@ -884,6 +914,9 @@
   </data>
   <data name="EmailMessage" xml:space="preserve">
     <value>سيتم ارسال بريد الكتروني لاعلامكم بنجاح التسجيل</value>
+  </data>
+  <data name="EmailTemplates" xml:space="preserve">
+    <value>قوالب البريد الالكتروني</value>
   </data>
   <data name="EmailVal" xml:space="preserve">
     <value>تأكد من البريد الالكتروني وكلمة السر</value>
@@ -1001,6 +1034,9 @@
   </data>
   <data name="gender" xml:space="preserve">
     <value>الجنس</value>
+  </data>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>الاعدادات العامة</value>
   </data>
   <data name="GoalCompletion" xml:space="preserve">
     <value>الاهداف </value>
@@ -1152,6 +1188,9 @@
   <data name="LifeInTurkey" xml:space="preserve">
     <value>الحياة في تركيا</value>
   </data>
+  <data name="LikedProducts" xml:space="preserve">
+    <value>المنتجات المفضلة</value>
+  </data>
   <data name="link" xml:space="preserve">
     <value>الرابط</value>
   </data>
@@ -1163,6 +1202,9 @@
   </data>
   <data name="LinkPermission" xml:space="preserve">
     <value>صلاحيات الروابط</value>
+  </data>
+  <data name="LoactionTax" xml:space="preserve">
+    <value>الدول/الضرائب</value>
   </data>
   <data name="login" xml:space="preserve">
     <value>تسجيل الدخول</value>
@@ -1182,6 +1224,12 @@
   <data name="Longitude" xml:space="preserve">
     <value>خط الطول</value>
   </data>
+  <data name="LowofStock" xml:space="preserve">
+    <value>المستهلك من المخزن</value>
+  </data>
+  <data name="MailingList" xml:space="preserve">
+    <value>قائمة البريد الالكتروني</value>
+  </data>
   <data name="MainMenu" xml:space="preserve">
     <value>القوائم الرئيسية</value>
   </data>
@@ -1200,6 +1248,9 @@
   <data name="Male" xml:space="preserve">
     <value>ذكر</value>
   </data>
+  <data name="ManageAdmins" xml:space="preserve">
+    <value>إدارة المسؤولين</value>
+  </data>
   <data name="ManageOptions" xml:space="preserve">
     <value>إدارة الخيارات</value>
   </data>
@@ -1208,6 +1259,9 @@
   </data>
   <data name="ManageValuesOptions" xml:space="preserve">
     <value>قيم الخيارات</value>
+  </data>
+  <data name="ManageVendors" xml:space="preserve">
+    <value>إدارة المتاجر</value>
   </data>
   <data name="manufacure" xml:space="preserve">
     <value>الشركات المصنعه</value>
@@ -1305,6 +1359,9 @@
   <data name="NewsletterSubscription" xml:space="preserve">
     <value>الاشتراك معنا</value>
   </data>
+  <data name="NewStores" xml:space="preserve">
+    <value>متاجر جديدة</value>
+  </data>
   <data name="NickNames" xml:space="preserve">
     <value>أسماء وصور المستخدمين الافتراضية</value>
   </data>
@@ -1389,6 +1446,15 @@
   <data name="OrderId" xml:space="preserve">
     <value>رقم الطلب</value>
   </data>
+  <data name="Orders" xml:space="preserve">
+    <value>الطلبات</value>
+  </data>
+  <data name="OrdersStatus" xml:space="preserve">
+    <value>حالات الطلب</value>
+  </data>
+  <data name="OrderStatusName" xml:space="preserve">
+    <value>اسم حالات الطلب</value>
+  </data>
   <data name="OrderSummary" xml:space="preserve">
     <value>ملخص الطلب</value>
   </data>
@@ -1412,6 +1478,9 @@
   </data>
   <data name="OurLocation" xml:space="preserve">
     <value>موقعنا</value>
+  </data>
+  <data name="OutofStock" xml:space="preserve">
+    <value>المنتهي من المخزن</value>
   </data>
   <data name="passwnotequal" xml:space="preserve">
     <value>تأكيد كلمة المرور لا يتطابق مع كلمة المرور!</value>
@@ -1442,6 +1511,9 @@
   </data>
   <data name="PaymentMethod" xml:space="preserve">
     <value>طريقة الدفع</value>
+  </data>
+  <data name="PendingOrders" xml:space="preserve">
+    <value>الطلبات المعلقة</value>
   </data>
   <data name="PendOrdMsg" xml:space="preserve">
     <value>تم اضافة الطلب بنجاح بانتظار الموافقة</value>
@@ -1701,6 +1773,9 @@
   <data name="replies" xml:space="preserve">
     <value>اضافة رد</value>
   </data>
+  <data name="Reports" xml:space="preserve">
+    <value>التقارير</value>
+  </data>
   <data name="Required" xml:space="preserve">
     <value>هذا الحقل مطلوب.</value>
   </data>
@@ -1730,6 +1805,9 @@
   </data>
   <data name="sale" xml:space="preserve">
     <value>خصم</value>
+  </data>
+  <data name="SalesReport" xml:space="preserve">
+    <value>تقرير المبيعات</value>
   </data>
   <data name="save" xml:space="preserve">
     <value>حفظ</value>
@@ -1854,8 +1932,14 @@
   <data name="Setting" xml:space="preserve">
     <value>الإعدادات</value>
   </data>
+  <data name="Setting(Website)" xml:space="preserve">
+    <value>اعدادات(الموقع)</value>
+  </data>
   <data name="settings" xml:space="preserve">
     <value>الإعدادات</value>
+  </data>
+  <data name="Settings(Mobile)" xml:space="preserve">
+    <value>لاعدادات(التطبيق)</value>
   </data>
   <data name="share" xml:space="preserve">
     <value>شارك هذه القصة ، اختر الموقع الخاص بك</value>
@@ -1887,6 +1971,9 @@
   <data name="showInHome" xml:space="preserve">
     <value>عرض في الرئيسية</value>
   </data>
+  <data name="ShowMailingList" xml:space="preserve">
+    <value>عرض قائمة البريد الالكتروني</value>
+  </data>
   <data name="showScolerships" xml:space="preserve">
     <value>عرض المنح</value>
   </data>
@@ -1907,6 +1994,9 @@
   </data>
   <data name="slider" xml:space="preserve">
     <value>الشرائح الرئيسية</value>
+  </data>
+  <data name="SliderImages" xml:space="preserve">
+    <value>صور السلايدر</value>
   </data>
   <data name="sliderlink" xml:space="preserve">
     <value>رابط الشريحة</value>
@@ -1973,6 +2063,9 @@
   </data>
   <data name="StaticList" xml:space="preserve">
     <value>قائمة الثوابت</value>
+  </data>
+  <data name="staticPages" xml:space="preserve">
+    <value>الصفحات الثابتة</value>
   </data>
   <data name="status" xml:space="preserve">
     <value>الحالة</value>
@@ -2115,6 +2208,18 @@
   <data name="total" xml:space="preserve">
     <value>المجموع الكلي</value>
   </data>
+  <data name="TotalProducts" xml:space="preserve">
+    <value>إجمالي المنتجات</value>
+  </data>
+  <data name="TotalPurchased" xml:space="preserve">
+    <value>إجمالي المشتريات</value>
+  </data>
+  <data name="TotalPurchasedMoney" xml:space="preserve">
+    <value>إجمالي الأموال المشتراة</value>
+  </data>
+  <data name="TotalTransactions" xml:space="preserve">
+    <value>إجمالي المعاملات</value>
+  </data>
   <data name="Trainee" xml:space="preserve">
     <value>المتدربين</value>
   </data>
@@ -2202,6 +2307,9 @@
   <data name="Vendors" xml:space="preserve">
     <value>المتاجر</value>
   </data>
+  <data name="VendorsSalesReport" xml:space="preserve">
+    <value>إجمالي مبيعات المتاجر</value>
+  </data>
   <data name="verify" xml:space="preserve">
     <value>تأكيد الحساب</value>
   </data>
@@ -2216,6 +2324,9 @@
   </data>
   <data name="ViewAllCustomers" xml:space="preserve">
     <value>عرض كل الزبائن</value>
+  </data>
+  <data name="ViewAllOrders" xml:space="preserve">
+    <value>عرض كل الطلبات</value>
   </data>
   <data name="ViewAllProducts" xml:space="preserve">
     <value>عرض كل المنتجات</value>
@@ -2255,6 +2366,9 @@
   </data>
   <data name="ViewSlider" xml:space="preserve">
     <value>عرض الشرائح</value>
+  </data>
+  <data name="viewStock" xml:space="preserve">
+    <value>عرض المخزن</value>
   </data>
   <data name="ViewSubscriber" xml:space="preserve">
     <value>عرض المشتركين</value>
@@ -2315,5 +2429,8 @@
   </data>
   <data name="zone" xml:space="preserve">
     <value>المنطقة</value>
+  </data>
+  <data name="zones" xml:space="preserve">
+    <value>المناطق</value>
   </data>
 </root>

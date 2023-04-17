@@ -28,10 +28,10 @@ namespace EtayfeAdminPanel.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
-        [HttpGet("getDefaultLang")]
+        [HttpGet("GetDefaultLanugage")]
         public async Task<IActionResult> GetDefaultLanugage()
         {
-            var result = await _homeBL.GetDefaultLanugage();
+            var result = GetLanguage();
             return Ok(result);
         }
 

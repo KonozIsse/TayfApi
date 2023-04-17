@@ -1,7 +1,5 @@
-﻿@page "/CP/Country/Edit"
-@page "/CP/Country/Edit/{Id:int}"
-@inject LocationTaxBL _locationTaxBL;
-@inject HomeBL _homeBL;
+﻿@page "/Country/Edit"
+@page "/Country/Edit/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editCountry") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -121,7 +119,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Countries" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Countries" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -147,8 +145,6 @@
     UpdateCountryDto create = new UpdateCountryDto();
     string message;
     string style;
-    string lang = "en";
-    int storeId = 3;
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateCountryDto();

@@ -1,7 +1,5 @@
-﻿@page "/CP/Reports/ViewLowStock"
-@page "/CP/Reports/ViewLowStock/{ProductId:int}"
-@inject ProductBL _productBL
-@inject LocService SharedLocalize
+﻿@page "/Reports/ViewLowStock"
+@page "/Reports/ViewLowStock/{ProductId:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("StockInHistory") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -111,7 +109,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Model = await _productBL.GetAllViewInventory(1, lang, ProductId);
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        Model = await _productBL.GetAllViewInventory(3, lang, ProductId);
     }
 
 }

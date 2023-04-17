@@ -2,6 +2,7 @@
 using Entities.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entities.DataTransferObjects
 {
@@ -44,25 +45,43 @@ namespace Entities.DataTransferObjects
     }
     public class CreateProductDto
     {
+        [Required(ErrorMessage = "enterallfiled")]
         public string ProductName { get; set; }
+        [Required(ErrorMessage = "enterallfiled")]
         public string ProductNameAr { get; set; }
+        [Required]
         public Status IsStatus { get; set; }
+        [Required]
         public string ProductModel { get; set; }
+        [Required(ErrorMessage = "enterPrice")]
         public decimal Price { get; set; }
+        [Required(ErrorMessage = "enterallfiled")]
         public string Description { get; set; }
+        [Required(ErrorMessage = "enterallfiled")]
         public string DescriptionAr { get; set; }
-        public int TypeId { get; set; }
+        [Required]
+        public ProductsType Type { get; set; }
         public int Availability { get; set; }
+        [Required]
         public int StoreId { get; set; } 
         public short IsFeature { get; set; }
         public short IsBest { get; set; }
-        public short IsPopular { get; set; }
+        public short IsPopular { get; set; } 
+        public short IsSale { get; set; }
+        public short IsSpecial { get; set; }
+        //[Required(ErrorMessage = "correctImage")]
         public List<CreateImageProductDto> Images { get; set; }
-        public bool IsSale { get; set; }
-        public List<CreateSaleDto> ProductSales { get; set; }
-        public bool IsSpecial { get; set; }
-        public List<CreateSpecialDto> SpecialProducts { get; set; }
+        [Required(ErrorMessage = "selectcategory")]
         public List<CreateProductCategoryDto> ProductCategories { get; set; }
+        //-----------------------
+        public decimal DiscountPrice { get; set; }
+        public Status IsStatusSale { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        //----------------------
+        public decimal SpecialPrice { get; set; }
+        public Status IsStatusSpecial { get; set; }
+        public DateTime? EndDateSpecial { get; set; }
     }
     public class UpdateProductDto : CreateProductDto
     {
@@ -87,14 +106,6 @@ namespace Entities.DataTransferObjects
         public DateTime? EndDate { get; set; }
         public int ProductId { get; set; }
     }
-    public class CreateSaleDto 
-    {
-        public int Id { get; set; }
-        public decimal DiscountPrice { get; set; }
-        public Status IsStatus { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-    }
     //Special----------------------------------
     public class SpecialDto
     {
@@ -103,12 +114,5 @@ namespace Entities.DataTransferObjects
         public DateTime? EndDate { get; set; }
         public int ProductId { get; set; }
     }
-    public class CreateSpecialDto
-    {
-        public int Id { get; set; }
-        public decimal SpecialPrice { get; set; }
-        public Status IsStatus { get; set; }
-        public DateTime? EndDate { get; set; }
-    } 
 
 }

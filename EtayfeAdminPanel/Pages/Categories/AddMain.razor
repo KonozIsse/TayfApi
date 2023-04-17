@@ -1,11 +1,11 @@
-﻿@page "/CP/Categories/Add/"
+﻿@page "/Categories/Add/"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addcategory") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
     <h1>@SharedLocalize.GetLocalizedStringValue("addcategory")<small>@SharedLocalize.GetLocalizedStringValue("EditSubCategories")</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard"><a href="/">@SharedLocalize.GetLocalizedStringValue("dashboard")</a></li>
-        <li class="fa fa-users"><a href="/CP/">@SharedLocalize.GetLocalizedStringValue("categories")</a></li>
+        <li class="fa fa-users"><a href="/">@SharedLocalize.GetLocalizedStringValue("categories")</a></li>
         <li class="fa fa-users"><a href="SubCategories">@SharedLocalize.GetLocalizedStringValue("categories")</a> </li>
         <li class="active">@SharedLocalize.GetLocalizedStringValue("addcategory")</li>
     </ol>
@@ -62,7 +62,7 @@
                                                                     <ImagesPage1 images="images"></ImagesPage1>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <a href="/CP/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                    <a href="/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
 
                                                                     <a class="btn btn-default refresh-image shownotify newIcon" id="reff" style="margin-right: 5px;"><i class="fa fa-refresh"></i></a>
                                                                     <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
@@ -107,7 +107,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a class="btn btn-defult" href="/CP/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a class="btn btn-defult" href="/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -138,7 +138,7 @@
     protected override async Task OnInitializedAsync()
     {
         create = new CreateCategoryDto();
-        images = await _imageBL.GetAllImageSettingOriginal(0);
+        images = await _imageBL.GetAllImageSettingOriginal(3);
     }
     string message = "";
     string style = "";

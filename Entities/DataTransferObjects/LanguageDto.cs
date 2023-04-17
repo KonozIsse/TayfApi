@@ -25,7 +25,7 @@ namespace Entities.DataTransferObjects
         public string Name { get; set; } 
         public string NameAr { get; set; }
         public string Direction { get; set; }
-        public string Image { get; set; }
+        public int ImgId { get; set; }
     }
     
 }

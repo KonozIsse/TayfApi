@@ -1,6 +1,4 @@
-﻿@page "/CP/SettingWeb/Sliders"
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/SettingWeb/Sliders"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("slider") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message"  Style="@style"></Alert>
@@ -122,9 +120,6 @@
     public string filter { get; set; }
     [Parameter]
     public string lang { get; set; }
-
-    int vendorId = 0;
-    int admin = 1;
     public List<SliderDto> Model { get; set; }
    
     public MetaData MetaData { get; set; } = new MetaData();
@@ -132,7 +127,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetSliderWeb();
     }
     private async Task SelectedPage(int page)

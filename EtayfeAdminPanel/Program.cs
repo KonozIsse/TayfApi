@@ -14,6 +14,7 @@ using Microsoft.JSInterop;
 using System.Globalization;
 using Blazored.LocalStorage;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 internal class Program
 {
@@ -36,7 +37,6 @@ internal class Program
         builder.Services.ConfigureRepositoryManager();
         builder.Services.ConfigureJWT(builder.Configuration);
         builder.Services.ConfigureNotificationService();
-        builder.Services.ConfigureLangaugeService();
         builder.Services.ConfigureSqlConnection(builder.Configuration);
         builder.Services.ConfigureLocService();
         builder.Services.ConfigureAddQuartz();
@@ -53,7 +53,7 @@ internal class Program
         //----------------------
         //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44360/") }.EnableIntercept(sp));
-        
+
         builder.Services.AddHttpClientInterceptor();
         builder.Services.AddScoped<HttpInterceptorService>();
         builder.Services.AddHttpClient();
@@ -126,6 +126,12 @@ internal class Program
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(
+            Path.Combine(@"C:\Users\a7ed\source\repos\TayfApi\WebLayer\wwwroot\media_files", "avatars")),
+            RequestPath = "/avatars"
+        });
         app.UseCors("CorsPolicy");
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {

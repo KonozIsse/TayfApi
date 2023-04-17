@@ -1,5 +1,5 @@
-﻿@page "/CP/Comments"
-@page "/CP/Comments/{Id:int}"
+﻿@page "/Comments"
+@page "/Comments/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Comments") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -119,7 +119,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetAllComments();
     }
     private async Task SelectedPage(int page)

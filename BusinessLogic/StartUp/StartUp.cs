@@ -96,8 +96,7 @@ namespace BusinessLogic.StartUp
         public static void ConfigureSqlConnection(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(
-               configuration.GetConnectionString("SqlConnection"),
-                  x => x.MigrationsAssembly("EtayfeAdminPanel")));
+               configuration.GetConnectionString("SqlConnection"), x => x.MigrationsAssembly("EtayfeAdminPanel") ));
         }
         public static void ConfigureFcmNotification(this IServiceCollection services, IConfiguration configuration)
         {
@@ -143,8 +142,6 @@ namespace BusinessLogic.StartUp
                    services.AddScoped<ILoggerManager, LoggerManager>();
         public static void ConfigureRepositoryManager(this IServiceCollection services)=>
             services.AddScoped<IRepositoryManager, RepositoryManager>();
-        public static void ConfigureLangaugeService(this IServiceCollection services) =>
-           services.AddScoped<ILanguageService, LangaugeService>(); 
         public static void ConfigureSMSService(this IServiceCollection services) =>
            services.AddScoped<ISMSService, SMSService>();
         public static void ConfigurePaymentService(this IServiceCollection services) =>

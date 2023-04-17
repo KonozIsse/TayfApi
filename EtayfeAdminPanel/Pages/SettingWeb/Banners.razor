@@ -1,7 +1,4 @@
-﻿@page "/CP/SettingWeb/Banners"
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-
+﻿@page "/SettingWeb/Banners"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("banners") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -120,9 +117,6 @@
     public string filter { get; set; }
     [Parameter]
     public string lang { get; set; }
-
-    int vendorId = 0;
-    int admin = 1;
     public List<BannerDto> Model { get; set; }
 
     public MetaData MetaData { get; set; } = new MetaData();
@@ -130,7 +124,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetBanners();
     }
     private async Task SelectedPage(int page)

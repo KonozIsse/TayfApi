@@ -1,7 +1,5 @@
 ﻿
-@page "/CP/Categories/Edit/{Id:int}"
-@inject ProductBL _productBL;
-@inject HomeBL _homeBL;
+@page "/Categories/Edit/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editCategory") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -63,7 +61,7 @@
                                                                 <div class="modal-body manufacturer-image-embed">
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <a href="/CP/Media" target="_blank" class="btn btn-primary pull-left">Add Image</a>
+                                                                    <a href="/Media" target="_blank" class="btn btn-primary pull-left">Add Image</a>
                                                                     <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
                                                                     <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">Add</button>
                                                                 </div>
@@ -107,7 +105,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a class="btn btn-defult" href="/CP/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a class="btn btn-defult" href="/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -133,7 +131,6 @@
     UpdateCategoryDto create = new UpdateCategoryDto();
     string message;
     string style;
-    string lang = "en";
     int storeId = 3;
     protected override async Task OnInitializedAsync()
     {

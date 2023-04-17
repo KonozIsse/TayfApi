@@ -1,5 +1,4 @@
-﻿@page "/CP/ManageVendors/Edit"
-@page "/CP/ManageVendors/Edit/{Id:int}"
+﻿@page "/ManageVendors/Edit/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditVendor") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -123,7 +122,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                            <a href="/CP/ManageVendors" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            <a href="/ManageVendors" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
 

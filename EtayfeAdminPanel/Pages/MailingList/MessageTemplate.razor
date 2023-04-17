@@ -1,8 +1,4 @@
 ﻿@page "/MailingList/Message"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject HttpClient http
-@inject IJSRuntime js
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("emailTemp")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <section class="content-header">
     <h1>  @SharedLocalize.GetLocalizedStringValue("emailTemp") <small>@SharedLocalize.GetLocalizedStringValue("emailTemp")</small> </h1>
@@ -11,14 +7,6 @@
         <li class="active"> @SharedLocalize.GetLocalizedStringValue("emailTemp") </li>
     </ol>
 </section>
-@*@if (string.IsNullOrEmpty(userName))
-{
-    <p><a href="/login">Login</a></p>
-}
-else
-{
-   <p>Hello @userName</p>
-}*@
 @if (Model != null)
 {
     <section class="content">
@@ -96,33 +84,16 @@ else
     </section>
 }
 @code {
-    string lang = "ar"; 
-    string userName = "";
-    string userData = "";
+    [Parameter]
+    public string lang { get; set; }
     public List<MessageTemplateDto> Model { get; set; }
     
 
     protected override async Task OnInitializedAsync()
     {
-        // Model= await _homeBL.GetAllMessageTemplates();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         
         Model = await http.GetFromJsonAsync<List<MessageTemplateDto>>("api/MailingList/getTemplate");
     }
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        userData = await js.InvokeAsync<string>("localStorage.getItem", "user").ConfigureAwait(false);
-    //        if (!string.IsNullOrWhiteSpace(userData))
-    //        {
-    //            var dataArray = userData.Split(";", 2);
-    //            userName = dataArray[0];
-    //            var responseMessage = new HttpRequestMessage(HttpMethod.Get, "/api/MailingList");
-    //            responseMessage.Headers.Add("Authorization", "Bearer " + dataArray[1]);
-    //            var resp = await http.SendAsync(responseMessage);
-    //            if (resp.IsSuccessStatusCode)
-    //                Model = await responseMessage.Content.ReadFromJsonAsync<List<MessageTemplateDto>>();
-    //        }
-    //    }
-    //}
 }

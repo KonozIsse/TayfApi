@@ -1,7 +1,4 @@
-﻿@page "/CP/ManageVendors/Add"
-@inject UserBL _userBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/ManageVendors/Add"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addvendor") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -136,7 +133,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/ManageVendors" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/ManageVendors" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
 

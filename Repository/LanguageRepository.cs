@@ -21,8 +21,8 @@ namespace Repository
         => await FindByCondition(c => c.Code == lange, trackChanges).FirstOrDefaultAsync();
         public async Task<Language> GetCodeLanguageId(int id, bool trackChanges)
        => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
-        public async Task<Language> GetDefaultLanguage(bool trackChanges)
-        => await FindByCondition(c => c.IsStatus == Status.Active, trackChanges).FirstOrDefaultAsync();
+        public async Task<Language> GetDefaultLanguage()
+        => await FindByCondition(c => c.IsStatus == Status.Active,false).SingleOrDefaultAsync();
         public async Task<IEnumerable<Language>> GetListLanguage(bool trackChanges)
         => await FindAll(trackChanges).ToListAsync();
         public async Task<IEnumerable<Language>> GetAllLanguage(string search ,string filter)

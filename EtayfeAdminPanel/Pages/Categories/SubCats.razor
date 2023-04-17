@@ -1,5 +1,4 @@
-﻿@page "/CP/Categories/SubCategories/{Id:int}"
-@inject ProductBL _productBL
+﻿@page "/Categories/SubCategories/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("SubCategories") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 
@@ -42,7 +41,7 @@
                      @if (user.UserType == UserType.Admin)
                         {
                             <div class="box-tools pull-right">
-                                <a href="/CP/Categories/@Id/AddSubCategories" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddSubCategories")</a>
+                                <a href="/Categories/@Id/AddSubCategories" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddSubCategories")</a>
 
                             </div>
                         }
@@ -102,7 +101,7 @@
                                                  @if (user.UserType == UserType.Admin)
                                                 {
                                                     <td>
-                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" href="/CP/Categories/@Id/EditSubCategories/@item.Id " class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                                <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" href="/Categories/@Id/EditSubCategories/@item.Id " class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a data-toggle="tooltip" data-placement="bottom" title=" @item.CategoryName" @onclick="(async () => await Delete(item.Id))" class="badge bg-red "><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
                                                 }
@@ -134,7 +133,6 @@
     }
 }
 @code {
-    string lang = "en";
     string message = "";
     string style = "";
     [Parameter]
@@ -142,13 +140,15 @@
     [Parameter]
     public string search { get; set; }
     public string filter { get; set; }
+    public string lang { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
     public List<CategoryDto> Model { get; set; }
     public AdminDto user { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GethMainCategories();
     }
@@ -185,6 +185,6 @@
     }
     void NavigateTo()
     {
-        NavigationManager.NavigateTo("/CP/Categories/SubCategories/" + Id, true);
+        NavigationManager.NavigateTo("/Categories/SubCategories/" + Id, true);
     }
 }

@@ -54,7 +54,6 @@ namespace WebLayer
             services.ConfigureRepositoryManager(); 
             services.ConfigureNotificationService();
             services.ConfigureLocService();
-            services.ConfigureLangaugeService();
             services.ConfigureSMSService();
             services.ConfigurePaymentService();
             //------------------------------

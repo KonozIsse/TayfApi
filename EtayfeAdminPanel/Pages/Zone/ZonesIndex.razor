@@ -1,9 +1,4 @@
-﻿@page "/CP/Zones"
-@inject LocationTaxBL _locationTaxBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject HomeBL _homeBL
-@inject IJSRuntime js
+﻿@page "/Zones"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Regions") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -50,7 +45,7 @@ else
                                 <div class="col-lg-4 form-inline" id="contact-form12"></div>
                             </div>
                             <div class="box-tools pull-right">
-                                <a href="/zone/create" type="button" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</a>
+                                <a href="/Zone/Add" type="button" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("RegionsAdd")</a>
                             </div>
                         </div>
 
@@ -91,7 +86,7 @@ else
                                                     <td>@item.ZoneCode</td>
                                                     <td>@item.CountryName</td>
                                                     <td>
-                                                    <a title="@item.ZoneName" href="/zone/edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                    <a title="@item.ZoneName" href="/Zone/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                     <a title="@item.ZoneName" @onclick="(async ()=> await Delete(item))"  class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i> </a>
                                                  @*  <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>*@
                                                    
@@ -120,7 +115,7 @@ else
     [Parameter]
     public string search { get; set; }
     public string filter { get; set; }
-    string lang = "ar";
+    public string lang { get; set; }
 
     public List<ZoneDto>  zoneDtos { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
@@ -128,7 +123,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetZones();
     }
     private async Task SelectedPage(int page)
@@ -165,7 +161,7 @@ else
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Zones", true);
+        NavigationManager.NavigateTo("/Zones", true);
     }
     
 }

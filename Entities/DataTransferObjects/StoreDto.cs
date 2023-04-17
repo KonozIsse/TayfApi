@@ -47,11 +47,16 @@ namespace Entities.DataTransferObjects
     public class UpdateStoreDto 
     {
         public int Id { get; set; }
+        [Required]
         public string FirstName { get; set; }
+        [Required]
         public string PhoneNumber { get; set; }
+        [Required]
         public Status Status { get; set; }
         public string Url { get; set; }
+        [Required]
         public int ImageId { get; set; }
+        [Required]
         public string AdressInfo { get; set; }
     }
     public class AdminDto
@@ -90,25 +95,6 @@ namespace Entities.DataTransferObjects
         [DataType(DataType.Password)]
         public string OldPassword { get; set; }
     }
-    public class ResetPasswordDto
-    {
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }
-
-        public string Email { get; set; }
-        public string Code { get; set; }
-    }
-    public class UserForAuthenticationDto
-    {
-        [Required(ErrorMessage = "User name is required")]
-        public string UserName { get; set; }
-        [Required(ErrorMessage = "Password name is required")]
-        public string Password { get; set; }
-    }
+  
 }
 

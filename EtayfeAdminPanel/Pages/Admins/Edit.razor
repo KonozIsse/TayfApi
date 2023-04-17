@@ -1,7 +1,4 @@
-﻿@page "/CP/Admin/Edit/{Id:int}"
-@inject UserBL _userBL;
-@inject HttpClient http;
-@inject LocService SharedLocalize
+﻿@page "/Admin/Edit/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editAdmin") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 
@@ -167,17 +164,17 @@
 </section>
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public int Id { get; set; } 
     public List<RoleDto> roles { get; set; }
     UpdateAdminDto create = new UpdateAdminDto();
     string message;
     string style;
-    string lang = "en";
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateAdminDto();
         create = await _userBL.GetMapAdmin(Id);
-        roles = await _userBL.GetTypesStoreAdmin();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        roles = await http.GetFromJsonAsync<List<RoleDto>>("api/Admin/get-roles");
       
     }
 

@@ -1,4 +1,4 @@
-﻿@page "/CP/Order/View/{Id:int}"
+﻿@page "/Order/View/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("ViewOrder") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 
@@ -25,7 +25,7 @@
             <div class="col-xs-6" style="float: @(lang == "en" ? "left":"right")">
                 <h2 class="page-header" style="padding-bottom: 25px; margin-top:0;">
                     <img src="/logo.png" title="remart" alt="remart" class="img-responsive" style="margin-bottom: 4%;" />
-                    @SharedLocalize.GetLocalizedStringValue("OrderID") # @Model.Id
+                    @SharedLocalize.GetLocalizedStringValue("OrderId") # @Model.Id
                     <small style="display: @(lang == "en"? "inline-block" :"contents;")">@SharedLocalize.GetLocalizedStringValue("OrderedDate"): @Model.CreatedAt</small>
                 </h2>
             </div>
@@ -256,7 +256,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         Model = await http.GetFromJsonAsync<OrderDto>("api/Orders/GetViewOrder/"+Id);
     }
     async Task Delete(int id)
@@ -333,6 +334,6 @@
     }
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("/CP/Order/View/"+Id, true);
+        NavigationManager.NavigateTo("/Order/View/"+Id, true);
     }
 }

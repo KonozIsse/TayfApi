@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>About Us</value>
   </data>
+  <data name="AboutScolerShip" xml:space="preserve">
+    <value>About Scholarship</value>
+  </data>
   <data name="AccountAlreadyExists" xml:space="preserve">
     <value>This Account Already Exists</value>
   </data>
@@ -129,8 +132,14 @@
   <data name="accountNotVerify" xml:space="preserve">
     <value>This Account is not Verified</value>
   </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
   <data name="activate" xml:space="preserve">
     <value>Activated Successfully</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>Active</value>
   </data>
   <data name="add" xml:space="preserve">
     <value>Add</value>
@@ -139,9 +148,6 @@
     <value>Add Address</value>
   </data>
   <data name="addAdmin" xml:space="preserve">
-    <value>إضافة مستخدم</value>
-  </data>
-  <data name="addAdmin1" xml:space="preserve">
     <value>Add Admin</value>
   </data>
   <data name="AddAdmins" xml:space="preserve">
@@ -151,69 +157,39 @@
     <value>Add Admin Type</value>
   </data>
   <data name="addArticle" xml:space="preserve">
-    <value>اضافة مقال</value>
-  </data>
-  <data name="addArticle1" xml:space="preserve">
     <value>Add Article</value>
   </data>
   <data name="addArticleCategory" xml:space="preserve">
-    <value>اضافة تصنيف</value>
-  </data>
-  <data name="addArticleCategory1" xml:space="preserve">
     <value>Add Article Category</value>
   </data>
   <data name="addcategory" xml:space="preserve">
-    <value>إضافة تصنيف</value>
-  </data>
-  <data name="addcategory1" xml:space="preserve">
     <value>Add Category</value>
   </data>
   <data name="addCity" xml:space="preserve">
-    <value>اضافة مدينة</value>
-  </data>
-  <data name="addCity1" xml:space="preserve">
     <value>Add City</value>
   </data>
   <data name="addClasses" xml:space="preserve">
-    <value>إضافة شعبة</value>
-  </data>
-  <data name="addClasses1" xml:space="preserve">
     <value>Add Classes</value>
   </data>
   <data name="addclient" xml:space="preserve">
     <value>Add Client</value>
   </data>
   <data name="addCollege" xml:space="preserve">
-    <value>اضافة كليه</value>
-  </data>
-  <data name="addCollege1" xml:space="preserve">
     <value>Add College</value>
   </data>
   <data name="AddComment" xml:space="preserve">
     <value>Add Comment</value>
   </data>
   <data name="addCountry" xml:space="preserve">
-    <value>اضافة دولة جديدة</value>
-  </data>
-  <data name="addCountry1" xml:space="preserve">
     <value>Add Country</value>
   </data>
   <data name="addCourse" xml:space="preserve">
-    <value>اضافة دورة تدريبية</value>
-  </data>
-  <data name="addCourse1" xml:space="preserve">
     <value>Add Course</value>
   </data>
   <data name="addCourseCategory" xml:space="preserve">
-    <value>اضافة تصنيف</value>
-  </data>
-  <data name="addCourseCategory1" xml:space="preserve">
     <value>Add Course Category</value>
   </data>
   <data name="addCriteria" xml:space="preserve">
-    <value>اضافة مهارة/معيار</value>
-  </data>
-  <data name="addCriteria1" xml:space="preserve">
     <value>Add Criteria</value>
   </data>
   <data name="addCurrency" xml:space="preserve">
@@ -226,15 +202,12 @@
     <value>Add Default Options</value>
   </data>
   <data name="addDegree" xml:space="preserve">
-    <value>اضافة درجة علمية</value>
-  </data>
-  <data name="addDegree1" xml:space="preserve">
     <value>Add Degree</value>
   </data>
   <data name="AddedDate" xml:space="preserve">
     <value>Added Date</value>
   </data>
-  <data name="AddedToCart" xml:space="preserve">
+  <data name="addedtoCart" xml:space="preserve">
     <value>Success: You have added Product to your shopping cart</value>
   </data>
   <data name="addedtoCompare" xml:space="preserve">
@@ -256,33 +229,18 @@
     <value>Add New Language</value>
   </data>
   <data name="addMainMenu" xml:space="preserve">
-    <value>اضافة قائمة جديدة</value>
-  </data>
-  <data name="addMainMenu1" xml:space="preserve">
     <value>Add Main Menu</value>
   </data>
   <data name="addManufacturers" xml:space="preserve">
-    <value>إضافة شركة</value>
-  </data>
-  <data name="addManufacturers1" xml:space="preserve">
     <value>Add Manufacturers</value>
   </data>
   <data name="addnews" xml:space="preserve">
-    <value>إضافة خبر</value>
-  </data>
-  <data name="addnews1" xml:space="preserve">
     <value>Add News</value>
   </data>
   <data name="AddNickNames" xml:space="preserve">
-    <value>اضافة مستخدم افتراضي</value>
-  </data>
-  <data name="AddNickNames1" xml:space="preserve">
     <value>Add Nickname</value>
   </data>
   <data name="AddOptions" xml:space="preserve">
-    <value>إضافة خَيار </value>
-  </data>
-  <data name="AddOptions1" xml:space="preserve">
     <value>Add Option</value>
   </data>
   <data name="AddOptionValue" xml:space="preserve">
@@ -294,17 +252,17 @@
   <data name="Addproducts" xml:space="preserve">
     <value>Add Products</value>
   </data>
-  <data name="addProperty" xml:space="preserve">
-    <value>اضافة عقار</value>
+  <data name="AddProductstoCart" xml:space="preserve">
+    <value>Add Products to Cart</value>
   </data>
-  <data name="addProperty1" xml:space="preserve">
+  <data name="addProperty" xml:space="preserve">
     <value>add Property</value>
   </data>
   <data name="addQuestion" xml:space="preserve">
-    <value>اضافة سؤال</value>
-  </data>
-  <data name="addQuestion1" xml:space="preserve">
     <value>Add Question</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
   </data>
   <data name="address1" xml:space="preserve">
     <value>Address 1</value>
@@ -331,33 +289,18 @@
     <value>Add Roles</value>
   </data>
   <data name="addScholarship" xml:space="preserve">
-    <value>اضافة منحة دراسية</value>
-  </data>
-  <data name="addScholarship1" xml:space="preserve">
     <value>Add Scholarship</value>
   </data>
   <data name="addServices" xml:space="preserve">
-    <value>إضافة خدمة</value>
-  </data>
-  <data name="addServices1" xml:space="preserve">
     <value>Add Services</value>
   </data>
   <data name="addSlider" xml:space="preserve">
-    <value>اضافة شريحة جديدة</value>
-  </data>
-  <data name="addSlider1" xml:space="preserve">
     <value>Add New Slider</value>
   </data>
   <data name="addSpecialization" xml:space="preserve">
-    <value>اضافة تخصص</value>
-  </data>
-  <data name="addSpecialization1" xml:space="preserve">
     <value>Add Specialization</value>
   </data>
   <data name="addSport" xml:space="preserve">
-    <value>اضافة رياضة</value>
-  </data>
-  <data name="addSport1" xml:space="preserve">
     <value>Add Sport</value>
   </data>
   <data name="AddStock" xml:space="preserve">
@@ -379,37 +322,28 @@
     <value>Add to Wish List</value>
   </data>
   <data name="addTrainer" xml:space="preserve">
-    <value>اضافة مدرب</value>
-  </data>
-  <data name="addTrainer1" xml:space="preserve">
     <value>Add Trainer</value>
   </data>
   <data name="AddUnits" xml:space="preserve">
     <value>Add Units</value>
   </data>
   <data name="addUniversity" xml:space="preserve">
-    <value>اضافة جامعة</value>
-  </data>
-  <data name="addUniversity1" xml:space="preserve">
     <value>Add University</value>
   </data>
-  <data name="Admin" xml:space="preserve">
-    <value>المستخدمين</value>
-  </data>
-  <data name="admin1" xml:space="preserve">
+  <data name="admin" xml:space="preserve">
     <value>Admin</value>
   </data>
-  <data name="Admin2" xml:space="preserve">
+  <data name="Admin1" xml:space="preserve">
     <value>Admins</value>
   </data>
   <data name="AdminProperty" xml:space="preserve">
-    <value>عروض الادارة</value>
-  </data>
-  <data name="AdminProperty1" xml:space="preserve">
     <value>Admin Properties</value>
   </data>
   <data name="admins" xml:space="preserve">
     <value>Admins</value>
+  </data>
+  <data name="AdminType" xml:space="preserve">
+    <value>Admin Type</value>
   </data>
   <data name="agreepolicy" xml:space="preserve">
     <value>I have read and agree to the</value>
@@ -441,20 +375,23 @@
   <data name="April" xml:space="preserve">
     <value>April</value>
   </data>
+  <data name="AqarUser" xml:space="preserve">
+    <value>Property Owner</value>
+  </data>
   <data name="Arrivel" xml:space="preserve">
     <value>Arrivel</value>
   </data>
   <data name="Article" xml:space="preserve">
-    <value>من نحن</value>
-  </data>
-  <data name="Article1" xml:space="preserve">
     <value>Articles</value>
   </data>
   <data name="ArticleCategory" xml:space="preserve">
-    <value>تصنيفات المقالات</value>
+    <value>Article Category</value>
   </data>
   <data name="ArticleCategory1" xml:space="preserve">
     <value>Article Category</value>
+  </data>
+  <data name="ArticleName" xml:space="preserve">
+    <value>Article Title</value>
   </data>
   <data name="August" xml:space="preserve">
     <value>August</value>
@@ -471,8 +408,8 @@
   <data name="banners" xml:space="preserve">
     <value>Banners</value>
   </data>
-  <data name="BecomeVendor" xml:space="preserve">
-    <value>Become a Vendor</value>
+  <data name="Benefit" xml:space="preserve">
+    <value>Benefits</value>
   </data>
   <data name="bestseller" xml:space="preserve">
     <value>bestseller</value>
@@ -489,17 +426,20 @@
   <data name="BrandIndex" xml:space="preserve">
     <value>Brand Index</value>
   </data>
+  <data name="Broker" xml:space="preserve">
+    <value>Broker</value>
+  </data>
+  <data name="BuildDate" xml:space="preserve">
+    <value>BuildDate</value>
+  </data>
   <data name="cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="CannotDeleteImage" xml:space="preserve">
-    <value>Cannot Delete Used Image</value>
+  <data name="CanceledOrders" xml:space="preserve">
+    <value>Canceled Orders</value>
   </data>
   <data name="cart" xml:space="preserve">
     <value>Cart</value>
-  </data>
-  <data name="CartDetails" xml:space="preserve">
-    <value>Cart Details</value>
   </data>
   <data name="cartIsEmpty" xml:space="preserve">
     <value>Please Add Products to Cart, Your Cart is Empty</value>
@@ -507,10 +447,16 @@
   <data name="cartUpdate" xml:space="preserve">
     <value>Cart Updated successfully</value>
   </data>
+  <data name="Catalog" xml:space="preserve">
+    <value>Catalog</value>
+  </data>
   <data name="categories" xml:space="preserve">
     <value>Categories</value>
   </data>
   <data name="category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="CategoryName" xml:space="preserve">
     <value>Category</value>
   </data>
   <data name="CF" xml:space="preserve">
@@ -519,14 +465,8 @@
   <data name="ChangePassword" xml:space="preserve">
     <value>Change Password</value>
   </data>
-  <data name="checkEmail" xml:space="preserve">
-    <value>Please check your email to reset your password.</value>
-  </data>
   <data name="Checkout" xml:space="preserve">
     <value>Checkout</value>
-  </data>
-  <data name="chooseAddress" xml:space="preserve">
-    <value>Choose Address</value>
   </data>
   <data name="chooseCat" xml:space="preserve">
     <value>Choose Category</value>
@@ -538,15 +478,21 @@
     <value>Choose Time</value>
   </data>
   <data name="Cities" xml:space="preserve">
-    <value>المدن</value>
-  </data>
-  <data name="Cities1" xml:space="preserve">
     <value>Cities</value>
   </data>
-  <data name="Classes" xml:space="preserve">
-    <value>الشعب</value>
+  <data name="City" xml:space="preserve">
+    <value>City</value>
   </data>
-  <data name="Classes1" xml:space="preserve">
+  <data name="CityName" xml:space="preserve">
+    <value>City Name</value>
+  </data>
+  <data name="CityNameAr" xml:space="preserve">
+    <value>City Name in Arabic</value>
+  </data>
+  <data name="CityNameEn" xml:space="preserve">
+    <value>City Name in English</value>
+  </data>
+  <data name="Classes" xml:space="preserve">
     <value>Classes</value>
   </data>
   <data name="clients" xml:space="preserve">
@@ -558,10 +504,13 @@
   <data name="CodeGrater" xml:space="preserve">
     <value>Coupon amount is greater than total price</value>
   </data>
-  <data name="Colleges" xml:space="preserve">
-    <value>الكليات</value>
+  <data name="CollegeDetails" xml:space="preserve">
+    <value>College Details</value>
   </data>
-  <data name="Colleges1" xml:space="preserve">
+  <data name="CollegeName" xml:space="preserve">
+    <value>College Name</value>
+  </data>
+  <data name="Colleges" xml:space="preserve">
     <value>Colleges</value>
   </data>
   <data name="CommentAdded" xml:space="preserve">
@@ -575,6 +524,9 @@
   </data>
   <data name="compare" xml:space="preserve">
     <value>compare</value>
+  </data>
+  <data name="CompleteOrders" xml:space="preserve">
+    <value>Complete Orders</value>
   </data>
   <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>
@@ -594,8 +546,14 @@
   <data name="ConfirmPass" xml:space="preserve">
     <value>Please Confirm Your Password</value>
   </data>
+  <data name="ConfirmPass2" xml:space="preserve">
+    <value>Please Confirm Your Password</value>
+  </data>
   <data name="ConfirmPassAtLeast" xml:space="preserve">
-    <value>Password must be small and big  characters and digits</value>
+    <value>Password must be at least 6 characters</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Confirm Password</value>
   </data>
   <data name="contact" xml:space="preserve">
     <value>Contact</value>
@@ -603,14 +561,17 @@
   <data name="ContactForm" xml:space="preserve">
     <value>Contact Form</value>
   </data>
+  <data name="Contacts" xml:space="preserve">
+    <value>Contacts</value>
+  </data>
   <data name="contactUs" xml:space="preserve">
-    <value>تواصل معنا</value>
+    <value>Contact Us</value>
   </data>
   <data name="contactUs1" xml:space="preserve">
     <value>Contact Us</value>
   </data>
-  <data name="contactUs2" xml:space="preserve">
-    <value>Contact Us</value>
+  <data name="Contents" xml:space="preserve">
+    <value>Contents</value>
   </data>
   <data name="continu" xml:space="preserve">
     <value>Continue</value>
@@ -619,12 +580,9 @@
     <value>Continue Shopping</value>
   </data>
   <data name="ControlPanel" xml:space="preserve">
-    <value>لوحة التحكم</value>
-  </data>
-  <data name="ControlPanel1" xml:space="preserve">
     <value>Control Panel</value>
   </data>
-  <data name="ControlPanel2" xml:space="preserve">
+  <data name="ControlPanel1" xml:space="preserve">
     <value>Contril Panel</value>
   </data>
   <data name="copMsg" xml:space="preserve">
@@ -636,40 +594,49 @@
   <data name="correctLink" xml:space="preserve">
     <value>Please make sure the link is correct</value>
   </data>
+  <data name="Costs" xml:space="preserve">
+    <value>Costs</value>
+  </data>
   <data name="Country" xml:space="preserve">
-    <value>الدول</value>
+    <value>Country</value>
   </data>
   <data name="Country1" xml:space="preserve">
     <value>Countries</value>
   </data>
-  <data name="Course" xml:space="preserve">
-    <value>الدورات التدريبية</value>
+  <data name="CountryCode" xml:space="preserve">
+    <value>Country Code</value>
   </data>
-  <data name="Course1" xml:space="preserve">
+  <data name="CountryImage" xml:space="preserve">
+    <value>Country Image</value>
+  </data>
+  <data name="CountryName" xml:space="preserve">
+    <value>CountryName</value>
+  </data>
+  <data name="CountryNameAr" xml:space="preserve">
+    <value>Country Name Arabic</value>
+  </data>
+  <data name="CountryNameEn" xml:space="preserve">
+    <value>Country Name English</value>
+  </data>
+  <data name="Coupons" xml:space="preserve">
+    <value>Coupons</value>
+  </data>
+  <data name="Course" xml:space="preserve">
     <value>Course</value>
   </data>
   <data name="CourseCategory" xml:space="preserve">
-    <value>تصنيفات الدورات التدريبية</value>
-  </data>
-  <data name="CourseCategory1" xml:space="preserve">
     <value>Course Category</value>
   </data>
   <data name="courseFeature" xml:space="preserve">
-    <value>ميزات الدورة</value>
-  </data>
-  <data name="courseFeature1" xml:space="preserve">
     <value>COURSE FEATURES</value>
   </data>
-  <data name="Criteria" xml:space="preserve">
-    <value>المهارات والمعايير</value>
+  <data name="CreatedDate" xml:space="preserve">
+    <value>Created Date</value>
   </data>
-  <data name="Criteria1" xml:space="preserve">
+  <data name="Criteria" xml:space="preserve">
     <value>Criteria</value>
   </data>
   <data name="CriteriaTitle" xml:space="preserve">
-    <value>عنوان المهارة/المعيار</value>
-  </data>
-  <data name="CriteriaTitle1" xml:space="preserve">
     <value>Criteria Title</value>
   </data>
   <data name="curr" xml:space="preserve">
@@ -678,19 +645,25 @@
   <data name="currency" xml:space="preserve">
     <value>Currencies</value>
   </data>
+  <data name="Customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>Customer Name</value>
+  </data>
+  <data name="CustomerRegistrations" xml:space="preserve">
+    <value>Customer Registrations</value>
+  </data>
+  <data name="CustomerReport" xml:space="preserve">
+    <value>Customer Orders Total</value>
+  </data>
   <data name="Customers" xml:space="preserve">
     <value>Customers</value>
   </data>
   <data name="CustomrQueries" xml:space="preserve">
-    <value>استفسارات الزبائن</value>
-  </data>
-  <data name="CustomrQueries1" xml:space="preserve">
     <value>Customer Queries</value>
   </data>
   <data name="CustomrServices" xml:space="preserve">
-    <value>خدمات الزبائن</value>
-  </data>
-  <data name="CustomrServices1" xml:space="preserve">
     <value>Customer Services</value>
   </data>
   <data name="dailydeal" xml:space="preserve">
@@ -705,25 +678,31 @@
   <data name="December" xml:space="preserve">
     <value>December</value>
   </data>
+  <data name="DecimalPlaces" xml:space="preserve">
+    <value>Decimal Places</value>
+  </data>
   <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Default1" xml:space="preserve">
     <value>Default</value>
   </data>
   <data name="DefaultAddress" xml:space="preserve">
     <value>Default Address</value>
   </data>
+  <data name="DefaultLanguage" xml:space="preserve">
+    <value>Default Language</value>
+  </data>
   <data name="DefaultOptions" xml:space="preserve">
     <value>Default Options</value>
   </data>
-  <data name="Degrees" xml:space="preserve">
-    <value>الدرجات العلمية</value>
+  <data name="Degree" xml:space="preserve">
+    <value>Degree</value>
   </data>
-  <data name="Degrees1" xml:space="preserve">
+  <data name="Degrees" xml:space="preserve">
     <value>Degrees</value>
   </data>
   <data name="delete" xml:space="preserve">
-    <value>حذف</value>
-  </data>
-  <data name="delete1" xml:space="preserve">
     <value>Delete</value>
   </data>
   <data name="DeleteCategoryMsg" xml:space="preserve">
@@ -738,7 +717,13 @@
   <data name="desc" xml:space="preserve">
     <value>Description</value>
   </data>
-  <data name="Details" xml:space="preserve">
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Details1" xml:space="preserve">
     <value>Details</value>
   </data>
   <data name="direction" xml:space="preserve">
@@ -750,40 +735,34 @@
   <data name="Discount" xml:space="preserve">
     <value>Discount</value>
   </data>
+  <data name="DOB" xml:space="preserve">
+    <value>DOB</value>
+  </data>
   <data name="downloadApp" xml:space="preserve">
     <value>Download App</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Duration</value>
   </data>
   <data name="EcoTax" xml:space="preserve">
     <value>Eco Tax</value>
   </data>
   <data name="edit" xml:space="preserve">
-    <value>تعديل</value>
-  </data>
-  <data name="edit1" xml:space="preserve">
     <value>Edit</value>
   </data>
   <data name="EditAddress" xml:space="preserve">
     <value>Edit Address</value>
   </data>
   <data name="editAdmin" xml:space="preserve">
-    <value>تعديل مستخدم</value>
-  </data>
-  <data name="editAdmin1" xml:space="preserve">
     <value>Edit Admin</value>
   </data>
   <data name="editAritcleCategory" xml:space="preserve">
     <value>Edit Article Category</value>
   </data>
   <data name="editArticle" xml:space="preserve">
-    <value>تعديل مقال</value>
-  </data>
-  <data name="editArticle1" xml:space="preserve">
     <value>Edit Article</value>
   </data>
   <data name="editArticleCategory" xml:space="preserve">
-    <value>تعديل تصنيف مقالة</value>
-  </data>
-  <data name="editArticleCategory1" xml:space="preserve">
     <value>Edit Article Category</value>
   </data>
   <data name="editattr" xml:space="preserve">
@@ -793,51 +772,27 @@
     <value>Edit Banners</value>
   </data>
   <data name="editCategory" xml:space="preserve">
-    <value>تعديل تصنيف</value>
-  </data>
-  <data name="editCategory1" xml:space="preserve">
     <value>Edit Category</value>
   </data>
   <data name="editCity" xml:space="preserve">
-    <value>تعديل مدينة</value>
-  </data>
-  <data name="editCity1" xml:space="preserve">
     <value>Edit City</value>
   </data>
   <data name="editClasses" xml:space="preserve">
-    <value>تعديل شعبة</value>
-  </data>
-  <data name="editClasses1" xml:space="preserve">
     <value>Edit Classes</value>
   </data>
   <data name="editCollege" xml:space="preserve">
-    <value>تعديل كلية</value>
-  </data>
-  <data name="editCollege1" xml:space="preserve">
     <value>Edit College</value>
   </data>
   <data name="editCountry" xml:space="preserve">
-    <value>تعديل دولة</value>
-  </data>
-  <data name="editCountry1" xml:space="preserve">
     <value>Edit Country</value>
   </data>
   <data name="editCourse" xml:space="preserve">
-    <value>تعديل دورة تدريبية</value>
-  </data>
-  <data name="editCourse1" xml:space="preserve">
     <value>Edit Course</value>
   </data>
   <data name="editCourseCategory" xml:space="preserve">
-    <value>تعديل تصنيف</value>
-  </data>
-  <data name="editCourseCategory1" xml:space="preserve">
     <value>Edit Course Category</value>
   </data>
   <data name="editCriteria" xml:space="preserve">
-    <value>تعديل مهارة/ معيار</value>
-  </data>
-  <data name="editCriteria1" xml:space="preserve">
     <value>Edit Criteria</value>
   </data>
   <data name="EditCurrency" xml:space="preserve">
@@ -853,27 +808,15 @@
     <value>Edit Language</value>
   </data>
   <data name="editMainMenu" xml:space="preserve">
-    <value>تعديل قائمة</value>
-  </data>
-  <data name="editMainMenu1" xml:space="preserve">
     <value>Edit Main Menu</value>
   </data>
   <data name="editManufacturers" xml:space="preserve">
-    <value>تعديل شركة</value>
-  </data>
-  <data name="editManufacturers1" xml:space="preserve">
     <value>Edit Manufacturers</value>
   </data>
   <data name="editnews" xml:space="preserve">
-    <value>تعديل خبر/مقال</value>
-  </data>
-  <data name="editnews1" xml:space="preserve">
     <value>Edit News</value>
   </data>
   <data name="editNickNames" xml:space="preserve">
-    <value>تعديل مستخدم افتراضي</value>
-  </data>
-  <data name="editNickNames1" xml:space="preserve">
     <value>Edit Nickname</value>
   </data>
   <data name="editOption" xml:space="preserve">
@@ -886,51 +829,30 @@
     <value>Edit Profile</value>
   </data>
   <data name="editProperty" xml:space="preserve">
-    <value>تعديل عقار</value>
-  </data>
-  <data name="editProperty1" xml:space="preserve">
     <value>Edit Property</value>
   </data>
   <data name="editQuestion" xml:space="preserve">
-    <value>تعديل سؤال</value>
-  </data>
-  <data name="editQuestion1" xml:space="preserve">
     <value>Edit Question</value>
   </data>
   <data name="EditRole" xml:space="preserve">
     <value>Edit Role</value>
   </data>
   <data name="editServices" xml:space="preserve">
-    <value>تعديل الخدمات</value>
+    <value>Edit Services</value>
   </data>
   <data name="editServices1" xml:space="preserve">
     <value>Edit Services</value>
   </data>
-  <data name="editServices2" xml:space="preserve">
-    <value>Edit Services</value>
-  </data>
   <data name="EditSetting" xml:space="preserve">
-    <value>تعديل الإعدادات</value>
-  </data>
-  <data name="EditSetting1" xml:space="preserve">
     <value>Edit Setting</value>
   </data>
   <data name="editSlider" xml:space="preserve">
-    <value>تعديل شريحة</value>
-  </data>
-  <data name="editSlider1" xml:space="preserve">
     <value>Edit Slider</value>
   </data>
   <data name="editSport" xml:space="preserve">
-    <value>تعديل رياضة</value>
-  </data>
-  <data name="editSport1" xml:space="preserve">
     <value>Edit Sport</value>
   </data>
   <data name="editStaticList" xml:space="preserve">
-    <value>تعديل ثوابت</value>
-  </data>
-  <data name="editStaticList1" xml:space="preserve">
     <value>Edit Constant</value>
   </data>
   <data name="edittaxes" xml:space="preserve">
@@ -943,12 +865,12 @@
     <value>Edit Testemonials</value>
   </data>
   <data name="editTrainer" xml:space="preserve">
-    <value>تعديل بيانات المدرب</value>
-  </data>
-  <data name="editTrainer1" xml:space="preserve">
     <value>Edit Trainer</value>
   </data>
-  <data name="EditType" xml:space="preserve">
+  <data name="editType" xml:space="preserve">
+    <value>Edit Type</value>
+  </data>
+  <data name="EditType1" xml:space="preserve">
     <value>Edit Admin Type</value>
   </data>
   <data name="EditUnits" xml:space="preserve">
@@ -958,6 +880,9 @@
     <value>Edit your account information</value>
   </data>
   <data name="Email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="Email1" xml:space="preserve">
     <value>Email</value>
   </data>
   <data name="EmailAddress" xml:space="preserve">
@@ -968,6 +893,9 @@
   </data>
   <data name="EmailMessage" xml:space="preserve">
     <value>An email will be sent to inform you of the successful registration</value>
+  </data>
+  <data name="EmailTemplates" xml:space="preserve">
+    <value>Email Templates</value>
   </data>
   <data name="EmailVal" xml:space="preserve">
     <value>Make sure your email and password</value>
@@ -1011,9 +939,6 @@
   <data name="errorCode" xml:space="preserve">
     <value>Error Code</value>
   </data>
-  <data name="ErrorOccurs" xml:space="preserve">
-    <value>An error occurred, please be aware of the login information</value>
-  </data>
   <data name="ETAYF" xml:space="preserve">
     <value>ETAYF</value>
   </data>
@@ -1023,20 +948,20 @@
   <data name="ExistItem" xml:space="preserve">
     <value>Item Already Exists</value>
   </data>
-  <data name="External" xml:space="preserve">
-    <value>External</value>
+  <data name="Facebook" xml:space="preserve">
+    <value>Facebook</value>
   </data>
   <data name="Featured" xml:space="preserve">
     <value>Featured</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>Features</value>
   </data>
   <data name="February" xml:space="preserve">
     <value>February</value>
   </data>
   <data name="Female" xml:space="preserve">
     <value>Female</value>
-  </data>
-  <data name="FileNotUploaded" xml:space="preserve">
-    <value>image not uploaded</value>
   </data>
   <data name="filter" xml:space="preserve">
     <value>Filter</value>
@@ -1046,6 +971,9 @@
   </data>
   <data name="findbrand" xml:space="preserve">
     <value>Find Your Favorite Brand</value>
+  </data>
+  <data name="firstName" xml:space="preserve">
+    <value>First Name</value>
   </data>
   <data name="FlashSale" xml:space="preserve">
     <value>Flash Sale</value>
@@ -1083,17 +1011,23 @@
   <data name="from" xml:space="preserve">
     <value>From</value>
   </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
   <data name="gender" xml:space="preserve">
     <value>Gender</value>
   </data>
-  <data name="GoalCompletion" xml:space="preserve">
-    <value>Goal Completion</value>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>General Settings</value>
   </data>
   <data name="goBack" xml:space="preserve">
     <value>Go Back To</value>
   </data>
   <data name="goLogin" xml:space="preserve">
     <value>You must login or create an account </value>
+  </data>
+  <data name="Google" xml:space="preserve">
+    <value>Google</value>
   </data>
   <data name="Hintlogin" xml:space="preserve">
     <value>By creating an account you will be able to shop faster, be up to date on an order's status, and keep track of the orders you have previously made.</value>
@@ -1143,8 +1077,17 @@
   <data name="IsFeature" xml:space="preserve">
     <value>Is Feature</value>
   </data>
+  <data name="iso2" xml:space="preserve">
+    <value>ISO Code 2</value>
+  </data>
+  <data name="iso3" xml:space="preserve">
+    <value>ISO Code 3</value>
+  </data>
   <data name="January" xml:space="preserve">
     <value>January</value>
+  </data>
+  <data name="JobTitle" xml:space="preserve">
+    <value>Job Title</value>
   </data>
   <data name="July" xml:space="preserve">
     <value>July</value>
@@ -1164,6 +1107,9 @@
   <data name="langNameSuchAs" xml:space="preserve">
     <value>Language name such as "English"</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
   <data name="LargeHeight" xml:space="preserve">
     <value>Large Height</value>
   </data>
@@ -1179,6 +1125,12 @@
   <data name="LastContact" xml:space="preserve">
     <value>Last Contact</value>
   </data>
+  <data name="LastDeadLine" xml:space="preserve">
+    <value>Application DeadLine </value>
+  </data>
+  <data name="lastName" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
   <data name="LastRegistration" xml:space="preserve">
     <value>Last Registration</value>
   </data>
@@ -1191,6 +1143,9 @@
   <data name="latestBlog" xml:space="preserve">
     <value>Latest Blog</value>
   </data>
+  <data name="Latitude" xml:space="preserve">
+    <value>Latitude</value>
+  </data>
   <data name="LearnMore" xml:space="preserve">
     <value>Learn More</value>
   </data>
@@ -1200,17 +1155,32 @@
   <data name="LeaveComments" xml:space="preserve">
     <value>Leave Comments</value>
   </data>
+  <data name="left" xml:space="preserve">
+    <value>Left</value>
+  </data>
   <data name="LeftToRight" xml:space="preserve">
     <value>Left To Right</value>
   </data>
   <data name="LifeInTurkey" xml:space="preserve">
     <value>Life In Turkey</value>
   </data>
+  <data name="LikedProducts" xml:space="preserve">
+    <value>Products Liked</value>
+  </data>
   <data name="link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="link1" xml:space="preserve">
     <value>Quick Link</value>
+  </data>
+  <data name="Linkedin" xml:space="preserve">
+    <value>Linkedin</value>
   </data>
   <data name="LinkPermission" xml:space="preserve">
     <value>Link Permission</value>
+  </data>
+  <data name="LoactionTax" xml:space="preserve">
+    <value>Location/Tax</value>
   </data>
   <data name="login" xml:space="preserve">
     <value>Login</value>
@@ -1221,19 +1191,28 @@
   <data name="loginPage" xml:space="preserve">
     <value>Login Page</value>
   </data>
+  <data name="logo" xml:space="preserve">
+    <value>logo</value>
+  </data>
   <data name="logout" xml:space="preserve">
     <value>Log Out</value>
   </data>
-  <data name="MainMenu" xml:space="preserve">
-    <value>القوائم الرئيسية</value>
+  <data name="Longitude" xml:space="preserve">
+    <value>Longitude</value>
   </data>
-  <data name="MainMenu1" xml:space="preserve">
+  <data name="LowofStock" xml:space="preserve">
+    <value>Product Stock</value>
+  </data>
+  <data name="MailingList" xml:space="preserve">
+    <value>Mailing List</value>
+  </data>
+  <data name="MainMenu" xml:space="preserve">
     <value>Main Menu</value>
   </data>
-  <data name="maintit" xml:space="preserve">
-    <value>عقاراتي - احصائيات</value>
+  <data name="MainMenuTitle" xml:space="preserve">
+    <value>Menu Name</value>
   </data>
-  <data name="maintit1" xml:space="preserve">
+  <data name="maintit" xml:space="preserve">
     <value>Aqarati - Statistics</value>
   </data>
   <data name="mainTitle" xml:space="preserve">
@@ -1254,10 +1233,10 @@
   <data name="ManageValuesOptions" xml:space="preserve">
     <value>Manage Values Options</value>
   </data>
-  <data name="manufacure" xml:space="preserve">
-    <value>الشركات المصنعه</value>
+  <data name="ManageVendors" xml:space="preserve">
+    <value>Manage Vendors</value>
   </data>
-  <data name="manufacure1" xml:space="preserve">
+  <data name="manufacure" xml:space="preserve">
     <value>Manufacturers</value>
   </data>
   <data name="March" xml:space="preserve">
@@ -1287,11 +1266,20 @@
   <data name="Message" xml:space="preserve">
     <value>Message</value>
   </data>
+  <data name="Message1" xml:space="preserve">
+    <value>Message</value>
+  </data>
   <data name="Messages" xml:space="preserve">
     <value>Messages</value>
   </data>
+  <data name="MessagesCount" xml:space="preserve">
+    <value>MessagesCount</value>
+  </data>
   <data name="MinOrderLimit" xml:space="preserve">
     <value>Min Order Limit</value>
+  </data>
+  <data name="Mobile" xml:space="preserve">
+    <value>Mobile</value>
   </data>
   <data name="MobileVal" xml:space="preserve">
     <value>Invalid Mobile Number</value>
@@ -1320,14 +1308,17 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="Name1" xml:space="preserve">
+    <value>Name</value>
+  </data>
   <data name="NewAddress" xml:space="preserve">
     <value>New Address</value>
   </data>
   <data name="NewCustomer" xml:space="preserve">
     <value>New Customer</value>
   </data>
-  <data name="NewOrders" xml:space="preserve">
-    <value>New Orders</value>
+  <data name="NewPassword" xml:space="preserve">
+    <value>New Password</value>
   </data>
   <data name="News" xml:space="preserve">
     <value>News</value>
@@ -1336,10 +1327,7 @@
     <value>News Categories</value>
   </data>
   <data name="NewsLetter" xml:space="preserve">
-    <value>إرسال الايميل</value>
-  </data>
-  <data name="NewsLetter1" xml:space="preserve">
-    <value>NewsLetter</value>
+    <value>Send  NewsLetter</value>
   </data>
   <data name="NewsletterSubscription" xml:space="preserve">
     <value>News letter Subscription</value>
@@ -1348,9 +1336,6 @@
     <value>New Stores</value>
   </data>
   <data name="NickNames" xml:space="preserve">
-    <value>أسماء وصور المستخدمين الافتراضية</value>
-  </data>
-  <data name="NickNames1" xml:space="preserve">
     <value>Nicknames</value>
   </data>
   <data name="No" xml:space="preserve">
@@ -1371,7 +1356,7 @@
   <data name="noOption" xml:space="preserve">
     <value>No record found! Please click on "Add Default Options" to add Options.</value>
   </data>
-  <data name="NoProducts" xml:space="preserve">
+  <data name="noproducts" xml:space="preserve">
     <value>No Products in Cart .</value>
   </data>
   <data name="NoRecordfound" xml:space="preserve">
@@ -1379,6 +1364,9 @@
   </data>
   <data name="NoResult" xml:space="preserve">
     <value>There are no results to display</value>
+  </data>
+  <data name="notActive" xml:space="preserve">
+    <value>Not Active</value>
   </data>
   <data name="NotActiveUser" xml:space="preserve">
     <value>This user is not active</value>
@@ -1389,20 +1377,23 @@
   <data name="notAvOp" xml:space="preserve">
     <value>This Product Option not available in stock now</value>
   </data>
-  <data name="NotDeleteProductInOrder" xml:space="preserve">
-    <value>Can not Delete Product Have Orders Or Items Cannot Be Deleted</value>
-  </data>
   <data name="notes" xml:space="preserve">
     <value>Notes</value>
   </data>
   <data name="November" xml:space="preserve">
     <value>November</value>
   </data>
+  <data name="Objectives" xml:space="preserve">
+    <value>Objectives</value>
+  </data>
   <data name="October" xml:space="preserve">
     <value>October</value>
   </data>
-  <data name="OldPassword" xml:space="preserve">
-    <value>Old Password</value>
+  <data name="Office" xml:space="preserve">
+    <value>Office</value>
+  </data>
+  <data name="OfficeAqar" xml:space="preserve">
+    <value>Properties Office</value>
   </data>
   <data name="OneWeek" xml:space="preserve">
     <value>One Week</value>
@@ -1428,14 +1419,20 @@
   <data name="OrderId" xml:space="preserve">
     <value>Order ID</value>
   </data>
+  <data name="Orders" xml:space="preserve">
+    <value>Orders</value>
+  </data>
+  <data name="OrdersStatus" xml:space="preserve">
+    <value>Orders Status</value>
+  </data>
+  <data name="OrderStatusName" xml:space="preserve">
+    <value>Order Status Name</value>
+  </data>
   <data name="OrderSummary" xml:space="preserve">
     <value>Order Summary</value>
   </data>
   <data name="OrderTime" xml:space="preserve">
     <value>Delivery Time</value>
-  </data>
-  <data name="OrUsing" xml:space="preserve">
-    <value>OR using</value>
   </data>
   <data name="OtherCourse" xml:space="preserve">
     <value>Other Course</value>
@@ -1452,8 +1449,14 @@
   <data name="OurLocation" xml:space="preserve">
     <value>Our Location</value>
   </data>
+  <data name="OutofStock" xml:space="preserve">
+    <value>Out Stock Products</value>
+  </data>
   <data name="passwnotequal" xml:space="preserve">
     <value>Password confirmation does not match password!</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
   </data>
   <data name="PasswordChangedSuccessfully" xml:space="preserve">
     <value>password changed successfully please login again!</value>
@@ -1482,6 +1485,9 @@
   <data name="PaymentMethod" xml:space="preserve">
     <value>Payment Method</value>
   </data>
+  <data name="PendingOrders" xml:space="preserve">
+    <value>Pending Orders</value>
+  </data>
   <data name="PendOrdMsg" xml:space="preserve">
     <value>The order has been successfully added, awaiting approval</value>
   </data>
@@ -1490,6 +1496,9 @@
   </data>
   <data name="PersonalInfo" xml:space="preserve">
     <value>Personal Info</value>
+  </data>
+  <data name="Pio" xml:space="preserve">
+    <value>Pio</value>
   </data>
   <data name="plzAgree" xml:space="preserve">
     <value>Please check approval Privacy Policy </value>
@@ -1518,13 +1527,19 @@
   <data name="popularproducts" xml:space="preserve">
     <value>Popular Products</value>
   </data>
+  <data name="position" xml:space="preserve">
+    <value>Position</value>
+  </data>
   <data name="postCode" xml:space="preserve">
     <value>Post Code</value>
   </data>
   <data name="PoweredBy" xml:space="preserve">
     <value>Powered By</value>
   </data>
-  <data name="Price" xml:space="preserve">
+  <data name="price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="Price1" xml:space="preserve">
     <value>Price</value>
   </data>
   <data name="Print" xml:space="preserve">
@@ -1563,29 +1578,50 @@
   <data name="ProductType" xml:space="preserve">
     <value>Product Type</value>
   </data>
+  <data name="PromoPrice" xml:space="preserve">
+    <value>Promo Price</value>
+  </data>
   <data name="Properties" xml:space="preserve">
     <value>Properties</value>
   </data>
-  <data name="PropertyTypes" xml:space="preserve">
-    <value>تصنيفات العقارات</value>
+  <data name="PropertyAddress" xml:space="preserve">
+    <value>Property Address</value>
   </data>
-  <data name="PropertyTypes1" xml:space="preserve">
+  <data name="PropertyAr" xml:space="preserve">
+    <value>Type in Arabic</value>
+  </data>
+  <data name="propertyArea" xml:space="preserve">
+    <value>Property Area</value>
+  </data>
+  <data name="PropertyColor" xml:space="preserve">
+    <value>Type Color</value>
+  </data>
+  <data name="PropertyEn" xml:space="preserve">
+    <value>Type in English</value>
+  </data>
+  <data name="PropertyInterface" xml:space="preserve">
+    <value>Property Interface</value>
+  </data>
+  <data name="propertyprice" xml:space="preserve">
+    <value>Property Price</value>
+  </data>
+  <data name="PropertyState" xml:space="preserve">
+    <value>Property State</value>
+  </data>
+  <data name="PropertyTitle" xml:space="preserve">
+    <value>Property Title</value>
+  </data>
+  <data name="propertyType" xml:space="preserve">
+    <value>Property Type</value>
+  </data>
+  <data name="PropertyTypes" xml:space="preserve">
     <value>Property Types</value>
   </data>
   <data name="PropertyTypesAdd" xml:space="preserve">
-    <value>اضافة تصنيف عقار</value>
-  </data>
-  <data name="PropertyTypesAdd1" xml:space="preserve">
     <value>Add Property Type</value>
   </data>
   <data name="PropertyTypesEdit" xml:space="preserve">
-    <value>تعديل تصنيف عقار</value>
-  </data>
-  <data name="PropertyTypesEdit1" xml:space="preserve">
     <value>Edit Property Type</value>
-  </data>
-  <data name="purchase" xml:space="preserve">
-    <value>Purchase</value>
   </data>
   <data name="purchasenow" xml:space="preserve">
     <value>Purchase Now</value>
@@ -1593,22 +1629,28 @@
   <data name="qty" xml:space="preserve">
     <value>Quantity</value>
   </data>
-  <data name="Question" xml:space="preserve">
-    <value>تص السؤال</value>
+  <data name="Qualification" xml:space="preserve">
+    <value>Qualifications</value>
   </data>
-  <data name="Question1" xml:space="preserve">
+  <data name="QueryDetails" xml:space="preserve">
+    <value>Inquiry Details</value>
+  </data>
+  <data name="QueryDone" xml:space="preserve">
+    <value>Inquiry Done</value>
+  </data>
+  <data name="QueryDoneDate" xml:space="preserve">
+    <value>Inquiry Done Date</value>
+  </data>
+  <data name="QueryTitle" xml:space="preserve">
+    <value>Inquiry Title</value>
+  </data>
+  <data name="Question" xml:space="preserve">
     <value>Question Text</value>
   </data>
   <data name="Questions" xml:space="preserve">
-    <value>الاسئلة</value>
-  </data>
-  <data name="Questions1" xml:space="preserve">
     <value>Questions</value>
   </data>
   <data name="QuestionTitle" xml:space="preserve">
-    <value>عنوان السؤال</value>
-  </data>
-  <data name="QuestionTitle1" xml:space="preserve">
     <value>Question Title</value>
   </data>
   <data name="QuickView" xml:space="preserve">
@@ -1620,17 +1662,17 @@
   <data name="QuiqLinks" xml:space="preserve">
     <value>QUICK LINKS</value>
   </data>
-  <data name="rangAsc" xml:space="preserve">
-    <value>Ascending Order</value>
-  </data>
-  <data name="rangDec" xml:space="preserve">
-    <value>Descending Order</value>
-  </data>
   <data name="Rating" xml:space="preserve">
     <value>Rating</value>
   </data>
   <data name="readMore" xml:space="preserve">
     <value>Read More</value>
+  </data>
+  <data name="receiverImage" xml:space="preserve">
+    <value>Receiver Image</value>
+  </data>
+  <data name="receiverName" xml:space="preserve">
+    <value>Receiver Name</value>
   </data>
   <data name="RecentlyAddedProducts" xml:space="preserve">
     <value>Recently Added Products</value>
@@ -1644,34 +1686,28 @@
   <data name="RefineSearch" xml:space="preserve">
     <value>Refine Search</value>
   </data>
+  <data name="RegionCode" xml:space="preserve">
+    <value>Zone Code</value>
+  </data>
+  <data name="RegionCount" xml:space="preserve">
+    <value>Cities Count</value>
+  </data>
+  <data name="RegionName" xml:space="preserve">
+    <value>Zone Name</value>
+  </data>
   <data name="Regions" xml:space="preserve">
-    <value>المناطق</value>
+    <value>Zones</value>
   </data>
   <data name="Regions1" xml:space="preserve">
-    <value>مدن المنطقة</value>
-  </data>
-  <data name="Regions11" xml:space="preserve">
     <value>Region Cities</value>
   </data>
   <data name="Regions2" xml:space="preserve">
-    <value>أقسام المناطق</value>
-  </data>
-  <data name="Regions21" xml:space="preserve">
     <value>Regions Sections</value>
   </data>
-  <data name="Regions3" xml:space="preserve">
-    <value>Zones</value>
-  </data>
   <data name="RegionsAdd" xml:space="preserve">
-    <value>اضافة منطقة</value>
-  </data>
-  <data name="RegionsAdd1" xml:space="preserve">
     <value>Add Zone</value>
   </data>
   <data name="RegionsEdit" xml:space="preserve">
-    <value>تعديل منطقة</value>
-  </data>
-  <data name="RegionsEdit1" xml:space="preserve">
     <value>Edit Zone</value>
   </data>
   <data name="Register" xml:space="preserve">
@@ -1692,6 +1728,9 @@
   <data name="Registration" xml:space="preserve">
     <value>for Registration</value>
   </data>
+  <data name="RegistrationDate" xml:space="preserve">
+    <value>Registration Date</value>
+  </data>
   <data name="repeat" xml:space="preserve">
     <value>City Name Already Exists</value>
   </data>
@@ -1699,16 +1738,16 @@
     <value>Name Already Exists</value>
   </data>
   <data name="replies" xml:space="preserve">
-    <value>اضافة رد</value>
-  </data>
-  <data name="replies1" xml:space="preserve">
     <value>reply</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Reports</value>
   </data>
   <data name="Required" xml:space="preserve">
     <value>This field is required.</value>
   </data>
-  <data name="ReSendCode" xml:space="preserve">
-    <value>ReSendCode</value>
+  <data name="Requirement" xml:space="preserve">
+    <value>Requirements</value>
   </data>
   <data name="ResetPassword" xml:space="preserve">
     <value>Reset Password</value>
@@ -1725,25 +1764,28 @@
   <data name="Reviews1" xml:space="preserve">
     <value>Reviews</value>
   </data>
+  <data name="right" xml:space="preserve">
+    <value>Right</value>
+  </data>
   <data name="RightToLeft" xml:space="preserve">
     <value>Right To Left</value>
   </data>
   <data name="sale" xml:space="preserve">
     <value>sale</value>
   </data>
+  <data name="SalesReport" xml:space="preserve">
+    <value>Sales Report</value>
+  </data>
   <data name="save" xml:space="preserve">
     <value>Save</value>
   </data>
   <data name="SaveContinue" xml:space="preserve">
-    <value>حفظ و استمرار</value>
-  </data>
-  <data name="SaveContinue1" xml:space="preserve">
     <value>Save &amp; Continue</value>
   </data>
-  <data name="Scholarships" xml:space="preserve">
-    <value>المنح الدراسية</value>
+  <data name="Scholarship" xml:space="preserve">
+    <value>Scholarship</value>
   </data>
-  <data name="Scholarships1" xml:space="preserve">
+  <data name="Scholarships" xml:space="preserve">
     <value>Scholarships</value>
   </data>
   <data name="search" xml:space="preserve">
@@ -1791,10 +1833,16 @@
   <data name="Send" xml:space="preserve">
     <value>Send</value>
   </data>
-  <data name="SendLetter" xml:space="preserve">
-    <value>ارسال رسالة</value>
+  <data name="SendDate" xml:space="preserve">
+    <value>Send Date</value>
   </data>
-  <data name="SendLetter1" xml:space="preserve">
+  <data name="senderImage" xml:space="preserve">
+    <value>Sender Image</value>
+  </data>
+  <data name="senderName" xml:space="preserve">
+    <value>Sender Name</value>
+  </data>
+  <data name="SendLetter" xml:space="preserve">
     <value>Send Letter</value>
   </data>
   <data name="sendMessage" xml:space="preserve">
@@ -1803,43 +1851,64 @@
   <data name="September" xml:space="preserve">
     <value>September</value>
   </data>
+  <data name="ServiceArPrice" xml:space="preserve">
+    <value>Service Price in Arabic</value>
+  </data>
+  <data name="ServiceDetails" xml:space="preserve">
+    <value>Service Details</value>
+  </data>
+  <data name="ServiceDone" xml:space="preserve">
+    <value>Done Service</value>
+  </data>
+  <data name="ServiceDoneDate" xml:space="preserve">
+    <value>Service Done Date</value>
+  </data>
+  <data name="ServiceEnPrice" xml:space="preserve">
+    <value>Service Price in English</value>
+  </data>
   <data name="Services" xml:space="preserve">
-    <value>الخدمات</value>
+    <value>Services</value>
   </data>
   <data name="Services1" xml:space="preserve">
     <value>Services</value>
   </data>
-  <data name="Services2" xml:space="preserve">
-    <value>Services</value>
+  <data name="ServicesName" xml:space="preserve">
+    <value>Services Name</value>
+  </data>
+  <data name="ServiceType" xml:space="preserve">
+    <value>Service Type</value>
+  </data>
+  <data name="ServiceTypeArCode" xml:space="preserve">
+    <value>Service Type in Arabic</value>
+  </data>
+  <data name="ServiceTypeEnCode" xml:space="preserve">
+    <value>Service Type in English</value>
   </data>
   <data name="ServiceTypes" xml:space="preserve">
-    <value>تصنيفات الخدمات</value>
-  </data>
-  <data name="ServiceTypes1" xml:space="preserve">
     <value>Service Types</value>
   </data>
   <data name="ServiceTypesAdd" xml:space="preserve">
-    <value>اضافة تصنيف خدمة</value>
-  </data>
-  <data name="ServiceTypesAdd1" xml:space="preserve">
     <value>Add Service Type</value>
   </data>
   <data name="ServiceTypesEdit" xml:space="preserve">
-    <value>تعديل تصنيف خدمة</value>
-  </data>
-  <data name="ServiceTypesEdit1" xml:space="preserve">
     <value>Edit Service Type</value>
   </data>
-  <data name="Setting" xml:space="preserve">
-    <value>الإعدادات</value>
+  <data name="ServiceUser" xml:space="preserve">
+    <value>Service Owner</value>
   </data>
-  <data name="Setting1" xml:space="preserve">
+  <data name="Setting" xml:space="preserve">
     <value>Setting</value>
   </data>
-  <data name="share" xml:space="preserve">
-    <value>شارك هذه القصة ، اختر الموقع الخاص بك</value>
+  <data name="Setting(Website)" xml:space="preserve">
+    <value>Setting(Website)</value>
   </data>
-  <data name="share1" xml:space="preserve">
+  <data name="settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings(Mobile)" xml:space="preserve">
+    <value>Settings(Mobile)</value>
+  </data>
+  <data name="share" xml:space="preserve">
     <value>share this story, choose your platform</value>
   </data>
   <data name="SharingLink" xml:space="preserve">
@@ -1869,6 +1938,12 @@
   <data name="showColleges" xml:space="preserve">
     <value>Show Colleges</value>
   </data>
+  <data name="showInHome" xml:space="preserve">
+    <value>show In Home</value>
+  </data>
+  <data name="ShowMailingList" xml:space="preserve">
+    <value>Show Mailing List</value>
+  </data>
   <data name="showScolerships" xml:space="preserve">
     <value>Show Scolerships</value>
   </data>
@@ -1881,26 +1956,20 @@
   <data name="showTrainee" xml:space="preserve">
     <value>View Trainee</value>
   </data>
-  <data name="Sign" xml:space="preserve">
-    <value>Sign in to start your session</value>
-  </data>
-  <data name="Simple" xml:space="preserve">
-    <value>Simple</value>
-  </data>
   <data name="slider" xml:space="preserve">
-    <value>الشرائح الرئيسية</value>
-  </data>
-  <data name="slider1" xml:space="preserve">
     <value>Sliders</value>
+  </data>
+  <data name="SliderImages" xml:space="preserve">
+    <value>Slider Images</value>
   </data>
   <data name="sliderlink" xml:space="preserve">
     <value>Slider Link</value>
   </data>
+  <data name="sliderTitle" xml:space="preserve">
+    <value>Slider Title</value>
+  </data>
   <data name="social" xml:space="preserve">
     <value>Social Media</value>
-  </data>
-  <data name="SocialAccountCanNotResetPassword" xml:space="preserve">
-    <value>Social accounts can not reset or change password!</value>
   </data>
   <data name="soon" xml:space="preserve">
     <value>Coming Soon</value>
@@ -1915,15 +1984,9 @@
     <value>Special</value>
   </data>
   <data name="Specialization" xml:space="preserve">
-    <value>التخصص</value>
-  </data>
-  <data name="Specialization1" xml:space="preserve">
     <value>Specialization</value>
   </data>
   <data name="Specializations" xml:space="preserve">
-    <value>التخصصات العلمية</value>
-  </data>
-  <data name="Specializations1" xml:space="preserve">
     <value>Specializations</value>
   </data>
   <data name="SpecialOffers" xml:space="preserve">
@@ -1935,26 +1998,35 @@
   <data name="Specification" xml:space="preserve">
     <value>Specification</value>
   </data>
-  <data name="Specifications" xml:space="preserve">
-    <value>Specifications</value>
-  </data>
   <data name="Sports" xml:space="preserve">
-    <value>أنواع الرياضة</value>
-  </data>
-  <data name="Sports1" xml:space="preserve">
     <value>Sports</value>
   </data>
+  <data name="sportTitle" xml:space="preserve">
+    <value>Sport Title</value>
+  </data>
+  <data name="StartAt" xml:space="preserve">
+    <value>Start Date</value>
+  </data>
   <data name="state" xml:space="preserve">
-    <value>حالة المستخدم</value>
+    <value>State</value>
   </data>
   <data name="state1" xml:space="preserve">
     <value>state</value>
   </data>
-  <data name="StaticList" xml:space="preserve">
-    <value>قائمة الثوابت</value>
+  <data name="StaticArCode" xml:space="preserve">
+    <value>Constant in Arabic</value>
   </data>
-  <data name="StaticList1" xml:space="preserve">
+  <data name="StaticEnCode" xml:space="preserve">
+    <value>Constant in English</value>
+  </data>
+  <data name="StaticList" xml:space="preserve">
     <value>Constants</value>
+  </data>
+  <data name="staticPages" xml:space="preserve">
+    <value>Static Pages</value>
+  </data>
+  <data name="status" xml:space="preserve">
+    <value>Status</value>
   </data>
   <data name="store" xml:space="preserve">
     <value>Store</value>
@@ -1968,8 +2040,14 @@
   <data name="storesyouwilllove" xml:space="preserve">
     <value>Stores You'll Love</value>
   </data>
-  <data name="streetAddress" xml:space="preserve">
+  <data name="StreetAddress" xml:space="preserve">
+    <value>Street Address</value>
+  </data>
+  <data name="streetAddress1" xml:space="preserve">
     <value>Street</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value>Media Settings</value>
   </data>
   <data name="subcategories" xml:space="preserve">
     <value>Sub Categories</value>
@@ -1977,14 +2055,17 @@
   <data name="subjcet" xml:space="preserve">
     <value>Subject</value>
   </data>
-  <data name="Submit" xml:space="preserve">
-    <value>إرسال</value>
+  <data name="Subject" xml:space="preserve">
+    <value>Subject</value>
   </data>
-  <data name="Submit1" xml:space="preserve">
+  <data name="Submit" xml:space="preserve">
     <value>Submit</value>
   </data>
   <data name="subscribe" xml:space="preserve">
     <value>Subscribe</value>
+  </data>
+  <data name="subscribeDate" xml:space="preserve">
+    <value>Subscribe Date</value>
   </data>
   <data name="SubscribeForNewsletter" xml:space="preserve">
     <value>Subscribe For Newsletter</value>
@@ -2016,11 +2097,17 @@
   <data name="successSend" xml:space="preserve">
     <value>Send successfully</value>
   </data>
+  <data name="Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
   <data name="sure" xml:space="preserve">
     <value>Sure</value>
   </data>
   <data name="sureLink" xml:space="preserve">
     <value>Please make sure the link</value>
+  </data>
+  <data name="symbol" xml:space="preserve">
+    <value>Symbol</value>
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
@@ -2033,6 +2120,12 @@
   </data>
   <data name="taxrate" xml:space="preserve">
     <value>Tax Rates</value>
+  </data>
+  <data name="TeamName" xml:space="preserve">
+    <value>Team Name</value>
+  </data>
+  <data name="Tel" xml:space="preserve">
+    <value>Telephone</value>
   </data>
   <data name="TermsConditions" xml:space="preserve">
     <value>Terms &amp; Conditions</value>
@@ -2061,6 +2154,9 @@
   <data name="ThumbnailWidth" xml:space="preserve">
     <value>Thumbnail Width</value>
   </data>
+  <data name="Times" xml:space="preserve">
+    <value>Times</value>
+  </data>
   <data name="title" xml:space="preserve">
     <value>Title</value>
   </data>
@@ -2070,19 +2166,25 @@
   <data name="total" xml:space="preserve">
     <value>TOTAL</value>
   </data>
-  <data name="Trainee" xml:space="preserve">
-    <value>المتدربين</value>
+  <data name="TotalProducts" xml:space="preserve">
+    <value>Total Products</value>
   </data>
-  <data name="Trainee1" xml:space="preserve">
+  <data name="TotalPurchased" xml:space="preserve">
+    <value>Total Purchased</value>
+  </data>
+  <data name="TotalPurchasedMoney" xml:space="preserve">
+    <value>Total Purchased Money</value>
+  </data>
+  <data name="TotalTransactions" xml:space="preserve">
+    <value>Total Transactions</value>
+  </data>
+  <data name="Trainee" xml:space="preserve">
     <value>Trainee</value>
   </data>
   <data name="traineeCount" xml:space="preserve">
     <value>Trainee Count</value>
   </data>
   <data name="Trainer" xml:space="preserve">
-    <value>المدربين</value>
-  </data>
-  <data name="Trainer1" xml:space="preserve">
     <value>Trainer</value>
   </data>
   <data name="TrainingCourse" xml:space="preserve">
@@ -2091,11 +2193,23 @@
   <data name="Transactions" xml:space="preserve">
     <value>Transactions</value>
   </data>
+  <data name="tryes" xml:space="preserve">
+    <value>Login Attempts</value>
+  </data>
+  <data name="Twitter" xml:space="preserve">
+    <value>Twitter</value>
+  </data>
   <data name="TwoWeek" xml:space="preserve">
     <value>Two Week</value>
   </data>
-  <data name="Type" xml:space="preserve">
+  <data name="type" xml:space="preserve">
+    <value>Message Type</value>
+  </data>
+  <data name="Type1" xml:space="preserve">
     <value>Type</value>
+  </data>
+  <data name="TypeofRegistration" xml:space="preserve">
+    <value>Type of Registration</value>
   </data>
   <data name="uniqUser" xml:space="preserve">
     <value>Email already exists</value>
@@ -2110,13 +2224,19 @@
     <value>Universities</value>
   </data>
   <data name="University" xml:space="preserve">
-    <value>الجامعات</value>
-  </data>
-  <data name="University1" xml:space="preserve">
     <value>Universities</value>
+  </data>
+  <data name="UniversityName" xml:space="preserve">
+    <value>University Name</value>
+  </data>
+  <data name="UniversityPhotos" xml:space="preserve">
+    <value>University Photos</value>
   </data>
   <data name="updateDate" xml:space="preserve">
     <value>Modified Date</value>
+  </data>
+  <data name="url" xml:space="preserve">
+    <value>URL</value>
   </data>
   <data name="UsCouponCode" xml:space="preserve">
     <value>Use Coupon Code</value>
@@ -2125,13 +2245,10 @@
     <value>User Permission</value>
   </data>
   <data name="Users" xml:space="preserve">
-    <value>المستخدمين</value>
-  </data>
-  <data name="Users1" xml:space="preserve">
     <value>Customers</value>
   </data>
-  <data name="Variable" xml:space="preserve">
-    <value>Variable</value>
+  <data name="Value" xml:space="preserve">
+    <value>Value</value>
   </data>
   <data name="VAT" xml:space="preserve">
     <value>VAT</value>
@@ -2142,20 +2259,20 @@
   <data name="Vendors" xml:space="preserve">
     <value>Vendors</value>
   </data>
+  <data name="VendorsSalesReport" xml:space="preserve">
+    <value>Vendors Sales Report</value>
+  </data>
   <data name="verify" xml:space="preserve">
     <value>Account Verification</value>
   </data>
   <data name="verifyCode" xml:space="preserve">
     <value>Verification Code</value>
   </data>
-  <data name="VerifyEmail" xml:space="preserve">
-    <value>Please Verify Your Email</value>
-  </data>
-  <data name="VerifyMobile" xml:space="preserve">
-    <value>Please Verify Mobile Number , Mobile must be at most 14 numbers</value>
-  </data>
   <data name="ViewAllCustomers" xml:space="preserve">
     <value>View All Customers</value>
+  </data>
+  <data name="ViewAllOrders" xml:space="preserve">
+    <value>View All Orders</value>
   </data>
   <data name="ViewAllProducts" xml:space="preserve">
     <value>View All Products</value>
@@ -2164,79 +2281,52 @@
     <value>View All Stores</value>
   </data>
   <data name="ViewArticle" xml:space="preserve">
-    <value>عرض المقالات</value>
-  </data>
-  <data name="ViewArticle1" xml:space="preserve">
     <value>View Article</value>
   </data>
   <data name="ViewArticleCategory" xml:space="preserve">
-    <value>عرض تصنيفات المقالات</value>
-  </data>
-  <data name="ViewArticleCategory1" xml:space="preserve">
     <value>View Article Category</value>
   </data>
   <data name="ViewCart" xml:space="preserve">
     <value>View Cart</value>
   </data>
   <data name="ViewClasses" xml:space="preserve">
-    <value>عرض الصفوف</value>
-  </data>
-  <data name="ViewClasses1" xml:space="preserve">
     <value>View Classes</value>
   </data>
   <data name="ViewCountry" xml:space="preserve">
-    <value>عرض الدول</value>
-  </data>
-  <data name="ViewCountry1" xml:space="preserve">
     <value>View Countries</value>
   </data>
   <data name="ViewCourse" xml:space="preserve">
-    <value>عرض الدورات التدريبية</value>
-  </data>
-  <data name="ViewCourse1" xml:space="preserve">
     <value>View Course</value>
   </data>
   <data name="ViewCourseCategory" xml:space="preserve">
-    <value>عرض تصنيفات الدورات</value>
-  </data>
-  <data name="ViewCourseCategory1" xml:space="preserve">
     <value>View Course Category</value>
   </data>
   <data name="ViewMainMenu" xml:space="preserve">
-    <value>عرض القوائم الرئيسية</value>
-  </data>
-  <data name="ViewMainMenu1" xml:space="preserve">
     <value>View Main Menu</value>
   </data>
   <data name="views" xml:space="preserve">
     <value>Views</value>
   </data>
   <data name="ViewServices" xml:space="preserve">
-    <value>عرض الخدمات</value>
-  </data>
-  <data name="ViewServices1" xml:space="preserve">
     <value>View Services</value>
   </data>
   <data name="ViewSlider" xml:space="preserve">
-    <value>عرض الشرائح</value>
-  </data>
-  <data name="ViewSlider1" xml:space="preserve">
     <value>View Sliders</value>
   </data>
-  <data name="ViewSubscriber" xml:space="preserve">
-    <value>عرض المشتركين</value>
+  <data name="viewStock" xml:space="preserve">
+    <value>View Stock</value>
   </data>
-  <data name="ViewSubscriber1" xml:space="preserve">
+  <data name="ViewSubscriber" xml:space="preserve">
     <value>View Subscriber</value>
   </data>
   <data name="ViewTrainer" xml:space="preserve">
-    <value>عرض المدربين</value>
-  </data>
-  <data name="ViewTrainer1" xml:space="preserve">
     <value>View Trainer</value>
   </data>
   <data name="ViewYourOrderHistory" xml:space="preserve">
     <value>View Your Order History</value>
+  </data>
+  <data name="VisitsCount" xml:space="preserve">
+    <value>Visits Count</value>
   </data>
   <data name="warn" xml:space="preserve">
     <value>Warning</value>
@@ -2268,9 +2358,6 @@
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>
   </data>
-  <data name="Youhave" xml:space="preserve">
-    <value>You have</value>
-  </data>
   <data name="YourPersonalDetails" xml:space="preserve">
     <value>Your Personal Details</value>
   </data>
@@ -2280,7 +2367,13 @@
   <data name="YourReviewUpdatedSuccessfully" xml:space="preserve">
     <value>Your Review for This Product  Updated Successfully</value>
   </data>
+  <data name="zip" xml:space="preserve">
+    <value>Zip/Postal Code</value>
+  </data>
   <data name="zone" xml:space="preserve">
-    <value>zone</value>
+    <value>Zone</value>
+  </data>
+  <data name="zones" xml:space="preserve">
+    <value>Zones</value>
   </data>
 </root>

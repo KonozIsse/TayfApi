@@ -1,7 +1,4 @@
-﻿@page "/zone/create"
-@inject LocationTaxBL _locationTaxBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
+﻿@page "/Zone/Add"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("RegionsAdd")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -79,7 +76,7 @@
 
                                                 <div class="box-footer text-center">
                                                     <button type="submit" class="btn btn-primary" >@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                    <a href="/CP/Zones" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                    <a href="/Zones" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                                 </div>
                                             </EditForm>
                                         </div>

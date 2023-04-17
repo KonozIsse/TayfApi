@@ -1,4 +1,4 @@
-﻿@page "/CP/Categories/{Id:int}/AddSubCategories"
+﻿@page "/Categories/{Id:int}/AddSubCategories"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("AddSubCategories") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -6,8 +6,8 @@
     <h1>@SharedLocalize.GetLocalizedStringValue("AddSubCategories")<small>@SharedLocalize.GetLocalizedStringValue("EditSubCategories")</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard"><a href="/">@SharedLocalize.GetLocalizedStringValue("dashboard")</a></li>
-        <li class="fa fa-users"><a href="/CP/Categories">@SharedLocalize.GetLocalizedStringValue("categories")</a></li>
-        <li class="fa fa-users"><a href="/CP/Categories/SubCategories/@Id">@SharedLocalize.GetLocalizedStringValue("categories")</a> </li>
+        <li class="fa fa-users"><a href="/Categories">@SharedLocalize.GetLocalizedStringValue("categories")</a></li>
+        <li class="fa fa-users"><a href="/Categories/SubCategories/@Id">@SharedLocalize.GetLocalizedStringValue("categories")</a> </li>
         <li class="active">@SharedLocalize.GetLocalizedStringValue("AddSubCategories")</li>
     </ol>
 </section>
@@ -60,7 +60,7 @@
                                                                 <div class="modal-body manufacturer-image-embed">
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <a href="/CP/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                    <a href="/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                                     <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
                                                                     <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
                                                                 </div>
@@ -102,7 +102,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a class="btn btn-defult" href="/CP/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a class="btn btn-defult" href="/Categories">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>

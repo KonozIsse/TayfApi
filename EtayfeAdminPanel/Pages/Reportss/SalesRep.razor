@@ -1,16 +1,12 @@
-﻿@page "/CP/Reports/SalesRep"
-@inject OrderBL _orderBL
-@inject UserBL _userBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-<PageTitle>@SharedLocalize.GetLocalizedStringValue("salesReport") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+﻿@page "/Reports/SalesRep"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("SalesReport") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 
 <section class="content-header">
-    <h1>@SharedLocalize.GetLocalizedStringValue("salesReport") <small> @SharedLocalize.GetLocalizedStringValue("salesReport")</small> </h1>
+    <h1>@SharedLocalize.GetLocalizedStringValue("SalesReport") <small> @SharedLocalize.GetLocalizedStringValue("SalesReport")</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
-        <li class="active">@SharedLocalize.GetLocalizedStringValue("salesReport") </li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("SalesReport") </li>
     </ol>
 </section>
 @if (Model != null)
@@ -23,7 +19,7 @@
             <div class="col-md-12">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("salesReport") </h3>
+                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("SalesReport") </h3>
                     </div>
                     <div class="box-header">
                         <div class="container-fluid">
@@ -51,7 +47,7 @@
                                     }
                                 </select>
 
-                                @if (vendorId == 0)
+                                @if (user.UserType == UserType.Admin)
                                 {
                                     <select type="button" class="btn btn-default sele dropdown-toggle form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true" data-toggle="dropdown" @bind="@storeId">
                                         <option value="0" selected="">@SharedLocalize.GetLocalizedStringValue("store")</option>
@@ -93,7 +89,7 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderID") </th>
+                                                <th>@SharedLocalize.GetLocalizedStringValue("OrderId") </th>
                                                 <th>@SharedLocalize.GetLocalizedStringValue("OrderStatus")</th>
                                                 <th>@SharedLocalize.GetLocalizedStringValue("vendor")</th>
                                                 <th>@SharedLocalize.GetLocalizedStringValue("Mobile")</th>
@@ -120,7 +116,7 @@
                                                     <td>@item.CustomerName</td>
                                                     <td>@item.DatePurchased</td>
 
-                                                    <td> <a href="/Orders/Index/@item.Id" target="_blank">QAR @item.OrderPrice</a></td>
+                                                    <td> <a href="/Order/View/@item.Id" target="_blank">QAR @item.OrderPrice</a></td>
                                                    
                                                 </tr>
                                             }
@@ -169,9 +165,7 @@
     public DateTime? dateTo { get; set; } 
     [Parameter]
     public string lang { get; set; }
-
-    int vendorId = 0;
-    int admin = 1;
+    public AdminDto user { get; set; }
     public List<OrderDto> Model { get; set; }
     public List<StoreDto> Stores { get; set; }
     public List<CustomerDto> Customers { get; set; }
@@ -181,7 +175,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GetAllSalesOrders();
         Customers = await _userBL.GetAllCustomer();
         Stores = await _userBL.GetStores();
@@ -189,7 +185,7 @@
     }
     async Task GetAllSalesOrders()
     {
-        Model = await _orderBL.GetAllSalesOrders(admin, search,customerId, storeId,statusId ,dateFrom, dateTo);
+        Model = await _orderBL.GetAllSalesOrders(3, search,customerId, storeId,statusId ,dateFrom, dateTo);
     }
   
 }

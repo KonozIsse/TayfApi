@@ -1,4 +1,4 @@
-﻿@page "/CP/Setting/Edit"
+﻿@page "/Setting/Edit"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditSetting") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <section class="content-header">
     <h1>@SharedLocalize.GetLocalizedStringValue("EditSetting")<small>@SharedLocalize.GetLocalizedStringValue("EditSetting")</small> </h1>
@@ -159,7 +159,7 @@
                                                                     <div class="modal-body manufacturer-image-embed">
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <a href="/CP/Media"target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                        <a href="/Media"target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                                         <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
                                                                         <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
                                                                     </div>
@@ -190,7 +190,7 @@
 
                                                 <div class="box-footer text-center">
                                                     <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                    <a class="btn btn-defult" href="/CP/Settings">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                    <a class="btn btn-defult" href="/Settings">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -213,7 +213,8 @@
     protected override async Task OnInitializedAsync()
     {
         create = new SettingVM();
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
     }
     async Task UpdateSetting()
     {

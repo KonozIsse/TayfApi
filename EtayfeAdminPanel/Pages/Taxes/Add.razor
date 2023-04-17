@@ -1,8 +1,4 @@
-﻿@page "/CP/Taxes/Add"
-@inject LocationTaxBL _locationTaxBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-
+﻿@page "/Taxes/Add"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addtaxes") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 
@@ -65,7 +61,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Taxes" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Taxes" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -87,10 +83,12 @@
 @code {
     public CreateTaxClassDto create { get; set; }
     private List<LanguageDto> languges;
-    string lang = "en";
+    public string lang { get; set; }
     protected override async Task OnInitializedAsync()
     {
         create = new CreateTaxClassDto();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         languges = await _homeBL.GetLanguages(lang);
     }
     string message = "";

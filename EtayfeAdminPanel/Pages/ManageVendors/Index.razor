@@ -1,8 +1,4 @@
-﻿@page "/CP/Vendors"
-@inject UserBL _userBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-
+﻿@page "/Vendors"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Vendors") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -36,7 +32,7 @@
                                     <div class="col-lg-4 form-inline"></div>
                                 </div>
                                 <div class="box-tools pull-right">
-                                    <a href="/CP/ManageVendors/Add/" type="button" style="width:none" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("add")</a>
+                                    <a href="/ManageVendors/Add/" type="button" style="width:none" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("add")</a>
                                </div>
                             </div>
                         </div>
@@ -84,10 +80,10 @@
                                                         @item.CreatedAt
                                                     </td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/ManageVendors/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <DeleteMessage Id="@item.Id" OnDelete="@Delete"> </DeleteMessage>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/ManageVendors/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
 
-                                                    </td>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title="@item.FirstName" @onclick="(async()=>await Delete(item.Id))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                        </td>
                                                 </tr>
 
                                             }
@@ -133,9 +129,6 @@
     public string filter { get; set; }
     [Parameter]
     public string lang { get; set; }
-
-    int vendorId = 0;
-    int admin = 1;
     public List<StoreDto> Model { get; set; }
 
     public MetaData MetaData { get; set; } = new MetaData();
@@ -143,7 +136,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetAllStores();
     }
     private async Task SelectedPage(int page)

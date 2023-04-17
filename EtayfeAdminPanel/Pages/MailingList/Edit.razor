@@ -1,9 +1,5 @@
 ﻿@page "/MailingList/Edit/"
 @page "/MailingList/Edit/{id:int}"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditEmailMessage")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <Alert Message="@message" Style="@style"></Alert>
@@ -78,7 +74,6 @@
     UpdateTemplateDto create = new UpdateTemplateDto();
     string message;
     string style;
-    string lang = "en";
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateTemplateDto();
@@ -102,6 +97,6 @@
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("MailingList/Message", true);
+        NavigationManager.NavigateTo("/MailingList/Message", true);
     }
 }

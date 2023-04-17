@@ -1,7 +1,4 @@
-﻿@page "/CP/SettingWeb/EditSlide"
-@page "/CP/SettingWeb/EditSlide/{id:int}"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
+﻿@page "/SettingWeb/EditSlide/{id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editSlider")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
@@ -150,8 +147,6 @@
     UpdateSliderDto create = new UpdateSliderDto();
     string message;
     string style;
-    string lang = "en";
-    int storeId = 3;
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateSliderDto();
@@ -161,7 +156,7 @@
     async Task UpdateSlider()
     {
         create.Id = id;
-        var result = await _homeBL.UpdateSlider(storeId,create);
+        var result = await _homeBL.UpdateSlider(3,create);
         if (result.Success)
         {
             message = result.Message;

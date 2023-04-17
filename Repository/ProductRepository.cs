@@ -53,7 +53,7 @@ namespace Repository
             .OrderByDescending(p => p.CreatedAt).Take(pageSize).ToListAsync();
 
         public async Task<List<Product>> SpecialsPage(int pageSize)
-          => await FindByCondition(c => c.SpecialProducts.Any(x => x.IsStatus == Status.Active && x.EndDate > DateTime.Now), false)
+          => await FindByCondition(c => c.SpecialProducts.IsStatus == Status.Active && c.SpecialProducts.EndDate > DateTime.Now, false)
                 .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(pageSize).ToListAsync();
 
         public async Task<List<Product>> DailyDeals()

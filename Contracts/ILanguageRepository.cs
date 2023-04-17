@@ -11,7 +11,7 @@ namespace Contracts
     {
         Task<Language> GetCodeLanguage(string lange, bool trackChanges);
         Task<Language> GetCodeLanguageId(int id, bool trackChanges);
-        Task<Language> GetDefaultLanguage(bool trackChanges);
+        Task<Language> GetDefaultLanguage();
         Task<IEnumerable<Language>> GetListLanguage(bool trackChanges);
         Task<IEnumerable<Language>> GetAllLanguage(string search , string filter);
         void DeleteLanguage(Language language);

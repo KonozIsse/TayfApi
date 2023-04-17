@@ -1,4 +1,4 @@
-﻿@page "/CP/Option/Edit/{Id:int}"
+﻿@page "/Option/Edit/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editOption") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -55,7 +55,7 @@
 
                                                 <div class="box-footer text-center">
                                                     <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                   <a class = "btn btn-defult" href=""> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                   <a class = "btn btn-defult" href="/Options"> @SharedLocalize.GetLocalizedStringValue("back")</a>
                                                 </div>
 
                                             </div>
@@ -88,7 +88,8 @@
     {
         create = new UpdateOptionDto();
         create = await _productBL.GetEditOption(Id);
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
 
     }
 

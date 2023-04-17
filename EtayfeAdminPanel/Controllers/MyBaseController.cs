@@ -88,7 +88,7 @@ namespace EtayfeAdminPanel.Controllers
         [NonAction]
         public string GetLanguage()
         {
-            var langusge = _repositoryManager.Language.GetDefaultLanguage(false).Result;
+            var langusge = _repositoryManager.Language.GetDefaultLanguage().Result;
             return langusge.Code;
         }
     }

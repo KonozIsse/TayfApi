@@ -1,6 +1,4 @@
-﻿@page "/CP/Reports/CustomerReport"
-@inject UserBL _userBL
-@inject LocService SharedLocalize
+﻿@page "/Reports/CustomerReport"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("CustomerReport") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -115,15 +113,15 @@
 @code {
      [Parameter]
     public string search { get; set; }
-    string lang = "ar";
-
+    public string lang { get; set; }
     public List<CustomerDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
 
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetCustomerTotal();
     }
     private async Task SelectedPage(int page)

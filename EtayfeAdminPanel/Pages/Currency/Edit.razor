@@ -1,7 +1,5 @@
-﻿@page "/CP/Currency/Edit"
-@page "/CP/Currency/Edit/{id:int}"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
+﻿
+@page "/Currency/Edit/{id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditCurrency")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -115,7 +113,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/currency/Index" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Currencies" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                         </div>
 
                                         </div>
@@ -142,9 +140,11 @@
     UpdateCurrencyDto create = new UpdateCurrencyDto();
     string message;
     string style;
-    string lang = "en";
+     public string lang { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         create = new UpdateCurrencyDto();
         create = await _homeBL.GetCurrency(id);
     }

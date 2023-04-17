@@ -1,8 +1,4 @@
-﻿@page "/CP/Currencies"
-@inject HomeBL _homeBL
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject IJSRuntime js
+﻿@page "/Currencies"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("currency")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -12,10 +8,7 @@
         <li class="active"> @SharedLocalize.GetLocalizedStringValue("currency")</li>
     </ol>
 </section>
-@if(Model == null)
-{
-    <p>Loading..</p>
-}else
+@if(Model != null)
 {
     <section class="content">
         <!-- Info boxes -->
@@ -26,7 +19,7 @@
                     <div class="box-header">
 
                         <div class="box-tools pull-right">
-                            <a href="/CP/Currency/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addCurrency")</a>
+                            <a href="/Currency/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addCurrency")</a>
                         </div>
                     </div>
                     <br />
@@ -83,7 +76,7 @@
 
                                                     </td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Name" href="/CP/Currency/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Name" href="/Currency/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         @if (item.IsDefault != 1)
                                                         {
                                                             <a  title=" @item.Name" @onclick="(async()=> await Delete(item))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
@@ -129,7 +122,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetCurrencies();
     }
     private async Task SelectedPage(int page)
@@ -166,7 +160,7 @@
     } 
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Currencies", true);
+        NavigationManager.NavigateTo("/Currencies", true);
     }
    
 }

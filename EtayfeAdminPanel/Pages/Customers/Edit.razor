@@ -1,5 +1,152 @@
-﻿@page "/CP/Customer/Edit"
-@page "/CP/Customer/Edit/{Id:int}"
+﻿@page "/Customer/Edit/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("EditCustomer") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("Customers") <small> @SharedLocalize.GetLocalizedStringValue("EditCustomer")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("Customers")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("EditCustomer")</li>
+    </ol>
+</section>
+<section class="content">
+    <!-- Info boxes -->
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("EditCustomer") </h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+
+                                <br>
+                                <div class="box-body">
+                                    <EditForm Model="create" OnValidSubmit="UpdateCustomer">
+                                        <div class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("firstName") </label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputText class="form-control field-validate" @bind-Value="create.FirstName"></InputText>
+                                                    <ValidationMessage For="@(() => create.FirstName)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("plzenterfirstName")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("Required")</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("lastName") </label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputText class="form-control field-validate" @bind-Value="create.LastName"></InputText>
+                                                    <ValidationMessage For="@(() => create.LastName)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("plzenterlastName")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("Required")</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Mobile")</label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputText class="form-control field-validate" @bind-Value="create.PhoneNumber"></InputText>
+                                                    <ValidationMessage For="@(() => create.PhoneNumber)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
+                                                        @SharedLocalize.GetLocalizedStringValue("plzenterTel")
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group required">
+                                                <label class="col-lg-3 col-xs-12 control-label" for="input-country">@SharedLocalize.GetLocalizedStringValue("Country")</label>
+                                                <div class="col-lg-4 col-xs-12">
+                                                    <InputSelect class="form-control" @bind-Value="create.CountryId">
+                                                        <option value="">@SharedLocalize.GetLocalizedStringValue("enterCountry")</option>
+                                                        @if(countries != null)
+                                                        {
+                                                            @foreach (var c in countries)
+                                                            {
+                                                                <option value="@c.Id">@c.CountryName</option>
+                                                            }
+                                                        }
+                                                    </InputSelect>
+                                                    <ValidationMessage For="@(() => create.CountryId)" />
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status") </label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputSelect class="form-control" @bind-Value="create.Status">
+                                                        <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                        <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                    </InputSelect>
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
+                                                        @SharedLocalize.GetLocalizedStringValue("chooseStatus")
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="box-footer text-center">
+                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                                <a class="btn btn-defult" href="/Customers">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+
+
+                                        </div>
+                                    </EditForm>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+    <!-- /.row -->
+    <!-- Main row -->
+    <!-- /.row -->
+</section>
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    UpdateCustomerDto create = new UpdateCustomerDto();
+    string message;
+    string style;
+    public string lang { get; set; }
+    public List<CountryDto> countries { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        countries = await http.GetFromJsonAsync<List<CountryDto>>("api/Country/GetCountries");
+        create = new UpdateCustomerDto();
+        create = await _userBL.GetCustomerId(Id);
+    }
+
+    async Task UpdateCustomer()
+    {
+        create.Id = Id;
+        var result = await _userBL.UpdateCustomerCP(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
 
 }

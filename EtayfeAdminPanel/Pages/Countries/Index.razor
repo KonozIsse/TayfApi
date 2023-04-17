@@ -1,7 +1,4 @@
-﻿@page "/CP/Countries"
-@inject LocationTaxBL _locationTaxBL
-@inject HomeBL _homeBL
-
+﻿@page "/Countries"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Country") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <Alert Message="@message" Style="@style"></Alert>
@@ -40,7 +37,7 @@
                                 <div class="col-lg-4 form-inline" id="contact-form12"></div>
                             </div>
                             <div class="box-tools pull-right">
-                                <a href="/CP/Country/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addCountry")</a>
+                                <a href="/Country/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addCountry")</a>
                             </div>
                         </div>
 
@@ -77,12 +74,12 @@
                                                 <tr>
                                                     <td>@i</td>
                                                     <td style="width:30%;"><img style="width: 13%;" src="@item.Image" /></td>
-                                                    <td>@(lang == "ar" ? item.CountryName : item.CountryName)</td>
+                                                    <td>@item.CountryName</td>
                                                     <td>@item.MobileCode</td>
                                                     <td>@item.CountryCode3</td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.CountryName" href="/CP/Country/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.CountryName" href="/Country/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                         <a  title=" @item.CountryName" @onclick="(async()=>await Delete(item.Id))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
                                                 </tr>
                                             }
@@ -115,7 +112,7 @@
         [Parameter]
         public string search { get; set; }
         public string filter { get; set; }
-        string lang = "ar";
+    public string lang { get; set; }
 
     public List<CountryDto> Model { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
@@ -123,7 +120,8 @@
 
         protected override async Task OnInitializedAsync()
         {
-            //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetAllCountries();
         }
         private async Task SelectedPage(int page)

@@ -1,5 +1,4 @@
-﻿@page "/CP/Languages"
-@inject HomeBL _homeBL
+﻿@page "/Languages"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("lang")| @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
@@ -80,7 +79,7 @@
                                                     <td>@item.Code</td>
                                                     <td>@item.Sort</td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Name" href="/CP/Language/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @item.Name" href="/Language/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
 
                                                     </td>
 
@@ -122,7 +121,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetLanguages();
     }
     private async Task SelectedPage(int page)
@@ -143,7 +143,7 @@
   
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("/CP/Languages", true);
+        NavigationManager.NavigateTo("/Languages", true);
     }
   
    

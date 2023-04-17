@@ -1,4 +1,4 @@
-﻿@page "/CP/Options"
+﻿@page "/Options"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Options") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -24,7 +24,7 @@
                         <div class="box-tools pull-right">
                             @if (user.UserType == UserType.Admin)
                             {
-                                <a href="/CP/Option/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddOptions")</a>
+                                <a href="/Option/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("AddOptions")</a>
 
                             }
                         </div>
@@ -66,18 +66,18 @@
                                                 <td dir="@(lang == "ar" ? "rtl": "ltr")">
                                                     <strong>@item.OptionName </strong>
                                                     <br>
-                                                    <a href="/CP/Values/@item.Id">  @SharedLocalize.GetLocalizedStringValue("ManageOptions")</a>
+                                                  <a href="/Option/Edit/@item.Id">  @SharedLocalize.GetLocalizedStringValue("ManageOptions")</a>
 
                                                 </td>
 
 
                                                 <td>
-                                                    <a style="padding:1%;" data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")" href="/CP/Values/@item.Id" class="badge bg-light-blue"><i class="fa fa-list" aria-hidden="true"></i> @SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")</a>
+                                                    <a style="padding:1%;" data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")" href="/Values/@item.Id" class="badge bg-light-blue"><i class="fa fa-list" aria-hidden="true"></i> @SharedLocalize.GetLocalizedStringValue("ManageValuesOptions")</a>
 
 
                                                     @if (user.UserType == UserType.Admin)
                                                     {
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick = "(async()=> await Delete(item.Id))" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="delete" @onclick="(async()=> await Delete(item.Id))" class="badge bg-red "><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     }
                                                 </td>
 
@@ -116,8 +116,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        user = await _homeBL.GetCurrentUser(3);
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GetAllOptions();
     }
     private async Task SelectedPage(int page)
@@ -153,6 +154,6 @@
     }
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("/CP/Options", true);
+        NavigationManager.NavigateTo("/Options", true);
     }
 }

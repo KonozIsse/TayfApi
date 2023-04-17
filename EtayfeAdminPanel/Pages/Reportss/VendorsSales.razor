@@ -1,17 +1,12 @@
-﻿@page "/CP/Reports/VendorsSales"
-@inject UserBL _userBL
-@inject LocService SharedLocalize
-@inject IJSRuntime js
-@using System.IO
-@using System.Text.Json
+﻿@page "/Reports/VendorsSales"
 
-<PageTitle>@SharedLocalize.GetLocalizedStringValue("VendorsSalesRep") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("VendorsSalesReport") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <section class="content-header">
-    <h1>@SharedLocalize.GetLocalizedStringValue("VendorsSalesRep") <small> @SharedLocalize.GetLocalizedStringValue("VendorsSalesRep")</small> </h1>
+    <h1>@SharedLocalize.GetLocalizedStringValue("VendorsSalesReport") <small> @SharedLocalize.GetLocalizedStringValue("VendorsSalesReport")</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
-        <li class="active">@SharedLocalize.GetLocalizedStringValue("VendorsSalesRep") </li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("VendorsSalesReport") </li>
     </ol>
 </section>
 @if (Model != null)
@@ -24,7 +19,7 @@
             <div class="col-md-12">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("VendorsSalesRep") </h3>
+                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("VendorsSalesReport") </h3>
                     </div>
                     <div class="box-header">
                         <div class="container-fluid">
@@ -88,7 +83,7 @@
                                                     <td>@item.Email</td>
                                                     <td>@item.PhoneNumber</td>
                                                     <td>
-                                                        <a href="/Orders/@item.Id" target="_blank">QAR @item.TotalPrice</a>
+                                                        <a href="/Order/View/@item.Id" target="_blank">QAR @item.TotalPrice</a>
 
                                                     </td>
                                                 </tr>
@@ -122,15 +117,15 @@
 @code {
     [Parameter]
     public string search { get; set; }
-    string lang = "ar";
-
+    public string lang { get; set; }
     public List<StoreDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
 
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetCustomerTotal();
     }
     private async Task SelectedPage(int page)

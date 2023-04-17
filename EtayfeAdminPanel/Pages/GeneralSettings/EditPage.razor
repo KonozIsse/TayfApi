@@ -1,4 +1,4 @@
-﻿@page "/CP/Page/Edit/{Id:int}"
+﻿@page "/Page/Edit/{Id:int}"
 <section class="content-header">
     <h1>@SharedLocalize.GetLocalizedStringValue("editStaticPage")<small>@SharedLocalize.GetLocalizedStringValue("editStaticPage")</small> </h1>
     <ol class="breadcrumb">
@@ -10,9 +10,6 @@
 
 <!-- Main content -->
 <section class="content">
-    <!-- Info boxes -->
-    <!-- /.row -->
-
     <div class="row">
         <div class="col-md-12">
             <div class="box">
@@ -55,7 +52,7 @@
                                                
                                                 <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary" @onclick="UpdatePage">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/Pages" type="submit" class="btn btn-default"> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/Pages" type="submit" class="btn btn-default"> @SharedLocalize.GetLocalizedStringValue("back")</a>
                                                 </div>
 
                                             </div>
@@ -97,7 +94,8 @@
         //{
         //    create = await _homeBL.GetAllPages(Id);
         //}
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         langs = await _homeBL.GetLanguages(lang);
     }
     private Dictionary<string, string> names = new()

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Entities.Models.Enums;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +15,20 @@ namespace Entities.DataTransferObjects
         public decimal AttributePrice { get; set; }
         public string ProductName { get; set; }
         public string Option { get; set; }
-        public string OptionType { get; set; }
+        public OptionType OptionType { get; set; }
         public string Value { get; set; }
     }
     public class CreateAttributeDto
     {
+        [Required]
         public string PricePrefix { get; set; }
+        [Required]
         public decimal AttributePrice { get; set; }
+        [Required]
         public short IsDefault { get; set; }
+        [Required]
         public int OptionId { get; set; }
+        [Required]
         public int ValueId { get; set; }
     }
     public class UpdateAttributeDto : CreateAttributeDto
@@ -33,14 +40,16 @@ namespace Entities.DataTransferObjects
     {
         public int Id { get; set; }
         public string OptionName { get; set; }
-        public string OptionType { get; set; }
+        public OptionType OptionType { get; set; }
         public List<ValueVM> Values { get; set; }
     }
 
     public class CreateOptionDto
     {
+        [Required]
         public string OptionName { get; set; }
-        public string OptionType { get; set; }
+        [Required]
+        public OptionType OptionType { get; set; }
     } 
     public class UpdateOptionDto : CreateOptionDto
     {
@@ -53,10 +62,11 @@ namespace Entities.DataTransferObjects
         public string OptionValueName { get; set; }
         public int OptionId { get; set; }
         public string OptionName { get; set; }
-        public string OptionType{ get; set; }
+        public OptionType OptionType { get; set; }
     }
     public class CreateValueDto
     {
+        [Required]
         public string ValueHexModel { get; set; }
         public string OptionValueName { get; set; }
     }

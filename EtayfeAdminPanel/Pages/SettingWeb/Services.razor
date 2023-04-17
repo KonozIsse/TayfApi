@@ -1,7 +1,4 @@
-﻿@page "/CP/SettingWeb/Services"
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-
+﻿@page "/SettingWeb/Services"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Services") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <section class="content-header">
     <h1>  @SharedLocalize.GetLocalizedStringValue("Services") <small> @SharedLocalize.GetLocalizedStringValue("Services")</small> </h1>
@@ -117,9 +114,6 @@
     public string filter { get; set; }
     [Parameter]
     public string lang { get; set; }
-
-    int vendorId = 0;
-    int admin = 1;
     public List<ServiceDto> Model { get; set; }
 
     public MetaData MetaData { get; set; } = new MetaData();
@@ -127,7 +121,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetServices();
     }
     private async Task SelectedPage(int page)

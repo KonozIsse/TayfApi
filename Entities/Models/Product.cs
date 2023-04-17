@@ -1,6 +1,7 @@
 namespace Entities.Models
 {
     using Entities.Models.Enums;
+    using Org.BouncyCastle.Crypto.Engines;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
     public class Product : BaseEntity
@@ -21,9 +22,9 @@ namespace Entities.Models
         public User Store { get; set; }
         public bool? IsAcceptAdmin { get; set; }
         public ProductsType ProductType { get; set; }
+        public ProductSales ProductSales { get; set; }
+        public SpecialProducts SpecialProducts { get; set; }
         public List<ProductCategory> ProductCategories { get; set; }
-        public List<ProductSales> ProductSales { get; set; }
-        public List<SpecialProducts> SpecialProducts { get; set; }
         public List<WishList> WishLists { get; set; }
         public List<Review> Reviews { get; set; }
         public List<ProductAttribut> AttributesProducts { get; set; }

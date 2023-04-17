@@ -1,8 +1,9 @@
-﻿@page "/CP/Values/{Id:int}"
-<PageTitle>@SharedLocalize.GetLocalizedStringValue("Orders") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+﻿@page "/Values/{Id:int}"
+@page "/Values"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("OptionsValues") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
-    <h1>  @SharedLocalize.GetLocalizedStringValue("Options") <small>@SharedLocalize.GetLocalizedStringValue("Options")</small> </h1>
+    <h1>  @SharedLocalize.GetLocalizedStringValue("Options") <small>@SharedLocalize.GetLocalizedStringValue("OptionsValues")</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
         <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("Options")</li>
@@ -51,7 +52,7 @@
 
                                     @if (option != null)
                                     {
-                                        @if (option.OptionType == "color")
+                                        @if (option.OptionType ==OptionType.Color )
                                         {
                                             <div class="form-group">
                                                 <label class="col-sm-5 col-md-5 control-label">@SharedLocalize.GetLocalizedStringValue("PropertyColor")</label>
@@ -66,7 +67,7 @@
                                     }
                                     <div class="box-footer text-center">
                                     <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                    <a class="btn btn-defult" href="/CP/Options"> @SharedLocalize.GetLocalizedStringValue("back")</a>
+                                    <a class="btn btn-defult" href="/Options"> @SharedLocalize.GetLocalizedStringValue("back")</a>
                                 </div>
                             </EditForm>
                         </div>
@@ -105,7 +106,7 @@
                                                 @if (user.UserType == UserType.Admin)
                                                 {
                                                     <td>
-                                                            <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/Value/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/Value/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick="(async()=> await Delete(item.Id))" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
                                                 }
@@ -160,9 +161,10 @@
     protected override async Task OnInitializedAsync()
     {
         create = new CreateValueDto();
-        lang = await _homeBL.GetDefaultLanugage();
-        option = await _productBL.GetOptionId(Id);
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        option = await _productBL.GetOptionId(Id);
         await GetAllValues();
     }
     
@@ -213,6 +215,6 @@
     }
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("/CP/Values", true);
+        NavigationManager.NavigateTo("/Values", true);
     }
 }

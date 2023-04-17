@@ -1,10 +1,4 @@
-﻿@page "/CP/Products"
-@inject ProductBL _productBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject IJSRuntime js
-@inject HttpClient http
+﻿@page "/Products"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("products") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -45,7 +39,7 @@
                                 <div class="col-lg-4 form-inline" id="contact-form12"></div>
                             </div>
                             <div class="box-tools pull-right">
-                                <a href="/CP/Products/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("Addproducts")</a>
+                                <a href="/Product/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("Addproducts")</a>
 
                             </div>
                         </div>
@@ -112,16 +106,16 @@
 
                                                     </td>
                                                     <td>
-                                                        <a class="btn btn-primary" style="width: 100%; margin-bottom: 5px;" href="/CP/Product/@d.Id"> @SharedLocalize.GetLocalizedStringValue("Editproducts")</a>
+                                                        <a class="btn btn-primary" style="width: 100%; margin-bottom: 5px;" href="/Product/@d.Id"> @SharedLocalize.GetLocalizedStringValue("Editproducts")</a>
 
                                                         @if (d.ProductType == ProductsType.Variable)
                                                         {
                                                             <br>
-                                                            <a class="btn btn-info" style="width: 100%;  margin-bottom: 5px;" href="/CP/Product/VariableProduct/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductAttributes")</a>
+                                                            <a class="btn btn-info" style="width: 100%;  margin-bottom: 5px;" href="/Product/VariableProduct/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductAttributes")</a>
                                                         }
                                                         <br>
 
-                                                        <a class="btn btn-warning" style="width: 100%;  margin-bottom: 5px;" href="/CP/Product/SimpleProd/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductImages")</a>
+                                                        <a class="btn btn-warning" style="width: 100%;  margin-bottom: 5px;" href="/Product/SimpleProd/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductImages")</a>
 
                                                         @if ( d.AdminId != 0 && d.IsAcceptAdmin == false)
                                                         {
@@ -180,7 +174,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lang = await _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         categories = await _productBL.GetAllSubActiveCategories(lang);
         await GetAllProducts();
     }
@@ -191,7 +186,6 @@
     }
     async Task GetAllProducts()
     {
-        // var currentUser = await _userManager.FindByNameAsync("");
         var pagingResponse = await _productBL.GetProductsCP(1, search, filter, lang, _PostsParameters);
         //await http.GetFromJsonAsync<PagedList<ProductDto>>($"api/product/allCP?{search}&{_PostsParameters.PageNumber}&{_PostsParameters.PageSize}");
         
@@ -237,6 +231,6 @@
     }
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Products", true);
+        NavigationManager.NavigateTo("/Products", true);
     }
 }

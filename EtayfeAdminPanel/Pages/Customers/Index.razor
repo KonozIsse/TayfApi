@@ -1,10 +1,4 @@
-﻿@page "/CP/Customers"
-
-@inject LocService SharedLocalize
-@inject NavigationManager _navigationManager
-@inject UserBL _userBL
-@inject IJSRuntime js
-
+﻿@page "/Customers"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Customers") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <Alert Message="@message" Style="@style"></Alert>
@@ -47,7 +41,7 @@
 
                                 <div class="box-tools pull-right">
 
-                                    <a href="/CP/Customer/Add" type="button" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("AddCustomer")</a>
+                                    <a href="/Customer/Add" type="button" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("AddCustomer")</a>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +104,7 @@
                                                                 </a>
                                                                 <ul class="dropdown-menu">
                                                                     <li role="presentation">
-                                                                        <a role="menuitem" tabindex="-1" href="/CP/Customer/Edit/@item.Id" title="@SharedLocalize.GetLocalizedStringValue("edit")">@SharedLocalize.GetLocalizedStringValue("edit")</a>
+                                                                        <a role="menuitem" tabindex="-1" href="/Customer/Edit/@item.Id" title="@SharedLocalize.GetLocalizedStringValue("edit")">@SharedLocalize.GetLocalizedStringValue("edit")</a>
                                                                     </li>
 
                                                                     <li role="presentation" class="divider"></li>
@@ -174,7 +168,7 @@
     [Parameter]
     public string search { get; set; }
     public string filter { get; set; }
-    string lang = "ar";
+    public string lang { get; set; }
 
     public List<CustomerDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
@@ -182,7 +176,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //lang = _homeBL.GetDefaultLanugage();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetCustomers();
     }
     private async Task SelectedPage(int page)
@@ -260,6 +255,6 @@
 
     void NevigateToYourUrl()
     {
-        _navigationManager.NavigateTo("/CP/Customers", true);
+        NavigationManager.NavigateTo("/Customers", true);
     }
 }

@@ -244,11 +244,6 @@
 
                     if (g.length == numOp) {
 
-                        @*var UrlPrefix = @Url.Action("AddStock", "Inventory", new { area = "CP",lang = lang, entry_prod= prod, values });
-                        window.location.replace(UrlPrefix
-                        +?entry_prod = " + prod + " & values =" + g + "& stock=" + stkk + " &purchase_price=" + prc + " &reference_code=" + cdd);*@
-
-
 
           window.location.replace("/@lang/CP/Inventory/AddStock/?entry_prod=" + prod + "&values=" + g + "&stock=" + stkk + "&purchase_price=" + prc + "&reference_code=" + cdd);
                     } else {
@@ -307,7 +302,6 @@
 
             var UrlPrefix = '@Url.Action("Delete", "Media", new {area = "CP",lang = lang})';
             jQuery("#Confirm .btn-danger").attr("href", (UrlPrefix + "?Ids=" + checkedIds));
-            //jQuery("#Confirm .btn-danger").attr("href","/admin/@lang/CP/Media/Delete/?Ids=" + checkedIds);
 
 
             return false;
@@ -387,6 +381,7 @@
             });
             });
 
+        
         function flash(a) {
             if (a.value == 1) {
                 jQuery("#loader").css("display", "block");
@@ -396,12 +391,12 @@
                 setTimeout(function () {
                     jQuery("#loader").css("display", "none");
                 }, 300);
+
             } else {
                 jQuery(".flash-container").css("display", "none");
 
             }
         }
-
 
         function DefProduct(a) {
             if (a.value == 1) {
@@ -449,13 +444,10 @@
             }
         }
 
-        function getUrlPrefix() {
-            return window.location.pathname.split("CP")[0];
-        }
     </script>
 
    
-    <script id="template-upload" type="text/x-tmpl">
+ @*   <script id="template-upload" type="text/x-tmpl">
         {% for (var i=0, file; file=o.files[i]; i++) { %}
         <tr class="template-upload fade">
             <td class="name" width="30%"><span>{%=file.name%}</span></td>
@@ -504,7 +496,7 @@
             </td>
         </tr>
         {% } %}
-    </script>
+    </script>*@
 </body>
 
 </html>
