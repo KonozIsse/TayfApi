@@ -54,7 +54,19 @@ namespace BusinessLogic.ApiClasses
             var roles = await _repositoryManager.Role.GetRolesAdminStore();
             var rolesDto = _mapper.Map<List<RoleDto>>(roles);
             return rolesDto;
-        } 
+        }
+        public async Task<List<LinkDto>> GetLinks( )
+        {
+            var links = await _repositoryManager.Link.GetLinks();
+            var linksDto = links.Select(link =>
+            {
+              var linkDto = _mapper.Map<LinkDto>(link);
+                linkDto.Title = _locService.GetLocalizedStringValue(link.Title);
+                return linkDto;
+            }).ToList();
+               
+            return linksDto;
+        }
         public async Task<BussnessResultModel> AddPermission(int roleId, List<RoleLinksDto> RoleLinksDto)
         {
             var permissions = await _repositoryManager.Permission.GetPermissionsRole(roleId, true);
@@ -101,10 +113,6 @@ namespace BusinessLogic.ApiClasses
             var role = await _repositoryManager.Role.GetRoleId(create.Id, true);
             if (role != null)
             {
-                if (String.IsNullOrEmpty(create.Name) || create.Name.Contains(" "))
-                {
-                    return new BussnessResultModel(role, _locService.GetLocalizedStringValue("enterallfiled"), false);
-                }
                 role.NormalizedName = create.Name.ToUpper();
                 _mapper.Map(create, role);
                 await _repositoryManager.SaveAsync();
@@ -114,6 +122,12 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
+        }
+        public async Task<UpdateRoleDto> GetMapRoleId(int id)
+        {
+            var role = await _repositoryManager.Role.GetRoleId(id, false);
+            var roleDto = _mapper.Map<UpdateRoleDto>(role);
+            return roleDto;
         }
         public async Task<BussnessResultModel> DeleteRole(int id)
         {
@@ -304,7 +318,7 @@ namespace BusinessLogic.ApiClasses
                 user.VerifiedCode = new Random().Next(1000, 9999);
                 var country = await _repositoryManager.Country.GetcountryById(Convert.ToInt32(userRegister.CountryId), false);
                 user.CodeMobileCountry = country == null ? null : country.MobileCode;
-                var role = await _repositoryManager.Role.GetRoleId(userRegister.RoleId, false);
+                var role = await _repositoryManager.Role.GetActiveRole(userRegister.RoleId, false);
                 user.RoleId = userRegister.RoleId;
                 if (role.Name == "Store")
                 {

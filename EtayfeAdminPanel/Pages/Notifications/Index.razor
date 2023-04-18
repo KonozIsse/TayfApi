@@ -1,0 +1,155 @@
+﻿@page "/Notifications"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Notifications") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+
+
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("Notifications") <small> @SharedLocalize.GetLocalizedStringValue("Notifications")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("Notifications") </li>
+    </ol>
+</section>
+@if(Model != null)
+{
+  <section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <div class="container-fluid">
+                        <div class="row">
+
+                            <div class="box-tools pull-right">
+
+                                    <a href="/Notification/Add" type="button" class="btn btn-block btn-primary" style="width : 30%;">@SharedLocalize.GetLocalizedStringValue("AddNotify")</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 table-responsive">
+
+
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th><a href="#">#</a></th>
+                                        <th>@SharedLocalize.GetLocalizedStringValue("Name")  </th>
+                                        <th>@SharedLocalize.GetLocalizedStringValue("title") </th>
+                                        <th>@SharedLocalize.GetLocalizedStringValue("Message")</th>
+                                        <th>@SharedLocalize.GetLocalizedStringValue("type") </th>
+                                        <th>@SharedLocalize.GetLocalizedStringValue("CreatedDate") </th>
+                                        <th>@SharedLocalize.GetLocalizedStringValue("Actions")</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @{
+                                        var i = 0;
+                                    }
+                                    @foreach (var item in Model)
+                                    {
+                                        i += 1;
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.Subject</td>
+                                                <td>@item.Body</td>
+
+                                            <td>@item.NotificationKey</td>
+                                            <td>
+                                                @item.CreatedAt.ToString("G")
+                                            </td>
+                                            <td>
+                                                    <a data-toggle="tooltip" data-placement="bottom" title="delete" @onclick="(async()=> await Delete(item.Id))" class="badge bg-red Confirm">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+
+                            </table>
+
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+        @if (Model.Count >= 10)
+        {
+            <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+        }
+</section>  
+}
+
+@code {
+    [Parameter]
+    public string lang { get; set; }
+    public List<NotificationDto> Model { get; set; }
+    public AdminDto user { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        await GetNotifications();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetNotifications();
+    }
+    async Task GetNotifications()
+    {
+        var pagingResponse = await _homeBL.GetNotifications(lang,_PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    public async Task Delete(int id)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure?");
+        if (confirm)
+        {
+            var result = await _homeBL.DeleteNotification(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+            NevigateToYourUrl();
+        }
+    }
+  
+    void NevigateToYourUrl()
+    {
+        NavigationManager.NavigateTo("/Notifications", true);
+    }
+}

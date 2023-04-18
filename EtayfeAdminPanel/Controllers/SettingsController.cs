@@ -43,11 +43,11 @@ namespace EtayfeAdminPanel.Controllers
             var result = await _homeBL.GetAllSettings();
             return Ok(result);
         }
-
-        [HttpPut("EditSettingStore")]
-        public async Task<IActionResult> EditSettingStore(SettingStoreVM update)
+       
+        [HttpPut("EditSetting")]
+        public async Task<IActionResult> EditSetting(SettingVM update)
         {
-            var result = await _homeBL.EditSettingStore(update);
+            var result = await _homeBL.EditSetting(update);
             if (result.Success)
             {
                 return Ok(result.Message);
@@ -57,10 +57,11 @@ namespace EtayfeAdminPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpPut("EditSetting")]
-        public async Task<IActionResult> EditSetting(SettingVM update)
+        //----------------------------------------
+        [HttpPut("EditSettingStore")]
+        public async Task<IActionResult> EditSettingStore(SettingStoreVM update)
         {
-            var result = await _homeBL.EditSetting(update);
+            var result = await _homeBL.EditSettingStore(update);
             if (result.Success)
             {
                 return Ok(result.Message);

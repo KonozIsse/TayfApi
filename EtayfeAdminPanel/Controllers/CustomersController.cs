@@ -20,6 +20,12 @@ namespace EtayfeAdminPanel.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
+        [HttpGet("GetCustomers")]
+        public async Task<IActionResult> GetCustomers()
+        {
+            var result = await _userBL.GetAllCustomer();
+            return Ok(result);
+        }
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateCustomer(CreateCustomerCPDto create)

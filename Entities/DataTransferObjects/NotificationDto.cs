@@ -15,8 +15,9 @@ namespace Entities.DataTransferObjects
         public string Name { get; set; }
         public string Body { get; set; }
         public string Subject { get; set; }
+        public NotificationKey NotificationKey { get; set; } 
         public DateTime CreatedAt { get; set; }
-        public NotificationKey NotificationKey { get; set; }
+
     }
     public class CreateNotificationDto
     {

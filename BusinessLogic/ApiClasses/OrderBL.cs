@@ -390,13 +390,16 @@ namespace BusinessLogic.ApiClasses
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CompleteOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
+            action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
             {
                 Body = action.Template,
+                BodyAr= action.TemplateAr,
                 UserId = order.CustomerId,
                 NotificationActionId = action.Id,
                 Status = NotificationStatus.New,
                 Subject = action.Subject,
+                SubjectAr = action.SubjectAr,
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);
@@ -425,13 +428,16 @@ namespace BusinessLogic.ApiClasses
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CancelOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
+            action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
             {
                 Body = action.Template,
+                BodyAr = action.TemplateAr,
                 UserId = order.CustomerId,
                 NotificationActionId = action.Id,
                 Status = NotificationStatus.New,
                 Subject = action.Subject,
+                SubjectAr = action.SubjectAr,   
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);
@@ -454,13 +460,16 @@ namespace BusinessLogic.ApiClasses
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.RejectOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
+            action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
             {
                 Body = action.Template,
+                BodyAr = action.TemplateAr,
                 UserId = order.CustomerId,
                 NotificationActionId = action.Id,
                 Status = NotificationStatus.New,
-                Subject = action.Subject,
+                Subject = action.Subject, 
+                SubjectAr = action.SubjectAr,
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);
@@ -533,14 +542,17 @@ namespace BusinessLogic.ApiClasses
 
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ReceiveOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
-            action.Template = action.Template.Replace("{userName}", store.FirstName);
+            action.Template = action.Template.Replace("{userName}", store.FirstName); 
+            action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
             {
                 Body = action.Template,
+                BodyAr = action.TemplateAr,
                 UserId = order.CustomerId,
                 NotificationActionId = action.Id,
                 Status = NotificationStatus.New,
-                Subject = action.Subject,
+                Subject = action.Subject, 
+                SubjectAr = action.SubjectAr,
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);
@@ -574,13 +586,16 @@ namespace BusinessLogic.ApiClasses
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ShippedOrder);
             var store = await _repositoryManager.User.GetStore(order.StoreId, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
+            action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
             {
                 Body = action.Template,
+                BodyAr= action.TemplateAr,
                 UserId = order.CustomerId,
                 NotificationActionId = action.Id,
                 Status = NotificationStatus.New,
                 Subject = action.Subject,
+                SubjectAr= action.SubjectAr,
                 IsRead = false
             };
             _repositoryManager.Notification.CreateNotification(notification);

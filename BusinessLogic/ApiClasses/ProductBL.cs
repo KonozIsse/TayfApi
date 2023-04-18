@@ -237,7 +237,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     IsStatus = createProductDto.IsStatusSpecial,
                     ProductId = product.Id,
-                    EndDate = createProductDto.EndDate.Value,
+                    EndDate = createProductDto.EndDateSpecial,
                     SpecialPrice = createProductDto.SpecialPrice,
                 };
                 _repositoryManager.SpecialProducts.AddSpecialProduct(special);

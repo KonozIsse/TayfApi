@@ -35,7 +35,7 @@
                                 <div class="col-lg-4 form-inline" id="contact-form12"></div>
                             </div>
                             <div class="box-tools pull-right">
-                                <a href="/CP/Taxes/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addtaxes")</a>
+                                <a href="/Tax/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addtaxes")</a>
                             </div>
                         </div>
 
@@ -83,7 +83,7 @@
                                                     </td>
                                                     <td>
                                                         <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/Taxes/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>
+                                                        <a title="delete" @onclick="(async ()=> await Delete(item.Id))" class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i></a>
 
                                                     </td>
 
@@ -148,17 +148,20 @@
     string style = "";
     async Task Delete(int id)
     {
-        var result = await _locationTaxBL.DeleteTaxClass(id);
-        if (result.Success)
+        var confirm = await js.confirMethod("Are you Sure ?");
+        if (confirm)
         {
-            message = result.Message;
-            style = "success";
+            var result = await _locationTaxBL.DeleteTaxClass(id);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
         }
-        else
-        {
-            message = result.Message;
-            style = "danger";
-        }
-
     }
 }

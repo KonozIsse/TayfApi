@@ -32,7 +32,7 @@
                             <div class="box box-info">
                                 <br>
                                     <div class="form-horizontal">
-                                    <EditForm Model="@create" OnValidSubmit="@AddAdmin">
+                                    <EditForm Model="@create" OnValidSubmit="@Register">
                                         <DataAnnotationsValidator />
                                         <div class="box-body">
                                                 <div class="form-group">
@@ -230,7 +230,7 @@
     }
     string message = "";
     string style = "";
-     async Task AddAdmin()
+    async Task Register()
     {
         var result = await _userBL.RegisterUser(create, zoneId, street, zip);
         if (result.Success)

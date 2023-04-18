@@ -27,6 +27,12 @@ namespace EtayfeAdminPanel.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
+        [HttpGet("GetAllSubActiveCategories")]
+        public async Task<IActionResult> GetAllSubActiveCategories()
+        {
+            var result =  await _productBL.GetAllSubActiveCategories(GetLanguage());
+            return Ok(result);
+        }
        
         [HttpPost("create-category")]
         public async Task<IActionResult> CreateCategory(CreateCategoryDto create)

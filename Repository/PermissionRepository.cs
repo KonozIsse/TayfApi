@@ -17,8 +17,8 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<Permission>> GetPermissionsShowRole (int roleId)
-        => await FindByCondition(c => c.RoleId == roleId && c.Link.Show == true, false).Include(r => r.Link).ToListAsync();   
+        public async Task<List<Permission>> GetPermissionsShowRole (int roleId)
+        => await FindByCondition(c => c.RoleId == roleId && c.Link.IsStatus == Entities.Models.Enums.Status.Active, false).Include(r => r.Link).ToListAsync();   
         public async Task<IEnumerable<Permission>> GetPermissionsRole (int roleId , bool trackChanges)
         => await FindByCondition(c => c.RoleId == roleId , trackChanges).ToListAsync();
         public async Task<IEnumerable<Permission>> GetLinksRole(int roleId, List<int> Ids, bool trackChanges)
@@ -32,7 +32,7 @@ namespace Repository
         {
 
         }
-        public async Task<IEnumerable<Link>> GetLinks()
-        => await FindByCondition(c => c.Show == true, false).Include(r => r.Permissions).ToListAsync();
+        public async Task<List<Link>> GetLinks()
+        => await FindByCondition(c =>  c.IsStatus == Entities.Models.Enums.Status.Active, false).Include(r => r.Permissions).ToListAsync();
     }
 }

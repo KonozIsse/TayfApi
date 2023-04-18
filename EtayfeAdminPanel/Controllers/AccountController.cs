@@ -17,6 +17,22 @@ namespace EtayfeAdminPanel.Controllers
         {
 
         }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userForAuthentication)
+        {
+            var validateUser = await _authManager.ValidateUser(userForAuthentication);
+            if (!validateUser)
+            {
+                return Unauthorized(new TokenResponse { ErrorMessage = "Invalid Authentication" });
+            }
+            var token = await _authManager.CreateToken();
+            var user = await _userManager.FindByNameAsync(userForAuthentication.UserName);
+            user.RefreshToken = _authManager.GenerateRefreshToken();
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            await _userManager.UpdateAsync(user);
+            return Ok(new TokenResponse { IsAuthSuccessful = true, Token = token, RefreshToken = user.RefreshToken });
+        }
+
         [HttpGet("currentUser")]
         public async Task<IActionResult> GetCurrentUserHome()
         {
@@ -43,36 +59,7 @@ namespace EtayfeAdminPanel.Controllers
             return Ok(new TokenResponse { Token = token, RefreshToken = user.RefreshToken, IsAuthSuccessful = true });
         }
         //@attribute [Authorize(Roles = "Administrator")]
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userForAuthentication)
-        {
-            var validateUser = await _authManager.ValidateUser(userForAuthentication);
-            if (!validateUser)
-            {
-                return Unauthorized(new TokenResponse { ErrorMessage = "Invalid Authentication" });
-            }
-            var token = await _authManager.CreateToken();
-            var user = await _userManager.FindByNameAsync(userForAuthentication.UserName);   
-            user.RefreshToken = _authManager.GenerateRefreshToken();
-            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
-            await _userManager.UpdateAsync(user);
-            return Ok(new TokenResponse { IsAuthSuccessful = true, Token = token, RefreshToken = user.RefreshToken});
-        }
-
-        [HttpPost("LoginUser")]
-        public async Task<IActionResult> LoginUser([FromBody] UserForAuthenticationDto user)
-        {
-            var result = await _userBL.ValidateUser(user);
-            if (result.Success)
-            { 
-                return Ok(result.Data);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
-        }
-
+       
         [AllowAnonymous]
         [HttpPost]
         [Route("forgot-password")]

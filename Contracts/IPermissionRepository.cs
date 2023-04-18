@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface IPermissionRepository
     {
-        Task<IEnumerable<Permission>> GetPermissionsShowRole(int roleId);
+        Task<List<Permission>> GetPermissionsShowRole(int roleId);
         Task<IEnumerable<Permission>> GetPermissionsRole(int roleId, bool trackChanges);
         Task<IEnumerable<Permission>> GetLinksRole(int roleId, List<int> Ids, bool trackChanges);
         void AddPermission(Permission permission);
@@ -17,6 +17,6 @@ namespace Contracts
     }
     public interface ILinkRepository
     {
-        Task<IEnumerable<Link>> GetLinks();
+        Task<List<Link>> GetLinks();
     }
 }

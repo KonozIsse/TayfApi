@@ -1,0 +1,148 @@
+﻿@page "/Setting/StoreSettings"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("EditSetting") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("EditSetting")<small>@SharedLocalize.GetLocalizedStringValue("StoreSettings")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+   <li class="active">@SharedLocalize.GetLocalizedStringValue("EditSetting")</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("StoreSettings")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+
+                                <div class="box-body">
+                                    <EditForm Model="@create" OnValidSubmit="@EditSettingStore">
+                                    <DataAnnotationsValidator />
+                                        <div class="form-horizontal">
+
+                                            <h4>@SharedLocalize.GetLocalizedStringValue("GoogleMapAPI")</h4>
+                                            <hr>
+
+                                            <div class="form-group">
+                                            <label class="control-label col-md-3">@SharedLocalize.GetLocalizedStringValue("GoogleMapAPI")</label>
+                                                <div class="col-md-8">
+                                                <InputText class="form-control" @bind-Value="create.google_map_api"  ></InputText>
+                                                </div>
+                                            </div>
+
+
+                                            <hr>
+                                            <h4>@SharedLocalize.GetLocalizedStringValue("Email")</h4>
+                                            <hr>
+
+
+
+                                            <div class="form-group">
+                                            <label class="control-label col-md-3">@SharedLocalize.GetLocalizedStringValue("ContactUsEmail")</label>
+                                                <div class="col-md-8">
+                                                <InputText class="form-control" @bind-Value="create.contact_us_email" ></InputText>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <h4>@SharedLocalize.GetLocalizedStringValue("OrderEmail")</h4>
+                                            <hr>
+
+                                            <div class="form-group">
+                                            <label  class = "control-label col-md-3">@SharedLocalize.GetLocalizedStringValue("OrderEmail")</label>
+                                                <div class="col-md-8">
+                                                <InputText class="form-control"  @bind-Value="create.order_email"></InputText>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <h4>@SharedLocalize.GetLocalizedStringValue("WebsiteSettings")</h4>
+                                            <hr>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("HidePrices")</label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <span><input type="radio" checked="@CheckedYes" name="hide_price" value="1" />@SharedLocalize.GetLocalizedStringValue("Yes") </span>
+                                                    <span><input type="radio" checked="@CheckedNo" name="hide_price"  value="0" />@SharedLocalize.GetLocalizedStringValue("No") </span>
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">
+                                                        hide all prices from website (yes)
+                                                    </span>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="box-footer text-center">
+                                            <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                            <a class="btn btn-default" href="/Settings">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+
+                                        </div>
+                                        </EditForm>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</section>
+
+@code {
+    SettingStoreVM create = new SettingStoreVM();
+    string message;
+    string style; 
+    bool CheckedYes; 
+    bool CheckedNo;
+    protected override async Task OnInitializedAsync()
+    {
+        create = new SettingStoreVM();
+        create = await _homeBL.GetSettingStore();
+        CheckedYes = create.hide_price == "1" ? true : false;
+        CheckedNo = create.hide_price == "0" ? true : false;
+
+    }
+
+    async Task EditSettingStore()
+    {
+        var result = await _homeBL.EditSettingStore(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+        NavigationManager.NavigateTo("/Setting/StoreSettings", true);
+    }
+    public async Task CheckedPrice(bool Check)
+    {
+        if (Check == true)
+        {
+            create.hide_price = "1";
+        }
+        else
+        {
+            create.hide_price = "0";
+        }
+    }
+}

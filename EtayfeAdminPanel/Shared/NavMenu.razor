@@ -46,7 +46,7 @@
         
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="/Languages">
-                <span class="oi oi-transfer" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("lang")
+                <span class="oi oi-transfer" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("langs")
             </NavLink>
         </li>
         <li class="nav-item px-3">
@@ -109,7 +109,7 @@
        
         <li class="nav-item px-3">
             <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Forth)">
-                <span class="oi oi-list-rich" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("Catalog")
+                <span class="oi oi-hard-drive" aria-hidden="true"></span>  @SharedLocalize.GetLocalizedStringValue("Catalog")
             </NavLink>
         </li>
 
@@ -144,7 +144,7 @@
         }
         <li class="nav-item px-3">
             <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Fifth)">
-                <span class="oi oi-aperture" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Setting(Website)")
+                <span class="oi oi-browser" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Setting(Website)")
             </NavLink>
         </li>
 
@@ -207,7 +207,7 @@
 
         <li class="nav-item px-3">
             <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Seventh)">
-                <span class="oi oi-aperture" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Settings(Mobile)")
+                <span class="oi oi-phone" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Settings(Mobile)")
             </NavLink>
         </li>
          
@@ -228,15 +228,15 @@
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Eight)">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("GeneralSettings")
+                <span class="oi oi-aperture" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("GeneralSettings")
             </NavLink>
         </li>
            
         @if (navSubmenu == NavSubmenu.Eight)
         {
             <li class="nav-item px-5">
-                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="/settings/Index">
-                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("Store Settings") 
+                <NavLink class="nav-link" @onclick="() => ToggleNavMenu()" href="/Setting/StoreSettings">
+                    <span class="oi oi-arrow-right" aria-hidden="true"></span>@SharedLocalize.GetLocalizedStringValue("StoreSettings") 
                 </NavLink>
             </li>
             <li class="nav-item px-5">
@@ -264,7 +264,7 @@
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/BLogs">
+            <NavLink class="nav-link" href="/Blogs">
                 <span class="oi oi-bookmark" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("blog")
             </NavLink>
         </li>
@@ -288,6 +288,11 @@
             </li>
 
         }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="/Notifications">
+                <span class="oi oi-chat" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("PushNotifications")
+            </NavLink>
+        </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" @onclick="() => TogleSubmenu(NavSubmenu.Tenth)">
                 <span class="oi oi-list" aria-hidden="true"></span> @SharedLocalize.GetLocalizedStringValue("MailingList")
@@ -318,25 +323,7 @@
 </div>
 
 @code {
-    private enum NavSubmenu
-    {
-        None,
-        First,
-        Second,
-        Third,
-        Forth,
-        Fifth,
-        Sixth,
-        Seventh,
-        Eight,
-        Ninth,
-        Tenth,
-        Eleventh,
-        Twelve,
-        Thirteen,
-        Fourteenth,
-        Fifteenth
-    }
+   
     [Parameter]
     public string lang { get; set; }
     //_homeBL.GetDefaultLanugage();

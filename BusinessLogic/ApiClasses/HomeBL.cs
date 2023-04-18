@@ -657,24 +657,18 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(notification, _locService.GetLocalizedStringValue("successDelete"));
         }
-        public async Task<List<NotificationDto>> GetNotifications(int PageId)
+        public async Task<PagedList<NotificationDto>> GetNotifications(string lang ,PostsParameters postsParameters)
         {
-            var notfis = await _repositoryManager.Notification.GetNotificationsPage(PageId, 15);
-            //var dto = _mapper.Map<List<NotificationDto>>(notfis);
-            var dto = new List<NotificationDto>();
-            foreach (var item in notfis)
-            {
-                dto.Add(new NotificationDto
+            var notfis = await _repositoryManager.Notification.GetAllNotifications(false);
+            var notfisDto = notfis.Select(item=>
                 {
-                    Id = item.Id,
-                    Name = item.User.FullName,
-                    Subject = item.Subject,
-                    Body = item.Body,
-                    NotificationKey = item.NotificationAction.NotificationKey,
-                    CreatedAt = item.CreatedAt
-                });
-            }
-            return dto;
+                    var dto = _mapper.Map<NotificationDto>(item);
+                    dto.Name = item.User.FullName;
+                    dto.Subject = lang == "en" ? item.NotificationAction.Subject : item.NotificationAction.SubjectAr;
+                    dto.NotificationKey = item.NotificationAction.NotificationKey ;
+                    return dto;
+                }).ToList();
+            return PagedList<NotificationDto>.ToPagedList(notfisDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         //Pages---------------------------------------------------------
         public async Task<PageDto> GetTypePage(PageType type, string lang)
@@ -723,12 +717,12 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(page, _locService.GetLocalizedStringValue("successSave"));
         }
-        //public async Task<EditPageDto> GetPageId(int id)
-        //{
-        //    var page = await _repositoryManager.StaticPages.GetPage(id, false);
-        //    var pageDto = _mapper.Map<EditPageDto>(page);
-        //    return pageDto;
-        //}
+        public async Task<EditPageDto> GetPageId(int id)
+        {
+            var page = await _repositoryManager.StaticPages.GetPage(id, false);
+            var pageDto = _mapper.Map<EditPageDto>(page);
+            return pageDto;
+        }
         //setting------------------------------------------------------
         public async Task<IEnumerable<SettingDto>> GetAllSettings()
         {
@@ -770,6 +764,17 @@ namespace BusinessLogic.ApiClasses
                 press_link = settingList.Where(r => r.Key == "press_link").First().Value,
                 android_app_link = settingList.Where(r => r.Key == "android_app_link").First().Value,
                 ios_app_link = settingList.Where(r => r.Key == "ios_app_link").First().Value
+            };
+        }
+        public async Task<SettingStoreVM> GetSettingStore()
+        {
+            var settingList = await _repositoryManager.Setting.GetAllSettings(false);
+            return new SettingStoreVM
+            {
+                google_map_api = settingList.Where(r => r.Key == "google_map_api").First().Value,
+                contact_us_email = settingList.Where(r => r.Key == "contact_us_email").First().Value,
+                order_email = settingList.Where(r => r.Key == "order_email").First().Value,
+                hide_price = settingList.Where(r => r.Key == "hide_price").First().Value,
             };
         }
     }

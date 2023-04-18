@@ -1,71 +1,85 @@
-﻿@inject ImageBL _imageBL
-@inject LocService SharedLocalize
+﻿@page "/image"
 <style>
     img {
         height: 100% !important;
         border: none !important;
     }
 </style>
+<div class="form-group" id="imageIcone2">
+    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("icon")<span style="color:red;">*</span></label>
+    <div class="col-sm-10 col-md-4">
+        <!-- Modal -->
+        <div class="modal fade embed-images" id="ModalmanufacturedICone2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h3 class="modal-title text-primary" id="myModalLabel2">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
+                    </div>
+                    <div class="modal-body manufacturer-image-embed">
+                        @if (images != null)
+                        {
+                            <ul class="thumbnails image_picker_selector">
 
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-    @SharedLocalize.GetLocalizedStringValue("addImg")
-</button>
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">@SharedLocalize.GetLocalizedStringValue("addImg")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            
-                <div class="modal-body">
-                    <ul class="thumbnails image_picker_selector">s
-                        <li>
-                            <span class="emailTable">
-                                <label title="Spreadsheet for accounting">
-                                    <div class="thumbnail">
-                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
-                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
-                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
-                                    </div>
-                                </label>
-                                <label title="Spreadsheet for accounting">
-                                    <div class="thumbnail">
-                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
-                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
-                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
-                                    </div>
-                                </label>
-                                <label title="Spreadsheet for accounting">
-                                    <div class="thumbnail">
-                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
-                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
-                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
-                                    </div>
-                                </label>
-                                <label title="Spreadsheet for accounting">
-                                    <div class="thumbnail">
-                                        <img class="image_picker_image" src="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" alt="1">
-                                        <input class="imgSrcc" value="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" hidden="">
-                                        <input id="/media_files/original/44d43e27-d574-4742-8d91-87b44b87d1f4.jpg" type="checkbox" class="lstt" name="im" value="1">
-                                    </div>
-                                </label>
-                            </span>
-                        </li>
-                    </ul>
+                                @foreach (var i in images)
+                                {
+                                    <li>
+                                        <span class="emailTable">
+                                            <label title="Spreadsheet for accounting">
+                                                <div class="thumbnail">
+
+                                                    <img class="image_picker_image" src="@i.Path" alt="@i.ImgId">
+                                                    <input class="imgSrcc" value="@i.Path" hidden>
+                                                    <input onclick="checkImage()" Id="@i.Path" type="checkbox" class="lstt" name="im" value="@i.ImgId" />
+
+                                                </div>
+                                            </label>
+                                        </span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div class="modal-footer">
+
+                        <a href="/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                        <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
+                        <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
+                    </div>
                 </div>
-            
-            <div class="modal-footer">
-                <a href="/Media/Index" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
-                <a class="btn btn-default refresh-image shownotify newIcon" ><i class="fa fa-refresh"></i></a>
-                <button type="button" class="btn btn-success"  data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
             </div>
         </div>
+        <div id="imageselected2">
+            <input value="Others" hidden id="typeImg" />
+            <a id="newIcon2" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone2" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+            <br>
+            <div id="selectedthumbnailIcon2" class="selectedthumbnail col-md-5"> </div>
+            <div class="closimage">
+                <button type="button" class="close pull-left image-close " id="image-Icone" style="display: none; position: absolute;left: 105px; top: 54px; background-color: black; color: white; opacity: 2.2; " aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        </div>
+        <br />
+        <br />
+
+        <img id="imgCont" width="80px" src="">
+        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("UploadYourImages")</span>
+
+        <br>
     </div>
 </div>
+
+
+
+
 @code {
-   //[Parameter]
-   // public List<ImageDto> Images { get; set; }
+
+    [Parameter]
+    public List<ImageSettingDto> images { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        images = await _imageBL.GetAllImageSettingOriginal(3);
+        // image = $"/media_files/medium/{image.Name}";
+    }
 }

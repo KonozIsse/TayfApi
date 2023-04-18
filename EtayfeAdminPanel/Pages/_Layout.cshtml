@@ -142,8 +142,19 @@
         }
          
     </script>
-    @*Images*@
     <script>
+
+        $(document).ready(function () {
+
+            $(function () {
+                $(".select2").select2();
+            });
+        });
+    </script>
+    @*Images*@
+
+    <script>
+       
         $('#chk').click(function (event) {
             if (this.checked) {
                 // Iterate each checkbox

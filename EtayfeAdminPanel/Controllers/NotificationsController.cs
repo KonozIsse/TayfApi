@@ -14,9 +14,9 @@ namespace EtayfeAdminPanel.Controllers
         {
         }
         [HttpGet("get")]
-        public async Task<IActionResult> GetAllNotifications(int PageId)
+        public async Task<IActionResult> GetAllNotifications(PostsParameters postsParameters)
         {
-            var result = await _homeBL.GetNotifications(PageId);
+            var result = await _homeBL.GetNotifications(GetLanguage(),postsParameters);
             return Ok(result);
         }
 

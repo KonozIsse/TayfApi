@@ -33,7 +33,7 @@
                                     <div class="form-horizontal">
                                         <!-- form start -->
                                         <div class="box-body">
-                                            <EditForm Model="@create" OnValidSubmit="@EditAdmin">
+                                        <EditForm Model="create" OnValidSubmit="UpdateAdmin">
                                         <DataAnnotationsValidator />
                                                @* @if (create.RoleId != 1)
                                                 {*@
@@ -175,10 +175,9 @@
         create = await _userBL.GetMapAdmin(Id);
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         roles = await http.GetFromJsonAsync<List<RoleDto>>("api/Admin/get-roles");
-      
     }
 
-    async Task EditAdmin()
+    async Task UpdateAdmin()
     {
         create.Id = Id;
         var result = await _userBL.EditAdmin(create);

@@ -88,8 +88,7 @@ else
                                                     <td>
                                                     <a title="@item.ZoneName" href="/Zone/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                     <a title="@item.ZoneName" @onclick="(async ()=> await Delete(item))"  class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i> </a>
-                                                 @*  <DeleteMessage Id="@item.Id" OnDelete="@Delete"></DeleteMessage>*@
-                                                   
+                                                  
                                                     </td>
 
                                                 </tr>

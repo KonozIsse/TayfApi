@@ -117,7 +117,7 @@
 
                                                         <a class="btn btn-warning" style="width: 100%;  margin-bottom: 5px;" href="/Product/SimpleProd/@d.Id">@SharedLocalize.GetLocalizedStringValue("ProductImages")</a>
 
-                                                        @if ( d.AdminId != 0 && d.IsAcceptAdmin == false)
+                                                        @if (user.UserType == UserType.Admin && d.IsAcceptAdmin == false)
                                                         {
                                                             <br>
 
@@ -126,7 +126,7 @@
                                                         <br />
 
 
-                                                        <a class="btn btn-danger" style="width: 100%;  margin-bottom: 5px;" @onclick="(async()=> await Delete(d.Id))">@SharedLocalize.GetLocalizedStringValue("DeleteProduct")</a>
+                                                        <a class="btn btn-danger" style="width: 100%;  margin-bottom: 5px;" @onclick="(async()=> await Delete(d))">@SharedLocalize.GetLocalizedStringValue("DeleteProduct")</a>
                                                     </td>
 
                                                 </tr>
@@ -164,11 +164,9 @@
     public int filter { get; set; }
     [Parameter]
     public string lang { get; set; }
-
-    int vendorId = 0;
-    int admin = 1;
     public List<ProductDto> Model { get; set; }
-    public List<CategoryDto> categories;
+    public List<CategoryDto> categories; 
+    public AdminDto user { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
 
@@ -176,7 +174,8 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
-        categories = await _productBL.GetAllSubActiveCategories(lang);
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        categories = await http.GetFromJsonAsync<List<CategoryDto>>("api/Categories/GetAllSubActiveCategories");
         await GetAllProducts();
     }
     private async Task SelectedPage(int page)
@@ -186,8 +185,7 @@
     }
     async Task GetAllProducts()
     {
-        var pagingResponse = await _productBL.GetProductsCP(1, search, filter, lang, _PostsParameters);
-        //await http.GetFromJsonAsync<PagedList<ProductDto>>($"api/product/allCP?{search}&{_PostsParameters.PageNumber}&{_PostsParameters.PageSize}");
+        var pagingResponse = await _productBL.GetProductsCP(user.Id, search, filter, lang, _PostsParameters);
         
         Model = pagingResponse.ToList();
 
@@ -195,12 +193,12 @@
     }
     string message = "";
     string style = "";
-    public async Task Delete(int id)
+    public async Task Delete(ProductDto product)
     {
-        var confirm = await js.confirMethod("Are you sure?");
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {product.ProductName}?");
         if (confirm)
         {
-            var result = await _productBL.RemoveProduct(id);
+            var result = await _productBL.RemoveProduct(product.Id);
             if (result.Success)
             {
                 message = result.Message;
@@ -211,6 +209,7 @@
                 message = result.Message;
                 style = "danger";
             }
+            NevigateToYourUrl();
         }
     }
     public async Task ApproveProduct(int id)

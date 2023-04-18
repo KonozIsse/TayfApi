@@ -180,62 +180,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                           @* <div class="row">
-
-                                                <div class="col-xs-12 col-md-6">
-                                                    <div class="form-group" id="imageIcone">
-                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
-                                                        <div class="col-sm-10 col-md-4">
-                                                            <!-- Modal -->
-                                                            <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                                                <div class="modal-dialog" role="document">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                                                                            <h3 class="modal-title text-primary" id="myModalLabel">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
-                                                                        </div>
-                                                                        <div class="modal-body manufacturer-image-embed">
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <a href="/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
-
-                                                                            <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
-                                                                            <button type="button" class="btn btn-success vld" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div id="imageselected">
-                                                                <input value="Products" hidden id="typeImg" />
-                                                                <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
-                                                                <br>
-                                                                <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
-                                                                <div class="closimage">
-                                                                    <button type="button" class="close pull-left image-close " id="image-Icone" style="display: none; position: absolute;left: 105px; top: 54px; background-color: black; color: white; opacity: 2.2; " aria-label="Close">
-                                                                        <span aria-hidden="true">×</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <img id="imgCont" width="80px" />
-                                                            <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("UploadYourImages")</span>
-
-                                                            <br>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xs-12 col-md-6" style="display:none;">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-2 col-md-3 control-label">Video EmbedCode Link</label>
-                                                        <div class="col-sm-10 col-md-8">
-                                                            <textarea class="form-control" rows="4" name="products_video_link" cols="50"></textarea>
-                                                            <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
-                                                                You can add your youtube embed code link here.
-                                                            </span>
-                                                            <span class="help-block hidden">This field is required.</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>*@
+                                        @* image place *@
                                             <hr>
 
 
@@ -429,6 +374,7 @@
 </section>
 @code {
     public CreateProductDto create { get; set; } 
+    public int[] CatIds { get; set; }
     public string lang { get; set; }
     public AdminDto user { get; set; }
     public List<string> Types; 
@@ -447,16 +393,21 @@
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         langs = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
-        categories = await _productBL.GetAllSubActiveCategories(lang);
-        Types = _productBL.GetProductTypes();
-        stores = await _userBL.GetStores();
-
+        categories = await http.GetFromJsonAsync<List<CategoryDto>>("api/Categories/GetAllSubActiveCategories");
+        Types = await http.GetFromJsonAsync<List<string>>("api/product/getAllTypesProducts");
+        stores = await http.GetFromJsonAsync<List<StoreDto>>("api/ManageVendors/GetStores");
     }
     public async Task AddProduct()
     {
-        //@onclick="(async()=> await Addcat(f.Id))"
-
-
+        foreach (var id in CatIds)
+        {
+            create.ProductCategories = new List<CreateProductCategoryDto>();
+            create.ProductCategories.Add(new CreateProductCategoryDto
+                {
+                    CategoryId = id
+                });
+        }
+      
         var result = await _productBL.AddProduct(user.Id,create);
         if (result.Success)
         {
@@ -476,6 +427,7 @@
             {
                 CategoryId = id
             });
+        create.ProductCategories = catIds;
     }
 
 }

@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EtayfeAdminPanel.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230418013222_editLink")]
+    partial class editLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -772,20 +774,26 @@ namespace EtayfeAdminPanel.Migrations
                     b.Property<bool?>("IsVendorLink")
                         .HasColumnType("bit");
 
-                    b.Property<int>("OrderId")
+                    b.Property<string>("LinkUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderedId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ParentId")
+                    b.Property<int>("ParentLinkId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
+                    b.Property<bool>("Show")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TitleLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TitleLinkAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1784,8 +1792,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "8261abff-bb9e-40f5-b2ee-d3249b8732e0",
-                            CreatedAt = new DateTime(2023, 4, 17, 15, 39, 9, 426, DateTimeKind.Local).AddTicks(3080),
+                            ConcurrencyStamp = "4ead1c86-c631-4113-a319-d3abf09a710e",
+                            CreatedAt = new DateTime(2023, 4, 17, 15, 32, 21, 879, DateTimeKind.Local).AddTicks(6539),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Admin",
@@ -1794,8 +1802,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "9ca78667-49fa-4bb4-b03c-65889c3845eb",
-                            CreatedAt = new DateTime(2023, 4, 17, 15, 39, 9, 426, DateTimeKind.Local).AddTicks(3140),
+                            ConcurrencyStamp = "2734b30e-a4c9-4352-b00a-58701c68f32a",
+                            CreatedAt = new DateTime(2023, 4, 17, 15, 32, 21, 879, DateTimeKind.Local).AddTicks(6603),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Customer",
@@ -1804,8 +1812,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "abb15bfe-6dc5-4633-91ff-c3612a9b8a20",
-                            CreatedAt = new DateTime(2023, 4, 17, 15, 39, 9, 426, DateTimeKind.Local).AddTicks(3145),
+                            ConcurrencyStamp = "81c55a10-87a2-468e-937c-aebcf053a61a",
+                            CreatedAt = new DateTime(2023, 4, 17, 15, 32, 21, 879, DateTimeKind.Local).AddTicks(6610),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Store",

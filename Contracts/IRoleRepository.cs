@@ -10,7 +10,8 @@ namespace Contracts
     public interface IRoleRepository
     {
         Task<List<Role>> GetRolesAdminStore();
-        Task<Role> GetRoleId(int id, bool trackChanges);
+        Task<Role> GetRoleId(int id, bool trackChanges); 
+        Task<Role> GetActiveRole(int id, bool trackChanges);
         Task<Role> IsExistRole(string name, bool trackChanges);
     }
 }

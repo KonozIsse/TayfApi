@@ -240,6 +240,9 @@
   <data name="AddNickNames" xml:space="preserve">
     <value>Add Nickname</value>
   </data>
+  <data name="AddNotify" xml:space="preserve">
+    <value>Add Notification</value>
+  </data>
   <data name="AddOptions" xml:space="preserve">
     <value>Add Option</value>
   </data>
@@ -1380,6 +1383,9 @@
   <data name="notes" xml:space="preserve">
     <value>Notes</value>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
   <data name="November" xml:space="preserve">
     <value>November</value>
   </data>
@@ -1625,6 +1631,9 @@
   </data>
   <data name="purchasenow" xml:space="preserve">
     <value>Purchase Now</value>
+  </data>
+  <data name="PushNotifications" xml:space="preserve">
+    <value>Push Notifications</value>
   </data>
   <data name="qty" xml:space="preserve">
     <value>Quantity</value>
@@ -2036,6 +2045,9 @@
   </data>
   <data name="stores" xml:space="preserve">
     <value>Stores</value>
+  </data>
+  <data name="StoreSettings" xml:space="preserve">
+    <value>Store Settings</value>
   </data>
   <data name="storesyouwilllove" xml:space="preserve">
     <value>Stores You'll Love</value>

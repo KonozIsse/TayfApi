@@ -23,6 +23,8 @@ namespace BusinessLogic
             //MapContact
             CreateMap<ContactDto, Contact>().ReverseMap();
             CreateMap<CreateContactDto, Contact>().ReverseMap();
+            //MapLink
+            CreateMap<LinkDto, Link>().ReverseMap();
             //MapLanguage
             CreateMap<Language, LanguageDto>().ReverseMap();
             CreateMap<UpdateLanguageDto, Language>().ReverseMap();

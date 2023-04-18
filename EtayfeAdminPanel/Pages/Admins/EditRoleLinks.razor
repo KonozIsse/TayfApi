@@ -1,0 +1,104 @@
+﻿@page "/Admin/EditRole/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("AddRoles") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1> @SharedLocalize.GetLocalizedStringValue("AddRoles") <small>@SharedLocalize.GetLocalizedStringValue("AddRoles")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("ManageRoles")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("AddRoles")</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="box box-info">
+                                    <!-- form start -->
+                                    <div class="box-body">
+
+                                        <form accept-charset="UTF-8" class="form-horizontal">
+                                            <div class="row">
+                                            @if (links != null && links.Count() > 0)
+                                                {
+                                                    foreach (var d in links)
+                                                    {
+                                                        <div class="col-md-6">
+
+                                                            <div class="form-group">
+
+                                                                <label class="col-sm-3 col-md-5 control-label" >@d.Title </label>
+                                                                <div class="col-sm-10 col-md-4">
+                                                                    <label class="control-label">
+                                                                        <input name="linkId"  type="redio" value="@d.Id" />
+                                                                    </label>
+
+                                                                    <br>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-xs-12 text-right">
+                                                        @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                                                    </div>
+                                                }
+
+                                            </div>
+
+                                            <!-- /.box-body -->
+                                            <div class="box-footer " style="text-align:center;">
+                                            <a style="float: unset;border: 1px solid #a19b9b69 !important;" class="btn btn-defult" href="/Roles">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit") </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+</section>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public List<LinkDto> links { get; set; }
+    List<RoleLinksDto> create = new List<RoleLinksDto>();
+    string message;
+    string style;
+    protected override async Task OnInitializedAsync()
+    {
+        create = new List<RoleLinksDto>();
+        links = await _userBL.GetLinks();
+    }
+
+    async Task UpdateAdmin()
+    {
+        var result = await _userBL.AddPermission(Id,create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+}
+
