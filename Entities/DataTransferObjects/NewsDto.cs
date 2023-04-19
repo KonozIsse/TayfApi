@@ -29,7 +29,7 @@ namespace Entities.DataTransferObjects
         public string Title { get; set; }
         public string Decription { get; set; }
         public Status IsStatus { get; set; }
-       // public int ImageId { get; set; }
+        public int ImgId { get; set; }
     }
     public class UpdateNewsDto : CreateNewsDto
     {

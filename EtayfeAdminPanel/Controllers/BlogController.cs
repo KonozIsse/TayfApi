@@ -13,13 +13,6 @@ namespace EtayfeAdminPanel.Controllers
     {
         public BlogController(IServiceProvider provider) : base(provider)
         {
-        }
-        [HttpGet("getblogsTest")]
-        public async Task<IActionResult> GetBlogsTest()
-        {
-            var result = await _newsBL.GetAllBlogstest(GetCurrentUserId(),GetLanguage());
-            //Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
-            return Ok(result);
         } 
         [HttpGet("get-blogs")]
         public async Task<IActionResult> GetBlogs(string search, [FromQuery] PostsParameters postsParameters)
@@ -38,7 +31,7 @@ namespace EtayfeAdminPanel.Controllers
         [HttpPost("create-blog")]
         public async Task<IActionResult> CreateBlog(CreateNewsDto create)
         {
-            var result = await _newsBL.AddNews(GetCurrentUserId(),1, create);
+            var result = await _newsBL.AddNews(GetCurrentUserId(), create);
             if (result.Success)
             {
                 return Ok(result.Message);

@@ -23,15 +23,7 @@ namespace Repository
 
         public async Task<ProductSales> GetFlashProductId(int productId)
         => await FindByCondition(r => r.ProductId == productId && r.EndDate > DateTime.UtcNow && r.IsStatus == Status.Active,false).FirstOrDefaultAsync();
-        public async Task<IEnumerable<ProductSales>> GetAllSalesProductId(int productId, bool trackChanges)
-        => await FindByCondition(r => r.ProductId ==  productId, trackChanges).ToListAsync();
         public void AddFlashSale(ProductSales sale) => Create(sale);
         public void DeleteFlashSale(ProductSales sale) => Delete(sale);
-        public void CreateListSales(List<ProductSales> entity) => CreateRange(entity);
-        public async Task DeleteListSales(List<int> Ids)
-        {
-            var result = await FindByCondition(c => Ids.Contains(c.Id), true).ToListAsync();
-            DeleteRange(result);
-        }
     }
 }

@@ -260,165 +260,200 @@ namespace BusinessLogic.ApiClasses
             }
             return new BussnessResultModel(product , _locService.GetLocalizedStringValue("successAdd"));
         }
-        //public async Task<BussnessResultModel> EditProduct(int userId, UpdateProductDto updateDto)
-        //{
-        //    var product = await _repositoryManager.Product.GetProductById(updateDto.Id, true);
-        //    if(product == null)
-        //    {
-        //        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
-        //    }
-        //    if (updateDto.DescriptionAr == null || updateDto.ProductNameAr == null)
-        //    {
-        //        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
-        //    }
-        //    if (updateDto.Price < 0)
-        //    {
-        //        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPrice"), false);
-        //    }
-        //    _mapper.Map(updateDto, product);
-        //    await _repositoryManager.SaveAsync();
-        //    if (updateDto.ProductCategories != null)
-        //    {
-        //        var categoriesProdId = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false);
-        //        var Ids = categoriesProdId.Select(x => x.Id);
-        //        var productCategoriesDto = updateDto.ProductCategories.Select(x => x.Id);
-        //        var listToDelete = Ids.Except(productCategoriesDto).ToList();
+        public async Task<BussnessResultModel> EditProduct(int userId, UpdateProductDto updateDto)
+        {
+            var product = await _repositoryManager.Product.GetProductById(updateDto.Id, true);
+            if (product == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
+            }
+            if (updateDto.DescriptionAr == null || updateDto.ProductNameAr == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
+            }
+            if (updateDto.Price < 0)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPrice"), false);
+            }
+            _mapper.Map(updateDto, product);
+            await _repositoryManager.SaveAsync();
+            if (updateDto.ProductCategories != null)
+            {
+                var categoriesProdId = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(product.Id, false);
+                var Ids = categoriesProdId.Select(x => x.Id);
+                var productCategoriesDto = updateDto.ProductCategories.Select(x => x.Id);
+                var listToDelete = Ids.Except(productCategoriesDto).ToList();
 
-        //        await _repositoryManager.ProductCategory.DeleteRowRange(listToDelete);
+                await _repositoryManager.ProductCategory.DeleteRowRange(listToDelete);
 
-        //        var listToAdd = updateDto.ProductCategories.Where(x => x.Id == 0);
+                var listToAdd = updateDto.ProductCategories.Where(x => x.Id == 0);
 
-        //        var entity = _mapper.Map<List<ProductCategory>>(listToAdd);
-        //        foreach (var item in entity)
-        //        {
-        //            item.ProductId = updateDto.Id;
-        //        }
-        //        _repositoryManager.ProductCategory.CreatProductCategoryRange(entity);
+                var entity = _mapper.Map<List<ProductCategory>>(listToAdd);
+                foreach (var item in entity)
+                {
+                    item.ProductId = updateDto.Id;
+                }
+                _repositoryManager.ProductCategory.CreatProductCategoryRange(entity);
 
-        //        var listToUpdate = Ids.Intersect(productCategoriesDto);
+                var listToUpdate = Ids.Intersect(productCategoriesDto);
 
-        //        foreach (var item in listToUpdate)
-        //        {
-        //            var itemEntity = await _repositoryManager.ProductCategory.GetItemId(item, true);
-        //            itemEntity.ProductId = updateDto.Id;
-        //            var dtoEntity = updateDto.ProductCategories.First(x => x.Id == item);
-        //            _mapper.Map(dtoEntity, itemEntity);
-        //        }
-        //        await _repositoryManager.SaveAsync();
-        //    }
-        //    else
-        //    {
-        //        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("selectcategory"), false);
-        //    }
-        //    if (updateDto.Images != null)
-        //    {
-        //        var imageProductId = await _repositoryManager.ImageProduct.GetAllImagesProductId(product.Id, false);
-        //        var Ids = imageProductId.Select(x => x.Id);
-        //        var IdsDto = updateDto.Images.Select(x => x.Id);
-        //        var listToDelete = Ids.Except(IdsDto).ToList();
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.ProductCategory.GetItemId(item, true);
+                    itemEntity.ProductId = updateDto.Id;
+                    var dtoEntity = updateDto.ProductCategories.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
+                await _repositoryManager.SaveAsync();
+            }
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("selectcategory"), false);
+            }
+            if (updateDto.Images != null)
+            {
+                var imageProductId = await _repositoryManager.ImageProduct.GetAllImagesProductId(product.Id, false);
+                var Ids = imageProductId.Select(x => x.Id);
+                var IdsDto = updateDto.Images.Select(x => x.Id);
+                var listToDelete = Ids.Except(IdsDto).ToList();
 
-        //        await _repositoryManager.ImageProduct.DeleteRowRange(listToDelete);
+                await _repositoryManager.ImageProduct.DeleteRowRange(listToDelete);
 
-        //        var listToAdd = updateDto.Images.Where(x => x.Id == 0);
+                var listToAdd = updateDto.Images.Where(x => x.Id == 0);
 
-        //        var entity = _mapper.Map<List<ProductImage>>(listToAdd);
-        //        foreach (var item in entity)
-        //        {
-        //            item.ProductId = updateDto.Id;
-        //        }
-        //        _repositoryManager.ImageProduct.CreatProductCategoryRange(entity);
+                var entity = _mapper.Map<List<ProductImage>>(listToAdd);
+                foreach (var item in entity)
+                {
+                    item.ProductId = updateDto.Id;
+                }
+                _repositoryManager.ImageProduct.CreatProductCategoryRange(entity);
 
-        //        var listToUpdate = Ids.Intersect(IdsDto);
+                var listToUpdate = Ids.Intersect(IdsDto);
 
-        //        foreach (var item in listToUpdate)
-        //        {
-        //            var itemEntity = await _repositoryManager.ImageProduct.GetImageProductId(item, true);
+                foreach (var item in listToUpdate)
+                {
+                    var itemEntity = await _repositoryManager.ImageProduct.GetImageProductId(item, true);
 
-        //            var dtoEntity = updateDto.Images.First(x => x.Id == item);
-        //            _mapper.Map(dtoEntity, itemEntity);
-        //        }
-        //        await _repositoryManager.SaveAsync();
-        //    }
-        //    else
-        //    {
-        //        return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
-        //    }
-           
-        //    if (updateDto.ProductSales != null)
-        //    {
-        //        var sale = updateDto.ProductSales.First();
-        //        if (sale.StartDate > sale.EndDate)
-        //        {
-        //            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("StartDateMustBeGaraterThanExpireDate"),false);
-        //        }
-        //        var sales = await _repositoryManager.Sales.GetAllSalesProductId(updateDto.Id, false);
-        //        var Ids = sales.Select(x => x.Id);
-        //        var salesDto = updateDto.ProductSales.Select(x => x.Id);
-        //        var listToDelete = Ids.Except(salesDto).ToList();
-        //        await _repositoryManager.Sales.DeleteListSales(listToDelete);
-        //        var listToAdd = updateDto.ProductSales.Where(x => x.Id == 0);
-        //        var entity = _mapper.Map<List<ProductSales>>(listToAdd);
-        //        foreach (var item in entity)
-        //        {
-        //            item.ProductId = product.Id;
-        //        }
-        //        _repositoryManager.Sales.CreateListSales(entity);
-        //        var listToUpdate = Ids.Intersect(salesDto);
-        //        foreach (var item in listToUpdate)
-        //        {
-        //            var itemEntity = await _repositoryManager.Sales.GetItemId(item, true);
-        //            var dtoEntity = updateDto.ProductSales.First(x => x.Id == item);
-        //            _mapper.Map(dtoEntity, itemEntity);
-        //        }
-        //        await _repositoryManager.SaveAsync();
-        //    }
-        //    else 
-        //    {
-        //        var salesProduct = await _repositoryManager.Sales.CheckFlashExists(updateDto.Id, false);
-        //        if (salesProduct != null)
-        //        {
-        //            _repositoryManager.Sales.DeleteFlashSale(salesProduct);
-        //            await _repositoryManager.SaveAsync();
-        //        }
-        //    }
-        //    if (updateDto.SpecialProducts != null)
-        //    {
-        //        if (DateTime.UtcNow > updateDto.SpecialProducts.First().EndDate)
-        //        {
-        //            return new BussnessResultModel(null, _locService.GetLocalizedStringValue("StartDateMustBeGaraterThanExpireDate"), false); 
-        //        }
-        //        var postSeePeopleDto = updateDto.SpecialProducts.Select(x => x.Id);
-        //        var sales = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(updateDto.Id, true);
-        //        var Ids = sales.Select(x => x.Id);
-        //        var listToDelete = Ids.Except(postSeePeopleDto).ToList();
-        //        await _repositoryManager.SpecialProducts.DeleteListSpecialProducts(listToDelete);
-        //        var listToAdd = updateDto.SpecialProducts.Where(x => x.Id == 0);
-        //        var entity = _mapper.Map<List<SpecialProducts>>(listToAdd);
-        //        foreach (var item in entity)
-        //        {
-        //            item.ProductId = product.Id;
-        //        }
-        //        _repositoryManager.SpecialProducts.CreateListSpecialProducts(entity);
-        //        var listToUpdate = Ids.Intersect(postSeePeopleDto);
-        //        foreach (var item in listToUpdate)
-        //        {
-        //            var itemEntity = await _repositoryManager.SpecialProducts.GetSpecialId(item, true);
-        //            var dtoEntity = updateDto.SpecialProducts.First(x => x.Id == item);
-        //            _mapper.Map(dtoEntity, itemEntity);
-        //        }
-        //        await _repositoryManager.SaveAsync();
-        //    }
-        //    else
-        //    {
-        //        var special = await _repositoryManager.SpecialProducts.CheckSpecialExists(updateDto.Id,false);
-        //        if (special != null)
-        //        {
-        //            _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
-        //            await _repositoryManager.SaveAsync();
-        //        }
-        //    }
-        //    return new BussnessResultModel(product, _locService.GetLocalizedStringValue("successSave"));
-        //}
+                    var dtoEntity = updateDto.Images.First(x => x.Id == item);
+                    _mapper.Map(dtoEntity, itemEntity);
+                }
+                await _repositoryManager.SaveAsync();
+            }
+            else
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"), false);
+            }
+
+            if (updateDto.IsSale == 1)
+            {
+                if (updateDto.StartDate > updateDto.EndDate)
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("StartDateMustBeGaraterThanExpireDate"), false);
+                }
+                var sale = await _repositoryManager.Sales.CheckFlashExists(updateDto.Id, true);
+                if(sale != null)
+                {
+                    sale.DiscountPrice = updateDto.DiscountPrice;
+                    sale.StartDate = (DateTime)updateDto.StartDate;
+                    sale.EndDate = (DateTime)updateDto.EndDate;
+                    sale.IsStatus = updateDto.IsStatusSale;
+                    sale.ProductId = product.Id;
+                    await _repositoryManager.SaveAsync();
+                }
+                else
+                {
+                    var saleNew = new ProductSales
+                    {
+                        IsStatus = updateDto.IsStatusSale,
+                        ProductId = product.Id,
+                        StartDate = updateDto.StartDate.Value,
+                        EndDate = updateDto.EndDate.Value,
+                        DiscountPrice = updateDto.DiscountPrice,
+                    };
+                    _repositoryManager.Sales.AddFlashSale(saleNew);
+                    await _repositoryManager.SaveAsync();
+                }
+            }
+            else
+            {
+                var salesProduct = await _repositoryManager.Sales.CheckFlashExists(updateDto.Id, false);
+                if (salesProduct != null)
+                {
+                    _repositoryManager.Sales.DeleteFlashSale(salesProduct);
+                    await _repositoryManager.SaveAsync();
+                }
+            }
+            if (updateDto.IsSpecial == 1)
+            {
+                if (DateTime.UtcNow > updateDto.EndDateSpecial)
+                {
+                    return new BussnessResultModel(null, _locService.GetLocalizedStringValue("StartDateMustBeGaraterThanExpireDate"), false);
+                }
+                var special = await _repositoryManager.SpecialProducts.CheckSpecialExists(updateDto.Id, true);
+                if (special != null)
+                {
+                    special.SpecialPrice = updateDto.SpecialPrice;
+                    special.EndDate = (DateTime)updateDto.EndDateSpecial;
+                    special.IsStatus = updateDto.IsStatusSpecial;
+                    special.ProductId = product.Id;
+                    await _repositoryManager.SaveAsync();
+                }
+                else
+                {
+                    var specialNew = new SpecialProducts
+                    {
+                        SpecialPrice = updateDto.SpecialPrice,
+                        EndDate = (DateTime)updateDto.EndDateSpecial,
+                        IsStatus = updateDto.IsStatusSpecial,
+                        ProductId = product.Id,
+                    };
+                    _repositoryManager.SpecialProducts.AddSpecialProduct(specialNew);
+                    await _repositoryManager.SaveAsync();
+
+                }
+            }
+            else
+            {
+                var special = await _repositoryManager.SpecialProducts.CheckSpecialExists(updateDto.Id, false);
+                if (special != null)
+                {
+                    _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
+                    await _repositoryManager.SaveAsync();
+                }
+            }
+            return new BussnessResultModel(product, _locService.GetLocalizedStringValue("successSave"));
+        }
+        public async Task<UpdateProductDto> GetMapProduct(int id)
+        {
+            var product = await _repositoryManager.Product.GetProductById(id, false);
+            var productDto = _mapper.Map<UpdateProductDto>(product);
+            var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(id);
+            if(special != null)
+            {
+                productDto.IsSpecial = 1 ;
+                productDto.SpecialPrice = special.SpecialPrice;
+                productDto.EndDateSpecial = special.EndDate;
+                productDto.IsStatusSpecial = special.IsStatus;
+            }
+            var flash = await _repositoryManager.Sales.GetFlashProductId(id);
+            if(flash != null)
+            {
+                productDto.IsSale =  1 ;
+                productDto.IsStatusSale = flash.IsStatus;
+                productDto.EndDate = flash.EndDate;
+                productDto.StartDate = flash.StartDate;
+            }
+            foreach(var catId in product.ProductCategories)
+            {
+                var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(id, false, false);
+                var catDtos = cats.Select(item => new CreateProductCategoryDto
+                {
+                    CategoryId = catId.CategoryId
+                });
+            }
+          
+            return productDto;
+        }
         public async Task<BussnessResultModel> ApproveProduct(int productId)
         {
             var product = await _repositoryManager.Product.GetProductById(productId, true);
@@ -445,21 +480,15 @@ namespace BusinessLogic.ApiClasses
             var product = await _repositoryManager.Product.GetProductById(productId, false);
             if (product != null )
             {
-                var specials = await _repositoryManager.SpecialProducts.GetSpecialProductsProductId(productId,false);
-                if (specials != null)
+                var special = await _repositoryManager.SpecialProducts.CheckSpecialExists(productId,false);
+                if (special != null)
                 {
-                    foreach (var special in specials)
-                    {
-                        _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
-                    }
+                    _repositoryManager.SpecialProducts.DeleteSpecialProduct(special);
                 }
-                var sales = await _repositoryManager.Sales.GetAllSalesProductId(productId,false);
-                if (sales != null)
+                var sale = await _repositoryManager.Sales.CheckFlashExists(productId,false);
+                if (sale != null)
                 {
-                    foreach (var sale in sales)
-                    {
-                        _repositoryManager.Sales.DeleteFlashSale(sale);
-                    }
+                    _repositoryManager.Sales.DeleteFlashSale(sale);
                 }
                 var likes = await _repositoryManager.WishList.GetLikesProductId(productId);
                 if (likes != null)

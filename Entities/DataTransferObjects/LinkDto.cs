@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace Entities.DataTransferObjects
         public string Icon { get; set; }
         public int ParentId { get; set; }
         public int OrderId { get; set; } 
+        public NavSubmenu NavSubmenu { get; set; } 
         public bool Show { get; set; }
     }
 }

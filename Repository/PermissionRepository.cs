@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using Entities.Models.Enums;
 
 namespace Repository
 {
@@ -18,7 +19,7 @@ namespace Repository
 
         }
         public async Task<List<Permission>> GetPermissionsShowRole (int roleId)
-        => await FindByCondition(c => c.RoleId == roleId && c.Link.IsStatus == Entities.Models.Enums.Status.Active, false).Include(r => r.Link).ToListAsync();   
+        => await FindByCondition(c => c.RoleId == roleId && c.Link.IsStatus == Status.Active, false).Include(r => r.Link).ToListAsync();   
         public async Task<IEnumerable<Permission>> GetPermissionsRole (int roleId , bool trackChanges)
         => await FindByCondition(c => c.RoleId == roleId , trackChanges).ToListAsync();
         public async Task<IEnumerable<Permission>> GetLinksRole(int roleId, List<int> Ids, bool trackChanges)
@@ -33,6 +34,6 @@ namespace Repository
 
         }
         public async Task<List<Link>> GetLinks()
-        => await FindByCondition(c =>  c.IsStatus == Entities.Models.Enums.Status.Active, false).Include(r => r.Permissions).ToListAsync();
+        => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(r => r.Permissions).ToListAsync();
     }
 }

@@ -157,7 +157,7 @@
     string style = "";
     async Task AddNews()
     {
-        var result = await _newBL.AddNews(3,im,create);
+        var result = await _newBL.AddNews(3,create);
         if (result.Success)
         {
             message = result.Message;

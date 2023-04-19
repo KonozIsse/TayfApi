@@ -10,6 +10,7 @@ namespace EtayfeAdminPanel.Controllers
         public AdminController(IServiceProvider provider) : base(provider)
         {
         }
+        
         [HttpGet("get-admins-stores")]
         public async Task<IActionResult> GetAdminsStors()
         {

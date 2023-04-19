@@ -23,20 +23,20 @@
                                     <!-- form start -->
                                     <div class="box-body">
 
-                                        <form accept-charset="UTF-8" class="form-horizontal">
+                                        <form class="form-horizontal">
                                             <div class="row">
                                             @if (links != null && links.Count() > 0)
                                                 {
                                                     foreach (var d in links)
                                                     {
-                                                        <div class="col-md-6">
+                                                    <div class="col-md-6">
 
                                                             <div class="form-group">
 
-                                                                <label class="col-sm-3 col-md-5 control-label" >@d.Title </label>
+                                                            <label class="col-sm-3 col-md-5 control-label">@SharedLocalize.GetLocalizedStringValue(d.Title)</label>
                                                                 <div class="col-sm-10 col-md-4">
                                                                     <label class="control-label">
-                                                                        <input name="linkId"  type="redio" value="@d.Id" />
+                                                                    <input @onclick="(async() => await AddLink(d.Id))"   type="checkbox" value="@d.Id" />
                                                                     </label>
 
                                                                     <br>
@@ -58,7 +58,7 @@
                                             <!-- /.box-body -->
                                             <div class="box-footer " style="text-align:center;">
                                             <a style="float: unset;border: 1px solid #a19b9b69 !important;" class="btn btn-defult" href="/Roles">@SharedLocalize.GetLocalizedStringValue("back")</a>
-                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit") </button>
+                                            <button type="submit" class="btn btn-primary" @onclick="CreatePermission">@SharedLocalize.GetLocalizedStringValue("Submit") </button>
                                             </div>
                                         </form>
                                     </div>
@@ -83,11 +83,13 @@
     protected override async Task OnInitializedAsync()
     {
         create = new List<RoleLinksDto>();
-        links = await _userBL.GetLinks();
+        links = links = await http.GetFromJsonAsync<List<LinkDto>>("api/Home/GetLinksRole/" + Id);
+     
     }
 
-    async Task UpdateAdmin()
+    async Task CreatePermission()
     {
+       
         var result = await _userBL.AddPermission(Id,create);
         if (result.Success)
         {
@@ -99,6 +101,10 @@
             message = result.Message;
             style = "danger";
         }
+    }
+     public async Task AddLink(int id)
+    {
+        create.Add(new RoleLinksDto { LinkId = id });
     }
 }
 

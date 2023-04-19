@@ -55,10 +55,9 @@ namespace BusinessLogic.ApiClasses
             newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId.Value);
             return newsDto;
         }
-        public async Task<BussnessResultModel> AddNews (int storeId, int im,CreateNewsDto create)
+        public async Task<BussnessResultModel> AddNews (int storeId, CreateNewsDto create)
         {
             var blog = _mapper.Map<News>(create);
-            blog.ImgId = im;
             var user = await _repositoryManager.User.GetActiveUserId(storeId, false);
             if (user.UserType == UserType.Store)
             {

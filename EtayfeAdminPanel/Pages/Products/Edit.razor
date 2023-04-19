@@ -1,5 +1,485 @@
-﻿<h3>Edit</h3>
+﻿@page "/Product/Edit/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Editproducts") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("products")<small>@SharedLocalize.GetLocalizedStringValue("Editproducts")</small> </h1>
+    <ol class="breadcrumb">
+        <li class = "fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("products")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("Editproducts")</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("Editproducts")</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                <div class="form-horizontal">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ProductType")<span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="select2_demo_1 form-control col-md-8 float-right" @bind="create.Type">
+                                                        @if (Types != null)
+                                                        {
+                                                            <option value="0">@SharedLocalize.GetLocalizedStringValue("ProductType")</option>
+                                                            @foreach (var type in Types)
+                                                            {
+                                                                <option value="@type">@type</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if (user != null && user.UserType == UserType.Admin)
+                                        {
+                                            <div class="col-xs-12 col-md-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("store")</label>
+                                                    <div class="col-sm-10 col-md-8">
+                                                        <select class="select2_demo_1 form-control col-md-8 float-right" @bind="create.StoreId">
+                                                            <option value=0>@SharedLocalize.GetLocalizedStringValue("store")</option>
+                                                            @if (stores != null)
+                                                            {
+                                                                @foreach (var store in stores)
+                                                                {
+                                                                    <option value="@store.Id">@store.FirstName</option>
+                                                                }
+                                                            }
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-2 control-label">@SharedLocalize.GetLocalizedStringValue("SubCategories")<span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-9">
+                                                    <ul class="list-group list-group-root well">
+                                                        @if (categories != null)
+                                                        {
+                                                            @foreach (var f in categories)
+                                                            {
+                                                                <li href="#" class="list-group-item">
+                                                                    <label style="width:100%">
+                                                                        <input class=" required_one categories sub_categories" type="checkbox" @onclick="(async()=> await AddCats(f.Id))" value="@f.Id">
+                                                                        @f.CategoryName
+                                                                    </label>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    </ul>
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
+                                                        @SharedLocalize.GetLocalizedStringValue("chooseCat")
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("IsFeature") </label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="form-control" @bind="@create.IsFeature">
+                                                        <option value="0">@SharedLocalize.GetLocalizedStringValue("No")</option>
+                                                        <option value="1">@SharedLocalize.GetLocalizedStringValue("Yes")</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")</label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="form-control" @bind="@create.IsStatus">
+                                                        <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                        <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ProductsPrice")<span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <input @bind="create.Price" class="form-control" type="number" />
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("bestproduct") </label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="form-control" @bind="create.IsBest">
+                                                        <option value="0">@SharedLocalize.GetLocalizedStringValue("No")</option>
+                                                        <option value="1">@SharedLocalize.GetLocalizedStringValue("Yes")</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("popularproducts") </label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="form-control" @bind="create.IsPopular">
+                                                        <option value=0>@SharedLocalize.GetLocalizedStringValue("No")</option>
+                                                        <option value=1>@SharedLocalize.GetLocalizedStringValue("Yes")</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" style="display:none;">
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ProductsModel")</label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <input @bind="create.ProductModel" class="form-control" type="text" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group flash-sale-link">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSale")</label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="form-control" name="isFlash" onchange="flash(this)">
+                                                        <option value="0">@SharedLocalize.GetLocalizedStringValue("No")</option>
+                                                        <option value="1" selected="@selectedSale">@SharedLocalize.GetLocalizedStringValue("Yes")</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            @if (create.IsSale == 1)
+                                            {
+                                                bool selectedActive = create.IsStatusSale == Status.Active ? true :false;
+                                                bool selectedNotActive = create.IsStatusSale == Status.NotActive ? true : false;
+
+                                                <div class="flash-container" style="display: block;">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSalePrice")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="number" @bind="@create.DiscountPrice" name="flash_sale_products_price">
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSaleStartDate")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" name="flash_start_date" type="date" @bind="create.StartDate">
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSaleExpireDate") <span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" name="flash_expires_date" type="date" @bind="@create.EndDate">
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")</label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <select class="form-control" @bind="create.IsStatusSale">
+                                                                <option value="@Status.Active" selected="@selectedActive">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                                <option value="@Status.NotActive" selected="@selectedNotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                            </select>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            }
+                                            @if (create.IsSale == 0)
+                                            {
+                                                <div class="flash-container" style="display: none;">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSalePrice")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="number" @bind="create.DiscountPrice">
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSaleStartDate")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="date" @bind="create.StartDate">
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSaleExpireDate") <span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" @bind="create.EndDate" type="date">
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")</label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <select class="form-control" @bind="create.IsStatusSale">
+                                                                <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                                <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                            </select>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-6">
+                                            <div class="form-group special-link">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Special")</label>
+                                                <div class="col-sm-10 col-md-8">
+                                                    <select class="form-control" name="isSpecial" onchange="special(this)">
+                                                        <option value="0">@SharedLocalize.GetLocalizedStringValue("No")</option>
+                                                        <option value="1" selected="@selectedSpeical">@SharedLocalize.GetLocalizedStringValue("Yes")</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            @if (create.IsSpecial == 1)
+                                            {
+                                                bool selected = create.IsStatusSpecial == Status.Active ? true : false;
+                                                bool selected1 = create.IsStatusSpecial == Status.NotActive ? true : false;
+                                                <div class="special-container" style="display: block;">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("SpecialPrice")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="number" name="specials_new_products_price" id="special-price" @bind="@create.SpecialPrice">
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ExpiryDate")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="date"  id="expiry-date" @bind="create.EndDateSpecial">
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <select class="form-control" @bind="create.IsStatusSpecial">
+                                                                <option value="Status.Active" selected="@selected">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                                <option value="Status.NotActive" selected="@selected1">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                            </select>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            @if (create.IsSpecial == 0)
+                                            {
+                                                <div class="special-container" style="display: none;">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("SpecialPrice")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="number" @bind="create.SpecialPrice" id="special-price" >
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ExpiryDate")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <input class="form-control" type="date" @bind="create.EndDateSpecial" id="expiry-date" >
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")<span style="color:red;">*</span></label>
+                                                        <div class="col-sm-10 col-md-8">
+                                                            <select class="form-control" @bind="create.IsStatusSpecial">
+                                                                <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                                <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                            </select>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <hr>
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="tabbable tabs-left">
+
+                                                <div class="tab-content">
+                                                    @if(lang != null)
+                                                    {
+                                                        @for (int i = 0; i < langs.Count(); i++)
+                                                        {
+                                                            <div style="margin-top: 15px;" class="tab-pane @(i == 0 ? "active" : "")" id="tab_@langs[i].Id">
+                                                                <div class="">
+                                                                    @foreach (var m in langs)
+                                                                    {
+                                                                        if (m.Code == "en")
+                                                                        {
+                                                                            <div class="form-group">
+                                                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ProductName")<span style="color:red;">*</span> (@m.Code)</label>
+                                                                                <div class="col-sm-10 col-md-8">
+                                                                                    <input @bind="create.ProductName" name="ProductName" required="required" class="form-control" />
+
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc")<span style="color:red;">*</span> (@m.Code)</label>
+                                                                                <div class="col-sm-10 col-md-8">
+                                                                                    <textarea @bind="create.Description" name="Description" cols="50" rows="10" required="required" class="ckeditor form-control">@create.Description</textarea>
+                                                                                </div>
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <div class="form-group">
+                                                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ProductName")<span style="color:red;">*</span> (@m.Code)</label>
+                                                                                <div class="col-sm-10 col-md-8">
+                                                                                    <input @bind="create.ProductNameAr" required="required" class="form-control" />
+
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc")<span style="color:red;">*</span> (@m.Code)</label>
+                                                                                <div class="col-sm-10 col-md-8">
+                                                                                    <textarea @bind="create.DescriptionAr" cols="50" rows="10" required="required" class="ckeditor form-control">@create.DescriptionAr</textarea>
+
+
+                                                                                </div>
+                                                                            </div>
+                                                                        }
+
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-footer text-center">
+                                        <button type="submit" class="btn btn-primary" @onclick="UpdateProduct">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                        <a class="btn btn-defult" href="/Products">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+</section>
 
 @code {
-
+    [Parameter]
+    public int Id { get; set; }
+    UpdateProductDto create = new UpdateProductDto();
+    public string lang { get; set; }
+    public AdminDto user { get; set; }
+    public List<string> Types;
+    public List<CategoryDto> categories;
+    public List<StoreDto> stores;
+    public List<LanguageDto> langs;
+    string message = "";
+    string style = "";
+    bool selectedSale = false;
+    bool selectedSpeical = false;
+    bool selectedStatusSpeical = false;
+    bool selectedStatusSale = false;
+    //-----------------------------
+    protected override async Task OnInitializedAsync()
+    {
+        create = new UpdateProductDto();
+        create = await  _productBL.GetMapProduct(Id);
+        selectedSale = create.IsSale == 1 ? true : false;
+        selectedSpeical = create.IsSpecial == 1 ? true : false;
+        //--------------------------------------
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        langs = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
+        categories = await http.GetFromJsonAsync<List<CategoryDto>>("api/Categories/GetAllSubActiveCategories");
+        Types = _productBL.GetProductTypes();
+        //http.GetFromJsonAsync<List<string>>("api/product/getAllTypesProducts");
+        stores = await http.GetFromJsonAsync<List<StoreDto>>("api/ManageVendors/GetStores");
+    }
+    public async Task UpdateProduct()
+    {
+        create.Id = Id;
+        var result = await _productBL.EditProduct(user.Id, create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+    public async Task AddCats(int id)
+    {
+        create.ProductCategories = new List<CreateProductCategoryDto>();
+        create.ProductCategories.Add(new CreateProductCategoryDto { CategoryId = id });
+    }
 }

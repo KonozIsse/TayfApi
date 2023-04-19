@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EtayfeAdminPanel.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230418213531_AddenumtoLink")]
+    partial class AddenumtoLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -771,9 +773,6 @@ namespace EtayfeAdminPanel.Migrations
 
                     b.Property<bool?>("IsVendorLink")
                         .HasColumnType("bit");
-
-                    b.Property<int>("NavSubmenu")
-                        .HasColumnType("int");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -1787,8 +1786,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "acd2a84e-8f30-4b8c-84d1-bd5d0cd5093a",
-                            CreatedAt = new DateTime(2023, 4, 18, 11, 37, 33, 566, DateTimeKind.Local).AddTicks(6012),
+                            ConcurrencyStamp = "2b4e8375-3532-45d3-b794-27782dac1e20",
+                            CreatedAt = new DateTime(2023, 4, 18, 11, 35, 29, 524, DateTimeKind.Local).AddTicks(7039),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Admin",
@@ -1797,8 +1796,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "152baac4-ac96-4486-8923-9d4e3676f70c",
-                            CreatedAt = new DateTime(2023, 4, 18, 11, 37, 33, 566, DateTimeKind.Local).AddTicks(6075),
+                            ConcurrencyStamp = "1f1ba777-3566-4479-953a-2a44703605ac",
+                            CreatedAt = new DateTime(2023, 4, 18, 11, 35, 29, 524, DateTimeKind.Local).AddTicks(7158),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Customer",
@@ -1807,8 +1806,8 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "3acfde42-8ab1-4d06-8817-ed47916359cf",
-                            CreatedAt = new DateTime(2023, 4, 18, 11, 37, 33, 566, DateTimeKind.Local).AddTicks(6079),
+                            ConcurrencyStamp = "b63b829f-c682-401b-819b-2a9f8a02242b",
+                            CreatedAt = new DateTime(2023, 4, 18, 11, 35, 29, 524, DateTimeKind.Local).AddTicks(7163),
                             IsDeleted = false,
                             IsStatus = 1,
                             Name = "Store",

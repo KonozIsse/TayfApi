@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Entities.Models
         public int ParentId { get; set; }
         public int OrderId { get; set; }
         public bool? IsVendorLink { get; set; }
+        public NavSubmenu NavSubmenu { get; set; }
         public List<Permission> Permissions { get; set; }
     }
 }

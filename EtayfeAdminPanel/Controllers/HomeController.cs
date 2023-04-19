@@ -14,10 +14,16 @@ namespace EtayfeAdminPanel.Controllers
         public HomeController(IServiceProvider provider) : base(provider)
         {
         }
+        [HttpGet("GetLinksRole/{roleId}")]
+        public async Task<IActionResult> GetLinksRole(int roleId)
+        {
+            var result = await _userBL.GetLinks(roleId);
+            return Ok(result);
+        }
         [HttpGet("GetTotalOrdersProducts")]
         public async Task<IActionResult> GetTotalOrdersProducts()
         {
-            var result = await _homeBL.GetHomeCP(3);
+            var result = await _homeBL.GetHomeCP(GetCurrentUserId());
             return Ok(result);
         } 
         [HttpGet("getNewCustomers")]
@@ -29,13 +35,13 @@ namespace EtayfeAdminPanel.Controllers
         [HttpGet("getRecentProducts")]
         public async Task<IActionResult> GetRecentProducts()
         {
-            var result = await _homeBL.GetRecentProducts(3,GetLanguage());
+            var result = await _homeBL.GetRecentProducts(GetCurrentUserId(), GetLanguage());
             return Ok(result);
         } 
         [HttpGet("getNewOrders")]
         public async Task<IActionResult> GetNewOrders()
         {
-            var result = await _homeBL.GetOrders(3);
+            var result = await _homeBL.GetOrders(GetCurrentUserId());
             return Ok(result);
         } 
         [HttpGet("getNewStores")]

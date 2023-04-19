@@ -99,10 +99,10 @@
                                 {
                                    <a class="btn btn-default btn-flat" href="/Admin/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
                                 }
-                                else
+                              @*  else
                                 {
                                     <a class="btn btn-default btn-flat" href="/UserAdmins/Edit/@user.Id">@SharedLocalize.GetLocalizedStringValue("editProfile")</a>
-                                }
+                                }*@
                             </div>
                             <div class="pull-right">
                                 <a class="btn btn-default btn-flat" @onclick="TryLogout">@SharedLocalize.GetLocalizedStringValue("logout") </a>
