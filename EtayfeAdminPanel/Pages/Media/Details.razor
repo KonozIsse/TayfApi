@@ -1,0 +1,158 @@
+﻿@page "/Media/Details/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("ImageDetail") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1> @SharedLocalize.GetLocalizedStringValue("ImageDetail") <small>@SharedLocalize.GetLocalizedStringValue("ImageDetail")...</small> </h1>
+    <ol class="breadcrumb">
+
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("ImageDetail")</li>
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("addImg")</li>
+    </ol>
+</section>
+
+@if (Model != null)
+{
+    <section class="content">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>
+                        @{
+                            var t = Model.Where(c => c.ImageType == ImageType.ACTUAL).FirstOrDefault();
+                        }
+                        @if (t != null)
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="caption">
+                                        <h2>@t.ImageType  (@t.Width X @t.Height)</h2>
+                                    </div>
+                                    <div class="thumbnail">
+                                        <img src="@t.Path" alt="@t.Width X @t.Height">
+                                        <div class="col-md-6 col-md-offset-3">
+                                            <div class="caption">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">Path</span>
+                                                    <input type="text" class="form-control" name="path" value="@t.Path">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (settings != null && Model.Count() > 0)
+                        {
+                            foreach (var t1 in Model.Where(r => r.ImageType != ImageType.ACTUAL))
+                            {
+                                if (t1 != null)
+                                {
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            @{
+                                                var thh = settings.Where(x => x.Key == "Thumbnail_height").First().Value;
+                                                var thw = settings.Where(x => x.Key == "Thumbnail_width").First().Value;
+                                                var mh = settings.Where(x => x.Key == "Medium_height").First().Value;
+                                                var mw = settings.Where(x => x.Key == "Medium_width").First().Value;
+                                                var lh = settings.Where(x => x.Key == "Large_height").First().Value;
+                                                var lw = settings.Where(x => x.Key == "Large_width").First().Value;
+                                            }
+                                            <div class="caption">
+                                                <h2>@t1.ImageType  @(t1.ImageType == ImageType.THUMBNAIL ? (thw + "X" + thh) : ((t1.ImageType == ImageType.MEDIUM) ? (mw + "X" + mh) : (lw + "X" + lh))) </h2>
+                                            </div>
+                                            <div class="thumbnail">
+                                                <img src="@t1.Path" alt="150 X 150">
+                                                <div class="col-md-6 col-md-offset-3">
+                                                    <div class="caption">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">Path</span>
+                                                            <input type="text" class="form-control" name="path" value="@t1.Path">
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                    <form accept-charset="UTF-8" class="form-horizontal form-validate">
+                                                        <div class="caption">
+                                                            <div class="input-group">
+                                                                <input hidden name="id" value="@t1.Id" />
+                                                                <input hidden name="type" value="@t1.ImageType" />
+                                                                <span class="input-group-addon">Size</span>
+                                                                <input required="" type="text" class="form-control" name="height" value="@t1.Height">
+                                                                <span class="input-group-addon">X</span>
+                                                                <input required="" type="text" class="form-control" name="width" value="@t1.Width">
+                                                                <span class="input-group-addon" style="padding: 0">
+                                                                    <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Regenerate")</button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <p id="demo"></p>
+
+            <!-- /.col -->
+        </div>
+
+
+        <!-- /.row -->
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    UpdateImageSettingDto create = new UpdateImageSettingDto();
+    public List<ImageSettingDto> Model { get; set; }
+    public List<SettingDto> settings { get; set; }
+    string message;
+    string style;
+    public string lang { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        create = new UpdateImageSettingDto();
+        Model = await _imageBL.GetAllImageSettingsToImage(Id);
+        settings = await _imageBL.GetAllSettings();
+    }
+
+    async Task EditImgSetting()
+    {
+        create.Id = Id;
+        var result = await _imageBL.EditImageSetting(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+}

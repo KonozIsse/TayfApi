@@ -52,7 +52,7 @@
                                                         <div class="form-group">
                                                             <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("store")</label>
                                                             <div class="col-sm-10 col-md-8">
-                                                                <select class = "select2_demo_1 form-control col-md-8 float-right" @bind="create.StoreId">
+                                                                <select class = "select2_demo_1 form-control col-md-8 float-right" required @bind="create.StoreId">
                                                                     <option value=0>@SharedLocalize.GetLocalizedStringValue("store")</option>
                                                                 @if (stores != null)
                                                                 {
@@ -113,9 +113,9 @@
                                                     <div class="form-group">
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")</label>
                                                         <div class="col-sm-10 col-md-8">
-                                                            <select class="form-control" @bind="create.IsStatus">
+                                                        <select class="form-control" @bind="create.IsStatus" required>
                                                                 <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
-                                                            <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                                <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
                                                             </select>
                                                             <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
                                                                 @SharedLocalize.GetLocalizedStringValue("chooseStatus")
@@ -143,7 +143,7 @@
                                                     <div class="form-group">
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("bestproduct") </label>
                                                         <div class="col-sm-10 col-md-8">
-                                                            <select class="form-control" @bind="create.IsBest">
+                                                        <select class="form-control" @bind="create.IsBest" required>
                                                                 <option value=0>@SharedLocalize.GetLocalizedStringValue("No")</option>
                                                                 <option value=1>@SharedLocalize.GetLocalizedStringValue("Yes")</option>
                                                             </select>
@@ -155,7 +155,7 @@
                                                     <div class="form-group">
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("popularproducts") </label>
                                                         <div class="col-sm-10 col-md-8">
-                                                            <select class="form-control" @bind="create.IsPopular">
+                                                        <select class="form-control" @bind="create.IsPopular" required>
                                                                 <option value=0>@SharedLocalize.GetLocalizedStringValue("No")</option>
                                                                 <option value=1>@SharedLocalize.GetLocalizedStringValue("Yes")</option>
                                                             </select>
@@ -173,7 +173,7 @@
                                                     <div class="form-group">
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ProductsModel")</label>
                                                         <div class="col-sm-10 col-md-8">
-                                                            <input @bind="create.ProductModel" class = "form-control" type = "text"/>
+                                                            <input @bind="create.ProductModel" class = "form-control" required  type = "text"/>
 
                                                         </div>
                                                     </div>

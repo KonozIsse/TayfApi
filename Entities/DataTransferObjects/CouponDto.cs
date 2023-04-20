@@ -23,10 +23,14 @@ namespace Entities.DataTransferObjects
     public class CreateCouponDto
     {
         public string Description { get; set; }
+        [Required]
         public string CouponCode { get; set; }
+        [Required]
         public DiscountType DiscountType { get; set; }
+        [Required]
         public decimal CouponAmount { get; set; }
         public DateTime? ExpiryDate { get; set; }
+        [Required]
         public List<ProductsCouponDto> ProductsCoupons { get; set; }
     }
     public class UpdateCouponDto: CreateCouponDto
@@ -36,6 +40,7 @@ namespace Entities.DataTransferObjects
     public class ProductsCouponDto
     {
         public int Id { get; set; }
+        [Required]
         public int ProductId { get; set; }
     }
 }

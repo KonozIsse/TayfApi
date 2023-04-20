@@ -427,6 +427,7 @@ namespace BusinessLogic.ApiClasses
         {
             var product = await _repositoryManager.Product.GetProductById(id, false);
             var productDto = _mapper.Map<UpdateProductDto>(product);
+            productDto.Type = product.ProductType;
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(id);
             if(special != null)
             {
@@ -443,15 +444,17 @@ namespace BusinessLogic.ApiClasses
                 productDto.EndDate = flash.EndDate;
                 productDto.StartDate = flash.StartDate;
             }
-            foreach(var catId in product.ProductCategories)
+            var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(id,false,false);
+            foreach (var catId in cats)
             {
-                var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(id, false, false);
                 var catDtos = cats.Select(item => new CreateProductCategoryDto
                 {
                     CategoryId = catId.CategoryId
-                });
+                }).ToList();
+                productDto.ProductCategories = catDtos;
             }
-          
+           
+
             return productDto;
         }
         public async Task<BussnessResultModel> ApproveProduct(int productId)

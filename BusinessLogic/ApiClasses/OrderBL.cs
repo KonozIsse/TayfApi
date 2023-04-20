@@ -931,8 +931,13 @@ namespace BusinessLogic.ApiClasses
                 return couponDto;
             }).ToList();
             return PagedList<CouponDto>.ToPagedList(couponsDto, postsParameters.PageNumber, postsParameters.PageSize);
-        } 
-       
+        }
+        public async Task<UpdateCouponDto> GetMapCouponId(int id)
+        {
+            var coupon = await _repositoryManager.Coupon.GetCouponId(id, false);
+            var couponDto = _mapper.Map<UpdateCouponDto>(coupon);
+            return couponDto;
+        }
         //OrderStatus------------------------------------------------
         public async Task<PagedList<OrderStatusDto>> GetOrderStatus(string lang  , PostsParameters postsParameters)
         {

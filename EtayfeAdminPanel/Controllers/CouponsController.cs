@@ -20,6 +20,12 @@ namespace EtayfeAdminPanel.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
+        [HttpGet("GetAllPrductsToCoupon")]
+        public async Task<IActionResult> GetAllPrductsToCoupon()
+        {
+            var result = await _orderBL.GetAllPrductsToCoupon();
+            return Ok(result);
+        }
 
         [HttpPost("create-coupon")]
         public async Task<IActionResult> CreateCoupon(CreateCouponDto create)

@@ -1,0 +1,346 @@
+﻿@page "/Media"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("imgs") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+
+<style>
+    input[type="file"] {
+  display: block;
+}
+.imageThumb {
+  max-height: 75px;
+  border: 2px solid;
+  padding: 1px;
+  cursor: pointer;
+}
+.pip {
+  display: inline-block;
+  margin: 10px 10px 0 0;
+}
+.remove {
+  display: block;
+  background: #444;
+  border: 1px solid black;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+.remove:hover {
+  background: white;
+  color: black;
+}
+</style>
+
+<!--  content -->
+<section class="content-header">
+    <h1> @SharedLocalize.GetLocalizedStringValue("imgs") <small>@SharedLocalize.GetLocalizedStringValue("imgs")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active"> @SharedLocalize.GetLocalizedStringValue("imgs")</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+@if (lang == "ar")
+{
+    <div class="box-header" style="float:unset !important;">
+        <h3 class="box-title" style="float: right !important;">  عرض كل الصور</h3>
+
+        <div style="float: left;">
+            <div class="box-tools pull-left">
+
+                <button id="btn" type="button" class="btn btn-block btn-danger ConfirmDelete">حذف</button>
+
+            </div>
+            <div style="margin-right: 3px;" class="box-tools pull-left">
+                <button id="checkbtn" type="button" class="btn btn-block btn-success">تحديد الكل</button>
+
+            </div>
+            <div  style="margin-right: 3px;" class="box-tools pull-left">
+                <button id="unchk" type="button" class="btn btn-block btn-info">ازالة التحديد</button>
+
+            </div>
+            <div class="box-tools pull-left" style=" margin-right: 3px;">
+                <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal">إضافة صور جديدة</button>
+
+            </div>
+        </div>
+    </div>
+}
+else
+{
+                <div class="box-header">
+                    <h3 class="box-title">Listing All The @SharedLocalize.GetLocalizedStringValue("imgs") </h3>
+
+                   
+                    <div style="margin-right:88px;" class="box-tools pull-left">
+                        <button id="btn" type="button" class="btn btn-block btn-danger ">Delete</button>
+
+                    </div>
+                    <div style="margin-right:162px;" class="box-tools pull-left">
+                        <button  id="checkbtn" type="button" class="btn btn-block btn-success">Select All</button>
+
+                    </div>
+                    <div style="margin-right:253px;" class="box-tools pull-left">
+                        <button id="unchk" type="button" class="btn btn-block btn-info">UnSelect All</button>
+
+                    </div>
+                    <div class="box-tools pull-left">
+                        <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal">Add New</button>
+
+                    </div>
+                </div>
+}
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box-header">
+                                <div class="box-header">
+                                    <div class="col-lg-6 form-inline" id="contact-form">
+                                        <form class="registration" method="get">
+                                            <div class="input-group-form search-panel" style="width: 45%;display:inline;">
+                                                <label style="margin: 2%;">@SharedLocalize.GetLocalizedStringValue("chooseCat") : </label>
+                                                <select class="form-control" @bind="@category" style="width: 45%;">
+                                                    <option value="" >@SharedLocalize.GetLocalizedStringValue("allcategory")</option>
+                                                    @if(categories != null)
+                                                    {
+                                                        @foreach (var c in categories)
+                                                        {
+                                                            switch (c)
+                                                            {
+                                                                case ImageCategory.Banners:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("banners") (1140 * 240)</option>
+                                                                    break;
+                                                                case ImageCategory.Categories:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("categories") (250 * 200)</option>
+                                                                    break;
+                                                                case ImageCategory.Sliders:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("slider") (1400 * 600)</option>
+                                                                    break;
+                                                                case ImageCategory.Products:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
+                                                                    break;
+                                                                case ImageCategory.Services:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("Services") (200 * 200)</option>
+                                                                    break;
+                                                                case ImageCategory.Blogs:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("blog") (250 * 250)</option>
+                                                                    break;
+                                                                case ImageCategory.Stores:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("store") (250 * 200)</option>
+                                                                    break;
+                                                                case ImageCategory.Others:
+                                                                    <option value="@c">@SharedLocalize.GetLocalizedStringValue("Others")</option>
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                   
+                                                </select>
+                                                <button type="button" class="btn btn-primary" @onclick="@GetAllImages"><i class="oi oi-magnifying-glass"></i></button>
+                                                <a onClick="window.location.reload()" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+
+
+                                            </div>
+                                        </form>
+                                        <div class="col-lg-4 form-inline" id="contact-form12"></div>
+                                    </div>
+                                   
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        article, aside, figure, footer, header, hgroup,
+                        menu, nav, section {
+                            display: block;
+                        }
+
+                        ul {
+                            list-style: none;
+                        }
+
+                            ul li {
+                                display: inline;
+                            }
+
+                        img {
+                            border: 2px solid white;
+                            cursor: pointer;
+                        }
+
+                            img:hover {
+                                border: 2px solid black;
+                            }
+
+                            img.hover {
+                                border: 2px solid black;
+                            }
+
+                        .margin-bottomset .thumbnail {
+                            margin-bottom: 0;
+                        }
+                    </style>
+
+                    
+                    <div class="row">
+
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            foreach (var m in Model)
+                            {
+                        <div class="col-xs-4 col-md-2 margin-bottomset">
+                            <div class="thumbnail thumbnail-imges">
+                                        <input @bind="m.Id" class="chk" type="checkbox" style="width: 19%;margin-top: -46%;opacity: 1 !important;" />
+                                <img style="max-height:74px !important;max-width: 118px;" class="test_image" src="@m.Name" title="@m.Category" alt="...">
+                            </div>
+                                    <a class="btn btn-block btn-primary" href="/Media/Details/@m.Id"> @SharedLocalize.GetLocalizedStringValue("Details")</a>
+                        </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <p id="demo"></p>
+
+        <!-- /.col -->
+    </div>
+    <!-- Main row -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <EditForm Model="create" OnValidSubmit="AddImage">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title">@SharedLocalize.GetLocalizedStringValue("AddFiles")</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>@SharedLocalize.GetLocalizedStringValue("ChooseImagesInTheBoxForUpload")</p>
+
+                    <InputSelect class="form-control" @bind-Value="create.Category">
+                        <option value="Products">@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
+                        @if(categories != null)
+                        {
+                            @foreach (var c in categories)
+                            {
+                                switch (c)
+                                {
+                                    case ImageCategory.Banners:
+                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("banners") (1140 * 240)</option>
+                                        break;
+                                    case ImageCategory.Categories:
+                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("categories") (250 * 200)</option>
+                                        break;
+                                    case ImageCategory.Sliders:
+                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("slider") (1400 * 600)</option>
+                                        break;
+                                    case ImageCategory.Services:
+                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("Services") (200 * 200)</option>
+                                        break;
+                                    case ImageCategory.Blogs:
+                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("blog") (250 * 250)</option>
+                                        break;
+                                    case ImageCategory.Stores:
+                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("store") (250 * 200)</option>
+                                        break;
+                                }
+                            }
+                        }
+                        
+                        <option value="Others">@SharedLocalize.GetLocalizedStringValue("Others")</option>
+                    </InputSelect>
+                        <ValidationMessage For="@(() => create.Category)" />
+                        <br />
+                    <div class="field" align="@(lang == "en"? "left":"right")">
+                            <input type="file" id="files" accept="image/*" name="@create.Files" multiple />
+                    </div>
+
+                </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary"  id="compelete">@SharedLocalize.GetLocalizedStringValue("Done")</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("close")</button>
+        </div>
+    </div>
+            </EditForm>
+        </div>
+    </div>
+ 
+
+    <!-- /.row -->
+</section>
+
+@code {
+    [Parameter]
+    public string lang { get; set; }
+      public CreateImageDto create { get; set; }
+    public List<ImageDto> Model { get; set; }
+    public List<ImageCategory> categories { get; set; }
+    public AdminDto user { get; set; }
+    public ImageCategory? category { get; set; }
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    create = new CreateImageDto();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        categories =  _imageBL.GetImageCategories();
+        await GetAllImages();
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
+        await GetAllImages();
+    }
+    async Task GetAllImages()
+    {
+        var pagingResponse = await _imageBL.GetImages(category,user.Id, _PostsParameters);
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(List<int> ids)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure ?");
+        @if (confirm)
+        {
+            var result = await _imageBL.DeleteImageIds(ids);
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+        }
+    }
+    async Task AddImage()
+    {
+        var result = await _imageBL.CreateImages(user.Id,create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+}

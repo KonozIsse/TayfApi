@@ -1,6 +1,5 @@
 ﻿@page "/Coupon/Add"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("Coupons")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
-
 <Alert Message="@message" Style="@style"></Alert>
 <style>
     .select2 {
@@ -38,14 +37,13 @@
                                   <EditForm Model="@create" OnValidSubmit="@AddCoupon">
                                                 <DataAnnotationsValidator />
                                     <div class="form-horizontal">
-
-                                        <!-- form start -->
                                         <div class="box-body">
 
                                             <div class="form-group">
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Coupon")<span style="color:red;">*</span></label>
                                                 <div class="col-sm-10 col-md-4">
-                                                    <InputText class="form-control" @bind-Value="create.CouponCode" />
+                                                    <InputText class="form-control" @bind-Value="create.CouponCode" ></InputText>
+                                                    <ValidationMessage For="@(() => create.CouponCode)" />
                                                 </div>
                                             </div>
 
@@ -53,7 +51,8 @@
                                             <div class="form-group">
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc")</label>
                                                 <div class="col-sm-10 col-md-4">
-                                                    <InputTextArea class="form-control" @bind-Value="create.Description" />
+                                                    <InputTextArea class="form-control" @bind-Value="create.Description" ></InputTextArea>
+                                                    <ValidationMessage For="@(() => create.Description)" />
                                                 </div>
                                             </div>
 
@@ -61,12 +60,12 @@
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("DiscountType") <span style="color:red;">*</span></label>
                                                 <div class="col-sm-10 col-md-4">
                                                     <InputSelect class="form-control field-validate" style="display:block;"  @bind-Value="create.DiscountType">
-                                                        <option value="@DiscountType.CartDiscount" selected="">@SharedLocalize.GetLocalizedStringValue("CartDiscount")</option>
+                                                        <option value="@DiscountType.CartDiscount" selected>@SharedLocalize.GetLocalizedStringValue("CartDiscount")</option>
                                                         <option value="@DiscountType.CartPercentDiscount">@SharedLocalize.GetLocalizedStringValue("Cart2Discount")</option>
                                                         <option value="@DiscountType.ProductDiscount">@SharedLocalize.GetLocalizedStringValue("ProductDiscount")</option>
                                                         <option value="@DiscountType.ProductPercentDiscount">@SharedLocalize.GetLocalizedStringValue("Product2Discount")</option>
                                                     </InputSelect>
-                                                   
+                                                    <ValidationMessage For="@(() => create.DiscountType)" />
                                                 </div>
                                             </div>
 
@@ -82,7 +81,7 @@
                                                             }
                                                         }
                                                     </InputSelect>
-
+                                                    <ValidationMessage For="@(() => create.ProductsCoupons)" />
                                                     <span class="dropdown-wrapper" aria-hidden="true"></span>
                                                     <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">List of product the coupon can be used on.</span>
                                                 </div>
@@ -93,7 +92,7 @@
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("CouponAmount")<span style="color:red;">*</span></label>
                                                 <div class="col-sm-10 col-md-4">
                                                     <InputNumber class="form-control" @bind-Value="create.CouponAmount"></InputNumber>
-                                                    
+                                                    <ValidationMessage For="@(() => create.CouponAmount)" />
                                                 </div>
                                             </div>
 
@@ -101,6 +100,7 @@
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("CouponExpiryDate")</label>
                                                 <div class="col-sm-10 col-md-4">
                                                     <InputDate class="form-control" @bind-Value="create.ExpiryDate"></InputDate>
+                                                    <ValidationMessage For="@(() => create.ExpiryDate)" />
                                                 </div>
                                             </div>
 
@@ -134,17 +134,20 @@
 
 @code {
     public CreateCouponDto create { get; set; }
+     public AdminDto user { get; set; }
     private List<ProductDto> products;
     protected override async Task OnInitializedAsync()
     {
         create = new CreateCouponDto();
-        products = await _orderBL.GetAllPrductsToCoupon();
+         http.DefaultRequestHeaders.Add("Accept", "application/json");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        products = await http.GetFromJsonAsync<List<ProductDto>>("api/Coupons/GetAllPrductsToCoupon");
     }
     string message = "";
     string style = "";
     async Task AddCoupon()
     {
-        var result = await _orderBL.AddCoupon(create,2);
+        var result = await _orderBL.AddCoupon(create,user.Id);
         if (result.Success)
         {
             message = result.Message;

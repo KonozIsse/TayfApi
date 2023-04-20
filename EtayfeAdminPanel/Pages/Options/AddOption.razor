@@ -39,6 +39,7 @@
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Name") </label>
                                             <div class="col-md-4">
                                                 <InputText @bind-Value="create.OptionName" class="form-control" ></InputText>
+                                                    <ValidationMessage For="@(() => create.OptionName)" />
                                             </div>
                                         </div>
 
@@ -49,6 +50,7 @@
                                                         <option value="@OptionType.Color">Color</option>
                                                         <option value="@OptionType.Radio">Radio</option>
                                                     </InputSelect>
+                                                    <ValidationMessage For="@(() => create.OptionType)" />
                                                     <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
                                                         @SharedLocalize.GetLocalizedStringValue("chooseCat")
                                                     </span>

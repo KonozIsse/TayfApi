@@ -23,6 +23,7 @@
                             <div class="box box-info">
                                 <br>
                                 <div class="form-horizontal">
+                                    @*<EditForm Model="create" OnValidSubmit="UpdateProduct"></EditForm>*@
                                     <div class="row">
                                         <div class="col-xs-12 col-md-6">
                                             <div class="form-group">
@@ -187,9 +188,6 @@
                                             </div>
                                             @if (create.IsSale == 1)
                                             {
-                                                bool selectedActive = create.IsStatusSale == Status.Active ? true :false;
-                                                bool selectedNotActive = create.IsStatusSale == Status.NotActive ? true : false;
-
                                                 <div class="flash-container" style="display: block;">
                                                     <div class="form-group">
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("FlashSalePrice")<span style="color:red;">*</span></label>
@@ -221,8 +219,8 @@
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")</label>
                                                         <div class="col-sm-10 col-md-8">
                                                             <select class="form-control" @bind="create.IsStatusSale">
-                                                                <option value="@Status.Active" selected="@selectedActive">@SharedLocalize.GetLocalizedStringValue("active")</option>
-                                                                <option value="@Status.NotActive" selected="@selectedNotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                                <option value="@Status.Active">@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                                <option value="@Status.NotActive" >@SharedLocalize.GetLocalizedStringValue("notActive")</option>
                                                             </select>
 
                                                         </div>
@@ -282,13 +280,11 @@
                                                         <option value="0">@SharedLocalize.GetLocalizedStringValue("No")</option>
                                                         <option value="1" selected="@selectedSpeical">@SharedLocalize.GetLocalizedStringValue("Yes")</option>
                                                     </select>
-
                                                 </div>
                                             </div>
                                             @if (create.IsSpecial == 1)
                                             {
-                                                bool selected = create.IsStatusSpecial == Status.Active ? true : false;
-                                                bool selected1 = create.IsStatusSpecial == Status.NotActive ? true : false;
+                                              
                                                 <div class="special-container" style="display: block;">
                                                     <div class="form-group">
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("SpecialPrice")<span style="color:red;">*</span></label>
@@ -308,8 +304,8 @@
                                                         <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("status")<span style="color:red;">*</span></label>
                                                         <div class="col-sm-10 col-md-8">
                                                             <select class="form-control" @bind="create.IsStatusSpecial">
-                                                                <option value="Status.Active" selected="@selected">@SharedLocalize.GetLocalizedStringValue("active")</option>
-                                                                <option value="Status.NotActive" selected="@selected1">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
+                                                                <option value="@Status.Active" >@SharedLocalize.GetLocalizedStringValue("active")</option>
+                                                                <option value="@Status.NotActive">@SharedLocalize.GetLocalizedStringValue("notActive")</option>
                                                             </select>
 
                                                         </div>

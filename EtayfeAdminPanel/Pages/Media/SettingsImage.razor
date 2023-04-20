@@ -1,0 +1,149 @@
+﻿@page "/Media/Setting"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("MediaSetting") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("MediaSetting")<small>@SharedLocalize.GetLocalizedStringValue("MediaSetting")</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("MediaSetting")</li>
+    </ol>
+</section>
+
+    <section class="content">
+        <!-- Info boxes -->
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("MediaSetting")</h3>
+                    </div>
+
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="box box-info">
+                                    <br>
+                                    <EditForm Model="create" OnValidSubmit="EditImgSetting">
+
+                                        <div class="form-horizontal">
+                                            <div class="box-body">
+                                                <h4>@SharedLocalize.GetLocalizedStringValue("ThumbnailSetting")</h4>
+                                                <hr>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("ThumbnailHeight")</label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control number-validate"  @bind-Value="@create.Thumbnail_height"></InputText>
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">@SharedLocalize.GetLocalizedStringValue("ThumbnailHeight")</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label"> @SharedLocalize.GetLocalizedStringValue("ThumbnailWidth") </label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control number-validate" @bind-Value="@create.Thumbnail_width"></InputText>
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">@SharedLocalize.GetLocalizedStringValue("ThumbnailWidth") </span>
+                                                    </div>
+
+                                                </div>
+
+                                                <h4>@SharedLocalize.GetLocalizedStringValue("MediumSetting")</h4>
+                                                <hr>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("MediumHeight")</label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control number-validate" @bind-Value="@create.Medium_height"></InputText>
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">@SharedLocalize.GetLocalizedStringValue("MediumHeight") </span>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("MediumWidth")  </label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control number-validate" @bind-Value="@create.Medium_width" ></InputText>
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;"> @SharedLocalize.GetLocalizedStringValue("MediumWidth") </span>
+                                                    </div>
+
+                                                </div>
+
+                                                <h4>@SharedLocalize.GetLocalizedStringValue("LargeSetting")</h4>
+                                                <hr>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("LargeHeight")</label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control number-validate" @bind-Value="@create.Large_height"></InputText>
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">@SharedLocalize.GetLocalizedStringValue("LargeHeight")</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("LargeWidth")</label>
+                                                    <div class="col-sm-10 col-md-4">
+                                                        <InputText class="form-control number-validate" id="1600" @bind-Value="@create.Large_width"></InputText>
+                                                        <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">@SharedLocalize.GetLocalizedStringValue("LargeWidth")</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <!-- /.box-body -->
+                                                <div class="box-footer text-center">
+                                                    <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                                <a href="/Media" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+                                            </div>
+
+                                        </div>
+                                    </EditForm>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.col -->
+            </div>
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+        <!-- /.row -->
+    </section>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    SettingImageVM create = new SettingImageVM();
+        string message;
+        string style;
+    public string lang { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        create = new SettingImageVM();
+        create = await _imageBL.GetMediaSetting();
+    }
+
+    async Task EditImgSetting()
+    {
+        var result = await _imageBL.EditMediaSetting(create);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
+}

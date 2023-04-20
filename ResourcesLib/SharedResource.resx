@@ -1110,8 +1110,11 @@
   <data name="langNameSuchAs" xml:space="preserve">
     <value>Language name such as "English"</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
+  <data name="Langs" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Languages" xml:space="preserve">
+    <value>Languages</value>
   </data>
   <data name="LargeHeight" xml:space="preserve">
     <value>Large Height</value>

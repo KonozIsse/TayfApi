@@ -1,13 +1,13 @@
-﻿@page "/Product/EditImg/{Id:int}"
-<PageTitle>@SharedLocalize.GetLocalizedStringValue("editImg") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+﻿@page "/Product/AddImg/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("addImg")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
-    <h1> @SharedLocalize.GetLocalizedStringValue("editImg") <small>@SharedLocalize.GetLocalizedStringValue("AddproductImgs")...</small> </h1>
+    <h1> @SharedLocalize.GetLocalizedStringValue("addImg") <small>@SharedLocalize.GetLocalizedStringValue("AddproductImgs")...</small> </h1>
     <ol class="breadcrumb">
         <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
         <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("products")</li>
 
-        <li class="active">@SharedLocalize.GetLocalizedStringValue("editImg")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("addImg")</li>
     </ol>
 </section>
 <!-- Main content -->
@@ -21,15 +21,15 @@
                     <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("AddproductImgs") </h3>
 
                 </div>
-
-                <!-- /.box-header -->
                 <br />
+                <!-- /.box-header -->
+
                 <div class="box-body">
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="box box-info">
                                 <br>
-                                @*<EditForm Model="create" OnValidSubmit=""></EditForm>*@
+
                                     <div class="form-horizontal">
                                         <div class="col-xs-12 col-md-6">
                                             <div class="form-group" id="imageIcone">
@@ -41,21 +41,22 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                                                                    <h3 class="modal-title text-primary" id="myModalLabel">Choose Image</h3>
+                                                                    <h3 class="modal-title text-primary" id="myModalLabel">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
                                                                 </div>
                                                                 <div class="modal-body manufacturer-image-embed">
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <a href="Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                <a href="Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+
                                                                     <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
-                                                                    <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">Add</button>
+                                                                    <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div id="imageselected">
                                                         <input value="Products" hidden id="typeImg" />
-                                                        <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">Add Image</a>
+                                                        <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                         <br>
                                                         <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
                                                         <div class="closimage">
@@ -64,30 +65,22 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <br />
-                                                <img width="80px" src="@image">
-                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">Upload category image.</span>
+                                                    <img id="imgCont" width="80px" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("UploadYourImages")</span>
 
                                                     <br>
                                                 </div>
                                             </div>
                                         </div>
                                         <br />
-                                        <br />
+                                        <br /><br /><br /><br />
 
                                         <!-- /.box-body -->
                                     </div>
-                                    <br />
-
-                                    <br />
-
-                                    <br />
-
-                                    <br />
                                     <div class="box-footer text-center">
                                         <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit") <i class="fa fa-angle-right 2x"></i></button>
                                     <a href="/Products" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
-                                </div>
+                                    </div>
                             </div>
                             <!-- /.col -->
                         </div>
@@ -99,30 +92,7 @@
 
 
 </section>
-
 @code {
-    [Parameter]
-    public int Id { get; set; }
-    public int imageId { get; set; }
-    public string image { get; set; }
-    string message= "";
+    string message = "";
     string style = "";
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-    public async Task EditImageProduct()
-    {
-        var result = await _imageBL.EditProductImage(Id, imageId);
-        if (result.Success)
-        {
-            message = result.Message;
-            style = "success";
-        }
-        else
-        {
-            message = result.Message;
-            style = "danger";
-        }
-    }
 }

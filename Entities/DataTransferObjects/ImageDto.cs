@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entities.DataTransferObjects
 {
@@ -19,7 +20,9 @@ namespace Entities.DataTransferObjects
     } 
     public class CreateImageDto
     {
+        [Required]
         public List<IFormFile> Files { get; set; }
+        [Required]
         public ImageCategory Category { get; set; }
     } 
     public class ImageSettingDto

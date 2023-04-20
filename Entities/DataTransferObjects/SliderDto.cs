@@ -1,6 +1,7 @@
 ﻿using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,10 +20,15 @@ namespace Entities.DataTransferObjects
     }
     public class CreateSliderDto
     {
+        [Required]
         public int ImageId { get; set; }
+        [Required]
         public string Title { get; set; }
+        [Required]
         public string Decription { get; set; }
+        [Required]
         public string TitleAr { get; set; }
+        [Required]
         public string DecriptionAr { get; set; }
         public string Url { get; set; }
         public int? LangId { get; set; }

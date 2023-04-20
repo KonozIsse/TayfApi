@@ -373,6 +373,12 @@ namespace BusinessLogic.ApiClasses
             }
             return new BussnessResultModel(itemFromDB);
         }
+        public async Task<List<ImageSettingDto>> GetAllImageSettingsToImage(int imageId)
+        {
+            var itemFromDB = await _repositoryManager.ImageSetting.GetImageSettings(imageId);
+            var itemFromDto = _mapper.Map<List<ImageSettingDto>>(itemFromDB);
+            return itemFromDto;
+        }
         public string GetImageMedium(int imageId)
         {
             var image = _repositoryManager.Image.GetImage(imageId, false,true);
@@ -438,6 +444,13 @@ namespace BusinessLogic.ApiClasses
             var imagesDto =  _mapper.Map<List<ImageDto>>(images);
             return PagedList<ImageDto>.ToPagedList(imagesDto, postsParameters.PageNumber, postsParameters.PageSize); 
         }
+        public List<ImageCategory> GetImageCategories()
+        {
+            List<ImageCategory> days = Enum.GetValues(typeof(ImageCategory))
+                             .Cast<ImageCategory>()
+                             .ToList();
+            return days;
+        }
         public async Task<List<ImageDto>> GetAllImages()
         {
             var images = await _repositoryManager.Image.GetAllImages();
@@ -472,25 +485,47 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(update, _locService.GetLocalizedStringValue("successSave"))??
                  new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"));
         } 
-        public async Task<IEnumerable<SettingDto>> GetMediaSetting()
+        public async Task<SettingImageVM> GetMediaSetting()
         {
-            var settings=  await _repositoryManager.Setting.GetMediaSetting();
+            var settingLargeHeight =  await _repositoryManager.Setting.GetSettingByValue("Large_height", false);
+            var settingLarge_width = await _repositoryManager.Setting.GetSettingByValue("Large_width", false);
+            var settingMedium_height = await _repositoryManager.Setting.GetSettingByValue("Medium_height", false);
+
+            var settingMedium_width =  await _repositoryManager.Setting.GetSettingByValue("Medium_width", false);
+            var settingThumbnail_height = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_height", false);
+            var settingThumbnail_width = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_width", false);
+            var settingsDto =  new SettingImageVM
+            {
+                Large_height = settingLargeHeight.Value,
+                Large_width= settingLarge_width.Value,
+                Medium_height= settingMedium_height.Value,
+                Medium_width = settingMedium_width.Value,
+                Thumbnail_height = settingThumbnail_height.Value,
+                Thumbnail_width = settingThumbnail_width.Value,
+            };
+            return settingsDto;
+        } 
+        public async Task<List<SettingDto>> GetAllSettings()
+        {
+            var settings=  await _repositoryManager.Setting.GetAllSettings(false);
             var settingsDto = _mapper.Map<List<SettingDto>>(settings);
             return settingsDto;
         }
+       
         //------------------------------
         public async Task<List<ProductImagesDto>> GetAllImagesToProduct(int productId)
         {
             var images = await _repositoryManager.ImageProduct.GetAllImagesProductId(productId, false, true);
             var listImages = images.Select(image => new ProductImagesDto
             {
+                Id = image.Id,
                 Image = GetImageOriginal(image.ImageId),
             }).ToList();
             return listImages;
         }
-        public async Task<BussnessResultModel> EditProductImage(int id, int imageId)
+        public async Task<BussnessResultModel> EditProductImage(int imageProducId ,int imageId)
         {
-            var image = await _repositoryManager.ImageProduct.GetImageProductId(id, true);
+            var image = await _repositoryManager.ImageProduct.GetImageProductId(imageProducId, true);
             if (image != null)
             {
                 image.ImageId = imageId;

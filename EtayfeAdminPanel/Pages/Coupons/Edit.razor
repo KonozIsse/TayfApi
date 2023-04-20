@@ -1,5 +1,161 @@
-﻿<h3>Edit</h3>
+﻿@page "/Coupon/Edit/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("Coupons")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
 
+<section class="content-header">
+    <h1>@SharedLocalize.GetLocalizedStringValue("EditCoupon")<small>@SharedLocalize.GetLocalizedStringValue("EditCoupon")</small> </h1>
+    <ol class="breadcrumb">
+        <li class = "fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class = "fa fa-users">@SharedLocalize.GetLocalizedStringValue("Coupons")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("EditCoupon")</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("EditCoupon")</h3>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box box-info">
+                                <br>
+                                    <div class="form-horizontal">
+                                        <EditForm Model="create" OnValidSubmit="EditCoupon">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Coupon")<span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-4">
+                                                   <InputText class="form-control" @bind-Value="create.CouponCode" />
+                                                   <ValidationMessage For="@(() => create.CouponCode)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("Coupon")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("Required")</span>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("desc")</label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputTextArea class="form-control" @bind-Value="create.Description"></InputTextArea>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("DiscountType") <span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputSelect class="form-control field-validate" style="display:block;" onchange="showList(this)"  @bind-Value="create.DiscountType">
+                                                        <option value="@DiscountType.CartDiscount" >@SharedLocalize.GetLocalizedStringValue("CartDiscount")</option>
+                                                        <option value="@DiscountType.CartPercentDiscount">@SharedLocalize.GetLocalizedStringValue("Cart2Discount")</option>
+                                                        <option value="@DiscountType.ProductDiscount" >@SharedLocalize.GetLocalizedStringValue("ProductDiscount")</option>
+                                                        <option value="@DiscountType.ProductPercentDiscount" >@SharedLocalize.GetLocalizedStringValue("Product2Discount")</option>
+                                                    </InputSelect>
+                                                    <ValidationMessage For="@(() => create.DiscountType)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("DiscountType")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("Required")</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group flst" style="@(create.DiscountType == DiscountType.ProductDiscount|| create.DiscountType == DiscountType.ProductPercentDiscount? "display:block;" : "display:none;")">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("products")</label>
+                                                <div class="col-sm-10 col-md-4 couponProdcuts">
+                                                    <InputSelect multiple="" class="form-control select2  select2-hidden-accessible" tabindex="-1" aria-hidden="true" @bind-Value="create.ProductsCoupons">
+                                                        @if(products != null)
+                                                        {
+                                                            @foreach (var c in products)
+                                                            {
+                                                                <option value="@c.Id" >@c.ProductName</option>
+                                                            }
+                                                        }
+                                                    </InputSelect>
+                                                    <ValidationMessage For="@(() => create.ProductsCoupons)" />
+                                                    <span class="dropdown-wrapper" aria-hidden="true"></span>
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">List of product the coupon can be used on.</span>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("CouponAmount")<span style="color:red;">*</span></label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputNumber class="form-control" @bind-Value="create.CouponAmount"></InputNumber>
+                                                     <ValidationMessage For="@(() => create.CouponAmount)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("CouponAmount")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("Required")</span>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("CouponExpiryDate")</label>
+                                                <div class="col-sm-10 col-md-4">
+                                                    <InputDate class="form-control" name="expiry_date" @bind-Value="@create.ExpiryDate"></InputDate>
+                                                    <ValidationMessage For="@(() => create.ExpiryDate)" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("CouponExpiryDate")</span>
+                                                    <span class="help-block hidden">@SharedLocalize.GetLocalizedStringValue("CouponExpiryDate").</span>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="box-footer text-center">
+                                                <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
+                                               <a href="/Coupons" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                            </div>
+
+
+                                        </div>
+                                    </EditForm>
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    UpdateCouponDto create = new UpdateCouponDto();
+    private List<ProductDto> products;
+    public AdminDto user { get; set; }
+    string message;
+    string style;
+    protected override async Task OnInitializedAsync()
+    {
+        //@(lst.Contains(c.Id.ToString()) ? "selected" : "" )
+        create = new UpdateCouponDto();
+        create = await _orderBL.GetMapCouponId(Id);
+       // create.ProductsCoupons.Contains(c.Id.ToString());
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+         products = await http.GetFromJsonAsync<List<ProductDto>>("api/Coupons/GetAllPrductsToCoupon");
+    }
+
+    async Task EditCoupon()
+    {
+        create.Id = Id;
+        var result = await _orderBL.UpdateCoupon(create,user.Id);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    }
 
 }

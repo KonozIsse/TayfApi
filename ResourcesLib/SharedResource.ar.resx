@@ -1137,6 +1137,9 @@
   <data name="Language" xml:space="preserve">
     <value>لغة التخصص</value>
   </data>
+  <data name="Languages" xml:space="preserve">
+    <value>اللغات</value>
+  </data>
   <data name="LargeHeight" xml:space="preserve">
     <value>ارتفاع الصور الكبيرة</value>
   </data>

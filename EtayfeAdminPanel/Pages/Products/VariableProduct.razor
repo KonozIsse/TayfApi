@@ -50,7 +50,7 @@
                                                     <td>@f.Value</td>
 
                                                     <td>
-                                                        <a  title="edit" href="/Products/EditAttr/@f.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a  title="edit" href="/Product/EditAttr/@f.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a  title="delete" @onclick="(async()=>await Delete(f.Id))"  class="badge bg-red"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
 
@@ -100,6 +100,7 @@
                                                                                 <option value="@c.Id">@c.OptionName</option>
                                                                             }
                                                                         </InputSelect>
+                                                                        <ValidationMessage For="@(() => create.OptionId)" />
                                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("OptionName")</span>
                                                                     </div>
                                                                 </div>
@@ -119,7 +120,7 @@
                                                                                 }
                                                                                 
                                                                             </InputSelect>
-
+                                                                        <ValidationMessage For="@(() => create.ValueId)" />
                                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("OptionValue")</span>
                                                                     </div>
 
@@ -131,6 +132,7 @@
                                                                             <option value=0>@SharedLocalize.GetLocalizedStringValue("No")</option>
                                                                             <option value=1>@SharedLocalize.GetLocalizedStringValue("Yes")</option>
                                                                         </InputSelect>
+                                                                        <ValidationMessage For="@(() => create.IsDefault)" />
                                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">
                                                                             @SharedLocalize.GetLocalizedStringValue("TextOption")
                                                                         </span>
@@ -144,10 +146,12 @@
                                                                             <option value="+">+</option>
                                                                             <option value="-">-</option>
                                                                         </InputSelect>
+                                                                        <ValidationMessage For="@(() => create.PricePrefix)" />
                                                                     </div>
 
                                                                     <div class="col-xs-8 col-sm-8 col-md-6">
-                                                                        <InputNumber  class="form-control" required="required"  @bind-Value="create.AttributePrice"></InputNumber>
+                                                                        <InputNumber  class="form-control"   @bind-Value="create.AttributePrice"></InputNumber>
+                                                                        <ValidationMessage For="@(() => create.AttributePrice)" />
                                                                         <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("enterPrice")</span>
                                                                     </div>
                                                                 </div>

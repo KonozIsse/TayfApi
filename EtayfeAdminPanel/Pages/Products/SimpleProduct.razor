@@ -1,0 +1,109 @@
+﻿@page "/Product/SimpleProd/{Id:int}"
+<PageTitle>@SharedLocalize.GetLocalizedStringValue("ProductImages") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
+<Alert Message="@message" Style="@style"></Alert>
+<section class="content-header">
+    <h1> @SharedLocalize.GetLocalizedStringValue("ProductImages") <small>@SharedLocalize.GetLocalizedStringValue("ProductImages").</small> </h1>
+    <ol class="breadcrumb">
+        <li class="fa fa-dashboard">@SharedLocalize.GetLocalizedStringValue("dashboard")</li>
+        <li class="fa fa-users">@SharedLocalize.GetLocalizedStringValue("products")</li>
+        <li class="active">@SharedLocalize.GetLocalizedStringValue("ProductImages")</li>
+    </ol>
+</section>
+<!-- Main content -->
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">@SharedLocalize.GetLocalizedStringValue("ProductImages") </h3>
+                    <div class="box-tools pull-right">
+
+                        <a href="/Product/AddImg/@Id" type="button" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("add")</a>
+                     
+                    </div>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+                    </div>
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        <div class="row">
+
+                            <div class="col-lg-12">
+                                @foreach (var i in Model)
+                                {
+
+                                    <div class="thumbnail" style="display: inline-block;height: 208px;margin: 1%;width: 15%;">
+                                        <div class="caption">
+
+                                            <a href="/Product/EditImg/@i.Id" 
+                                       class="badge bg-light-blue editProductImagesModal">
+                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            </a>
+                                            <a title="delete" class="badge bg-red"  @onclick="(async ()=> await DeleteImge(i))">
+                                                <i class="fa fa-trash " aria-hidden="true"></i>
+                                            </a>
+
+                                        </div>
+                                        <img width="200px" height="300px" src="@i.Image" alt="..." />
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="col-xs-12 text-right">
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-xs-12 @(lang == "ar"?"text-right":"text-left")">
+                            @SharedLocalize.GetLocalizedStringValue("NoRecordfound").
+                        </div>
+                    }
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+
+</section>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public string lang { get; set; }
+    public List<ProductImagesDto> Model { get; set; }
+    string message = "";
+    string style = "";
+    protected override async Task OnInitializedAsync()
+    {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        Model = await _imageBL.GetAllImagesToProduct(Id);
+    }
+    public async Task DeleteImge(ProductImagesDto image)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure you want to delete ?");
+        if (confirm)
+        {
+            var result = await _imageBL.DeleteImageProduct(image.Id);
+            if (result.Success)
+            {
+                message = result.Message;
+            }
+            else
+            {
+                message = result.Message;
+            }
+            NavigationManager.NavigateTo("/Products", true);
+        }
+    }
+}

@@ -39,6 +39,7 @@
                                             <label class="control-label col-md-3">@SharedLocalize.GetLocalizedStringValue("GoogleMapAPI")</label>
                                                 <div class="col-md-8">
                                                 <InputText class="form-control" @bind-Value="create.google_map_api"  ></InputText>
+                                                    <ValidationMessage For="@(() => create.google_map_api)" />
                                                 </div>
                                             </div>
 
@@ -53,6 +54,7 @@
                                             <label class="control-label col-md-3">@SharedLocalize.GetLocalizedStringValue("ContactUsEmail")</label>
                                                 <div class="col-md-8">
                                                 <InputText class="form-control" @bind-Value="create.contact_us_email" ></InputText>
+                                                    <ValidationMessage For="@(() => create.contact_us_email)" />
                                                 </div>
                                             </div>
 
@@ -64,6 +66,7 @@
                                             <label  class = "control-label col-md-3">@SharedLocalize.GetLocalizedStringValue("OrderEmail")</label>
                                                 <div class="col-md-8">
                                                 <InputText class="form-control"  @bind-Value="create.order_email"></InputText>
+                                                    <ValidationMessage For="@(() => create.order_email)" />
                                                 </div>
                                             </div>
 
@@ -78,7 +81,7 @@
                                                          <span> <InputRadio  Value="@trueVal" /> @SharedLocalize.GetLocalizedStringValue("Yes") </span>
                                                         <span> <InputRadio Value="@falseVal" /> @SharedLocalize.GetLocalizedStringValue("No") </span>
                                                     </InputRadioGroup>
-                                                    
+                                                    <ValidationMessage For="@(() => create.hide_price)" />
                                                     <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;margin-top: 0;">
                                                         hide all prices from website (yes)
                                                     </span>
