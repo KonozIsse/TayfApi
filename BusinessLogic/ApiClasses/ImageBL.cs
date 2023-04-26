@@ -288,15 +288,22 @@ namespace BusinessLogic.ApiClasses
             var imageSetting = _mapper.Map<ImageSetting>(settingDto);
             _repositoryManager.ImageSetting.AddImageSetting(imageSetting);
             await _repositoryManager.SaveAsync();
-        }  
-        public async Task<BussnessResultModel> EditImageSetting(UpdateImageSettingDto update)
+        }
+        public async Task<ImageSettingDto> GetMapImageSetting(int id)
         {
 
-            var itemFromDB = await _repositoryManager.ImageSetting.GetImageSettingId(update.Id , true);
+            var itemFromDB =  await _repositoryManager.ImageSetting.GetImageSettingId(id, false);
+            var itemFromDto = _mapper.Map<ImageSettingDto>(itemFromDB);
+            return itemFromDto;
+        }
+        public async Task<BussnessResultModel> EditImageSetting(UpdateImageSettingDto update)
+        {
+           var itemFromDB = await _repositoryManager.ImageSetting.GetImageSettingId(update.Id , true);
             if(itemFromDB == null)
             {
                 return new BussnessResultModel(null , _locService.GetLocalizedStringValue("is null"),false);
             }
+           
             var image = _repositoryManager.Image.GetImage(itemFromDB.ImgId, true);
             string folder = ""; string path = "";
             if (update.ImageType == ImageType.THUMBNAIL)
@@ -328,7 +335,7 @@ namespace BusinessLogic.ApiClasses
                 var request = _httpContextAccessor.HttpContext.Request;
                 var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
 
-                var Res = client.GetAsync(baseUrl + "/media_files/" + itemFromDB.Path);
+                var Res = client.GetAsync(baseUrl + "/media_files" + itemFromDB.Path);
 
                 //Checking the response is successful or not which is sent using HttpClient  
                 var result = Res.Result;
@@ -365,18 +372,22 @@ namespace BusinessLogic.ApiClasses
                         }
 
                     }
-                    image.Name = name2;
                     itemFromDB.Path = "/" + path + "/" + name2;
                     _mapper.Map(update, itemFromDB);
                     await _repositoryManager.SaveAsync();
                 }
             }
-            return new BussnessResultModel(itemFromDB);
+            return new BussnessResultModel(itemFromDB,"sussesfull");
         }
         public async Task<List<ImageSettingDto>> GetAllImageSettingsToImage(int imageId)
         {
             var itemFromDB = await _repositoryManager.ImageSetting.GetImageSettings(imageId);
-            var itemFromDto = _mapper.Map<List<ImageSettingDto>>(itemFromDB);
+            var itemFromDto = itemFromDB.Select(setting =>
+            {
+               var settingDto = _mapper.Map<ImageSettingDto>(setting);
+                settingDto.Path = "/media_files" + setting.Path;
+                return settingDto;
+            }).ToList();
             return itemFromDto;
         }
         public string GetImageMedium(int imageId)
@@ -487,21 +498,15 @@ namespace BusinessLogic.ApiClasses
         } 
         public async Task<SettingImageVM> GetMediaSetting()
         {
-            var settingLargeHeight =  await _repositoryManager.Setting.GetSettingByValue("Large_height", false);
-            var settingLarge_width = await _repositoryManager.Setting.GetSettingByValue("Large_width", false);
-            var settingMedium_height = await _repositoryManager.Setting.GetSettingByValue("Medium_height", false);
-
-            var settingMedium_width =  await _repositoryManager.Setting.GetSettingByValue("Medium_width", false);
-            var settingThumbnail_height = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_height", false);
-            var settingThumbnail_width = await _repositoryManager.Setting.GetSettingByValue("Thumbnail_width", false);
-            var settingsDto =  new SettingImageVM
+            var settings = await _repositoryManager.Setting.GetAllSettings(false);
+            var settingsDto = new SettingImageVM
             {
-                Large_height = settingLargeHeight.Value,
-                Large_width= settingLarge_width.Value,
-                Medium_height= settingMedium_height.Value,
-                Medium_width = settingMedium_width.Value,
-                Thumbnail_height = settingThumbnail_height.Value,
-                Thumbnail_width = settingThumbnail_width.Value,
+                Large_height = settings.Where(c=>c.Key == "Large_height").First().Value,
+                Large_width = settings.Where(c => c.Key == "Large_width").First().Value,
+                Medium_height = settings.Where(c => c.Key == "Medium_height").First().Value,
+                Medium_width = settings.Where(c => c.Key == "Medium_width").First().Value,
+                Thumbnail_height = settings.Where(c => c.Key == "Thumbnail_height").First().Value,
+                Thumbnail_width = settings.Where(c => c.Key == "Thumbnail_width").First().Value,
             };
             return settingsDto;
         } 
@@ -547,6 +552,27 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.ImageProduct.DeleteImageProduct(image);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(image, _locService.GetLocalizedStringValue("successDelete"));
+        }
+        public async Task<BussnessResultModel> AddProductImage(int productId , List<CreateImageProductDto> images)
+        {
+            if (images == null)
+            {
+                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctImage"),false);
+            }
+            if (images.Count() > 0)
+            {
+                foreach (var imageDto in images)
+                {
+                    var image = new ProductImage
+                    {
+                        ProductId = productId,
+                        ImageId= imageDto.ImageId,
+                    };
+                    _repositoryManager.ImageProduct.CreateImageProduct(image);
+                }
+            }
+            await _repositoryManager.SaveAsync();
+            return new BussnessResultModel(images, _locService.GetLocalizedStringValue("successAdd"));
         }
     }
 }

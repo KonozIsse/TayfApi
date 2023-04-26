@@ -46,10 +46,11 @@ namespace Entities.DataTransferObjects
     public class UpdateImageSettingDto
     {
         public int Id { get; set; }
+        [Required]
         public int Height { get; set; }
+        [Required]
         public int Width { get; set; }
         public ImageType ImageType { get; set; }
-
     }
   
 }

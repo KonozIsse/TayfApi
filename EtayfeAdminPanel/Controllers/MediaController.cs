@@ -57,7 +57,7 @@ namespace EtayfeAdminPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
-        [HttpDelete("deleteListImages")]
+        [HttpDelete("deleteListImages/{Ids}")]
         public async Task<IActionResult> DeleteImages(List<int> Ids)
         {
             var result = await _imageBL.DeleteImageIds(Ids);

@@ -50,15 +50,15 @@
         <div style="float: left;">
             <div class="box-tools pull-left">
 
-                <button id="btn" type="button" class="btn btn-block btn-danger ConfirmDelete">حذف</button>
+                <button onclick="removeCheckedCheckboxes()"  type="button" class="btn btn-block btn-danger ConfirmDelete">حذف</button>
 
             </div>
             <div style="margin-right: 3px;" class="box-tools pull-left">
-                <button id="checkbtn" type="button" class="btn btn-block btn-success">تحديد الكل</button>
+              <button onclick='check()' type="button" class="btn btn-block btn-success">تحديد الكل</button>
 
             </div>
             <div  style="margin-right: 3px;" class="box-tools pull-left">
-                <button id="unchk" type="button" class="btn btn-block btn-info">ازالة التحديد</button>
+              <button onclick='unCheck()' type="button" class="btn btn-block btn-info">ازالة التحديد</button>
 
             </div>
             <div class="box-tools pull-left" style=" margin-right: 3px;">
@@ -75,24 +75,22 @@ else
 
                    
                     <div style="margin-right:88px;" class="box-tools pull-left">
-                        <button id="btn" type="button" class="btn btn-block btn-danger ">Delete</button>
+                            <button  onclick="return confirm('Are you sure?')" type="button" class="btn btn-block btn-danger ">Delete</button>
 
                     </div>
                     <div style="margin-right:162px;" class="box-tools pull-left">
-                        <button  id="checkbtn" type="button" class="btn btn-block btn-success">Select All</button>
+                            <button onclick='check()' type="button" class="btn btn-block btn-success">Select All</button>
 
                     </div>
                     <div style="margin-right:253px;" class="box-tools pull-left">
-                        <button id="unchk" type="button" class="btn btn-block btn-info">UnSelect All</button>
+                            <button onclick='unCheck()' type="button" class="btn btn-block btn-info">UnSelect All</button>
 
                     </div>
-                    <div class="box-tools pull-left">
-                        <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal">Add New</button>
-
-                    </div>
+                        <div class="box-tools pull-left">
+                            <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal">Add New</button>
+                        </div>
                 </div>
 }
-                <!-- /.box-header -->
                 <div class="box-body">
                     <div class="row">
                         <div class="col-xs-12">
@@ -195,7 +193,7 @@ else
                             {
                         <div class="col-xs-4 col-md-2 margin-bottomset">
                             <div class="thumbnail thumbnail-imges">
-                                        <input @bind="m.Id" class="chk" type="checkbox" style="width: 19%;margin-top: -46%;opacity: 1 !important;" />
+                                        <input value="@m.Id" name="check" id="checkBoxAll" type="checkbox" style="width: 19%;margin-top: -46%;opacity: 1 !important;" />
                                 <img style="max-height:74px !important;max-width: 118px;" class="test_image" src="@m.Name" title="@m.Category" alt="...">
                             </div>
                                     <a class="btn btn-block btn-primary" href="/Media/Details/@m.Id"> @SharedLocalize.GetLocalizedStringValue("Details")</a>
@@ -212,69 +210,42 @@ else
 
         <!-- /.col -->
     </div>
-    <!-- Main row -->
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <EditForm Model="create" OnValidSubmit="AddImage">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">×</button>
+           <form >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
                         <h4 class="modal-title">@SharedLocalize.GetLocalizedStringValue("AddFiles")</h4>
-                </div>
-
-                <div class="modal-body">
-                    <p>@SharedLocalize.GetLocalizedStringValue("ChooseImagesInTheBoxForUpload")</p>
-
-                    <InputSelect class="form-control" @bind-Value="create.Category">
-                        <option value="Products">@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
-                        @if(categories != null)
-                        {
-                            @foreach (var c in categories)
-                            {
-                                switch (c)
-                                {
-                                    case ImageCategory.Banners:
-                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("banners") (1140 * 240)</option>
-                                        break;
-                                    case ImageCategory.Categories:
-                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("categories") (250 * 200)</option>
-                                        break;
-                                    case ImageCategory.Sliders:
-                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("slider") (1400 * 600)</option>
-                                        break;
-                                    case ImageCategory.Services:
-                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("Services") (200 * 200)</option>
-                                        break;
-                                    case ImageCategory.Blogs:
-                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("blog") (250 * 250)</option>
-                                        break;
-                                    case ImageCategory.Stores:
-                                        <option value="@c">@SharedLocalize.GetLocalizedStringValue("store") (250 * 200)</option>
-                                        break;
-                                }
-                            }
-                        }
-                        
-                        <option value="Others">@SharedLocalize.GetLocalizedStringValue("Others")</option>
-                    </InputSelect>
-                        <ValidationMessage For="@(() => create.Category)" />
-                        <br />
-                    <div class="field" align="@(lang == "en"? "left":"right")">
-                            <input type="file" id="files" accept="image/*" name="@create.Files" multiple />
                     </div>
 
+                    <div class="modal-body">
+                        <p>@SharedLocalize.GetLocalizedStringValue("ChooseImagesInTheBoxForUpload")</p>
+                        <select class="form-control" @bind="create.Category">
+                            <option value="@ImageCategory.Products" selected="selected">@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
+                            <option value="@ImageCategory.Banners">@SharedLocalize.GetLocalizedStringValue("banners") (1140 * 240)</option>
+                            <option value="@ImageCategory.Categories">@SharedLocalize.GetLocalizedStringValue("categories") (250 * 200)</option>
+                            <option value="@ImageCategory.Sliders">@SharedLocalize.GetLocalizedStringValue("slider") (1400 * 600)</option>
+                            <option value="@ImageCategory.Services">@SharedLocalize.GetLocalizedStringValue("Services") (200 * 200)</option>
+                            <option value="@ImageCategory.Blogs">@SharedLocalize.GetLocalizedStringValue("blog") (250 * 250)</option>
+                            <option value="@ImageCategory.Stores">@SharedLocalize.GetLocalizedStringValue("store") (250 * 200)</option>
+                            <option value="@ImageCategory.Others">@SharedLocalize.GetLocalizedStringValue("Others")</option>
+                        </select>
+                        <br />
+                        <div class="field" align="@(lang == "en"? "left":"right")">
+                            <input type="file" id="@create.Files" name="@create.Files" multiple />
+                            <InputFile OnChange="HandleFileSelected" class="btn-primary" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="compelete" @onclick="AddImage">@SharedLocalize.GetLocalizedStringValue("Done")</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("close")</button>
+                    </div>
                 </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary"  id="compelete">@SharedLocalize.GetLocalizedStringValue("Done")</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("close")</button>
+            </form>
         </div>
     </div>
-            </EditForm>
-        </div>
-    </div>
- 
 
-    <!-- /.row -->
 </section>
 
 @code {
@@ -282,7 +253,7 @@ else
     public string lang { get; set; }
       public CreateImageDto create { get; set; }
     public List<ImageDto> Model { get; set; }
-    public List<ImageCategory> categories { get; set; }
+    public List<ImageCategory> categories { get; set; } 
     public AdminDto user { get; set; }
     public ImageCategory? category { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
@@ -290,8 +261,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        
-    create = new CreateImageDto();
+        create = new CreateImageDto();
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
@@ -331,6 +301,7 @@ else
     }
     async Task AddImage()
     {
+        create.Category = ImageCategory.Others;
         var result = await _imageBL.CreateImages(user.Id,create);
         if (result.Success)
         {
@@ -342,5 +313,9 @@ else
             message = result.Message;
             style = "danger";
         }
+    }
+    void HandleFileSelected(List<IFormFile> files)
+    {
+        create.Files = files;
     }
 }

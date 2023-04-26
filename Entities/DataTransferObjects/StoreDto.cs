@@ -71,9 +71,9 @@ namespace Entities.DataTransferObjects
     }
     public class CreateAdminDto
     {
-        [Required]
+        [Required (ErrorMessage = "enterallfiled")]
         public string FirstName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "enterallfiled")]
         public string LastName { get; set; }
         [Required]
         public string PhoneNumber { get; set; }

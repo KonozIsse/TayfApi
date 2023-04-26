@@ -140,6 +140,19 @@ namespace EtayfeAdminPanel.Controllers
                 return BadRequest(result.Message);
             }
         } 
+        [HttpPost("AddProductImage")]
+        public async Task<IActionResult> AddProductImage(int id , List<CreateImageProductDto> image)
+        {
+            var result = await _imageBL.AddProductImage(id, image);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        } 
         [HttpDelete("deleteImageProduct")]
         public async Task<IActionResult> DeleteImageProduct(int id )
         {

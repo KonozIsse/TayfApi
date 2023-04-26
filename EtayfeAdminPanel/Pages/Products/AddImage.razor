@@ -1,4 +1,6 @@
 ﻿@page "/Product/AddImg/{Id:int}"
+
+
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addImg")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -93,6 +95,49 @@
 
 </section>
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    public string lang { get; set; }
+    public AdminDto user { get; set; }
+    public List<CreateImageProductDto> creates { get; set; }
     string message = "";
     string style = "";
+    //-----------------------------
+    protected override async Task OnInitializedAsync()
+    {
+        creates = new List<CreateImageProductDto>();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+    }
+    public async Task AddImages()
+    {
+
+        var result = await _imageBL.AddProductImage(Id, creates);
+        if (result.Success)
+        {
+            message = result.Message;
+            style = "success";
+        }
+        else
+        {
+            message = result.Message;
+            style = "danger";
+        }
+    } 
+    // //public async Task EditProductImage()
+    //{
+
+    //    var result = await _imageBL.EditProductImage(user.Id, create);
+    //    if (result.Success)
+    //    {
+    //        message = result.Message;
+    //        style = "success";
+    //    }
+    //    else
+    //    {
+    //        message = result.Message;
+    //        style = "danger";
+    //    }
+    //}
 }

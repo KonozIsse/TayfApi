@@ -129,17 +129,7 @@
         });
         $("#reff").load(location.href + " #reff");
 
-        function checkAll() {
-            if (document.getElementById('ckb').checked) {
-                $('.ckb:checkbox').each(function () {
-                    this.checked = true;
-                });
-            } else {
-                $('.ckb:checkbox').each(function () {
-                    this.checked = false;
-                });
-            }
-        }
+        
          
     </script>
     <script>
@@ -153,20 +143,54 @@
     </script>
     @*Images*@
 
-    <script>
-       
-        $('#chk').click(function (event) {
-            if (this.checked) {
-                // Iterate each checkbox
-                $('.ckb:checkbox').each(function () {
-                    this.checked = true;
-                });
-            } else {
-                $('.ckb:checkbox').each(function () {
-                    this.checked = false;
-                });
+    <script type="text/javascript">
+      
+        jQuery(document).on("click", ".ConfirmDelete", function () {
+            var checkedIds = [];
+            var weights = [];
+
+            $('div > .thumbnail').each(function () {
+                if ($(this).find('input[type="checkbox"]').is(":checked")) {
+                    checkedIds.push($(this).find('input[type="checkbox"]').attr('Id'));
+
+                }
+            });
+
+            if (checkedIds == null || checkedIds == 0 || checkedIds == "") {
+                alert("Please choose product");
+                return;
             }
+            jQuery("#Confirm").modal("show");
+
+            var UrlPrefix = "api/Media/deleteListImages";
+            jQuery("#Confirm .btn-danger").attr("href", (UrlPrefix + "?Ids=" + checkedIds));
+            return false;
         });
+       function removeCheckedCheckboxes() {
+          var checked = document.querySelectorAll(".delete-checkbox:checked");
+          checked.forEach((elem) => {
+            elem.parentElement.style.display = "none";
+          })
+        }
+        function check(){
+
+            var get= document.getElementsByName('check');
+
+            for(var i= 0; i<get.length; i++){
+
+            get[i].checked= true;}
+
+        }
+        function unCheck() {
+
+            var get = document.getElementsByName('check');
+
+            for (var i = 0; i < get.length; i++) {
+
+                get[i].checked = false;
+            }
+
+        }
         function checkAll() {
             if (document.getElementById('ckb').checked) {
                 $('.ckb:checkbox').each(function () {
@@ -227,170 +251,8 @@
 
     </script>
     <script type="text/javascript">
-       
 
 
-        $(document).ready(function () {
-
-            $(".ds").click(function () {
-                var g = [];
-                var prod = $("#prod").val();
-                var stkk = $("#current_stocks").val();
-                var prc = $("#prc").val();
-                var numOp = $(".numOp").val();
-                var cdd = $("#cdd").val() || 0;
-                if (prod == null || prod == 0 )
-                {
-                    alert("Please Enter All fields");
-                    return;
-                }
-                if (prod != null && prod != "") {
-                    $('ul > li > .nn').each(function () {
-                        if ($(this).find('input[type="radio"]').is(":checked")) {
-                            g.push($(this).find('input[type="radio"]').attr('Id'));   // get id's of user
-                        }
-
-                    });
-
-
-                    if (g.length == numOp) {
-
-
-          window.location.replace("/@lang/CP/Inventory/AddStock/?entry_prod=" + prod + "&values=" + g + "&stock=" + stkk + "&purchase_price=" + prc + "&reference_code=" + cdd);
-                    } else {
-                        alert("Please Enter Value for all Options");
-                    }
-                 }
-            });
-
-            if (window.File && window.FileList && window.FileReader) {
-                $("#files").on("change", function (e) {
-                    var files = e.target.files,
-                      filesLength = files.length;
-                    for (var i = 0; i < filesLength; i++) {
-                        var f = files[i]
-                        var fileReader = new FileReader();
-                        fileReader.onload = (function (e) {
-                            var file = e.target;
-                            $("<span class=\"pip\">" +
-                              "<img class=\"imageThumb\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
-                              "<br/><span class=\"remove\">Remove image</span>" +
-                              "</span>").insertAfter("#files");
-                            $(".remove").click(function () {
-                                $(this).parent(".pip").remove();
-                            });
-
-
-                        });
-                        fileReader.readAsDataURL(f);
-                    }
-                });
-            } else {
-                alert("Your browser doesn't support to File API")
-            }
-        });
-
-        jQuery(document).on("click", ".ConfirmDelete", function () {
-
-
-        var checkedIds = [];
-        var weights = [];
-
-        $('div > .thumbnail').each(function () {
-            if ($(this).find('input[type="checkbox"]').is(":checked")) {
-                checkedIds.push($(this).find('input[type="checkbox"]').attr('Id'));
-
-            }
-
-
-        });
-
-        if (checkedIds == null || checkedIds == 0 || checkedIds == "") {
-            alert("Please choose product");
-            return;
-        }
-            jQuery("#Confirm").modal("show");
-
-            var UrlPrefix = '@Url.Action("Delete", "Media", new {area = "CP",lang = lang})';
-            jQuery("#Confirm .btn-danger").attr("href", (UrlPrefix + "?Ids=" + checkedIds));
-
-
-            return false;
-        });
-
-
-       
-
-     
-
-      
-
-        function getproducts_Stockprice() {
-            jQuery("#loader").css("display", "block");
-            var urlPrefix = getUrlPrefix();
-            jQuery.post( urlPrefix +'CP/Home/getproducts_Stockprice/', {
-                id: jQuery("#prod").val()
-            }, function (data) {
-                jQuery("#attribute").css("display", "block");
-                    jQuery("#attribute").html(data);
-                getCurrent_stocks(jQuery("#prod").val());
-
-            });
-            setTimeout(function () {
-                jQuery("#loader").css("display", "none");
-            }, 200);
-
-        }
-
-        function getCurrent_stocks(id) {
-            jQuery("#loader").css("display", "block");
-            var urlPrefix = getUrlPrefix();
-            jQuery.post( urlPrefix +'CP/Home/getCurrent_stocks/', {
-                id: id
-            }, function (data) {
-                    jQuery("#current_stocks").css("display", "inline");
-                if ($(".numOp").val() > 0) {
-                    jQuery("#current_stocks").val(data);
-                } else {
-                    jQuery("#current_stocks").val(data);
-                }
-                getTotalPrice(jQuery("#prod").val());
-
-            });
-            setTimeout(function () {
-                jQuery("#loader").css("display", "none");
-            }, 200);
-
-        }
-
-        function getTotalPrice(id) {
-            jQuery("#loader").css("display", "block");
-            var urlPrefix = getUrlPrefix();
-            jQuery.post( urlPrefix +'CP/Home/getTotalPrice/', {
-                id: id
-            }, function (data) {
-                jQuery("#total_purchases").css("display", "inline");
-                jQuery("#total_purchases").html(data);
-
-            });
-            setTimeout(function () {
-                jQuery("#loader").css("display", "none");
-            }, 200);
-
-        }
-
-
-        $("#pdf").click(function () {
-            var checkedIds = [];
-            var weights = [];
-
-            $('ul > li  > span > label > div ').each(function () {
-                if ($(this).find('input[type="checkbox"]').is(":checked")) {
-                    alert("");
-                    $(this).css("background", "red");
-                };
-            });
-            });
 
         
         function flash(a) {

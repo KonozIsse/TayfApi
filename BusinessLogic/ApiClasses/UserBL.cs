@@ -99,10 +99,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("ExistItem"), false);
             }
-            if (String.IsNullOrEmpty(create.Name) || create.Name.Contains(" "))
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
-            }
             var role = _mapper.Map<Role>(create);
             role.NormalizedName = create.Name.ToUpper();
             await _roleManager.CreateAsync(role);

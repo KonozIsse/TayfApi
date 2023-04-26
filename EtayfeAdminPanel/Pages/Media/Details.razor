@@ -78,21 +78,19 @@
                                                             <input type="text" class="form-control" name="path" value="@t1.Path">
                                                         </div>
                                                     </div>
-
-
-
-
-                                                    <form accept-charset="UTF-8" class="form-horizontal form-validate">
+                                                    <form class="form-horizontal form-validate">
                                                         <div class="caption">
                                                             <div class="input-group">
-                                                                <input hidden name="id" value="@t1.Id" />
-                                                                <input hidden name="type" value="@t1.ImageType" />
+                                                                <input hidden @bind="@t1.Id" />
+                                                                <input hidden @bind="@t1.ImageType" />
                                                                 <span class="input-group-addon">Size</span>
-                                                                <input required="" type="text" class="form-control" name="height" value="@t1.Height">
+                                                                <input type="text" class="form-control" @bind="@t1.Height">
                                                                 <span class="input-group-addon">X</span>
-                                                                <input required="" type="text" class="form-control" name="width" value="@t1.Width">
+                                                                <input type="text" class="form-control" @bind="@t1.Width">
                                                                 <span class="input-group-addon" style="padding: 0">
-                                                                    <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Regenerate")</button>
+                                                                    <button type="submit" class="btn btn-primary" @onclick="(async()=> await EditImgSetting(t1))">
+                                                                        @SharedLocalize.GetLocalizedStringValue("Regenerate")
+                                                                    </button>
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -110,21 +108,16 @@
                     <!-- /.box-body -->
                 </div>
                 <!-- /.box -->
+                <p id="demo"></p>
             </div>
-            <p id="demo"></p>
-
-            <!-- /.col -->
         </div>
-
-
-        <!-- /.row -->
     </section>
 }
 
 @code {
     [Parameter]
     public int Id { get; set; }
-    UpdateImageSettingDto create = new UpdateImageSettingDto();
+   // ImageSettingDto create = new ImageSettingDto();
     public List<ImageSettingDto> Model { get; set; }
     public List<SettingDto> settings { get; set; }
     string message;
@@ -132,18 +125,24 @@
     public string lang { get; set; }
     protected override async Task OnInitializedAsync()
     {
-
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
-        create = new UpdateImageSettingDto();
         Model = await _imageBL.GetAllImageSettingsToImage(Id);
+        //create = new ImageSettingDto();
+        //create = await _imageBL.GetMapImageSetting();
         settings = await _imageBL.GetAllSettings();
     }
 
-    async Task EditImgSetting()
+    async Task EditImgSetting(ImageSettingDto create)
     {
-        create.Id = Id;
-        var result = await _imageBL.EditImageSetting(create);
+        var updateDto = new UpdateImageSettingDto
+            {
+                Id = create.Id,
+                Height = create.Height,
+                Width = create.Width,
+                ImageType = create.ImageType
+            };
+        var result = await _imageBL.EditImageSetting(updateDto);
         if (result.Success)
         {
             message = result.Message;

@@ -18,6 +18,10 @@ using Microsoft.AspNetCore.Localization;
 using Quartz;
 using BusinessLogic.Services.Jobs;
 using Entities.Models.CorePushModels;
+using ResourcesLib;
+using System.Reflection;
+using Microsoft.Extensions.Localization;
+
 namespace BusinessLogic.StartUp
 {
     public static class StartUp
@@ -115,7 +119,14 @@ namespace BusinessLogic.StartUp
                 options.FallBackToParentCultures = true;
                 options.ApplyCurrentCultureToResponseHeaders = true;
             });
-
+            services.AddControllersWithViews().AddViewLocalization().AddDataAnnotationsLocalization(option =>
+            {
+                var type = typeof(SharedResource);
+                var assemble = new AssemblyName(type.GetTypeInfo().Assembly.FullName);
+                var factory = services.BuildServiceProvider().GetService<IStringLocalizerFactory>();
+                var loc = factory.Create("SharedResource", assemble.Name);
+                option.DataAnnotationLocalizerProvider = (t, f) => loc;
+            });
         }
         public static void ConfigureAddQuartz(this IServiceCollection services)
         {
