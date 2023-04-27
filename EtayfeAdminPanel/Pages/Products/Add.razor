@@ -393,6 +393,7 @@
         Types =  _productBL.GetProductTypes();
         //http.GetFromJsonAsync<List<string>>("api/product/getAllTypesProducts");
         stores = await http.GetFromJsonAsync<List<StoreDto>>("api/ManageVendors/GetStores");
+          create.ProductCategories = new List<CreateProductCategoryDto>();
     }
     public async Task AddProduct()
     {
@@ -411,7 +412,7 @@
     }
     public async Task AddCats(int id)
     {
-        create.ProductCategories = new List<CreateProductCategoryDto>();
+      
         create.ProductCategories.Add(new CreateProductCategoryDto { CategoryId = id });
     }
 

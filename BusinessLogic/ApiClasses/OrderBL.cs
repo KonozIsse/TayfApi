@@ -7,7 +7,9 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -884,7 +886,7 @@ namespace BusinessLogic.ApiClasses
 
                 await _repositoryManager.ProductsCoupon.DeleteRowRange(listToDelete);
 
-                var listToAdd = updateDto.ProductsCoupons.Where(x => x.Id == 0);
+                var listToAdd = updateDto.ProductsCoupons.Where(x => x.Id == 0).ToList();
 
                 var entity = _mapper.Map<List<ProductsCoupon>>(listToAdd);
                 foreach (var item in entity)
@@ -897,7 +899,7 @@ namespace BusinessLogic.ApiClasses
 
                 foreach (var item in listToUpdate)
                 {
-                    var itemEntity = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(item, true);
+                    var itemEntity = await _repositoryManager.ProductsCoupon.GetItemId(item, true);
                     var dtoEntity = updateDto.ProductsCoupons.First(x => x.Id == item);
                     _mapper.Map(dtoEntity, itemEntity);
                 }
@@ -936,6 +938,15 @@ namespace BusinessLogic.ApiClasses
         {
             var coupon = await _repositoryManager.Coupon.GetCouponId(id, false);
             var couponDto = _mapper.Map<UpdateCouponDto>(coupon);
+            var products = await _repositoryManager.ProductsCoupon.GetAllProductsCouponId(id, false);
+            var catDtos = products.Select(item => new ProductsCouponDto
+            {
+                Id = item.Id,
+                ProductId = item.ProductId
+            }).ToList();
+
+            couponDto.ProductsCoupons = catDtos;
+           
             return couponDto;
         }
         //OrderStatus------------------------------------------------

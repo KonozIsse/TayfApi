@@ -30,7 +30,7 @@
 
                                                     <img class="image_picker_image" src="@i.Path" alt="@i.ImgId">
                                                     <input class="imgSrcc" value="@i.Path" hidden>
-                                                    <input onclick="checkImage()" Id="@i.Path" type="checkbox" class="lstt" name="im" value="@i.ImgId" />
+                                                    <input id="@i.Path" type="checkbox" class="lstt" name="im" value="@i.ImgId" onchange="onSelectImg()" />
 
                                                 </div>
                                             </label>

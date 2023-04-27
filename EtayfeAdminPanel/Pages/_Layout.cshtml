@@ -132,7 +132,7 @@
         
          
     </script>
-    <script>
+   @* <script>
 
         $(document).ready(function () {
 
@@ -140,7 +140,7 @@
                 $(".select2").select2();
             });
         });
-    </script>
+    </script>*@
     @*Images*@
 
     <script type="text/javascript">
@@ -213,12 +213,13 @@
             //}
         };
        
-        $("input[name='im']").change(function () {
-            var path = $(this).attr('Id');
+        function onSelectImg() {
+            var path = $(this).attr('id');
             // Iterate each checkbox
             $("#imgCont").attr("src", path);
+            console.log("path, ", path)
 
-            $('.lstt:checkbox').each(function () {
+            $("input[name='im']").each(function () {
                 if ($('input[name="im"]:checked').length > 1) {
                     $("input[name='im']:checked").checked = false;
                 } else {
@@ -226,7 +227,7 @@
 
                 }
             });
-        });
+        }
 
         $(".newIcon").click(function () {
             jQuery("#loader").css("display", "block");

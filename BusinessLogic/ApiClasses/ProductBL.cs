@@ -267,10 +267,6 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            if (updateDto.DescriptionAr == null || updateDto.ProductNameAr == null)
-            {
-                return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
-            }
             if (updateDto.Price < 0)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPrice"), false);
@@ -427,6 +423,7 @@ namespace BusinessLogic.ApiClasses
         {
             var product = await _repositoryManager.Product.GetProductById(id, false);
             var productDto = _mapper.Map<UpdateProductDto>(product);
+            productDto.StoreId = product.StoreId;
             productDto.Type = product.ProductType;
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(id);
             if(special != null)
@@ -445,16 +442,12 @@ namespace BusinessLogic.ApiClasses
                 productDto.StartDate = flash.StartDate;
             }
             var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(id,false,false);
-            foreach (var catId in cats)
+            var catDtos = cats.Select(item => new CreateProductCategoryDto
             {
-                var catDtos = cats.Select(item => new CreateProductCategoryDto
-                {
-                    CategoryId = catId.CategoryId
-                }).ToList();
-                productDto.ProductCategories = catDtos;
-            }
-           
-
+                Id = item.Id,
+                CategoryId = item.CategoryId
+            }).ToList();
+            productDto.ProductCategories = catDtos;
             return productDto;
         }
         public async Task<BussnessResultModel> ApproveProduct(int productId)

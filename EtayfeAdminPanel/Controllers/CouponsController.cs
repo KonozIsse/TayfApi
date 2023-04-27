@@ -3,6 +3,7 @@ using Entities.RequestFeatures;
 using Entities.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Entities.Models;
 
 namespace EtayfeAdminPanel.Controllers
 {
@@ -17,6 +18,7 @@ namespace EtayfeAdminPanel.Controllers
         public async Task<IActionResult> GetAllCoupons(string search, [FromQuery] PostsParameters postsParameters)
         {
             var result = await _orderBL.GetAllCoupons(search,postsParameters);
+            
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
@@ -24,6 +26,12 @@ namespace EtayfeAdminPanel.Controllers
         public async Task<IActionResult> GetAllPrductsToCoupon()
         {
             var result = await _orderBL.GetAllPrductsToCoupon();
+            return Ok(result);
+        } 
+        [HttpGet("test")]
+        public async Task<IActionResult> GetMapCouponId(int id)
+        {
+            var result = await _orderBL.GetMapCouponId(id);
             return Ok(result);
         }
 
