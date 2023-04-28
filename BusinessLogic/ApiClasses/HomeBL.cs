@@ -463,7 +463,7 @@ namespace BusinessLogic.ApiClasses
         //Language------------------------------------------------
         public async Task<PagedList<LanguageDto>> GetAllLanguages(string search,string filter, string lang, PostsParameters postsParameters)
         {
-            var languages = await _repositoryManager.Language.GetAllLanguage(search , filter);
+            var languages = await _repositoryManager.Language.GetAllLanguage(search , filter,false);
             var languagesDto = languages.Select(language => 
             {
                 var languageDto = _mapper.Map<LanguageDto>(language);
@@ -548,6 +548,7 @@ namespace BusinessLogic.ApiClasses
         {
             var currency = await _repositoryManager.Currency.GetCurrency(id,false);
             var currencyDto = _mapper.Map<UpdateCurrencyDto>(currency);
+            currencyDto.Position = currency.Position;
              return currencyDto;
         }
         public async Task ChangeDefaultCurrency(int id)
@@ -614,7 +615,7 @@ namespace BusinessLogic.ApiClasses
 
             var users = await _repositoryManager.User.GetCustomers(false);
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.GeneralNotfication);
-            if (create.IdUsers.First() == 0)
+            if (create.IdUsers.Count == 0)
             {
                 foreach (var u in users)
                 {

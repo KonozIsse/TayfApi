@@ -25,9 +25,9 @@ namespace Repository
         => await FindByCondition(c => c.IsStatus == Status.Active,false).SingleOrDefaultAsync();
         public async Task<IEnumerable<Language>> GetListLanguage(bool trackChanges)
         => await FindAll(trackChanges).ToListAsync();
-        public async Task<IEnumerable<Language>> GetAllLanguage(string search ,string filter)
-        { 
-            var langs =  FindAll(false);
+        public async Task<IEnumerable<Language>> GetAllLanguage(string search ,string filter, bool trackChanges)
+        {
+            var langs = FindAll(trackChanges);
             if (!string.IsNullOrEmpty(search))
             {
                 if(filter== "0")
@@ -43,7 +43,7 @@ namespace Repository
                     langs = langs.Where(c => c.Name.Contains(search) || c.Code.Contains(search));
                 }
             }
-            return await langs.Include(c=>c.Image).ToListAsync();
+            return await langs.ToListAsync();
         }
         public void DeleteLanguage(Language language) => Delete(language);
         public async Task<IEnumerable<Language>> GetListLanguageImage(int imageId,bool trackChanges)

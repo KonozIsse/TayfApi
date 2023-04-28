@@ -147,6 +147,12 @@ internal class Program
         {
             endpoints.MapControllers();
         });
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllerRoute(
+                name: "default",
+                pattern: "{controller= Home}/{action=Index}/{id?}");
+        });
         app.UseSwagger();
         app.UseSwaggerUI(s =>
         {

@@ -31,14 +31,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link href="EtayfeAdminPanel.styles.css" rel="stylesheet" />
-  
+    <base href="/" />
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 
 </head>
 <body>
     @RenderBody()
-
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
             An error has occurred. This application may no longer respond until reloaded.
@@ -151,27 +150,33 @@
 
             $('div > .thumbnail').each(function () {
                 if ($(this).find('input[type="checkbox"]').is(":checked")) {
-                    checkedIds.push($(this).find('input[type="checkbox"]').attr('Id'));
-
+                    checkedIds.push($(this).find('input[type="checkbox"]').attr('id'));
                 }
             });
 
             if (checkedIds == null || checkedIds == 0 || checkedIds == "") {
-                alert("Please choose product");
+                alert("Please choose image");
                 return;
             }
             jQuery("#Confirm").modal("show");
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("DELETE", "https://localhost:44360/api/Media/deleteListImages/" + checkedIds, true);
+            xhttp.send();
+            xhttp.onreadystatechange = function () {
 
-            var UrlPrefix = "api/Media/deleteListImages";
-            jQuery("#Confirm .btn-danger").attr("href", (UrlPrefix + "?Ids=" + checkedIds));
+                if (this.readyState == 4 && this.status == 200) {
+                    alert(this.response);
+                    location.reload();
+                }else{
+                    alert(this.response);
+                    location.reload();
+                }
+            };
+            console.log("url " + UrlPrefix + checkedIds);
+
             return false;
         });
-       function removeCheckedCheckboxes() {
-          var checked = document.querySelectorAll(".delete-checkbox:checked");
-          checked.forEach((elem) => {
-            elem.parentElement.style.display = "none";
-          })
-        }
+
         function check(){
 
             var get= document.getElementsByName('check');
@@ -254,6 +259,7 @@
     <script type="text/javascript">
 
 
+       
 
         
         function flash(a) {

@@ -1,4 +1,4 @@
-﻿@page "/TaxRates/Add"
+﻿@page "/TaxRate/Add"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addtaxes") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -119,22 +119,25 @@
     </div>
 </section>
 @code {
-    public CreateTaxRateDto create { get; set; }
+    public CreateTaxRateDto create { get; set; } 
+    public AdminDto user { get; set; }
+    public string lang { get; set; }
     private List<ZoneDto> zones;
     private List<TaxClassDto> taxes;
-    string lang = "en";
     protected override async Task OnInitializedAsync()
     {
         create = new CreateTaxRateDto();
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         zones = await _locationTaxBL.GetZones(); 
         taxes = await _locationTaxBL.GetTaxes(lang);
     }
-    int storeId = 3;
     string message = "";
     string style = "";
     async Task AddTaxRate()
     {
-        var result = await _locationTaxBL.AddTaxRate(storeId, create);
+        var result = await _locationTaxBL.AddTaxRate(user.Id, create);
         if (result.Success)
         {
             message = result.Message;

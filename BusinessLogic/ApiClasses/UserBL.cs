@@ -55,18 +55,33 @@ namespace BusinessLogic.ApiClasses
             var rolesDto = _mapper.Map<List<RoleDto>>(roles);
             return rolesDto;
         }
-        public async Task<List<LinkDto>> GetLinks(int roleId)
+        public async Task<List<LinkDto>> GetLinks()
         {
             var links = await _repositoryManager.Link.GetLinks();
-            links = links.Where(c=>c.Permissions.Any(c=>c.RoleId== roleId)).ToList();
             var linksDto = links.Select(link =>
             {
               var linkDto = _mapper.Map<LinkDto>(link);
-               // linkDto.Title = _locService.GetLocalizedStringValue(link.Title);
                 linkDto.Show = link.IsStatus == Status.Active ? true : false;
                 return linkDto;
             }).ToList();
             return linksDto;
+        }
+        public async Task<List<LinkDto>> GetLinksRole(int roleId)
+        {
+            var links = await _repositoryManager.Link.GetLinks();
+            links = links.Where(c=>c.Permissions.Any(x=>x.RoleId == roleId)).ToList();   
+            var linksDto = links.Select(link =>
+            {
+              var linkDto = _mapper.Map<LinkDto>(link);
+                linkDto.Show = link.IsStatus == Status.Active ? true : false;
+                return linkDto;
+            }).ToList();
+            return linksDto;
+        }
+        public async Task<List<Permission>> GetPermissionsRole(int roleId)
+        {
+            var permissions = await _repositoryManager.Permission.GetPermissionsRole(roleId, false);
+            return (List<Permission>)permissions;
         }
         public async Task<BussnessResultModel> AddPermission(int roleId, List<RoleLinksDto> RoleLinksDto)
         {

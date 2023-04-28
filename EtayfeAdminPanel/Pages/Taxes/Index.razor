@@ -82,7 +82,7 @@
 
                                                     </td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/Taxes/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Tax/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a title="delete" @onclick="(async ()=> await Delete(item.Id))" class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i></a>
 
                                                     </td>
@@ -148,7 +148,7 @@
     string style = "";
     async Task Delete(int id)
     {
-        var confirm = await js.confirMethod("Are you Sure ?");
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ");
         if (confirm)
         {
             var result = await _locationTaxBL.DeleteTaxClass(id);
@@ -162,6 +162,7 @@
                 message = result.Message;
                 style = "danger";
             }
+            NavigationManager.NavigateTo("/Taxes", true);
         }
     }
 }

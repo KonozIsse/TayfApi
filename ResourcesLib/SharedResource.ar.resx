@@ -822,6 +822,9 @@
   <data name="EditCustomer" xml:space="preserve">
     <value>تعديل زبون</value>
   </data>
+  <data name="EditEmailMessage" xml:space="preserve">
+    <value>تعديل قالب الايميل</value>
+  </data>
   <data name="editImg" xml:space="preserve">
     <value>تعديل صورة</value>
   </data>
@@ -917,6 +920,9 @@
   </data>
   <data name="EmailMessage" xml:space="preserve">
     <value>سيتم ارسال بريد الكتروني لاعلامكم بنجاح التسجيل</value>
+  </data>
+  <data name="emailTemp" xml:space="preserve">
+    <value>قالب الايميل</value>
   </data>
   <data name="EmailTemplates" xml:space="preserve">
     <value>قوالب البريد الالكتروني</value>

@@ -58,7 +58,7 @@ namespace EtayfeAdminPanel.Controllers
             }
         }
         [HttpDelete("deleteListImages/{Ids}")]
-        public async Task<IActionResult> DeleteImages(List<int> Ids)
+        public async Task<IActionResult> DeleteImages(string Ids)
         {
             var result = await _imageBL.DeleteImageIds(Ids);
             if (!result.Success)

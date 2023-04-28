@@ -137,22 +137,26 @@
     string style = "";
     async Task Delete(int id)
     {
-        var result = await _orderBL.DeleteCoupon(id);
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
+        if (confirm)
+        {
+            var result = await _orderBL.DeleteCoupon(id);
 
-        if (result.Success)
-        {
-            message = result.Message;
-            style = "success";
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+            NevigateToYourUrl();
         }
-        else
-        {
-            message = result.Message;
-            style = "danger";
-        }
-        NevigateToYourUrl();
     }
     void NevigateToYourUrl()
     {
-        NavigationManager.NavigateTo("/CP/Coupons", true);
+        NavigationManager.NavigateTo("/Coupons", true);
     }
 }

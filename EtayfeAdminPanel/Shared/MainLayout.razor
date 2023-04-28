@@ -39,8 +39,8 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
-        Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");
         Customers = await http.GetFromJsonAsync<List<CustomerDto>>("api/Home/getNewCustomers");
         Orders = await http.GetFromJsonAsync<List<OrderDto>>("api/Home/getNewOrders");
     }

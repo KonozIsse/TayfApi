@@ -38,7 +38,7 @@
                                 <div class="col-lg-4 form-inline" id="contact-form12"></div>
                             </div>
                             <div class="box-tools pull-right">
-                                <a href="/TaxRates/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addtaxrate")</a>
+                                <a href="/TaxRate/Add" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addtaxrate")</a>
                             </div>
                         </div>
 
@@ -87,7 +87,7 @@
 
                                                     </td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/TaxRates/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/TaxRate/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                         <a  title="delete" @onclick="(async ()=> await Delete(item.Id))"  class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i></a>
 
                                                     </td>
@@ -155,22 +155,21 @@
     string style = "";
     async Task Delete(int id)
     {
-        var confirm = await js.confirMethod("Are you Sure ?");
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ");
         if (confirm)
         {
             var result = await _locationTaxBL.DeleteTaxRate(id);
-        if (result.Success)
-        {
-            message = result.Message;
-            style = "success";
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+                    NavigationManager.NavigateTo("/TaxRates", true);
+            } 
         }
-        else
-        {
-            message = result.Message;
-            style = "danger";
-        } NavigationManager.NavigateTo("/TaxRates",true);
-        }
-        
-       
     }
 }

@@ -1,8 +1,4 @@
-﻿@page "/CP/TaxRates/Edit"
-@page "/CP/TaxRates/Edit/{Id:int}"
-@inject LocationTaxBL _locationTaxBL;
-@inject HomeBL _homeBL;
-@inject LocService SharedLocalize
+﻿@page "/TaxRate/Edit/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("addtaxes") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
@@ -103,7 +99,7 @@
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a href="/CP/TaxRates" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/TaxRates" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -125,23 +121,26 @@
 @code {
     [Parameter]
     public int Id { get; set; }
+    public string lang { get; set; }
+    public AdminDto user { get; set; }
     UpdateTaxRateDto create = new UpdateTaxRateDto();
     private List<ZoneDto> zones;
     private List<TaxClassDto> taxes;
-    string lang = "en";
     protected override async Task OnInitializedAsync()
     {
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         create = new UpdateTaxRateDto();
         create = await _locationTaxBL.GetTaxRateId(Id);
         zones = await _locationTaxBL.GetZones();
         taxes = await _locationTaxBL.GetTaxes(lang);
     }
-    int storeId = 3;
     string message = "";
     string style = "";
     async Task AddTaxRate()
     {
-        var result = await _locationTaxBL.EditTaxRate(storeId, create);
+        var result = await _locationTaxBL.EditTaxRate(user.Id, create);
         if (result.Success)
         {
             message = result.Message;

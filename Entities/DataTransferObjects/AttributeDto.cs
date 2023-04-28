@@ -15,6 +15,9 @@ namespace Entities.DataTransferObjects
         public decimal AttributePrice { get; set; }
         public string ProductName { get; set; }
         public string Option { get; set; }
+        public int OptionId { get; set; }
+        public int ProductId { get; set; }
+        public int ValueId { get; set; }
         public OptionType OptionType { get; set; }
         public string Value { get; set; }
     }
@@ -69,6 +72,7 @@ namespace Entities.DataTransferObjects
         [Required]
         public string ValueHexModel { get; set; }
         public string OptionValueName { get; set; }
+        public string OptionValueNameAr { get; set; }
     }
     public class UpdateValueDto : CreateValueDto
     {

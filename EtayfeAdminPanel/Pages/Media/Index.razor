@@ -50,7 +50,7 @@
         <div style="float: left;">
             <div class="box-tools pull-left">
 
-                <button onclick="removeCheckedCheckboxes()"  type="button" class="btn btn-block btn-danger ConfirmDelete">حذف</button>
+                <a href="" id="btn"  type="button" class="btn btn-block btn-danger ConfirmDelete">حذف</a>
 
             </div>
             <div style="margin-right: 3px;" class="box-tools pull-left">
@@ -75,16 +75,13 @@ else
 
                    
                     <div style="margin-right:88px;" class="box-tools pull-left">
-                            <button  onclick="return confirm('Are you sure?')" type="button" class="btn btn-block btn-danger ">Delete</button>
-
+                            <a href="" id="btn"  type="button" class="btn btn-block btn-danger ConfirmDelete">Delete</a>
                     </div>
                     <div style="margin-right:162px;" class="box-tools pull-left">
                             <button onclick='check()' type="button" class="btn btn-block btn-success">Select All</button>
-
                     </div>
                     <div style="margin-right:253px;" class="box-tools pull-left">
                             <button onclick='unCheck()' type="button" class="btn btn-block btn-info">UnSelect All</button>
-
                     </div>
                         <div class="box-tools pull-left">
                             <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#myModal">Add New</button>
@@ -193,7 +190,7 @@ else
                             {
                         <div class="col-xs-4 col-md-2 margin-bottomset">
                             <div class="thumbnail thumbnail-imges">
-                                        <input value="@m.Id" name="check" id="checkBoxAll" type="checkbox" style="width: 19%;margin-top: -46%;opacity: 1 !important;" />
+                                        <input value="@m.Id" name="check" id="@m.Id" type="checkbox" style="width: 19%;margin-top: -46%;opacity: 1 !important;" />
                                 <img style="max-height:74px !important;max-width: 118px;" class="test_image" src="@m.Name" title="@m.Category" alt="...">
                             </div>
                                     <a class="btn btn-block btn-primary" href="/Media/Details/@m.Id"> @SharedLocalize.GetLocalizedStringValue("Details")</a>
@@ -235,7 +232,7 @@ else
                         <div class="field" align="@(lang == "en"? "left":"right")">
                              @*<input type="file" required="required" id="files" accept="image/*" name="files" multiple />*@
                            @*  <InputFile @ref="@create.Files" multiple />*@
-                            <InputFile OnChange="(()=>SelectImages(files))" multiple />
+                            <InputFile @onclick="(()=>SelectImages(files))" multiple />
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -252,7 +249,7 @@ else
 @code {
     [Parameter]
     public string lang { get; set; }
-      public CreateImageDto create { get; set; }
+    public CreateImageDto create { get; set; }
     public List<ImageDto> Model { get; set; }
     public List<ImageCategory> categories { get; set; } 
     public AdminDto user { get; set; }
@@ -269,6 +266,7 @@ else
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         categories =  _imageBL.GetImageCategories();
         await GetAllImages();
+        create.Files = new List<IFormFile>();
     }
     private async Task SelectedPage(int page)
     {
@@ -283,24 +281,6 @@ else
     }
     string message = "";
     string style = "";
-    async Task Delete(List<int> ids)
-    {
-        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure ?");
-        @if (confirm)
-        {
-            var result = await _imageBL.DeleteImageIds(ids);
-            if (result.Success)
-            {
-                message = result.Message;
-                style = "success";
-            }
-            else
-            {
-                message = result.Message;
-                style = "danger";
-            }
-        }
-    }
     async Task AddImage()
     {
         var result = await _imageBL.CreateImages(user.Id,create);
@@ -318,7 +298,9 @@ else
 
     void SelectImages(List<IFormFile> files)
     {
-        create.Files = files;
+       
+        create.Files.AddRange(files);
     }
+  
 
 }

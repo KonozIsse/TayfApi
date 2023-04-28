@@ -107,37 +107,40 @@
         }
     }
     </section>
-    @code {
+@code {
 
-        [Parameter]
-        public string search { get; set; }
-        public string filter { get; set; }
+    [Parameter]
+    public string search { get; set; }
+    public string filter { get; set; }
     public string lang { get; set; }
 
     public List<CountryDto> Model { get; set; }
-        public MetaData MetaData { get; set; } = new MetaData();
-        private PostsParameters _PostsParameters = new PostsParameters();
+    public MetaData MetaData { get; set; } = new MetaData();
+    private PostsParameters _PostsParameters = new PostsParameters();
 
-        protected override async Task OnInitializedAsync()
-        {
+    protected override async Task OnInitializedAsync()
+    {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         await GetAllCountries();
-        }
-        private async Task SelectedPage(int page)
-        {
-            _PostsParameters.PageNumber = page;
+    }
+    private async Task SelectedPage(int page)
+    {
+        _PostsParameters.PageNumber = page;
         await GetAllCountries();
-        }
+    }
     async Task GetAllCountries()
-        {
+    {
         var pagingResponse = await _locationTaxBL.GetAllCountries(lang,search, filter, _PostsParameters);
-            Model = pagingResponse.ToList();
-            MetaData = pagingResponse.MetaData;
-        }
-        string message = "";
-        string style = "";
-        async Task Delete(int id)
+        Model = pagingResponse.ToList();
+        MetaData = pagingResponse.MetaData;
+    }
+    string message = "";
+    string style = "";
+    async Task Delete(int id)
+    {
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
+        if (confirm)
         {
             var result = await _locationTaxBL.DeleteCountry(id);
 
@@ -151,7 +154,8 @@
                 message = result.Message;
                 style = "danger";
             }
-        NavigationManager.NavigateTo("/CP/Countries", true);
+            NavigationManager.NavigateTo("/Countries", true);
         }
+    }
 
     }

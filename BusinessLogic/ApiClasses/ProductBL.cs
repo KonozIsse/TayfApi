@@ -943,40 +943,24 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<ProductDto>> PopularsPage(int pageSize = 10)
         {
             var popular = await _repositoryManager.Product.GetPopularProducts(pageSize);
-            if(popular == null && popular.Count == 0)
-            {
-                return null;
-            }
             var popularDto = _mapper.Map<List<ProductDto>>(popular);
             return popularDto;
         }
         public async Task<List<ProductDto>> BestPage(int pageSize = 10)
         {
             var popular = await _repositoryManager.Product.GetBestProducts(pageSize);
-            if (popular == null && popular.Count == 0)
-            {
-                return null;
-            }
             var popularDto = _mapper.Map<List<ProductDto>>(popular);
             return popularDto;
         }
         public async Task<List<ProductDto>> LatestPage(int pageSize = 10)
         {
             var populars = await _repositoryManager.Product.GetLatestPage(pageSize);
-            if (populars == null && populars.Count == 0)
-            {
-                return null;
-            }
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
         public async Task<List<ProductDto>> SpecialsPage(int pageSize = 5)
         {
             var populars = await _repositoryManager.Product.SpecialsPage(pageSize);
-            if (populars == null && populars.Count == 0)
-            {
-                return null;
-            }
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }

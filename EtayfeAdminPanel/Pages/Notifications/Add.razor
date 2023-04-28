@@ -35,13 +35,13 @@
                                             <div class="form-group">
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Name")</label>
                                                 <div class="col-sm-10 col-md-4 couponProdcuts">
-                                                    <select multiple="" @bind="@create.IdUsers" class="form-control select2 select2-hidden-accessible" required tabindex="-1" aria-hidden="true">
+                                                    <select multiple=""  class="form-control select2 select2-hidden-accessible" required tabindex="-1" aria-hidden="true">
                                                         <option value="0">All Customers</option>
                                                     @if (customers != null)
                                                     {
                                                         @foreach (var c in customers)
                                                         {
-                                                            <option value="@c.Id">@c.FullName</option>
+                                                            <option @onclick="(()=>AddUser(c.Id))" value="@c.Id">@c.FullName</option>
 
                                                         }
                                                     }
@@ -115,6 +115,7 @@
     {
         create = new CreateNotificationDto();
         customers = await http.GetFromJsonAsync<List<CustomerDto>>("api/Customers/GetCustomers");
+        create.IdUsers = new List<int>();
     }
     string message = "";
     string style = "";
@@ -131,6 +132,10 @@
             message = result.Message;
             style = "danger";
         }
+    }
+    void AddUser(int id)
+    {
+       create.IdUsers.Add(id);
     }
 
 

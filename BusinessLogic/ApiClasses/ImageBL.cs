@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Entities.Exception;
 using Microsoft.AspNetCore.Hosting;
 using System.Xml.Linq;
+using Org.BouncyCastle.Crypto;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -219,15 +220,18 @@ namespace BusinessLogic.ApiClasses
             }
             return new BussnessResultModel(create, _locService.GetLocalizedStringValue("successSave"));
         } 
-        public async Task<BussnessResultModel> DeleteImageIds(List<int> ids)
+        public async Task<BussnessResultModel> DeleteImageIds(string ids)
         {
-            foreach (var id in ids)
+            char[] delimiters = new char[] { ',' };
+            string[] stringArray = ids.Split(delimiters);
+            int[] intArray = Array.ConvertAll(stringArray, s => int.Parse(s));
+            foreach (var id in intArray)
             {
-                var image =  _repositoryManager.Image.GetImage(id, true);
+                var image =  _repositoryManager.Image.GetImage(id, false);
                 if (image != null)
                 {
                     var sliders = await _repositoryManager.Slider.GetSlideImageId(id, false);
-                    if(sliders != null)
+                    if (sliders != null)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }

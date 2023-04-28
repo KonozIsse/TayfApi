@@ -29,14 +29,14 @@
                                                 {
                                                     foreach (var d in links)
                                                     {
-                                                    <div class="col-md-6">
+                                                        bool IsChecked = haveAdminThisLink.Where(c => c.LinkId == d.Id).Count() > 0 ? true : false;
+                                                        <div class="col-md-6">
 
                                                             <div class="form-group">
-
                                                             <label class="col-sm-3 col-md-5 control-label">@SharedLocalize.GetLocalizedStringValue(d.Title)</label>
                                                                 <div class="col-sm-10 col-md-4">
                                                                     <label class="control-label">
-                                                                    <input @onclick="(async() => await AddLink(d.Id))"   type="checkbox" value="@d.Id" />
+                                                                    <input @onclick="(() => AddLink(d.Id))" checked="@IsChecked" type="checkbox" value="@d.Id" />
                                                                     </label>
 
                                                                     <br>
@@ -77,14 +77,15 @@
     [Parameter]
     public int Id { get; set; }
     public List<LinkDto> links { get; set; }
+    public List<Permission> haveAdminThisLink { get; set; }
     List<RoleLinksDto> create = new List<RoleLinksDto>();
     string message;
     string style;
     protected override async Task OnInitializedAsync()
     {
         create = new List<RoleLinksDto>();
-        links = links = await http.GetFromJsonAsync<List<LinkDto>>("api/Home/GetLinksRole/" + Id);
-     
+        links  = await http.GetFromJsonAsync<List<LinkDto>>("api/Home/GetLinks");
+       haveAdminThisLink = await _userBL.GetPermissionsRole(Id);
     }
 
     async Task CreatePermission()
@@ -102,9 +103,9 @@
             style = "danger";
         }
     }
-     public async Task AddLink(int id)
+     public void AddLink(int id)
     {
-        create.Add(new RoleLinksDto { LinkId = id });
+        create.Add(new RoleLinksDto {  LinkId = id });
     }
 }
 

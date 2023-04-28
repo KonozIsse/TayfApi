@@ -139,6 +139,7 @@
     async Task DefaultLang(int id)
     {
         await _homeBL.ChangeDefaultLanugage(id);
+        NavigationManager.NavigateTo("/Languages", true);
     }
   
     void NevigateToYourUrl()

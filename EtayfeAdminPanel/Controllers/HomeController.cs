@@ -14,10 +14,16 @@ namespace EtayfeAdminPanel.Controllers
         public HomeController(IServiceProvider provider) : base(provider)
         {
         }
+        [HttpGet("GetLinks")]
+        public async Task<IActionResult> GetLinks()
+        {
+            var result = await _userBL.GetLinks();
+            return Ok(result);
+        } 
         [HttpGet("GetLinksRole/{roleId}")]
         public async Task<IActionResult> GetLinksRole(int roleId)
         {
-            var result = await _userBL.GetLinks(roleId);
+            var result = await _userBL.GetLinksRole(roleId);
             return Ok(result);
         }
         [HttpGet("GetTotalOrdersProducts")]

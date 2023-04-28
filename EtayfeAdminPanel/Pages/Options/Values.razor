@@ -1,5 +1,4 @@
 ﻿@page "/Values/{Id:int}"
-@page "/Values"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("OptionsValues") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 <Alert Message="@message" Style="@style"></Alert>
 <section class="content-header">
@@ -12,8 +11,6 @@
     </ol>
 </section>
 @if(Model != null)
-{
-    @if(user != null)
 {
 <section class="content">
     <div class="row">
@@ -103,11 +100,11 @@
                                                     </p>
 
                                                 </td>
-                                                @if (user.UserType == UserType.Admin)
+                                                @if (user != null && user.UserType == UserType.Admin)
                                                 {
                                                     <td>
                                                             <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/Value/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("delete")" @onclick="(async()=> await Delete(item.Id))" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title="Delete" @onclick="(async()=> await Delete(item.Id))" class="badge bg-red Confirm"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                     </td>
                                                 }
                                             </tr>
@@ -142,7 +139,6 @@
 
     </div>
  </section>
-}
 }
 
 @code {
@@ -183,7 +179,7 @@
     string style = "";
     async Task Delete(int id)
     {
-        var confirm = await js.confirMethod("are you sure");
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
         if (confirm)
         {
             var result = await _productBL.DeleteValueProduct(id);
@@ -197,6 +193,7 @@
                 message = result.Message;
                 style = "danger";
             }
+            NavigationManager.NavigateTo("/Options", true);
         }
     }
     async Task AddValue()
@@ -212,9 +209,5 @@
             message = result.Message;
             style = "danger";
         }
-    }
-    void NevigateToYourUrl()
-    {
-        NavigationManager.NavigateTo("/Values", true);
     }
 }

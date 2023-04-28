@@ -32,7 +32,7 @@
                                     <div class="col-lg-4 form-inline"></div>
                                 </div>
                                 <div class="box-tools pull-right">
-                                    <a href="/ManageVendors/Add/" type="button" style="width:none" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("add")</a>
+                                    <a href="/Vendors/Add/" type="button" style="width:none" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("add")</a>
                                </div>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                                                         @item.CreatedAt
                                                     </td>
                                                     <td>
-                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/ManageVendors/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a data-toggle="tooltip" data-placement="bottom" title=" @SharedLocalize.GetLocalizedStringValue("edit")" href="/Vendors/Edit/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
 
                                                         <a data-toggle="tooltip" data-placement="bottom" title="@item.FirstName" @onclick="(async()=>await Delete(item.Id))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                                         </td>
@@ -155,18 +155,22 @@
     string style = "";
     async Task Delete(int id)
     {
-        var result = await _userBL.DeleteStore(id);
-
-        if (result.Success)
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
+        if (confirm)
         {
-            message = result.Message;
-            style = "success";
-        }
-        else
-        {
-            message = result.Message;
-            style = "danger";
-        }
+            var result = await _userBL.DeleteStore(id);
 
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+            NavigationManager.NavigateTo("/Vendors", true);
+        }
     }
 }

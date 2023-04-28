@@ -441,6 +441,9 @@
   <data name="CanceledOrders" xml:space="preserve">
     <value>Canceled Orders</value>
   </data>
+  <data name="CannotDeleteImage" xml:space="preserve">
+    <value>Previously used image cannot be deleted</value>
+  </data>
   <data name="cart" xml:space="preserve">
     <value>Cart</value>
   </data>
@@ -804,6 +807,9 @@
   <data name="EditCustomer" xml:space="preserve">
     <value>Edit Customer</value>
   </data>
+  <data name="EditEmailMessage" xml:space="preserve">
+    <value>Edit Email Message</value>
+  </data>
   <data name="editImg" xml:space="preserve">
     <value>Edit Image</value>
   </data>
@@ -896,6 +902,9 @@
   </data>
   <data name="EmailMessage" xml:space="preserve">
     <value>An email will be sent to inform you of the successful registration</value>
+  </data>
+  <data name="emailTemp" xml:space="preserve">
+    <value>Email Template</value>
   </data>
   <data name="EmailTemplates" xml:space="preserve">
     <value>Email Templates</value>
@@ -1366,7 +1375,7 @@
     <value>No Products in Cart .</value>
   </data>
   <data name="NoRecordfound" xml:space="preserve">
-    <value>No Products Found</value>
+    <value>No Records Found</value>
   </data>
   <data name="NoResult" xml:space="preserve">
     <value>There are no results to display</value>

@@ -1,5 +1,4 @@
-﻿@page "/MailingList/Edit/"
-@page "/MailingList/Edit/{id:int}"
+﻿@page "/MailingList/Edit/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditEmailMessage")|@SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
 
 <Alert Message="@message" Style="@style"></Alert>
@@ -31,13 +30,13 @@
                             <div class="box box-info">
                                 <br>
                                     <div class="form-horizontal">
-                                    <EditForm Model="@create" OnValidSubmit="@UpdateTemplate">
+                                    <EditForm Model="create" OnValidSubmit="UpdateTemplate">
                                                 <DataAnnotationsValidator />
                                         <div class="box-body">
                                             <div class="form-group">
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Subject")</label>
                                                 <div class="col-md-4">
-                                                    <InputText class="form-control " @bind-Value="create.Subject" />
+                                                    <InputText class="form-control" @bind-Value="create.Subject" ></InputText>
                                                     <ValidationMessage For="@(() => create.Subject)" />
                                                 </div>
                                             </div>
@@ -45,14 +44,14 @@
                                             <div class="form-group">
                                                 <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("Message")</label>
                                                 <div class="col-sm-10 col-md-4">
-                                                    <InputTextArea class="form-control" cols="20" id="message" @bind-Value="create.Message" ></InputTextArea>
+                                                    <InputTextArea class="form-control" cols="20"  @bind-Value="create.Message" ></InputTextArea>
                                                     <ValidationMessage For="@(() => create.Message)" />
                                                 </div>
                                             </div>
 
                                             <div class="box-footer text-center">
                                                 <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit")</button>
-                                                <a @onclick="@NevigateToYourUrl" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
+                                                <a href="/MailingList/Message" type="submit" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                             </div>
 
                                         </div>
@@ -72,19 +71,19 @@
 </section>
 @code {
     [Parameter]
-    public int id { get; set; }
+    public int Id { get; set; }
     UpdateTemplateDto create = new UpdateTemplateDto();
     string message;
     string style;
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateTemplateDto();
-        create = await _homeBL.GetTemplateId(id);
+        create = await _homeBL.GetTemplateId(Id);
     }
 
     async Task UpdateTemplate()
     {
-        create.Id = id;
+        create.Id = Id;
         var result = await _homeBL.UpdateTemplate(create);
         if (result.Success)
         {
@@ -97,8 +96,5 @@
             style = "danger";
         }
     }
-    void NevigateToYourUrl()
-    {
-        NavigationManager.NavigateTo("/MailingList/Message", true);
-    }
+ 
 }

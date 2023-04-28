@@ -21,7 +21,7 @@ namespace Repository
         public async Task<List<Product>> GetAllAcceptedProducts()
           => await FindByCondition(c =>  c.IsStatus == Status.Active && c.IsAcceptAdmin == true, false)
             .Include(s => s.SpecialProducts).Include(c => c.ProductSales).Include(e => e.WishLists)
-            .Include(c => c.Reviews).Include(c => c.AttributesProducts).Include(i=>i.Images).Include(c=>c.Store)
+            .Include(c => c.AttributesProducts).Include(c=>c.Store)
             .OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<Product> GetProductById(int id, bool trackChanges)
         => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();

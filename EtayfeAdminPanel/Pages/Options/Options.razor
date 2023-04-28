@@ -136,7 +136,7 @@
     string style = "";
     async Task Delete(int id)
     {
-        var confirm = await js.confirMethod("are you sure");
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
         if (confirm)
         {
             var result = await _productBL.DeleteOptionProduct(id);
@@ -150,10 +150,7 @@
                 message = result.Message;
                 style = "danger";
             }
+            NavigationManager.NavigateTo("/Options", true);
         }
-    }
-    void NevigateToYourUrl()
-    {
-        NavigationManager.NavigateTo("/Options", true);
     }
 }

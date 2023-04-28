@@ -82,7 +82,8 @@
                                                     <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
 
                                                     <td>
-                                                        <DeleteMessage  OnDelete="@Delete" Id="@item.Id"></DeleteMessage>
+                                                        <a title="delete" @onclick="(async()=>await Delete(item.Id))" class="badge bg-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
                                                     </td>
                                                 </tr>
                                             }
@@ -142,17 +143,21 @@
     }
     async Task Delete(int id)
     {
-        var result = await _homeBL.DeleteContact(id);
-       
-        if (result.Success)
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
+        if (confirm)
         {
-            message = result.Message;
-            style = "success";
-        }
-        else
-        {
-            message = result.Message;
-            style = "danger";
+            var result = await _homeBL.DeleteContact(id);
+
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
         }
         NevigateToYourUrl();
     }
