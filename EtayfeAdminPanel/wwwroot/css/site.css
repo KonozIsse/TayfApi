@@ -225,3 +225,7 @@ select {
 .main-header li.user-header {
     background-color: #3c8dbc  !important;
 }
+img {
+    height: 100% !important;
+    border: none !important;
+}

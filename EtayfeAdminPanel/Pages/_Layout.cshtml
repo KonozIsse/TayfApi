@@ -93,16 +93,12 @@
                     filename: "Vendors Sales" + new Date(),
                 });
             });
-
         $(".exportExcel2").click(function () {
             $("#html2_table").table2excel({
                 exclude: ".noExport",
                 filename: "Sales Report",
             });
         });
-
-       
-
     </script>
    @*MailList*@
     <script>
@@ -127,9 +123,6 @@
 
         });
         $("#reff").load(location.href + " #reff");
-
-        
-         
     </script>
    @* <script>
 
@@ -176,7 +169,6 @@
 
             return false;
         });
-
         function check(){
 
             var get= document.getElementsByName('check');
@@ -207,61 +199,11 @@
                 });
             }
         }
-       
-        function checkImage() {
-            //if ($(this).is(":checked")) {
-            $(this).find('input[type="checkbox"]').attr('Id')
-            // Iterate each checkbox
-            $("#imgCont").attr("src", $(".imgSrcc").val());
 
-            $(".imgSrcc").val = "";
-            //}
-        };
-       
-        function onSelectImg() {
-            var path = $(this).attr('id');
-            // Iterate each checkbox
-            $("#imgCont").attr("src", path);
-            console.log("path, ", path)
-
-            $("input[name='im']").each(function () {
-                if ($('input[name="im"]:checked').length > 1) {
-                    $("input[name='im']:checked").checked = false;
-                } else {
-                    $(this).checked = true
-
-                }
-            });
-        }
-
-        $(".newIcon").click(function () {
-            jQuery("#loader").css("display", "block");
-            $.ajax({
-                type: "GET",
-                url: "/Images",
-                contentType: "application/json; charset=utf-8",
-                datatype: "json",
-                success: function (data) {
-
-                    $('.manufacturer-image-embed').html(data);
-
-                    $('#ModalmanufacturedICone').modal('show');
-                    setTimeout(function () {
-                        jQuery("#loader").css("display", "none");
-                    }, 100);
-                },
-                error: function () {
-                }
-            });
-        });
+      
 
     </script>
     <script type="text/javascript">
-
-
-       
-
-        
         function flash(a) {
             if (a.value == 1) {
                 jQuery("#loader").css("display", "block");
@@ -306,7 +248,6 @@
 
             }
         }
-
 
         function special(a) {
             //console.log(a.value);

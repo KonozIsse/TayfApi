@@ -218,7 +218,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var countryDto = _mapper.Map<CountryDto>(c);
                 countryDto.CountryName = lang == "en" ? c.CountryName : c.CountryNameAr;
-                countryDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(c.ImgId));
+                countryDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(c.ImageId));
                 return countryDto;
             }).ToList();
             return PagedList<CountryDto>.ToPagedList(countriesDto, postsParameters.PageNumber, postsParameters.PageSize);
@@ -233,7 +233,6 @@ namespace BusinessLogic.ApiClasses
         {
             var country = await _repositoryManager.Country.GetcountryById(id, false);
             var countryDto = _mapper.Map<UpdateCountryDto>(country);
-            countryDto.Image = _imageBL.GetImageMedium(Convert.ToInt32(country.ImgId));
             return countryDto;
         }
         //Zone------------------------------------------------

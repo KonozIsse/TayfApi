@@ -10,7 +10,7 @@ namespace Entities.Models
         public string CountryCode3 { get; set; }
         public string MobileCode { get; set; }
         [ForeignKey(nameof(Image))]
-        public int? ImgId { get; set; }
+        public int? ImageId { get; set; }
         public Image Image { get; set; }
         public  List<Address> Address { get; set; }
         public  List<Zone> Zones { get; set; }

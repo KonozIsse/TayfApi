@@ -77,7 +77,7 @@
                                             </div>
                                           
                                             <div class="form-group" id="imageIcone">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("icon")<span style="color:red;">*</span></label>
+                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
                                                 <div class="col-sm-10 col-md-4">
                                                     <!-- Modal -->
                                                     <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -88,12 +88,29 @@
                                                                     <h3 class="modal-title text-primary" id="myModalLabel">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
                                                                 </div>
                                                                 <div class="modal-body manufacturer-image-embed">
+                                                                    @if (images != null)
+                                                                    {
+                                                                        <ul class="thumbnails image_picker_selector">
+
+                                                                            @foreach (var i in images)
+                                                                            {
+                                                                                <li>
+                                                                                    <span class="emailTable">
+                                                                                        <label title="Spreadsheet for accounting">
+                                                                                            <div class="thumbnail">
+
+                                                                                                <img class="image_picker_image" src="@i.Path" alt="@i.Id">
+                                                                                                <input @onclick="(()=>Select(i.Path,i.ImgId))" type="checkbox" value="@i.Path" />
+                                                                                            </div>
+                                                                                        </label>
+                                                                                    </span>
+                                                                                </li>
+                                                                            }
+                                                                        </ul>
+                                                                    }
                                                                 </div>
                                                                 <div class="modal-footer">
-
-
-                                                                    <a href="Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
-                                                                    @*<a href="/admin/@lang/CP/Media/" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("")addImg</a>*@
+                                                                    <a href="/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                                     <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
                                                                     <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
                                                                 </div>
@@ -101,7 +118,7 @@
                                                         </div>
                                                     </div>
                                                     <div id="imageselected">
-                                                        <input value="Stores" hidden id="typeImg" />
+                                                        <input value="Blogs" hidden id="typeImg" />
                                                         <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
                                                         <br>
                                                         <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
@@ -111,10 +128,8 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <br />
-
-                                                    <img id="imgCont" width="80px" src="@create.ImageId">
-                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("addImg")</span>
+                                                    <img width="80px" src="@image" />
+                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("UploadYourImages")</span>
 
                                                     <br>
                                                 </div>
@@ -147,11 +162,16 @@
     [Parameter]
     public int Id { get; set; }
     UpdateStoreDto create = new UpdateStoreDto();
+    public List<ImageSettingDto> images { get; set; }
+    public string image { get; set; }
     string message;
     string style;
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateStoreDto();
+        image = _imageBL.GetImageOriginal(create.ImageId) ?? " ";
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
     }
 
     async Task UpdateStore()
@@ -170,5 +190,9 @@
         }
     }
 
-
+    public void Select(string image1, int imgId)
+    {
+        image = image1;
+        create.ImageId = imgId;
+    }
 }

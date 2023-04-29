@@ -14,6 +14,12 @@ namespace EtayfeAdminPanel.Controllers
         public HomeController(IServiceProvider provider) : base(provider)
         {
         }
+        [HttpGet("GetAllImagesOriginal")]
+        public async Task<IActionResult> GetAllImagesOriginal()
+        {
+            var result = await _imageBL.GetAllImageSettingOriginal(GetCurrentUserId());
+            return Ok(result);
+        }
         [HttpGet("GetLinks")]
         public async Task<IActionResult> GetLinks()
         {

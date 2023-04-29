@@ -45,14 +45,13 @@ namespace BusinessLogic.ApiClasses
             newsDto.Title = lang == "en" ? blog.Title : blog.TitleAr;
             newsDto.Decription = lang == "en" ? blog.Decription : blog.DecriptionAr;
             newsDto.CountComment = blog.Comments == null ? 0 : blog.Comments.Count();
-            newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId.Value);
+            newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId);
             return newsDto;
         }
         public async Task<UpdateNewsDto> GetBlogId(int blogId)
         {
             var blog = await _repositoryManager.News.GetBlogById(blogId, false, false);
             var newsDto = _mapper.Map<UpdateNewsDto>(blog);
-            newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId.Value);
             return newsDto;
         }
         public async Task<BussnessResultModel> AddNews (int storeId, CreateNewsDto create)

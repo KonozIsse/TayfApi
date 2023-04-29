@@ -34,7 +34,6 @@ namespace Entities.DataTransferObjects
     public class UpdateNewsDto : CreateNewsDto
     {
         public int Id { get; set; }
-        public string Image { get; set; }
     } 
     public class CreateCommentDto
     {

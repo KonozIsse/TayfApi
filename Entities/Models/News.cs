@@ -15,7 +15,7 @@ namespace Entities.Models
         public string Url { get; set; }
 
         [ForeignKey(nameof(Image))]
-        public int? ImgId { get; set; }
+        public int ImgId { get; set; }
         public Image Image { get; set; }
         [ForeignKey(nameof(Vendor))]
         public int? VendorId { get; set; }

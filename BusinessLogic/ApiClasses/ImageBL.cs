@@ -481,10 +481,11 @@ namespace BusinessLogic.ApiClasses
         public async Task<List<ImageSettingDto>> GetAllImageSettingOriginal(int userId)
         {
             var images = await _repositoryManager.ImageSetting.GetImageSettingOriginal();
-            //if (userId != 0)
-            //{
-            //    images = images.Where(s=>s.Image.VendId== userId);
-            //}
+            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (user.UserType == UserType.Store)
+            {
+                images = images.Where(s => s.Image.VendId == userId).ToList();
+            }
             var imagesDto = _mapper.Map<List<ImageSettingDto>>(images);
             return imagesDto;
         }

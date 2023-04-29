@@ -22,7 +22,7 @@ namespace Repository
         public async Task<List<Country>> GetCountries()
         => await FindAll(false).Include(x => x.Zones).ToListAsync();
         public async Task<List<Country>> GetCountriesImage(int ImageId)
-       => await FindByCondition(c=>c.ImgId== ImageId,false).ToListAsync();
+       => await FindByCondition(c=>c.ImageId== ImageId,false).ToListAsync();
         public async Task<IEnumerable<Country>> GetAllCountries(string search , string filter)
         { 
             var countries = FindAll(false);
