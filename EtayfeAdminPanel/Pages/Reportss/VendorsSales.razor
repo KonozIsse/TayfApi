@@ -41,9 +41,8 @@
                         </form>
 
                     </div>
-                    @*onclick="exportTableToExcel1('html_table', 'Vendor Sales Report')"*@
                     <div class="col-lg-6 form-inline" id="contact-form12">
-                        <button @onclick="ExportAsCSV" class="btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
+                        <button onclick="exportTableToExcelVendors()" class="btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
                         <button onclick="printJS('html_table', 'html')" class="btn btn-primary @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-print"></i> @SharedLocalize.GetLocalizedStringValue("Print")</button>
                     </div>
 
@@ -139,20 +138,5 @@
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }
-    private async Task ExportAsCSV()
-    {
-        using (var memoryStream = new MemoryStream())
-        {
-            using (var writer = new StreamWriter(memoryStream))
-            {
-                //using (var csv = new CsvHelper.CsvWriter(writer,SharedLocalize.GetLocalizedString("")))
-                //{
-                //    csv.WriteRecords(Model);
-                //}
-
-                var arr = memoryStream.ToArray();
-                await js.SaveAs("people.csv", arr);
-            }
-        }
-    }
+  
 }

@@ -1,6 +1,7 @@
 ﻿using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -21,8 +22,14 @@ namespace Entities.DataTransferObjects
     public class UpdateServiceDto
     {
         public int Id { get; set; }
+        [Required]
         public string Title { get; set; }
+        [Required]
         public string Description { get; set; }
-        public int ImgId { get; set; }
+        [Required]
+        public string TitleAr { get; set; }
+        [Required]
+        public string DescriptionAr { get; set; }
+        public int? ImgId { get; set; }
     }
 }

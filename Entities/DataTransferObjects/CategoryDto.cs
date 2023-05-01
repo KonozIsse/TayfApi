@@ -39,7 +39,7 @@ namespace Entities.DataTransferObjects
         [Required]
         public string CategoryNameAr { get; set; }
         public int? MainCategoryId { get; set; }
-        public int? ImgId { get; set; }
+        public int ImgId { get; set; }
         [Required]
         public Status IsStatus { get; set; }
     }

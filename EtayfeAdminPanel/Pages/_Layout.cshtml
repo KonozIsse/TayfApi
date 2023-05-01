@@ -13,7 +13,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
-     @*kk*@
     <link href="https://printjs-4de6.kxcdn.com/print.min.css" rel="stylesheet" />
     <link rel="shortcut icon" href="~/log.png">
     <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
@@ -57,48 +56,18 @@
     <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
     <script>
 
-        function exportTableToExcel(tableID, filename = '') {
-            var downloadLink;
-            var dataType = 'application/vnd.ms-excel';
-            var tableSelect = document.getElementById(tableID);
-            var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-
-            // Specify file name
-            filename = filename ? filename + '.xls' : 'excel_data.xls';
-
-            // Create download link element
-            downloadLink = document.createElement("a");
-
-            document.body.appendChild(downloadLink);
-
-            if (navigator.msSaveOrOpenBlob) {
-                var blob = new Blob(['\ufeff', tableHTML], {
-                    type: dataType
-                });
-                navigator.msSaveOrOpenBlob(blob, filename);
-            } else {
-                // Create a link to the file
-                downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-
-                // Setting the file name
-                downloadLink.download = filename;
-
-                //triggering the function
-                downloadLink.click();
-            }
-        }
-        $(".exportExcel").click(function () {
-                $("#html_table").table2excel({
-                    exclude: ".noExport",
-                    filename: "Vendors Sales" + new Date(),
-                });
-            });
-        $(".exportExcel2").click(function () {
+        function exportTableToExcelCustomers() {
             $("#html2_table").table2excel({
                 exclude: ".noExport",
                 filename: "Sales Report",
             });
-        });
+        }
+        function exportTableToExcelVendors() {
+            $("#html_table").table2excel({
+                exclude: ".noExport",
+                filename: "Vendors Sales" + new Date(),
+            });
+        }
     </script>
    @*MailList*@
     <script>

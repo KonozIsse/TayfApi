@@ -492,6 +492,9 @@
   <data name="chooseCat" xml:space="preserve">
     <value>اختر تصنيف رئيسي </value>
   </data>
+  <data name="ChooseImagesInTheBoxForUpload" xml:space="preserve">
+    <value>اختر الصور في الصندوق للتحميل</value>
+  </data>
   <data name="chooseStatus" xml:space="preserve">
     <value>اختر الحالة </value>
   </data>

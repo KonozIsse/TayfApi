@@ -36,7 +36,7 @@
                         </div>
                         <div class="box-tools pull-right">
 
-                            <a href="/CP/SettingWeb/AddSlide" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addSlider")</a>
+                            <a href="/SettingWeb/AddSlide" type="button" style="display:inline-block; width: auto; margin-top: 0;" class="btn btn-block btn-primary">@SharedLocalize.GetLocalizedStringValue("addSlider")</a>
 
                         </div>
                     </div>
@@ -82,9 +82,10 @@
                                                     @SharedLocalize.GetLocalizedStringValue("AddedDate") : @item.CreatedAt
                                                 </td>
                                                 <td>
-                                                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/CP/SettingWeb/EditSlide/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                                        <DeleteMessage OnDelete="@Delete" Id="@item.Id"> </DeleteMessage>
-                                                </td>
+                                                    <a data-toggle="tooltip" data-placement="bottom" title="@SharedLocalize.GetLocalizedStringValue("edit")" href="/SettingWeb/EditSlide/@item.Id" class="badge bg-light-blue"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                        <a title="delete" @onclick="(async ()=> await Delete(item.Id))" class="badge bg-red"> <i class="fa fa-trash" aria-hidden="true"></i> </a>
+
+                                                    </td>
                                             </tr>
                                         }
                                     </tbody>
@@ -121,7 +122,7 @@
     [Parameter]
     public string lang { get; set; }
     public List<SliderDto> Model { get; set; }
-   
+
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
 
@@ -146,18 +147,22 @@
     string style = "";
     async Task Delete(int id)
     {
-        var result = await _homeBL.DeleteSlide(id);
-
-        if (result.Success)
+        var confirm = await js.InvokeAsync<bool>("confirm", "Are you sure ?");
+        if (confirm)
         {
-            message = result.Message;
-            style = "success";
-        }
-        else
-        {
-            message = result.Message;
-            style = "danger";
-        }
+            var result = await _homeBL.DeleteSlide(id);
 
+            if (result.Success)
+            {
+                message = result.Message;
+                style = "success";
+            }
+            else
+            {
+                message = result.Message;
+                style = "danger";
+            }
+            NavigationManager.NavigateTo("/SettingWeb/Sliders", true);
+        }
     }
 }

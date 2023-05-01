@@ -1,7 +1,7 @@
 ﻿@page "/Vendors/Edit/{Id:int}"
 
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("EditVendor") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
-<Alert Message="@message" Style="@style"></Alert>
+
 <section class="content-header">
     <h1>@SharedLocalize.GetLocalizedStringValue("Vendors") <small> @SharedLocalize.GetLocalizedStringValue("EditVendor")</small> </h1>
     <ol class="breadcrumb">
@@ -10,6 +10,7 @@
         <li class="active">@SharedLocalize.GetLocalizedStringValue("EditVendor")</li>
     </ol>
 </section>
+<Alert Message="@message" Style="@style"></Alert>
 <section class="content">
     <!-- Info boxes -->
     <!-- /.row -->
@@ -169,6 +170,7 @@
     protected override async Task OnInitializedAsync()
     {
         create = new UpdateStoreDto();
+        create = await _userBL.GetMapStore(Id);
         image = _imageBL.GetImageOriginal(create.ImageId) ?? " ";
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");

@@ -180,7 +180,13 @@ namespace BusinessLogic.ApiClasses
             }).ToList();
 
             return storesDto;
-        }  
+        }
+        public async Task<UpdateStoreDto> GetMapStore(int id)
+        {
+            var store = await _repositoryManager.User.GetStoreId(id);
+           var storeDto = _mapper.Map<UpdateStoreDto>(store);
+            return storeDto;
+        }
         public async Task<PagedList<StoreDto>> GetAllActiveStores(PostsParameters postsParameters , int? sort)
         {
             var stores = await _repositoryManager.User.GetAllStores(false);

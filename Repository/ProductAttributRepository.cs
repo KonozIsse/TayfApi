@@ -23,6 +23,9 @@ namespace Repository
         public async Task<List<ProductAttribut>> GetAttributesProductId (int productId)
          =>await FindByCondition(c => c.ProductId == productId, false).Include(c=>c.Product)
             .Include(c=>c.ProductOption).Include(c=>c.ProductOptionValue).ToListAsync();
+        public async Task<List<ProductAttribut>> GetAllAttributes()
+        => await FindAll(false).Include(c => c.Product)
+           .Include(c => c.ProductOption).Include(c => c.ProductOptionValue).ToListAsync();
         public async Task<List<ProductAttribut>> GetAttributesOptionId(int optionId)
          => await FindByCondition(c => c.OptionId == optionId, false).ToListAsync();
          public async Task<ProductAttribut> GetProductOptionValue(int productId, int optionId, int valueId)

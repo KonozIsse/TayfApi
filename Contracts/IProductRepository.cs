@@ -17,11 +17,11 @@ namespace Contracts
         Task<Product> GetAcceptAdminActiveProduct(int id);
         Task<List<Product>> GetProductsTOStoreId(int storeId);
         Task<Product> CheckApproveProduct(int id); 
-        Task<List<Product>> TopRatedPage(int pageSize);
-        Task<List<Product>> GetBestProducts(int pageSize);
-        Task<List<Product>> GetPopularProducts(int pageSize);
-        Task<List<Product>> GetLatestPage(int pageSize);
-        Task<List<Product>> SpecialsPage(int pageSize);
+        Task<List<Product>> TopRatedPage();
+        Task<List<Product>> GetBestProducts();
+        Task<List<Product>> GetPopularProducts();
+        Task<List<Product>> GetLatestPage();
+        Task<List<Product>> SpecialsPage();
         Task<List<Product>> DailyDeals();
         Task<List<Product>> GetProductsCP( string search, int? filter);
         void AddProduct(Product product);

@@ -142,6 +142,7 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapBlazorHub();
+        app.MapRazorPages();
         app.MapFallbackToPage("/_Host");
         app.UseEndpoints(endpoints =>
         {

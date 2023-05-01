@@ -1,6 +1,5 @@
 ﻿@page "/Media"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("imgs") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
-<Alert Message="@message" Style="@style"></Alert>
 
 <style>
     input[type="file"] {
@@ -38,6 +37,7 @@
         <li class="active"> @SharedLocalize.GetLocalizedStringValue("imgs")</li>
     </ol>
 </section>
+<Alert Message="@message" Style="@style"></Alert>
 <section class="content">
     <div class="row">
         <div class="col-md-12">
@@ -192,6 +192,7 @@ else
                             <div class="thumbnail thumbnail-imges">
                                         <input value="@m.Id" name="check" id="@m.Id" type="checkbox" style="width: 19%;margin-top: -46%;opacity: 1 !important;" />
                                 <img style="max-height:74px !important;max-width: 118px;" class="test_image" src="@m.Name" title="@m.Category" alt="...">
+
                             </div>
                                     <a class="btn btn-block btn-primary" href="/Media/Details/@m.Id"> @SharedLocalize.GetLocalizedStringValue("Details")</a>
                         </div>
@@ -209,7 +210,7 @@ else
     </div>
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <EditForm Model="create" OnValidSubmit="AddImage">
+            <form  enctype="multipart/form-data">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">×</button>
@@ -217,9 +218,9 @@ else
                     </div>
 
                     <div class="modal-body">
-                        <p>@SharedLocalize.GetLocalizedStringValue("ChooseImagesInTheBoxForUpload")</p>
-                        <InputSelect class="form-control" @bind-Value="create.Category">
-                            <option value="@ImageCategory.Products" selected >@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
+                        <p>@SharedLocalize.GetLocalizedStringValue("ChooseImages")</p>
+                        <select class="form-control" @bind="create.Category">
+                            <option value="@ImageCategory.Products" selected>@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
                             <option value="@ImageCategory.Banners">@SharedLocalize.GetLocalizedStringValue("banners") (1140 * 240)</option>
                             <option value="@ImageCategory.Categories">@SharedLocalize.GetLocalizedStringValue("categories") (250 * 200)</option>
                             <option value="@ImageCategory.Sliders">@SharedLocalize.GetLocalizedStringValue("slider") (1400 * 600)</option>
@@ -227,20 +228,21 @@ else
                             <option value="@ImageCategory.Blogs">@SharedLocalize.GetLocalizedStringValue("blog") (250 * 250)</option>
                             <option value="@ImageCategory.Stores">@SharedLocalize.GetLocalizedStringValue("store") (250 * 200)</option>
                             <option value="@ImageCategory.Others">@SharedLocalize.GetLocalizedStringValue("Others")</option>
-                        </InputSelect>
+                        </select>
                         <br />
                         <div class="field" align="@(lang == "en"? "left":"right")">
                              @*<input type="file" required="required" id="files" accept="image/*" name="files" multiple />*@
-                           @*  <InputFile @ref="@create.Files" multiple />*@
-                            <InputFile @onclick="(()=>SelectImages(files))" multiple />
+                             @*<InputFile @ref="@create.Files" multiple />*@
+                            @*<input type="file"  id="files" accept="image/*" name="files" multiple="" />*@
+                            <InputFile OnChange="@SelectFile" />
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" id="compelete" @onclick="AddImage">@SharedLocalize.GetLocalizedStringValue("Done")</button>
+                        <button type="submit" class="btn btn-primary" @onclick="AddImage">@SharedLocalize.GetLocalizedStringValue("Done")</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("close")</button>
                     </div>
                 </div>
-            </EditForm>
+            </form>
         </div>
     </div>
 
@@ -257,6 +259,10 @@ else
     public ImageCategory? category { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
+    private StreamContent fileContent;
+    private string fileName;
+    private string imgUrl;
+    private string imageType;
 
     protected override async Task OnInitializedAsync()
     {
@@ -266,7 +272,6 @@ else
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         categories =  _imageBL.GetImageCategories();
         await GetAllImages();
-        create.Files = new List<IFormFile>();
     }
     private async Task SelectedPage(int page)
     {
@@ -283,24 +288,53 @@ else
     string style = "";
     async Task AddImage()
     {
-        var result = await _imageBL.CreateImages(user.Id,create);
-        if (result.Success)
+        using var content = new MultipartFormDataContent();
+        content.Add(content: fileContent, name: "\"file\"", fileName: fileName );
+        var response =
+                await http.PostAsync("api/Media/addImages",
+                content);
+        if (response.IsSuccessStatusCode)
         {
-            message = result.Message;
-            style = "success";
+            message = SharedLocalize.GetLocalizedStringValue("successSave");
         }
         else
         {
-            message = result.Message;
-            style = "danger";
+            message = SharedLocalize.GetLocalizedStringValue("correctImage");
         }
+        //var result = await _imageBL.CreateImages(user.Id,create);
+        //if (result.Success)
+        //{
+        //    message = result.Message;
+        //    style = "success";
+        //}
+        //else
+        //{
+        //    message = result.Message;
+        //    style = "danger";
+        //}
+        NavigationManager.NavigateTo("/Media", true);
     }
 
-    void SelectImages(List<IFormFile> files)
+    private async Task SelectFile(InputFileChangeEventArgs e)
     {
-       
-        create.Files.AddRange(files);
+        // setting the max size for the file
+        long maxFileSize = 1024 * 1024 * 10;
+        // Provide the HTTP Content based Stream
+        // and open the stream for reading the uploaded file
+        fileContent = new StreamContent(e.File.OpenReadStream(maxFileSize));
+        // read file name
+        fileName = e.File.Name;
+
+        var fileSize = new byte[e.File.Size];
+        // read the file bytes in sequence
+        await e.File.OpenReadStream().ReadAsync(fileSize);
+        // read file content type
+        imageType = e.File.ContentType;
+        // create URL
+        imgUrl = $"data:{imageType};base64,{Convert.ToBase64String(fileSize)}";
+
+        this.StateHasChanged();
     }
-  
+
 
 }

@@ -441,13 +441,20 @@ namespace BusinessLogic.ApiClasses
                 productDto.EndDate = flash.EndDate;
                 productDto.StartDate = flash.StartDate;
             }
-            var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(id,false,false);
+            var cats = await _repositoryManager.ProductCategory.GetAllCategoriesProductId(id,false,true);
             var catDtos = cats.Select(item => new CreateProductCategoryDto
             {
                 Id = item.Id,
                 CategoryId = item.CategoryId
             }).ToList();
             productDto.ProductCategories = catDtos;
+            var images = await _repositoryManager.ImageProduct.GetAllImagesProductId(id, false, true);
+            var imagesDtos = images.Select(item => new CreateImageProductDto
+            {
+                Id = item.Id,
+                ImageId = item.ImageId
+            }).ToList();
+            productDto.Images = imagesDtos;
             return productDto;
         }
         public async Task<BussnessResultModel> ApproveProduct(int productId)
@@ -644,7 +651,7 @@ namespace BusinessLogic.ApiClasses
                 ProductType = product.ProductType,
                 Price = special != null ? special.SpecialPrice : product.Price ,
                 IsStatus = product.IsStatus.ToString(),
-                ImageProduct = _imageBL.GetImageOriginal(product.Images.First().ImageId) ?? null,
+                ImageProduct = _imageBL.GetImageOriginal(product.Images.First().ImageId),
                 Availability =  AvailabilityProducts(product.Id) ,
                 AttributesProducts = await GetAttributsProducts(product.Id) ?? null,
                 Images = await _imageBL.GetAllImagesToProduct(product.Id) ?? null,
@@ -940,33 +947,33 @@ namespace BusinessLogic.ApiClasses
              products = products.Where(c=>c.IsSale == true).ToList();
             return products;
         }
-        public async Task<List<ProductDto>> PopularsPage(int pageSize = 10)
+        public async Task<List<ProductDto>> PopularsPage()
         {
-            var popular = await _repositoryManager.Product.GetPopularProducts(pageSize);
+            var popular = await _repositoryManager.Product.GetPopularProducts();
             var popularDto = _mapper.Map<List<ProductDto>>(popular);
             return popularDto;
         }
-        public async Task<List<ProductDto>> BestPage(int pageSize = 10)
+        public async Task<List<ProductDto>> BestPage()
         {
-            var popular = await _repositoryManager.Product.GetBestProducts(pageSize);
+            var popular = await _repositoryManager.Product.GetBestProducts();
             var popularDto = _mapper.Map<List<ProductDto>>(popular);
             return popularDto;
         }
-        public async Task<List<ProductDto>> LatestPage(int pageSize = 10)
+        public async Task<List<ProductDto>> LatestPage()
         {
-            var populars = await _repositoryManager.Product.GetLatestPage(pageSize);
+            var populars = await _repositoryManager.Product.GetLatestPage();
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
-        public async Task<List<ProductDto>> SpecialsPage(int pageSize = 5)
+        public async Task<List<ProductDto>> SpecialsPage()
         {
-            var populars = await _repositoryManager.Product.SpecialsPage(pageSize);
+            var populars = await _repositoryManager.Product.SpecialsPage();
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
-        public async Task<List<ProductDto>> TopRatedPage(int pageSize = 6)
+        public async Task<List<ProductDto>> TopRatedPage()
         {
-            var populars = await _repositoryManager.Product.TopRatedPage(pageSize);
+            var populars = await _repositoryManager.Product.TopRatedPage();
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
@@ -976,8 +983,6 @@ namespace BusinessLogic.ApiClasses
             var popularsDto = _mapper.Map<List<ProductDto>>(populars);
             return popularsDto;
         }
-
-
         //ProductType------------------------------------------------
         public List<string> GetProductTypes()
         {
@@ -991,6 +996,20 @@ namespace BusinessLogic.ApiClasses
             var attributsDto = attributs.Select(attribut =>
             {
                var attributDto = _mapper.Map<AttributeDto>(attribut);
+                attributDto.ProductName = attribut.Product.ProductName;
+                attributDto.Option = attribut.ProductOption.OptionName;
+                attributDto.OptionType = attribut.ProductOption.OptionType;
+                attributDto.Value = attribut.ProductOptionValue.OptionValueName;
+                return attributDto;
+            }).ToList();
+            return attributsDto;
+        }
+        public async Task<List<AttributeDto>> GetAttributs()
+        {
+            var attributs = await _repositoryManager.Attribute.GetAllAttributes();
+            var attributsDto = attributs.Select(attribut =>
+            {
+                var attributDto = _mapper.Map<AttributeDto>(attribut);
                 attributDto.ProductName = attribut.Product.ProductName;
                 attributDto.Option = attribut.ProductOption.OptionName;
                 attributDto.OptionType = attribut.ProductOption.OptionType;

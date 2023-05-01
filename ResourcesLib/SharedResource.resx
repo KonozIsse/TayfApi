@@ -477,6 +477,9 @@
   <data name="chooseCat" xml:space="preserve">
     <value>Choose Category</value>
   </data>
+  <data name="ChooseImages" xml:space="preserve">
+    <value>Choose Images In The Box For Upload</value>
+  </data>
   <data name="chooseStatus" xml:space="preserve">
     <value>Please choose Status</value>
   </data>

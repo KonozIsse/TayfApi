@@ -35,7 +35,6 @@ namespace Entities.DataTransferObjects
     }
     public class UpdateSliderDto : CreateSliderDto
     {
-        public string Image { get; set; }
         public int Id { get; set; }
     }
 }

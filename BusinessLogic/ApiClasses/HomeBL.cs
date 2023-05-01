@@ -8,6 +8,8 @@ using Entities.Exception;
 using Entities.RequestFeatures;
 using System.Reflection;
 using Newtonsoft.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -193,6 +195,12 @@ namespace BusinessLogic.ApiClasses
             _mapper.Map(updateDto, banner);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(banner, _locService.GetLocalizedStringValue("successSave"));
+        } 
+        public async Task<UpdateBannerDto> GetMapBanner(int id)
+        {
+            var banner = await _repositoryManager.Banner.GetBannerId(id, false);
+            var bannerDto = _mapper.Map<UpdateBannerDto>(banner);
+            return bannerDto;
         }
         //Sliders------------------------------------------------
         public async Task<PagedList<SliderDto>> GetSliderMobile(string lang,string search, PostsParameters postsParameters)
@@ -301,10 +309,7 @@ namespace BusinessLogic.ApiClasses
         {
             var slider = await _repositoryManager.Slider.GetSlideById(id, false);
             var sliderDto = _mapper.Map<UpdateSliderDto>(slider);
-            
-            var image = _repositoryManager.Image.GetImageId(slider.ImgId);
             sliderDto.ImageId = slider.ImgId;
-            sliderDto.Image  = $"/media_files/medium/{image.Name}";
             return sliderDto;
         }
         //Services------------------------------------------------
@@ -326,6 +331,7 @@ namespace BusinessLogic.ApiClasses
             var services = await _repositoryManager.Services.GetAllServices(search, false);
                  var servicesDto = services.Select(c => new ServiceDto
                  {
+                     Id = c.Id ,
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Description = lang == "en" ? c.Description : c.DescriptionAr,
                     Image = _imageBL.GetImageOriginal(c.ImgId.Value),
@@ -333,6 +339,12 @@ namespace BusinessLogic.ApiClasses
                     UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
             return PagedList<ServiceDto>.ToPagedList(servicesDto, postsParameters.PageNumber, postsParameters.PageSize);
+        }
+        public async Task<UpdateServiceDto> GetMapService(int id)
+        {
+            var service = await _repositoryManager.Services.GetServiceById(id, false, false);
+            var sliderDto = _mapper.Map<UpdateServiceDto>(service);
+            return sliderDto;
         }
         public async Task<BussnessResultModel> UpdateService(UpdateServiceDto update)
         {
@@ -776,6 +788,35 @@ namespace BusinessLogic.ApiClasses
                 contact_us_email = settingList.Where(r => r.Key == "contact_us_email").First().Value,
                 order_email = settingList.Where(r => r.Key == "order_email").First().Value,
                 hide_price = settingList.Where(r => r.Key == "hide_price").First().Value,
+            };
+        }
+        public async Task<SettingVM> GetMapAllSetting()
+        {
+            var settingList = await _repositoryManager.Setting.GetAllSettings(false);
+            return new SettingVM
+            {
+                app_name= settingList.Where(r => r.Key == "app_name").First().Value,
+                google_map_api= settingList.Where(r => r.Key == "google_map_api").First().Value,
+                contact_us_email= settingList.Where(r => r.Key == "contact_us_email").First().Value,
+                order_email= settingList.Where(r => r.Key == "order_email").First().Value,
+                hide_price= settingList.Where(r=> r.Key == "order_email").First().Value,
+                phone_no = settingList.Where(r => r.Key == "phone_no").First().Value,
+                address = settingList.Where(r => r.Key == "address").First().Value,
+                country = settingList.Where(r => r.Key == "country").First().Value,
+                city = settingList.Where(r => r.Key == "city").First().Value,
+                open_time = settingList.Where(r => r.Key == "open_time").First().Value,
+                close_time = settingList.Where(r => r.Key == "close_time").First().Value,
+                cp_logo= settingList.Where(r => r.Key == "cp_logo").First().Value,
+               website_logo= settingList.Where(r => r.Key == "website_logo").First().Value,
+
+                facebook_url = settingList.Where(r => r.Key == "facebook_url").First().Value,
+                twitter_url = settingList.Where(r => r.Key == "twitter_url").First().Value,
+                youtube_link = settingList.Where(r => r.Key == "youtube_link").First().Value,
+                whatsApp = settingList.Where(r => r.Key == "whatsApp").First().Value,
+                instagram_url = settingList.Where(r => r.Key == "instagram_url").First().Value,
+                press_link = settingList.Where(r => r.Key == "press_link").First().Value,
+                android_app_link = settingList.Where(r => r.Key == "android_app_link").First().Value,
+                ios_app_link = settingList.Where(r => r.Key == "ios_app_link").First().Value
             };
         }
     }

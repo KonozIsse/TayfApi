@@ -230,6 +230,8 @@
     protected override async Task OnInitializedAsync()
     {
         create = new SettingVM();
+        create = await _homeBL.GetMapAllSetting();
+        image = _imageBL.GetImageOriginal(Convert.ToInt16(create.website_logo));
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
@@ -252,6 +254,7 @@
     {
         image = image1;
         create.website_logo = imgId.ToString();
+        create.cp_logo = imgId.ToString();
     }
 }
 

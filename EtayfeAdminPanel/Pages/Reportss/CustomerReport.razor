@@ -40,7 +40,7 @@
                         <div class="col-lg-4 form-inline" id="contact-form12"></div>
                     </div>
                     <div class="col-lg-3 form-inline" id="contact-form12">
-                        <button class="exportExcel2 btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
+                        <button onclick="exportTableToExcelCustomers()" class=" btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
                         <button onclick="printJS('html2_table', 'html')" class="btn btn-primary @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-print"></i> @SharedLocalize.GetLocalizedStringValue("Print")</button>
                     </div>
                     <!-- /.box-header -->

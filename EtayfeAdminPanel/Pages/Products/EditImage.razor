@@ -1,6 +1,6 @@
 ﻿@page "/Product/EditImg/{Id:int}"
 <PageTitle>@SharedLocalize.GetLocalizedStringValue("editImg") | @SharedLocalize.GetLocalizedStringValue("ControlPanel")</PageTitle>
-<Alert Message="@message" Style="@style"></Alert>
+
 <section class="content-header">
     <h1> @SharedLocalize.GetLocalizedStringValue("editImg") <small>@SharedLocalize.GetLocalizedStringValue("AddproductImgs")...</small> </h1>
     <ol class="breadcrumb">
@@ -11,7 +11,7 @@
     </ol>
 </section>
 <!-- Main content -->
-
+<Alert Message="@message" Style="@style"></Alert>
 <section class="content">
 
     <div class="row">
@@ -29,48 +29,66 @@
                         <div class="col-xs-12">
                             <div class="box box-info">
                                 <br>
-                                @*<EditForm Model="create" OnValidSubmit=""></EditForm>*@
                                     <div class="form-horizontal">
                                         <div class="col-xs-12 col-md-6">
-                                            <div class="form-group" id="imageIcone">
-                                                <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
-                                                <div class="col-sm-10 col-md-4">
-                                                    <!-- Modal -->
-                                                    <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                                        <div class="modal-dialog" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                                                                    <h3 class="modal-title text-primary" id="myModalLabel">Choose Image</h3>
-                                                                </div>
-                                                                <div class="modal-body manufacturer-image-embed">
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <a href="Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
-                                                                    <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
-                                                                    <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">Add</button>
-                                                                </div>
+                                        <div class="form-group" id="imageIcone">
+                                            <label class="col-sm-2 col-md-3 control-label">@SharedLocalize.GetLocalizedStringValue("img")<span style="color:red;">*</span></label>
+                                            <div class="col-sm-10 col-md-4">
+                                                <!-- Modal -->
+                                                <div class="modal fade embed-images" id="ModalmanufacturedICone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal" id="closemodal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                                <h3 class="modal-title text-primary" id="myModalLabel">@SharedLocalize.GetLocalizedStringValue("addImg")</h3>
+                                                            </div>
+                                                            <div class="modal-body manufacturer-image-embed">
+                                                                @if (images != null)
+                                                                {
+                                                                    <ul class="thumbnails image_picker_selector">
+
+                                                                        @foreach (var i in images)
+                                                                        {
+                                                                            <li>
+                                                                                <span class="emailTable">
+                                                                                    <label title="Spreadsheet for accounting">
+                                                                                        <div class="thumbnail">
+
+                                                                                            <img class="image_picker_image" src="@i.Path" alt="@i.Id">
+                                                                                            <input @onclick="(()=>Select(i.Path,i.ImgId))" type="checkbox" value="@i.Path" />
+                                                                                        </div>
+                                                                                    </label>
+                                                                                </span>
+                                                                            </li>
+                                                                        }
+                                                                    </ul>
+                                                                }
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <a href="/Media" target="_blank" class="btn btn-primary pull-left">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                                <a class="btn btn-default refresh-image shownotify newIcon" id="reff"><i class="fa fa-refresh"></i></a>
+                                                                <button type="button" class="btn btn-success" id="selectedICONE" data-dismiss="modal">@SharedLocalize.GetLocalizedStringValue("add")</button>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div id="imageselected">
-                                                        <input value="Products" hidden id="typeImg" />
-                                                        <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">Add Image</a>
-                                                        <br>
-                                                        <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
-                                                        <div class="closimage">
-                                                            <button type="button" class="close pull-left image-close " id="image-Icone" style="display: none; position: absolute;left: 105px; top: 54px; background-color: black; color: white; opacity: 2.2; " aria-label="Close">
-                                                                <span aria-hidden="true">×</span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <br />
-                                                <img width="80px" src="@image">
-                                                    <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">Upload category image.</span>
-
-                                                    <br>
                                                 </div>
+                                                <div id="imageselected">
+                                                    <input value="Blogs" hidden id="typeImg" />
+                                                    <a id="newIcon" data-id="1" class="newIcon btn btn-primary field-validate" data-toggle="modal" data-target="#ModalmanufacturedICone" type="button">@SharedLocalize.GetLocalizedStringValue("addImg")</a>
+                                                    <br>
+                                                    <div id="selectedthumbnailIcon" class="selectedthumbnail col-md-5"> </div>
+                                                    <div class="closimage">
+                                                        <button type="button" class="close pull-left image-close " id="image-Icone" style="display: none; position: absolute;left: 105px; top: 54px; background-color: black; color: white; opacity: 2.2; " aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <img width="80px" src="@image" />
+                                                <span class="help-block" style="font-weight: normal;font-size: 11px;margin-bottom: 0;">@SharedLocalize.GetLocalizedStringValue("UploadYourImages")</span>
+
+                                                <br>
                                             </div>
+                                        </div>
                                         </div>
                                         <br />
                                         <br />
@@ -85,7 +103,7 @@
 
                                     <br />
                                     <div class="box-footer text-center">
-                                        <button type="submit" class="btn btn-primary">@SharedLocalize.GetLocalizedStringValue("Submit") <i class="fa fa-angle-right 2x"></i></button>
+                                    <button type="submit" class="btn btn-primary" @onclick="EditImageProduct">@SharedLocalize.GetLocalizedStringValue("Submit") <i class="fa fa-angle-right 2x"></i></button>
                                     <a href="/Products" class="btn btn-defult">@SharedLocalize.GetLocalizedStringValue("back")</a>
                                 </div>
                             </div>
@@ -104,12 +122,17 @@
     [Parameter]
     public int Id { get; set; }
     public int imageId { get; set; }
+    public string lang { get; set; }
     public string image { get; set; }
+    public List<ImageSettingDto> images { get; set; }
     string message= "";
     string style = "";
     protected override async Task OnInitializedAsync()
     {
-
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+        lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
+        image = _imageBL.GetImageOriginal(imageId);
     }
     public async Task EditImageProduct()
     {
@@ -125,4 +148,9 @@
             style = "danger";
         }
     }
+    public void Select(string image1, int imgId)
+    {
+        image = image1;
+        imageId = imgId ;
+}
 }

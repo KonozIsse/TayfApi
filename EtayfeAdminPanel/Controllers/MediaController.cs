@@ -32,8 +32,13 @@ namespace EtayfeAdminPanel.Controllers
             return Ok(result);
         }
         [HttpPost("addImages")]
-        public async Task<IActionResult> CreateImages([FromForm] CreateImageDto create)
+        public async Task<IActionResult> CreateImages([FromForm] List<IFormFile> file)
         {
+            var create = new CreateImageDto
+            {
+                Category = ImageCategory.Others,
+                Files = file,
+            };
             var result = await _imageBL.CreateImages(GetCurrentUserId(), create);
             if (result.Success)
             {
@@ -44,6 +49,7 @@ namespace EtayfeAdminPanel.Controllers
                 return BadRequest(result.Message);
             }
         }
+       
         [HttpPut("editSettingImage")]
         public async Task<IActionResult> EditImageSetting(UpdateImageSettingDto update)
         {

@@ -38,23 +38,23 @@ namespace Repository
        => await FindAll(false).OrderByDescending(c => c.CreatedAt).ToListAsync();
         public async Task<Product> CheckApproveProduct(int id)
          => await FindByCondition(c => c.Id == id && c.IsAcceptAdmin == true, false).FirstOrDefaultAsync();
-         public async Task<List<Product>> TopRatedPage(int pageSize)
+         public async Task<List<Product>> TopRatedPage()
         => await FindByCondition(c => c.Reviews.Any(r => r.IsStatus == Status.Active), false)
-            .OrderByDescending(p => p.Reviews.Average(r => r.Rating)).Include(p => p.Images).Include(p => p.Reviews).Take(pageSize).ToListAsync();
-        public async Task<List<Product>> GetBestProducts(int pageSize)
+            .OrderByDescending(p => p.Reviews.Average(r => r.Rating)).Include(p => p.Images).Include(p => p.Reviews).Take(6).ToListAsync();
+        public async Task<List<Product>> GetBestProducts()
         => await FindByCondition(c => c.IsBest == 1 && c.IsStatus == Status.Active, false)
-                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(pageSize).ToListAsync();
+                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(10).ToListAsync();
 
-        public async Task<List<Product>> GetPopularProducts(int pageSize)
+        public async Task<List<Product>> GetPopularProducts()
          => await FindByCondition(c => c.IsPopular == 1 && c.IsStatus == Status.Active, false)
-                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(pageSize).ToListAsync();
-        public async Task<List<Product>> GetLatestPage(int pageSize)
+                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(10).ToListAsync();
+        public async Task<List<Product>> GetLatestPage()
          => await FindByCondition(c => c.IsStatus == Status.Active, false).Include(i => i.Images).Include(r => r.Reviews)
-            .OrderByDescending(p => p.CreatedAt).Take(pageSize).ToListAsync();
+            .OrderByDescending(p => p.CreatedAt).Take(10).ToListAsync();
 
-        public async Task<List<Product>> SpecialsPage(int pageSize)
+        public async Task<List<Product>> SpecialsPage()
           => await FindByCondition(c => c.SpecialProducts.IsStatus == Status.Active && c.SpecialProducts.EndDate > DateTime.Now, false)
-                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(pageSize).ToListAsync();
+                .Include(i => i.Images).Include(r => r.Reviews).OrderByDescending(p => p.Id).Take(5).ToListAsync();
 
         public async Task<List<Product>> DailyDeals()
         => await FindByCondition(c => c.Reviews.Any(), false).Include(p => p.Images).Include(p => p.Reviews).ToListAsync();
