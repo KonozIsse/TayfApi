@@ -10,11 +10,9 @@ using BusinessLogic;
 using BusinessLogic.StartUp;
 using EtayfeAdminPanel.Services;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
-using System.Globalization;
-using Blazored.LocalStorage;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using EtayfeAdminPanel;
 
 internal class Program
 {
@@ -124,12 +122,12 @@ internal class Program
         var options = ((IApplicationBuilder)app).ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
         app.UseRequestLocalization(options.Value);
 
-        app.UseHttpsRedirection();
+app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseStaticFiles(new StaticFileOptions
         {
             FileProvider = new PhysicalFileProvider(
-            Path.Combine(@"C:\Users\a7ed\source\repos\TayfApi\WebLayer\wwwroot\media_files", "avatars")),
+            Path.Combine(@"C:\Users\a7ed\source\repos\TayfApi\EtayfeWeb\wwwroot\media_files", "avatars")),
             RequestPath = "/avatars"
         });
         app.UseCors("CorsPolicy");

@@ -20,8 +20,8 @@ namespace Repository
          => await FindByCondition(c => c.Id.Equals(userId), trackChanges).SingleOrDefaultAsync();
         public async Task<User> GetActiveUserId(int userId, bool trackChanges)
          => await FindByCondition(c => c.Id.Equals(userId) && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
-        public async Task<User> GetCustomerId (int customerId, bool trackChanges)
-        => await FindByCondition(c => c.Id == customerId && c.UserType == UserType.Customer, trackChanges).SingleOrDefaultAsync();
+        public async Task<User> GetTypeUserId (int userId, UserType type,  bool trackChanges)
+        => await FindByCondition(c => c.Id == userId && c.UserType == type, trackChanges).SingleOrDefaultAsync();
         public async Task<List<User>> GetCustomers( bool trackChanges)
         => await FindByCondition(c => c.UserType == UserType.Customer, trackChanges).OrderByDescending(c => c.CreatedAt)
             .Include(c => c.DefaultAddress).ToListAsync(); 
@@ -50,9 +50,7 @@ namespace Repository
             }
             return await customers.OrderByDescending(c => c.CreatedAt).Include(c => c.DefaultAddress).ToListAsync();
         }
-        public async Task<User> GetUserDefaultAddress(int userId, int defaultAddressId)
-        => await FindByCondition(c => c.Id.Equals(userId) && c.DefaultAddressId == defaultAddressId, false).SingleOrDefaultAsync();
-        public async Task<User> VerifiedCodeUser(int id, int code ,bool trackChanges)
+          public async Task<User> VerifiedCodeUser(int id, int code ,bool trackChanges)
          => await FindByCondition(c => c.Id.Equals(id) && c.VerifiedCode == code, trackChanges).SingleOrDefaultAsync();
         public void DeleteUser(User user) => Delete(user);
         public async Task<User> GetCustomerEmail(string email,bool trackChanges)
@@ -61,9 +59,9 @@ namespace Repository
         => await FindByCondition(c => c.Id == id && c.UserType == UserType.Customer && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
         // Admin 1-------------------------------------------------
         public async Task<IEnumerable<User>> GetAdminsStors (bool trackChanges)
-         => await FindByCondition(c => c.UserType != UserType.Customer, trackChanges).Include(c=>c.Role).ToListAsync();
-        public async Task<User> GetAdminAndStoreEmail(string email)
-         => await FindByCondition(c => c.Email == email && c.UserType != UserType.Customer && c.Status == Status.Active, false).SingleOrDefaultAsync();
+        {
+           return await FindByCondition(c => c.UserType != UserType.Customer, trackChanges).Include(c => c.Role).ToListAsync();
+        }
         // Store 3--------------------------------------------------
         public async Task<List<User>> GetVendorTotal(string search, bool trackChanges)
         {
@@ -74,9 +72,6 @@ namespace Repository
             }
            return await result.ToListAsync();
         }
-
-        public async Task<User> GetStore(int storeId, bool trackChanges)
-        => await FindByCondition(c => c.Id == storeId && c.UserType == UserType.Store && c.Status == Status.Active, trackChanges).SingleOrDefaultAsync();
         public async Task<IEnumerable<User>> GetSearchStores(string search)
         {
             var stores = FindByCondition(c => c.UserType == UserType.Store, false);
@@ -95,10 +90,7 @@ namespace Repository
         public async Task<User> GetStoreId(int id)
        => await FindByCondition(c =>c.Id == id && c.UserType == UserType.Store && c.Status == Status.Active, false)
             .Include(c=>c.Products).Include(c=>c.Addresses).FirstOrDefaultAsync();
-        public async Task<IEnumerable<User>> Get10Stores()
-        => await FindByCondition(c => c.UserType == UserType.Store && c.Status == Status.Active, false)
-            .OrderByDescending(r => r.CreatedAt).Take(10).ToListAsync();
-    
+       
 
     }
 }

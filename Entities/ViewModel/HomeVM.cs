@@ -21,7 +21,6 @@ namespace Entities.ViewModel
         public List<ProductDto> ProductsPopular { get; set; }
         public List<ProductDto> ProductsBest { get; set; }
         public List<ProductDto> ProductsLatest { get; set; }
-        public List<ProductDto> ProductsSpecial { get; set; }
         public List<ProductDto> ProductsTopRated { get; set; }
         public List<ProductDto> ProductsDailyDeal { get; set; }
     }

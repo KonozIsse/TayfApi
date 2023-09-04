@@ -114,6 +114,7 @@
      [Parameter]
     public string search { get; set; }
     public string lang { get; set; }
+    public AdminDto user { get; set; }
     public List<CustomerDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
@@ -122,6 +123,7 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GetCustomerTotal();
     }
     private async Task SelectedPage(int page)
@@ -131,7 +133,7 @@
     }
     async Task GetCustomerTotal()
     {
-        var pagingResponse = await _userBL.GetCustomerTotal(search, _PostsParameters);
+        var pagingResponse = await _userBL.GetCustomerTotal(user.Id,search, _PostsParameters);
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }

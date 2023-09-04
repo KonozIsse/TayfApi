@@ -7,9 +7,6 @@ using Contracts;
 using Entities.Exception;
 using Entities.RequestFeatures;
 using System.Reflection;
-using Newtonsoft.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using System;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -40,16 +37,15 @@ namespace BusinessLogic.ApiClasses
                 Sliders = await GetAllSliders(lang),
                 Services = await GetAllServices(lang),
                 Banner = await GetBanner(languge.Id),
-                Blogs = await _newsBL.GetNews(lang)??null,
-                ProductsPopular = await _productBL.PopularsPage(),
-                ProductsBest = await _productBL.BestPage(),
-                ProductsLatest = await _productBL.LatestPage(),
-                ProductsSpecial = await _productBL.SpecialsPage(),
-                ProductsTopRated = await _productBL.TopRatedPage(),
-                ProductsDailyDeal = await _productBL.DailyDeals(),
+                Blogs = await _newsBL.GetNews(lang) ?? null,
+                ProductsPopular = await _productBL.GetDelegateProducts(customerId , lang,p => p.IsPopular == 1),
+                ProductsBest = await _productBL.GetDelegateProducts(customerId, lang, p => p.IsBest == 1),
+                ProductsLatest = await _productBL.GetDelegateProducts(customerId, lang, null),
+                SpecialProducts = await _productBL.GetDelegateProducts(customerId, lang, p => p.IsSpecial == true),
+                ProductsTopRated = await _productBL.TopRatedPage(customerId, lang),
+                ProductsDailyDeal = await _productBL.GetDelegateProducts(customerId, lang, c => c.Reviews.Any()),
                 Products = await _productBL.GetAllActiveAcceptProducts(customerId, lang),
-                FlashProducts = await _productBL.GetFlashProds(customerId,lang),
-                SpecialProducts = await _productBL.GetSpecialsProd(customerId, lang),
+                FlashProducts = await _productBL.GetDelegateProducts(customerId, lang, p => p.IsSale == true),
                 Stores = await _userBL.GetStores()
             };
             return model;
@@ -57,9 +53,9 @@ namespace BusinessLogic.ApiClasses
         public async Task<HomeCPVM> GetHomeCP(int userId)
         {
             var orders = await _repositoryManager.Order.GetOrders(false); 
-            var panding = await _repositoryManager.Order.GetAllPandingOrders(false);
-            var cansal = await _repositoryManager.Order.GetAllCansalOrders(false);
-            var complete = await _repositoryManager.Order.GetAllCompleteOrders(false);
+            var panding = await _repositoryManager.Order.GetTypeAllOrders( OrderStatusEnum.OrderPending ,false);
+            var cansal = await _repositoryManager.Order.GetTypeAllOrders(OrderStatusEnum.OrderCanceled, false);
+            var complete = await _repositoryManager.Order.GetTypeAllOrders(OrderStatusEnum.OrderCompleted, false);
             var products = await _repositoryManager.Product.GetAllProducts();
             var stocks = await _repositoryManager.Inventory.GetAllOutStock();
             var ordersTransaction = orders.Where(c => c.Transaction != null);
@@ -77,7 +73,6 @@ namespace BusinessLogic.ApiClasses
                 stocks = stocks.Where(c => c.VendorId == userId).ToList();
                 carts = carts.Where(c => c.StoreId == userId).ToList();
             }
-
             var model = new HomeCPVM
             {
                 TotalOrders = orders.Count() ,
@@ -95,14 +90,12 @@ namespace BusinessLogic.ApiClasses
                 TotalCarts = carts.Count(),
                 CartsPercentage = double.IsNaN(Math.Round((((double)carts.Count() / products.Count()) * 100), 2)) ? 0: Math.Round((((double)carts.Count() / products.Count()) * 100), 2)
             };
-          
             return model;
         }
         public async Task<AdminDto> GetCurrentUser(int id)
         {
             var user = await _repositoryManager.User.GetUserId(id, false);
             var userDto = _mapper.Map<AdminDto>(user);
-            
             return userDto;
         }
         public async Task<List<CustomerDto>> GetNewCustomers()
@@ -123,7 +116,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var productDto = _mapper.Map<ProductDto>(c);
                 productDto.ProductName = lang == "en" ? c.ProductName : c.ProductNameAr;
-                productDto.ImageProduct = _imageBL.GetImageOriginal(c.Images.First().ImageId);
+                productDto.ImageProduct = _imageBL.GetTypeImage(c.Images.First().ImageId, ImageType.ACTUAL);
                 return productDto;
             }).Take(15).ToList();
             return productsDto;
@@ -152,7 +145,7 @@ namespace BusinessLogic.ApiClasses
             var storesDto = stores.Select(store =>
             {
                 var bookDto = _mapper.Map<StoreDto>(store);
-                bookDto.Image = _imageBL.GetImageMedium(Convert.ToInt32(store.ImageId));
+                bookDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(store.ImageId), ImageType.MEDIUM);
                 bookDto.CreatedAt = store.CreatedAt.ToString("G");
                 return bookDto;
             }).ToList();
@@ -161,15 +154,18 @@ namespace BusinessLogic.ApiClasses
         public async Task<string> GetLogo()
         {
             var logo = await _repositoryManager.Setting.GetSettingByValue("website_logo",false);
-            return _imageBL.GetImageOriginal(Convert.ToInt32(logo.Value));
+            return _imageBL.GetTypeImage(Convert.ToInt32(logo.Value), ImageType.ACTUAL);
         }
         //Banner------------------------------------------------
         public async Task<BannerDto> GetBanner(int langId)
         {
             var banner = await _repositoryManager.Banner.GetBannerByType(langId,"category", false);
             var bannerDto = _mapper.Map<BannerDto>(banner);
-            bannerDto.LangName = banner.Language.Code == "en" ? banner.Language.Name : banner.Language.NameAr;
-            bannerDto.Img = _imageBL.GetImageOriginal(banner.ImgId);
+            if(banner != null)
+            {
+                bannerDto.LangName = banner.Language.Code == "en" ? banner.Language.Name : banner.Language.NameAr;
+                bannerDto.Img = _imageBL.GetTypeImage(banner.ImgId, ImageType.ACTUAL);
+            }
             return bannerDto;
         }
         public async Task<PagedList<BannerDto>> GetBanners(string search,string filter, PostsParameters postsParameters)
@@ -179,7 +175,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var bannerDto = _mapper.Map<BannerDto>(c);
                 bannerDto.LangName = c.Language.Name == "English" ? _locService.GetLocalizedStringValue("English") : _locService.GetLocalizedStringValue("Arabic");
-                bannerDto.Img = _imageBL.GetImageOriginal(c.ImgId);
+                bannerDto.Img = _imageBL.GetTypeImage(c.ImgId, ImageType.ACTUAL);
                 bannerDto.CreatedAt = c.CreatedAt.ToString("G");
                 return bannerDto;
             }).ToList();
@@ -211,7 +207,7 @@ namespace BusinessLogic.ApiClasses
                  var sliderDto  = _mapper.Map<SliderDto>(c);
                 sliderDto.Title = lang == "en" ? c.Title : c.TitleAr;
                 sliderDto.Decription = lang == "en" ? c.Decription : c.DecriptionAr;
-                sliderDto.Image = _imageBL.GetImageMedium(c.ImgId);
+                sliderDto.Image = _imageBL.GetTypeImage(c.ImgId, ImageType.MEDIUM);
                 sliderDto.CreatedAt = c.CreatedAt.ToString("G");
                 sliderDto.UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G");
                 return sliderDto;
@@ -226,7 +222,7 @@ namespace BusinessLogic.ApiClasses
                    var sliderDto  = _mapper.Map<SliderDto>(c);
                     sliderDto.Title = lang == "en" ? c.Title : c.TitleAr;
                     sliderDto.Decription = lang == "en" ? c.Decription : c.DecriptionAr;
-                    sliderDto.Image = _imageBL.GetImageOriginal(c.ImgId);
+                    sliderDto.Image = _imageBL.GetTypeImage(c.ImgId, ImageType.ACTUAL);
                     sliderDto.CreatedAt = c.CreatedAt.ToString("G");
                     sliderDto.UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G");
                     return sliderDto;
@@ -241,7 +237,7 @@ namespace BusinessLogic.ApiClasses
                    var sliderDto = _mapper.Map<SliderDto>(c);
                     sliderDto.Title = lang == "en" ? c.Title : c.TitleAr;
                     sliderDto.Decription = lang == "en" ? c.Decription : c.DecriptionAr;
-                    sliderDto.Image = _imageBL.GetImageOriginal(c.ImgId);
+                    sliderDto.Image = _imageBL.GetTypeImage(c.ImgId, ImageType.ACTUAL);
                     sliderDto.CreatedAt = c.CreatedAt.ToString("G");
                     sliderDto.UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G");
                     return sliderDto;
@@ -320,7 +316,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Description = lang == "en" ? c.Description : c.DescriptionAr,
-                    Image = _imageBL.GetImageOriginal(c.ImgId.Value),
+                    Image = _imageBL.GetTypeImage(c.ImgId.Value, ImageType.ACTUAL),
                     CreatedAt = c.CreatedAt.ToString("G"),
                     UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
@@ -334,7 +330,7 @@ namespace BusinessLogic.ApiClasses
                      Id = c.Id ,
                     Title = lang == "en" ? c.Title : c.TitleAr,
                     Description = lang == "en" ? c.Description : c.DescriptionAr,
-                    Image = _imageBL.GetImageOriginal(c.ImgId.Value),
+                    Image = _imageBL.GetTypeImage(c.ImgId.Value, ImageType.ACTUAL),
                     CreatedAt = c.CreatedAt.ToString("G"),
                     UpdatedAt = c.UpdatedAt == null ? null : c.UpdatedAt.Value.ToString("G"),
                 }).ToList();
@@ -371,19 +367,6 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(service, _locService.GetLocalizedStringValue("successDelete"));
         }
         //Contact------------------------------------------------
-        public async Task<ContactVM> GetContactSetting()
-        {
-            var setting = await _repositoryManager.Setting.GetAllSettings(false);
-            return new ContactVM
-            {
-                phone_no = setting.Where(r => r.Key == "phone_no").First().Value,
-                address = setting.Where(r => r.Key == "address").First().Value,
-                country = setting.Where(r => r.Key == "country").First().Value,
-                city = setting.Where(r => r.Key == "city").First().Value,
-                open_time = setting.Where(r => r.Key == "open_time").First().Value,
-                close_time = setting.Where(r => r.Key == "close_time").First().Value
-            };
-        }
         public async Task<PagedList<ContactDto>> GetAllContacts(string search ,string filter, PostsParameters postsParameters)
         {
             var contacts = await _repositoryManager.Contact.GetContacts(search, filter);
@@ -480,7 +463,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var languageDto = _mapper.Map<LanguageDto>(language);
                 languageDto.Name = lang == "en" ? language.Name : language.NameAr;
-                languageDto.Image = _imageBL.GetImageOriginal(language.ImgId);
+                languageDto.Image = _imageBL.GetTypeImage(language.ImgId, ImageType.ACTUAL);
                 languageDto.IsDefault = language.IsStatus == Status.Active ? true : false;
                 return languageDto;
             }).ToList();
@@ -688,12 +671,9 @@ namespace BusinessLogic.ApiClasses
         {
             var page = await _repositoryManager.StaticPages.GetTypePage(type, false);
             var pageDto = _mapper.Map<PageDto>(page);
-            if (page.Names.ContainsKey(lang))
+            if (page.Names.ContainsKey(lang) && page.Descriptions.ContainsKey(lang))
             {
                 pageDto.Title = page.Names[lang];
-            }
-            if (page.Descriptions.ContainsKey(lang))
-            {
                 pageDto.Description = page.Descriptions[lang];
             }
             return pageDto;
@@ -704,12 +684,9 @@ namespace BusinessLogic.ApiClasses
             var pagesDto = pages.Select(page => 
             {
                 var pageDto = _mapper.Map<PageDto>(page);
-                if (page.Names.ContainsKey(lang))
+                if (page.Names.ContainsKey(lang) && page.Descriptions.ContainsKey(lang))
                 {
                     pageDto.Title =  page.Names[lang];
-                }
-                if (page.Descriptions.ContainsKey(lang))
-                {
                     pageDto.Description = page.Descriptions[lang];
                 }
                 return pageDto;
@@ -765,59 +742,23 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(properties, _locService.GetLocalizedStringValue("successSave"));
         }
-        public async Task<SocialSettingVM> GetSocialSetting()
+        public async Task<object> GetSettingVM(object settingVM)
         {
-            var settingList = await _repositoryManager.Setting.GetAllSettings(false);
-            return new SocialSettingVM
-            {
-                facebook_url = settingList.Where(r => r.Key == "facebook_url").First().Value,
-                twitter_url = settingList.Where(r => r.Key == "twitter_url").First().Value,
-                youtube_link = settingList.Where(r => r.Key == "youtube_link").First().Value,
-                instagram_url = settingList.Where(r => r.Key == "instagram_url").First().Value,
-                press_link = settingList.Where(r => r.Key == "press_link").First().Value,
-                android_app_link = settingList.Where(r => r.Key == "android_app_link").First().Value,
-                ios_app_link = settingList.Where(r => r.Key == "ios_app_link").First().Value
-            };
-        }
-        public async Task<SettingStoreVM> GetSettingStore()
-        {
-            var settingList = await _repositoryManager.Setting.GetAllSettings(false);
-            return new SettingStoreVM
-            {
-                google_map_api = settingList.Where(r => r.Key == "google_map_api").First().Value,
-                contact_us_email = settingList.Where(r => r.Key == "contact_us_email").First().Value,
-                order_email = settingList.Where(r => r.Key == "order_email").First().Value,
-                hide_price = settingList.Where(r => r.Key == "hide_price").First().Value,
-            };
-        }
-        public async Task<SettingVM> GetMapAllSetting()
-        {
-            var settingList = await _repositoryManager.Setting.GetAllSettings(false);
-            return new SettingVM
-            {
-                app_name= settingList.Where(r => r.Key == "app_name").First().Value,
-                google_map_api= settingList.Where(r => r.Key == "google_map_api").First().Value,
-                contact_us_email= settingList.Where(r => r.Key == "contact_us_email").First().Value,
-                order_email= settingList.Where(r => r.Key == "order_email").First().Value,
-                hide_price= settingList.Where(r=> r.Key == "order_email").First().Value,
-                phone_no = settingList.Where(r => r.Key == "phone_no").First().Value,
-                address = settingList.Where(r => r.Key == "address").First().Value,
-                country = settingList.Where(r => r.Key == "country").First().Value,
-                city = settingList.Where(r => r.Key == "city").First().Value,
-                open_time = settingList.Where(r => r.Key == "open_time").First().Value,
-                close_time = settingList.Where(r => r.Key == "close_time").First().Value,
-                cp_logo= settingList.Where(r => r.Key == "cp_logo").First().Value,
-               website_logo= settingList.Where(r => r.Key == "website_logo").First().Value,
+            PropertyInfo[] properties = settingVM.GetType().GetProperties();
 
-                facebook_url = settingList.Where(r => r.Key == "facebook_url").First().Value,
-                twitter_url = settingList.Where(r => r.Key == "twitter_url").First().Value,
-                youtube_link = settingList.Where(r => r.Key == "youtube_link").First().Value,
-                whatsApp = settingList.Where(r => r.Key == "whatsApp").First().Value,
-                instagram_url = settingList.Where(r => r.Key == "instagram_url").First().Value,
-                press_link = settingList.Where(r => r.Key == "press_link").First().Value,
-                android_app_link = settingList.Where(r => r.Key == "android_app_link").First().Value,
-                ios_app_link = settingList.Where(r => r.Key == "ios_app_link").First().Value
-            };
+            foreach (PropertyInfo property in properties)
+            {
+                var itemDB = await _repositoryManager.Setting.GetSettingByValue(property.Name, false);
+                if (itemDB != null)
+                {
+                    if (itemDB.Key == "website_logo")
+                    {
+                        itemDB.Value = _imageBL.GetTypeImage(Convert.ToInt32(itemDB.Value), ImageType.MEDIUM);
+                    }
+                    property.SetValue(settingVM, itemDB.Value);
+                }
+            }
+            return settingVM;
         }
     }
 }

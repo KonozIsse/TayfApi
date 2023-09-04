@@ -118,6 +118,7 @@
     [Parameter]
     public string search { get; set; }
     public string lang { get; set; }
+    public AdminDto user { get; set; }
 
     public List<InventoryDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
@@ -127,6 +128,7 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GetAllOutInventory();
     }
     private async Task SelectedPage(int page)
@@ -136,7 +138,7 @@
     }
     async Task GetAllOutInventory()
     {
-        var pagingResponse = await _productBL.GetAllOutInventory(search, 1, lang, _PostsParameters);
+        var pagingResponse = await _productBL.GetAllOutInventory(search, user.Id, lang, _PostsParameters);
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }

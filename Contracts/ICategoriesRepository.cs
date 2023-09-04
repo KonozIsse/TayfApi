@@ -10,13 +10,10 @@ namespace Contracts
     public interface ICategoriesRepository
     {
         Task<Category> GetCategoryById(int id, bool trackChanges); 
-        Task<IEnumerable<Category>> GetAllCategories(bool trackChanges);
         Task<IEnumerable<Category>> GetAllActiveMainCategories(bool trackChanges);
         Task<IEnumerable<Category>> GetSubActiveCategories(bool trackChanges);
         Task<IEnumerable<Category>> GetSubCategoriesByMainId(int id, bool trackChanges);
-        Task<IEnumerable<Category>> GetSubCategoriesMainIDCP(int mainId);
         Task<IEnumerable<Category>> SearchSubCategories(int mainId, string search);
-        Task<IEnumerable<Category>> GetAllMainCategories();
         Task<IEnumerable<Category>> SearchMainCategoriesCP(string search);
         void CreateMainCategory(Category category);
         void DeleteCategory(Category category);

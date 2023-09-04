@@ -5,6 +5,7 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
+using Humanizer;
 using System.Collections.Generic;
 
 namespace BusinessLogic.ApiClasses
@@ -33,7 +34,7 @@ namespace BusinessLogic.ApiClasses
                 blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
                 blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
                 blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");
-                blogDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(x.ImgId));
+                blogDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(x.ImgId), ImageType.ACTUAL);
                 return blogDto;
             }).ToList(); 
             return list;
@@ -45,7 +46,7 @@ namespace BusinessLogic.ApiClasses
             newsDto.Title = lang == "en" ? blog.Title : blog.TitleAr;
             newsDto.Decription = lang == "en" ? blog.Decription : blog.DecriptionAr;
             newsDto.CountComment = blog.Comments == null ? 0 : blog.Comments.Count();
-            newsDto.Image = _imageBL.GetImageOriginal(blog.ImgId);
+            newsDto.Image = _imageBL.GetTypeImage(blog.ImgId, ImageType.ACTUAL);
             return newsDto;
         }
         public async Task<UpdateNewsDto> GetBlogId(int blogId)
@@ -125,7 +126,7 @@ namespace BusinessLogic.ApiClasses
                 blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
                 blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
                 blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");
-                blogDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(x.ImgId));
+                blogDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(x.ImgId), ImageType.ACTUAL);
                 return blogDto;
             }).ToList();
             return newsDto;
@@ -134,6 +135,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<PagedList<NewsDto>> GetAllBlogs (int userId, string lang, string search, PostsParameters postsParameters)
         {
             var searchBlog = await _repositoryManager.News.SearchNews(search);
+
             var user = await _repositoryManager.User.GetActiveUserId(userId, false);
             if (user.UserType == UserType.Store) 
             { 
@@ -146,7 +148,11 @@ namespace BusinessLogic.ApiClasses
                 blogDto.Title = lang == "en" ? x.Title : x.TitleAr;
                 blogDto.Decription = lang == "en" ? x.Decription : x.DecriptionAr;
                 blogDto.CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy");
-                blogDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(x.ImgId));
+#if DEBUG
+                blogDto.CreatedAt = x.CreatedAt.Humanize();
+#endif
+                //.Humanize();
+                blogDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(x.ImgId), ImageType.ACTUAL);
                 return blogDto;
             }).ToList();
             return PagedList<NewsDto>.ToPagedList(newsDto, postsParameters.PageNumber, postsParameters.PageSize);

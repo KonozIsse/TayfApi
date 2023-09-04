@@ -29,7 +29,6 @@ namespace Repository
         public async Task<List<Order>> GetOrders(bool trackChanges)
          => await FindAll(trackChanges).Include(c => c.Customer).Include(c => c.OrderStatus)
                 .Include(c => c.DeliveryTime).Include(c => c.Store).OrderByDescending(r => r.CreatedAt).ToListAsync();
-        
         public async Task<List<Order>> GetOrdersToStore(int storeId)
           => await FindByCondition(c => c.StoreId == storeId, false).ToListAsync(); 
         public async Task<List<Order>> GetsAllTransactionOrders()
@@ -37,7 +36,7 @@ namespace Repository
         public async Task<List<Order>> GetOrdersToCustomer(int customerId)
         => await FindByCondition(c => c.CustomerId == customerId, false).OrderByDescending(c=>c.CreatedAt).ToListAsync();
         public async Task<Order> GetCustomerNewOlderByStore(int vendorId, int customerId)
-         => await FindByCondition(c => c.StoreId == vendorId && c.CustomerId == customerId && c.OrderStatusId == 1, false).SingleOrDefaultAsync();
+         => await FindByCondition(c => c.StoreId == vendorId && c.CustomerId == customerId && c.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderPending, false).SingleOrDefaultAsync();
          public void DeleteOrder(Order order) => Delete(order);
          public void CreateOrder(Order order) => Create(order);
 
@@ -73,12 +72,8 @@ namespace Repository
                 .Include(c => c.DeliveryTime).Include(c => c.OrderProducts)
                 .OrderByDescending(r => r.CreatedAt).ToListAsync();
         }
-        public async Task<List<Order>> GetAllCansalOrders(bool trackChanges)
-       => await FindByCondition(c => c.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderCanceled, trackChanges).ToListAsync();
-        public async Task<List<Order>> GetAllPandingOrders(bool trackChanges)
-        => await FindByCondition(c => c.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderPending, trackChanges).ToListAsync();
-        public async Task<List<Order>> GetAllCompleteOrders(bool trackChanges)
-      => await FindByCondition(c => c.OrderStatus.OrderStatusEnum == OrderStatusEnum.OrderCompleted, trackChanges).ToListAsync();
+        public async Task<List<Order>> GetTypeAllOrders(OrderStatusEnum status , bool trackChanges)
+       => await FindByCondition(c => c.OrderStatus.OrderStatusEnum == status, trackChanges).ToListAsync();
     }
    
 }

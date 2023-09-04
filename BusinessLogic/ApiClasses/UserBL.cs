@@ -10,7 +10,6 @@ using Entities.Exception;
 using BusinessLogic.Services;
 using Entities.RequestFeatures;
 using System.Data;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace BusinessLogic.ApiClasses
@@ -162,7 +161,7 @@ namespace BusinessLogic.ApiClasses
             var storesDto = stores.Select(store =>
             {
                 var storeDto = _mapper.Map<StoreDto>(store);
-                storeDto.Image = _imageBL.GetImageMedium(Convert.ToInt32(store.ImageId));
+                storeDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(store.ImageId), ImageType.MEDIUM);
                 storeDto.CreatedAt = store.CreatedAt.ToString("G");
                 return storeDto;
             }).ToList();
@@ -174,7 +173,7 @@ namespace BusinessLogic.ApiClasses
             var storesDto = stores.Select(store =>
             {
                 var bookDto = _mapper.Map<StoreDto>(store);
-                bookDto.Image = _imageBL.GetImageMedium(Convert.ToInt32(store.ImageId));
+                bookDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(store.ImageId), ImageType.MEDIUM);
                 bookDto.CreatedAt = store.CreatedAt.ToString("G");
                 return bookDto;
             }).ToList();
@@ -203,16 +202,18 @@ namespace BusinessLogic.ApiClasses
                 var storeDto = _mapper.Map<StoreDto>(store);
                 storeDto.Status = store.Status == Status.Active ? _locService.GetLocalizedStringValue("active")
                   : _locService.GetLocalizedStringValue("notActive");
-                storeDto.Image = _imageBL.GetImageMedium(Convert.ToInt32(store.ImageId));
+                storeDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(store.ImageId), ImageType.MEDIUM);
                 storeDto.CreatedAt = store.CreatedAt.ToString("G");
                 return storeDto;
             }).ToList();
             return PagedList<StoreDto>.ToPagedList(storesDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
-        public async Task<PagedList<StoreDto>> GetVendorTotal(string search, PostsParameters postsParameters)
+        public async Task<PagedList<StoreDto>> GetVendorTotal(int userId ,string search, PostsParameters postsParameters)
         {
+            
             var stores = await _repositoryManager.User.GetVendorTotal(search, false);
             var orders = await _repositoryManager.Order.GetsAllTransactionOrders();
+           
             var storesTotal = stores.Select(x =>
             {
                 var storeDto = _mapper.Map<StoreDto>(x);
@@ -220,6 +221,11 @@ namespace BusinessLogic.ApiClasses
                 storeDto.TotalPrice = Convert.ToInt32(order.Sum(c => c.OrderPrice));
                 return storeDto;
             }).OrderByDescending(c => c.TotalPrice).ToList();
+            var store = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (store.UserType == UserType.Store)
+            {
+                storesTotal = storesTotal.Where(c => c.Id == userId).ToList();
+            }
             return PagedList<StoreDto>.ToPagedList(storesTotal, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<BussnessResultModel> AddStore(CreateStoreDto create)
@@ -262,7 +268,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> UpdateStore(UpdateStoreDto update)
         {
-            var store = await _repositoryManager.User.GetStore(update.Id, true);
+            var store = await _repositoryManager.User.GetTypeUserId(update.Id, UserType.Store, true);
             if(store == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
@@ -273,7 +279,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> DeleteStore(int id)
         {
-            var store = await _repositoryManager.User.GetStore(id, false);
+            var store = await _repositoryManager.User.GetTypeUserId(id, UserType.Store, false);
             if (store != null)
             {
                 var orders = await _repositoryManager.Order.GetOrdersToStore(id);
@@ -383,6 +389,15 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
+            var role = await _repositoryManager.Role.GetActiveRole(update.RoleId, false);
+            if (role.Name == "Store")
+            {
+                user.UserType = UserType.Store;
+            }
+            else
+            {
+                user.UserType = UserType.Admin;
+            }
             if (!string.IsNullOrEmpty(update.Password))
             {
                 if (String.IsNullOrEmpty(update.OldPassword))
@@ -413,7 +428,7 @@ namespace BusinessLogic.ApiClasses
         //Customer------------------------------------------------
         public async Task<BussnessResultModel> EditSubscribeletter(string newsletter, int CustomerId)
         {
-            var customer = await _repositoryManager.User.GetCustomerId(CustomerId,true);
+            var customer = await _repositoryManager.User.GetTypeUserId(CustomerId, UserType.Customer, true);
             if(customer == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"),false);
@@ -428,10 +443,15 @@ namespace BusinessLogic.ApiClasses
             var customersDto = _mapper.Map<List<CustomerDto>>(customers);
             return PagedList<CustomerDto>.ToPagedList(customersDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
-        public async Task<PagedList<CustomerDto>> GetCustomerTotal(string search , PostsParameters postsParameters)
+        public async Task<PagedList<CustomerDto>> GetCustomerTotal(int userId,string search , PostsParameters postsParameters)
         {
             var customers = await _repositoryManager.User.GetAllCustomers(search,"", false);
             var orders = await _repositoryManager.Order.GetsAllTransactionOrders();
+            var store = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (store.UserType == UserType.Store)
+            {
+                orders = orders.Where(c => c.StoreId == userId).ToList();
+            }
             var storesTotal = customers.Select(x =>
             {
                 var storeDto = _mapper.Map<CustomerDto>(x);
@@ -449,7 +469,7 @@ namespace BusinessLogic.ApiClasses
         } 
         public async Task<UpdateCustomerDto> GetCustomerId(int id)
         {
-            var customer = await _repositoryManager.User.GetCustomerId(id,false);
+            var customer = await _repositoryManager.User.GetTypeUserId(id, UserType.Customer, false);
             var customerDto = _mapper.Map<UpdateCustomerDto>(customer);
             return customerDto;
         }
@@ -494,7 +514,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> DeleteCustomer(int id)
         {
-            var user = await _repositoryManager.User.GetCustomerId(id, false);
+            var user = await _repositoryManager.User.GetTypeUserId(id, UserType.Customer, false);
             if(user != null)
             {
                 var addresses = await _repositoryManager.Address.GetAllAddressesByCustomerId(id);
@@ -581,7 +601,8 @@ namespace BusinessLogic.ApiClasses
                     var role = await _repositoryManager.Role.IsExistRole("Customer", false);
                     user.RoleId = role.Id;
                     user.UserName = userRegister.Email;
-                    user.VerifiedCode = new Random().Next(1000, 9999);
+                    user.VerifiedCode =  Convert.ToInt32(Guid.NewGuid().ToString().Substring(0, 4));
+                                        //new Random().Next(1000, 9999);
                     var country = await _repositoryManager.Country.GetcountryById(Convert.ToInt32(userRegister.CountryId), false);
                     user.CodeMobileCountry = country == null ? null : country.MobileCode;
 
@@ -695,7 +716,7 @@ namespace BusinessLogic.ApiClasses
         } 
         public async Task<BussnessResultModel> DeactiveCustomer(int id)
         {
-            var customer = await _repositoryManager.User.GetCustomerId(id, true);
+            var customer = await _repositoryManager.User.GetTypeUserId(id, UserType.Customer, true);
             if (customer == null)
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
@@ -724,7 +745,7 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<BussnessResultModel> ActiveCustomer(int id)
         {
-            var customer = await _repositoryManager.User.GetCustomerId(id, true);
+            var customer = await _repositoryManager.User.GetTypeUserId(id, UserType.Customer, true);
             if (customer != null)
             {
                 customer.Status = Status.Active;

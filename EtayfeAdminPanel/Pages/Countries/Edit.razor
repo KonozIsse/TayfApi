@@ -166,7 +166,7 @@
     {
         create = new UpdateCountryDto();
         create = await _locationTaxBL.GetCountry(Id);
-        image = _imageBL.GetImageOriginal(create.ImageId) ?? " ";
+        image = _imageBL.GetTypeImage(create.ImageId , ImageType.ACTUAL) ?? " ";
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
     }

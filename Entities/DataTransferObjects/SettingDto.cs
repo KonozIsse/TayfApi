@@ -19,8 +19,4 @@ namespace Entities.DataTransferObjects
         public string Key { get; set; }
         public string Value { get; set; }
     } 
-    public class SettingMedieDto
-    {
-        public string Value { get; set; }
-    }
 }

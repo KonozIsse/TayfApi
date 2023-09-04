@@ -30,7 +30,8 @@ namespace EtayfeAdminPanel.Services
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var token = "";// await js.GetFromLocalStorage("authToken");
+            var token = "";
+            //await js.GetFromLocalStorage("authToken");
 
             if (string.IsNullOrEmpty(token))
             {

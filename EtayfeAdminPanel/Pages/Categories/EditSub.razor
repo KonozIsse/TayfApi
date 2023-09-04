@@ -159,7 +159,7 @@
     {
         create = new UpdateCategoryDto();
         create = await _productBL.GetCategoryId(Id);
-        image = _imageBL.GetImageOriginal(create.ImgId) ?? " ";
+        image = _imageBL.GetTypeImage(create.ImgId , ImageType.ACTUAL) ?? " ";
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
     }

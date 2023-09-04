@@ -8,9 +8,6 @@ using Microsoft.CodeAnalysis;
 using Entities.Exception;
 using Entities.RequestFeatures;
 using System;
-using MailKit.Search;
-using System.Diagnostics.Metrics;
-using Microsoft.Extensions.Options;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -35,7 +32,7 @@ namespace BusinessLogic.ApiClasses
             {
                 Id = category.Id,
                 CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
-                ImageId = _imageBL.GetImageMedium(category.ImgId),
+                ImageId = _imageBL.GetTypeImage(category.ImgId,ImageType.MEDIUM),
                 IsStatus = category.IsStatus.ToString(),
                 CreatedAt = category.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
             }).ToList();
@@ -51,7 +48,7 @@ namespace BusinessLogic.ApiClasses
                 MainCategoryName = lang == "en" ? mainCat.CategoryName : mainCat.CategoryNameAr,
                 Id = category.Id,
                 CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
-                ImageId = _imageBL.GetImageMedium(category.ImgId),
+                ImageId = _imageBL.GetTypeImage(category.ImgId, ImageType.MEDIUM),
                 IsStatus = category.IsStatus == Status.Active ? _locService.GetLocalizedStringValue("active") : _locService.GetLocalizedStringValue("notActive"),
                 CreatedAt = category.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
             }).ToList();
@@ -64,7 +61,7 @@ namespace BusinessLogic.ApiClasses
             {
                 Id = category.Id,
                 CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
-                ImageId = _imageBL.GetImageMedium(category.ImgId),
+                ImageId = _imageBL.GetTypeImage(category.ImgId,ImageType.MEDIUM),
                 CreatedAt = category.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
             }).ToList();
             return categoriesDto;
@@ -76,7 +73,7 @@ namespace BusinessLogic.ApiClasses
             {
                 Id = category.Id,
                 CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
-                ImageId = _imageBL.GetImageMedium(category.ImgId),
+                ImageId = _imageBL.GetTypeImage(category.ImgId, ImageType.MEDIUM),
                 CreatedAt = category.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
             }).ToList();
             return categoriesDto;
@@ -91,7 +88,7 @@ namespace BusinessLogic.ApiClasses
                 MainCategoryName = lang == "en" ? mainCat.CategoryName : mainCat.CategoryNameAr,
                 Id = category.Id,
                 CategoryName = lang == "en" ? category.CategoryName : category.CategoryNameAr,
-                ImageId = _imageBL.GetImageOriginal(category.ImgId),
+                ImageId = _imageBL.GetTypeImage(category.ImgId,ImageType.ACTUAL),
                 CreatedAt = category.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
             }).ToList();
             return PagedList<CategoryDto>.ToPagedList(categoriesDto, postsParameters.PageNumber, postsParameters.PageSize);
@@ -271,6 +268,18 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterPrice"), false);
             }
+            var user = await _repositoryManager.User.GetActiveUserId(userId, false);
+            if (user.UserType == UserType.Admin)
+            {
+                product.AdminId = userId;
+                product.IsAcceptAdmin = true;
+                product.StoreId = updateDto.StoreId;
+            }
+            else
+            {
+                product.StoreId = userId;
+                product.IsAcceptAdmin = false;
+            }
             _mapper.Map(updateDto, product);
             await _repositoryManager.SaveAsync();
             if (updateDto.ProductCategories != null)
@@ -389,7 +398,7 @@ namespace BusinessLogic.ApiClasses
                 if (special != null)
                 {
                     special.SpecialPrice = updateDto.SpecialPrice;
-                    special.EndDate = (DateTime)updateDto.EndDateSpecial;
+                    special.EndDate = updateDto.EndDateSpecial;
                     special.IsStatus = updateDto.IsStatusSpecial;
                     special.ProductId = product.Id;
                     await _repositoryManager.SaveAsync();
@@ -399,7 +408,7 @@ namespace BusinessLogic.ApiClasses
                     var specialNew = new SpecialProducts
                     {
                         SpecialPrice = updateDto.SpecialPrice,
-                        EndDate = (DateTime)updateDto.EndDateSpecial,
+                        EndDate = updateDto.EndDateSpecial,
                         IsStatus = updateDto.IsStatusSpecial,
                         ProductId = product.Id,
                     };
@@ -556,7 +565,7 @@ namespace BusinessLogic.ApiClasses
                         MainCategoryId = c.Category.MainCategoryId,
                         CategoryId = c.CategoryId,
                         CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
-                        CategoryImage = _imageBL.GetImageThumbnail(c.Category.ImgId),
+                        CategoryImage = _imageBL.GetTypeImage(c.Category.ImgId, ImageType.THUMBNAIL),
                     }).ToList();
                     productDto.ProductCategories = catsDto;
 
@@ -572,20 +581,21 @@ namespace BusinessLogic.ApiClasses
                         productDto.Price = special.SpecialPrice;
                         productDto.IsSpecial = true;
                     }
-                    productDto.ImageProduct = _imageBL.GetImageThumbnail(product.Images.First().ImageId);
+                    var WishList =  _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId.Value, product.Id).Result;
+                    productDto.ImageProduct = _imageBL.GetTypeImage(product.Images.First().ImageId, ImageType.THUMBNAIL);
                     productDto.ProductName = lang == "en" ? product.ProductName : product.ProductNameAr;
                     productDto.Description = lang == "en" ? product.Description : product.DescriptionAr;
                     productDto.Availability = AvailabilityProducts(product.Id);
                     productDto.AttributesProducts = GetAttributsProducts(product.Id).Result;
                     productDto.Images = _imageBL.GetAllImagesToProduct(product.Id).Result;
                     productDto.ShareLink = "http://demotay.com/admin" + "/share.html?id=" + product.Id;
-                    productDto.IsFavorite = IsFavourite(Convert.ToInt32(customerId), product.Id).Result;
-                    productDto.NumLike = GetFavourite(Convert.ToInt32(customerId), product.Id).Result;
+                    productDto.IsFavorite = WishList != null ? true : false;;
+                    productDto.NumLike = WishList != null ? WishList.Id : 0;
                     productDto.Reviews = GetActiveReviews(product.Id,lang).Result;
                     productDto.CountReviews = product.Reviews.Count();
-                    productDto.Rate = Rate(product.Id).Result;
+                    productDto.Rate = GetRate(product.Id).Result;
                     productDto.StoreName = product.Store != null ? product.Store.FullName : null;
-                    productDto.StoreImage = product.Store != null ? _imageBL.GetImageOriginal(Convert.ToInt32(product.Store.ImageId)) : null;
+                    productDto.StoreImage = product.Store != null ? _imageBL.GetTypeImage(Convert.ToInt32(product.Store.ImageId),ImageType.ACTUAL) : null;
                     productDto.AttributesProducts = GetAttributsProducts(product.Id).Result;
                     return productDto;
                 }).ToList();
@@ -615,7 +625,7 @@ namespace BusinessLogic.ApiClasses
                 productDto.ProductName = lang == "en" ? item.ProductName : item.ProductNameAr;
                 productDto.Description = lang == "en" ? item.Description : item.DescriptionAr;
                 productDto.IsStatus = item.IsStatus.ToString();
-                productDto.ImageProduct = _imageBL.GetImageThumbnail(item.Images.First().ImageId) ?? null;
+                productDto.ImageProduct = _imageBL.GetTypeImage(item.Images.First().ImageId,ImageType.THUMBNAIL) ?? null;
                 productDto.Availability = AvailabilityProducts(item.Id);
                 productDto.NumLike = item.WishLists.Count();
                 productDto.CategoryName = lang == "en" ? item.ProductCategories.First().Category.CategoryName : item.ProductCategories.First().Category.CategoryNameAr;
@@ -626,7 +636,6 @@ namespace BusinessLogic.ApiClasses
         public async Task<ProductDto> GetProductDetails(int productId, int customerId, string lang)
         {
             var product = await _repositoryManager.Product.GetAcceptAdminActiveProduct(productId);
-            if (product == null) { return null; }
 
             var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(productId);
             var flash = await _repositoryManager.Sales.GetFlashProductId(product.Id);
@@ -639,8 +648,9 @@ namespace BusinessLogic.ApiClasses
                 MainCategoryId = c.Category.MainCategoryId,
                 CategoryId = c.CategoryId,
                 CategoryName = lang == "en" ? c.Category.CategoryName : c.Category.CategoryNameAr,
-                CategoryImage = _imageBL.GetImageMedium(c.Category.ImgId),
+                CategoryImage = _imageBL.GetTypeImage(c.Category.ImgId,ImageType.MEDIUM),
             }).ToList() ;
+            var WishList = await _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId, productId);
             return new ProductDto
             {
                 ProductCategories = catsDto,
@@ -651,7 +661,7 @@ namespace BusinessLogic.ApiClasses
                 ProductType = product.ProductType,
                 Price = special != null ? special.SpecialPrice : product.Price ,
                 IsStatus = product.IsStatus.ToString(),
-                ImageProduct = _imageBL.GetImageOriginal(product.Images.First().ImageId),
+                ImageProduct = _imageBL.GetTypeImage(product.Images.First().ImageId,ImageType.ACTUAL),
                 Availability =  AvailabilityProducts(product.Id) ,
                 AttributesProducts = await GetAttributsProducts(product.Id) ?? null,
                 Images = await _imageBL.GetAllImagesToProduct(product.Id) ?? null,
@@ -662,145 +672,15 @@ namespace BusinessLogic.ApiClasses
                 IsSpecial = special != null ? true : false,
                 IsSale = flash != null ? true : false,
 
-                IsFavorite = await IsFavourite(customerId, product.Id) ,
-                NumLike = await GetFavourite(customerId, product.Id) ,
+                IsFavorite = WishList != null ? true : false ,
+                NumLike = WishList != null ? WishList.Id : 0,
                 Reviews = await GetActiveReviews(product.Id,lang)??null,
-                Rate = await Rate(product.Id) == 0 ? 0 : await Rate(product.Id),
+                Rate =  await GetRate(product.Id),
 
                 StoreId =  product.StoreId,
                 StoreName =   product.Store.FullName ?? null,
-                StoreImage =  _imageBL.GetImageMedium(Convert.ToInt32(product.Store.ImageId)) ?? null
+                StoreImage =  _imageBL.GetTypeImage(Convert.ToInt32(product.Store.ImageId),ImageType.MEDIUM) ?? null
             };
-        }
-        public async Task<CatStoreProductVM> GetAllProducts(int? catId, int customerId, string lang ,int type, int? price1, int? price2)
-        {
-            var categories = await GetAllSubActiveCategories(lang);
-            var products = await GetAllActiveAcceptProducts(customerId, lang);
-            if(catId != null)
-            {
-                products = products.Where(c => c.ProductCategories.Any(c => c.CategoryId == catId)).ToList();
-            }
-           
-            if (price2 != 0 && price2 < 1000)
-            {
-                products = products.Where(r => r.Price >= price1 && r.Price <= price2).ToList();
-            }
-            if (price2 >= 1000)
-            {
-                products = products.Where(r => r.Price >= price1).ToList();
-            }
-            var stores = new List<StoreDto>();
-            if (type == 1)
-            {
-                var productsStore = products.GroupBy(x => x.StoreId).Select(x => x.First()).ToList();
-                foreach (var store in productsStore)
-                {
-                    var storeDB = await _repositoryManager.User.GetStoreId(store.StoreId);
-                    if (storeDB != null)
-                    {
-                        stores.Add(new StoreDto
-                        {
-                            Id = storeDB.Id,
-                            FirstName = storeDB.FirstName,
-                            Image = _imageBL.GetImageOriginal(Convert.ToInt32(storeDB.ImageId)),
-                            AdressInfo = storeDB.AdressInfo
-                        });
-                    }
-                }
-            }
-            var model = new CatStoreProductVM
-            {
-                Products = products,
-                Categories = categories,
-                Stores = stores
-            };
-            return model;
-        }
-        public async Task<CatStoreProductVM> GetAllSearchProducts(int? catId, int customerId,  string search, string lang, int PageId , int? sort, int type , int? price1, int? price2, int RowsPerPage = 15)
-        {
-            var categories = await GetAllSubActiveCategories(lang);
-            var products = await GetAllActiveAcceptProducts(customerId, lang);
-            if (!string.IsNullOrEmpty(search))
-            {
-                products = products.Where(c => c.ProductName.Contains(search)  || c.Description.Contains(search) || c.ProductCategories.Any(x=>x.CategoryName.Contains(search))).ToList();
-            }
-            if (catId != null)
-            {
-                products = products.Where(x => x.Availability > 0 && x.ProductCategories.Any(c => c.CategoryId == catId || c.MainCategoryId == catId)).ToList();
-            }
-            if (price2 != 0 && price2 < 1000)
-            {
-                products = products.Where(r => r.Availability > 0 && r.Price >= price1 && r.Price <= price2).ToList();
-            }
-            if (price2 >= 1000)
-            {
-                products = products.Where(r => r.Availability > 0 &&  r.Price >= price1).ToList();
-            }
-            int TotalProductCount = products.Count();
-            int PageCount = (int)Math.Ceiling((float)TotalProductCount / RowsPerPage);
-            if (PageId < 1 || PageId > PageCount)
-                PageId = 1;
-            int SkipCount = RowsPerPage * (PageId - 1);
-
-            var items = products.OrderByDescending(x => x.CreatedAt).Skip(SkipCount).Take(RowsPerPage).ToList();
-            if (sort == 1)
-            {
-                items = products.OrderBy(x => x.ProductName).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            else if (sort == 2)
-            {
-                items = products.OrderByDescending(x => x.ProductName).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            if (sort == 3)
-            {
-                items = products.OrderBy(x => x.Price).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            else if (sort == 4)
-            {
-                items = products.OrderByDescending(x => x.Price).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            if (sort == 5)
-            {
-                items = products.OrderBy(x => x.Rate).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            else if (sort == 6)
-            {
-                items = products.OrderByDescending(x => x.Rate).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            if (sort == 7)
-            {
-                items = products.OrderBy(x => x.ProductModel).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            else if (sort == 8)
-            {
-                items = products.OrderByDescending(x => x.ProductModel).Skip(SkipCount).Take(RowsPerPage).ToList();
-            }
-            var stores = new List<StoreDto>();
-            if (type == 1)
-            {
-                var productsStore = products.GroupBy(x => x.StoreId).Select(x => x.First()).ToList();
-                foreach (var store in productsStore)
-                {
-                    var storeDB = await _repositoryManager.User.GetStoreId(store.StoreId);
-                    if (storeDB != null)
-                    {
-                        stores.Add(new StoreDto
-                        {
-                            Id = storeDB.Id,
-                            FirstName = storeDB.FirstName,
-                            Image = _imageBL.GetImageOriginal(storeDB.ImageId.Value),
-                            AdressInfo = storeDB.AdressInfo
-                        });
-                    }
-                }
-            }
-            var model = new CatStoreProductVM
-            {
-                Products = items,
-                Categories = categories,
-                Stores = stores
-            };
-            return model;
         }
         public async Task<List<ProductDto>> GetMyWishList(int? catId, int customerId, string lang, int? sort, int type, int? price1, int? price2)
         {
@@ -840,16 +720,10 @@ namespace BusinessLogic.ApiClasses
             }
             return productsList;
         }
-        public async Task<List<ProductDto>> GetAllProductsCategory(int catId ,int customerId ,string lang)
-        {
-            var products = await GetAllActiveAcceptProducts(customerId, lang);
-            var productsCatId = products.Where(c => c.ProductCategories.Any(x=> x.CategoryId == catId)).ToList();
-            return productsCatId;
-        }
         public async Task<PagedList<ProductDto>> GetAllProductsToCategory(int catId, int customerId, string lang, int? sort , PostsParameters postsParameters)
         {
-            var products = await GetAllActiveAcceptProducts(customerId, lang);
-            var productsList = products.Where(c => c.ProductCategories.Any(x => x.CategoryId == catId)).ToList();
+            var productsList = await GetAllActiveAcceptProducts(customerId, lang);
+            productsList = productsList.Where(c => c.ProductCategories.Any(x => x.CategoryId == catId)).ToList();
             if (sort == 1)
             {
                 productsList = productsList.OrderBy(x => x.ProductName).ToList();
@@ -892,7 +766,7 @@ namespace BusinessLogic.ApiClasses
             //-------------------------------------------------
             var store = await _repositoryManager.User.GetStoreId(storeId);
             var storeDto = _mapper.Map<StoreDto>(store);
-            storeDto.Image = _imageBL.GetImageMedium(Convert.ToInt32(store.ImageId));
+            storeDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(store.ImageId), ImageType.MEDIUM);
             //-------------------------------------------------
             if (catId != null)
             {
@@ -920,7 +794,7 @@ namespace BusinessLogic.ApiClasses
                         {
                             Id = storeDB.Id,
                             FirstName = storeDB.FirstName,
-                            Image = _imageBL.GetImageOriginal(Convert.ToInt32(store.ImageId)),
+                            Image = _imageBL.GetTypeImage(Convert.ToInt32(store.ImageId),ImageType.ACTUAL),
                             AdressInfo = storeDB.AdressInfo
                         });
                     }
@@ -935,53 +809,170 @@ namespace BusinessLogic.ApiClasses
             };
             return model;
         }
-        public async Task<List<ProductDto>> GetSpecialsProd(int customerId,string lang)
+        public async Task<CatStoreProductVM> GetAllProducts(int? catId, int customerId, string lang, int type, int? price1, int? price2)
+        {
+            var categories = await GetAllSubActiveCategories(lang);
+            var products = await GetAllActiveAcceptProducts(customerId, lang);
+            if (catId != null)
+            {
+                products = products.Where(c => c.ProductCategories.Any(c => c.CategoryId == catId)).ToList();
+            }
+
+            if (price2 != 0 && price2 < 1000)
+            {
+                products = products.Where(r => r.Price >= price1 && r.Price <= price2).ToList();
+            }
+            if (price2 >= 1000)
+            {
+                products = products.Where(r => r.Price >= price1).ToList();
+            }
+            var stores = new List<StoreDto>();
+            if (type == 1)
+            {
+                var productsStore = products.GroupBy(x => x.StoreId).Select(x => x.First()).ToList();
+                foreach (var store in productsStore)
+                {
+                    var storeDB = await _repositoryManager.User.GetStoreId(store.StoreId);
+                    if (storeDB != null)
+                    {
+                        stores.Add(new StoreDto
+                        {
+                            Id = storeDB.Id,
+                            FirstName = storeDB.FirstName,
+                            Image = _imageBL.GetTypeImage(Convert.ToInt32(storeDB.ImageId), ImageType.ACTUAL),
+                            AdressInfo = storeDB.AdressInfo
+                        });
+                    }
+                }
+            }
+            var model = new CatStoreProductVM
+            {
+                Products = products,
+                Categories = categories,
+                Stores = stores
+            };
+            return model;
+        }
+        public async Task<CatStoreProductVM> GetAllSearchProducts(int? catId, int customerId, string search, string lang, int? sort, int type, int? price1, int? price2, PostsParameters postsParameters)
+        {
+            var categories = await GetAllSubActiveCategories(lang);
+            var products = await GetAllActiveAcceptProducts(customerId, lang);
+            products = products.Take(15).ToList();
+            if (!string.IsNullOrEmpty(search))
+            {
+                products = products.Where(c => c.ProductName.Contains(search) || c.Description.Contains(search) || c.ProductCategories.Any(x => x.CategoryName.Contains(search))).ToList();
+            }
+            if (catId != null)
+            {
+                products = products.Where(x => x.Availability > 0 && x.ProductCategories.Any(c => c.CategoryId == catId || c.MainCategoryId == catId)).ToList();
+            }
+            if (price2 != 0 && price2 < 1000)
+            {
+                products = products.Where(r => r.Availability > 0 && r.Price >= price1 && r.Price <= price2).ToList();
+            }
+            if (price2 >= 1000)
+            {
+                products = products.Where(r => r.Availability > 0 && r.Price >= price1).ToList();
+            }
+
+            var items = products.OrderByDescending(x => x.CreatedAt).Skip(15).ToList();
+            if (sort == 1)
+            {
+                items = products.OrderBy(x => x.ProductName).Skip(15).ToList();
+            }
+            else if (sort == 2)
+            {
+                items = products.OrderByDescending(x => x.ProductName).Skip(15).ToList();
+            }
+            if (sort == 3)
+            {
+                items = products.OrderBy(x => x.Price).Skip(15).ToList();
+            }
+            else if (sort == 4)
+            {
+                items = products.OrderByDescending(x => x.Price).Skip(15).ToList();
+            }
+            if (sort == 5)
+            {
+                items = products.OrderBy(x => x.Rate).Skip(15).ToList();
+            }
+            else if (sort == 6)
+            {
+                items = products.OrderByDescending(x => x.Rate).Skip(15).ToList();
+            }
+            if (sort == 7)
+            {
+                items = products.OrderBy(x => x.ProductModel).Skip(15).ToList();
+            }
+            else if (sort == 8)
+            {
+                items = products.OrderByDescending(x => x.ProductModel).Skip(15).ToList();
+            }
+            var stores = new List<StoreDto>();
+            if (type == 1)
+            {
+                var productsStore = products.GroupBy(x => x.StoreId).Select(x => x.First()).ToList();
+                foreach (var store in productsStore)
+                {
+                    var storeDB = await _repositoryManager.User.GetStoreId(store.StoreId);
+                    if (storeDB != null)
+                    {
+                        stores.Add(new StoreDto
+                        {
+                            Id = storeDB.Id,
+                            FirstName = storeDB.FirstName,
+                            Image = _imageBL.GetTypeImage(storeDB.ImageId.Value, ImageType.ACTUAL),
+                            AdressInfo = storeDB.AdressInfo
+                        });
+                    }
+                }
+            }
+            var model = new CatStoreProductVM
+            {
+                Products = items,
+                Categories = categories,
+                Stores = stores
+            };
+            return model;
+        }
+        public async Task<List<ProductDto>> GetDelegateProducts(int customerId ,string lang, Predicate<ProductDto>? predicate)
         {
             var products = await GetAllActiveAcceptProducts(customerId, lang);
-             products = products.Where(c=>c.IsSpecial == true).ToList();
+            var newProducts = new List<ProductDto>();
+            foreach (var product in products)
+            {
+                if(predicate != null )
+                {
+                    if (predicate(product)) { newProducts.Add(product); }
+                }
+                else
+                {
+                    newProducts = products;
+                }
+               
+            }
+            return newProducts;
+        }
+        public async IAsyncEnumerable<ProductDto> GetIEnumerableDelegateProducts(int customerId, string lang, Predicate<ProductDto>? predicate)
+        {
+            var products = (IEnumerable<ProductDto>) await GetAllActiveAcceptProducts(customerId, lang);
+            foreach (var product in products)
+            {
+                if (predicate != null)
+                {
+                    if (predicate(product)) { yield return product; }
+
+                }else
+                {
+                    yield return product ;
+                }
+            }
+        }
+        public async Task<List<ProductDto>> TopRatedPage(int customerId, string lang)
+        {
+            var products = await GetDelegateProducts(customerId, lang, c => c.Reviews.Any(r => r.IsStatus == Status.Active));
+            products = products.OrderByDescending(p => p.Reviews.Average(r => r.Rating)).ToList();
             return products;
-        }
-        public async Task<List<ProductDto>> GetFlashProds(int customerId,string lang)
-        {
-            var products = await GetAllActiveAcceptProducts(customerId, lang);
-             products = products.Where(c=>c.IsSale == true).ToList();
-            return products;
-        }
-        public async Task<List<ProductDto>> PopularsPage()
-        {
-            var popular = await _repositoryManager.Product.GetPopularProducts();
-            var popularDto = _mapper.Map<List<ProductDto>>(popular);
-            return popularDto;
-        }
-        public async Task<List<ProductDto>> BestPage()
-        {
-            var popular = await _repositoryManager.Product.GetBestProducts();
-            var popularDto = _mapper.Map<List<ProductDto>>(popular);
-            return popularDto;
-        }
-        public async Task<List<ProductDto>> LatestPage()
-        {
-            var populars = await _repositoryManager.Product.GetLatestPage();
-            var popularsDto = _mapper.Map<List<ProductDto>>(populars);
-            return popularsDto;
-        }
-        public async Task<List<ProductDto>> SpecialsPage()
-        {
-            var populars = await _repositoryManager.Product.SpecialsPage();
-            var popularsDto = _mapper.Map<List<ProductDto>>(populars);
-            return popularsDto;
-        }
-        public async Task<List<ProductDto>> TopRatedPage()
-        {
-            var populars = await _repositoryManager.Product.TopRatedPage();
-            var popularsDto = _mapper.Map<List<ProductDto>>(populars);
-            return popularsDto;
-        }
-        public async Task<List<ProductDto>> DailyDeals()
-        {
-            var populars = await _repositoryManager.Product.DailyDeals();
-            var popularsDto = _mapper.Map<List<ProductDto>>(populars);
-            return popularsDto;
         }
         //ProductType------------------------------------------------
         public List<string> GetProductTypes()
@@ -1076,23 +1067,17 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task<string> GetPriceForAttribute(int id)
         {
-            decimal productPrice = 0;
-            int stock = 0;
             var attrProduct = await _repositoryManager.Attribute.GetAttributeId(id, false);
             if (attrProduct != null)
             {
-                int prodId = attrProduct.ProductId;
-                var product = await _repositoryManager.Product.GetProductById(prodId, false);
-                if (product != null)
-                {
-                    productPrice = product.Price;
-                }
-                var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(prodId);
+                var product = await _repositoryManager.Product.GetProductById(attrProduct.ProductId, false);
+                var productPrice = product.Price;
+                var special = await _repositoryManager.SpecialProducts.GetSpecialProductId(attrProduct.ProductId);
                 if (special != null)
                 {
                     productPrice = special.SpecialPrice;
                 }
-                var flashSale = await _repositoryManager.Sales.GetFlashProductId(prodId);
+                var flashSale = await _repositoryManager.Sales.GetFlashProductId(attrProduct.ProductId);
                 if (flashSale != null)
                 {
                     productPrice = flashSale.DiscountPrice;
@@ -1108,11 +1093,15 @@ namespace BusinessLogic.ApiClasses
                         productPrice -= attrProduct.AttributePrice;
                     }
                 }
-                var inStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(prodId, id);
-                var OutStockList = await _repositoryManager.Inventory.GetProductIdOptoinIdOutStock(prodId, id);
-                stock = inStockList.Sum(r => r.Stock) - OutStockList.Sum(r => r.Stock);
+                var inStockList = await _repositoryManager.Inventory.GetProductIdAttributeId(attrProduct.ProductId, id, r=>r.StockType == "in");
+                var OutStockList = await _repositoryManager.Inventory.GetProductIdAttributeId(attrProduct.ProductId, id, r => r.StockType == "out");
+                var stock = inStockList.Sum(r => r.Stock) - OutStockList.Sum(r => r.Stock);
+                return productPrice + "  _  " + stock;
             }
-            return productPrice + "  _  " + stock;
+            else
+            {
+                return "0";
+            }
         }
         //Option------------------------------------------------
         public async Task<BussnessResultModel> AddOption(CreateOptionDto createOptionDto)
@@ -1424,7 +1413,7 @@ namespace BusinessLogic.ApiClasses
             });
             return PagedList<ReviewDto>.ToPagedList(reviewsDto, postsParameters.PageNumber, postsParameters.PageSize);
         } 
-        public async Task<decimal> Rate(int productId)
+        public async Task<decimal> GetRate(int productId)
         {
             var reviews = await _repositoryManager.Review.GetReviewsActiveProductId(productId);
             decimal rate = (reviews.Count() > 0 ? Convert.ToDecimal(reviews.Sum(r => r.Rating) / reviews.Count()) : 0);
@@ -1439,7 +1428,7 @@ namespace BusinessLogic.ApiClasses
                 var wishList = new WishList{ ProductId = productId, CustomerId = customerId };
                 _repositoryManager.WishList.Addlike(productId, wishList);
                 await _repositoryManager.SaveAsync();
-                return new BussnessResultModel(wishList, "successfully Added");
+                return new BussnessResultModel(wishList, _locService.GetLocalizedStringValue("successfullyAdded"));
             }
             else
             {
@@ -1458,16 +1447,6 @@ namespace BusinessLogic.ApiClasses
             _repositoryManager.WishList.DeleteLike(wishList);
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(wishList, _locService.GetLocalizedStringValue("successDelete"));
-        }
-        public async Task<bool> IsFavourite(int customerId, int productId)
-        {
-            var WishList = await _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId, productId);
-            return WishList != null ? true : false;
-        }
-        public async Task<int> GetFavourite(int customerId, int productId)
-        {
-            var WishList = await _repositoryManager.WishList.GetWishListProductIdCustomerId(customerId, productId);
-            return WishList == null ? 0 : WishList.Id;
         }
         //inventory------------------------------------------------
         public async Task<PagedList<InventoryDto>> GetAllInventory( string search ,int userId ,string lang , PostsParameters postsParameters)
@@ -1496,7 +1475,7 @@ namespace BusinessLogic.ApiClasses
                 ProductName = stock.ProductName ,
             }).DistinctBy(c=>c.ProductId).ToList();
            
-            return PagedList<InventoryDto>.ToPagedList((IEnumerable<InventoryDto>)stocksDto, postsParameters.PageNumber, postsParameters.PageSize);
+            return PagedList<InventoryDto>.ToPagedList(stocksDto, postsParameters.PageNumber, postsParameters.PageSize);
         }
         public async Task<PagedList<InventoryDto>> GetAllOutInventory(string search, int userId, string lang, PostsParameters postsParameters)
         {
@@ -1514,13 +1493,13 @@ namespace BusinessLogic.ApiClasses
             foreach (var stock in stocks)
             {
                 int inSum = 0;
-                var inStocks = await _repositoryManager.Inventory.GetInStockProduct(stock.ProductId);
+                var inStocks = await _repositoryManager.Inventory.GetPredicateStockProduct(stock.ProductId, s => s.StockType == "in");
                 if(inStocks != null)
                 {
                     inSum = inStocks.Sum(c=>c.Stock);
                 }
                 int outSum = 0;
-                var outStocks = await _repositoryManager.Inventory.GetOutStockProduct(stock.ProductId);
+                var outStocks = await _repositoryManager.Inventory.GetPredicateStockProduct(stock.ProductId, s => s.StockType == "out");
                 if (outStocks != null)
                 {
                     outSum = outStocks.Sum(c => c.Stock);
@@ -1531,7 +1510,7 @@ namespace BusinessLogic.ApiClasses
                     {
                         Id = stock.Id,
                         ProductId = stock.ProductId,
-                        ProductImage = _imageBL.GetImageOriginal(stock.Product.Images.First().ImageId),
+                        ProductImage = _imageBL.GetTypeImage(stock.Product.Images.First().ImageId, ImageType.ACTUAL),
                         ProductName = lang == "en" ? stock.Product.ProductName : stock.Product.ProductNameAr,
                         UpdateAt = stock.CreatedAt.ToString("MM/dd/yyyy hh:mm tt") 
                     });
@@ -1547,9 +1526,9 @@ namespace BusinessLogic.ApiClasses
             {
                 stocks = stocks.Where(c => c.VendorId == userId).ToList();
             }
-            var inStocks = await _repositoryManager.Inventory.GetInStockProduct(productId);
+            var inStocks = await _repositoryManager.Inventory.GetPredicateStockProduct(productId, s => s.StockType == "in");
             int inSum = inStocks != null ? inStocks.Sum(c => c.Stock) : 0;
-            var outStocks = await _repositoryManager.Inventory.GetOutStockProduct(productId);
+            var outStocks = await _repositoryManager.Inventory.GetPredicateStockProduct(productId, s => s.StockType == "out");
             int outSum = outStocks != null ? outStocks.Sum(c => c.Stock) : 0;
 
             var stocksDto = stocks.Select(stock => new InventoryDto
@@ -1569,7 +1548,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<BussnessResultModel> AddInventory(int userId, CreateInventoryDto createDto)
         {
             var inventory = _mapper.Map<Inventory>(createDto);
-            var item = await _repositoryManager.Inventory.GetOptionsByProductIdInStock(createDto.ProductId);
+            var item = await _repositoryManager.Inventory.GetPredicateStockProduct(createDto.ProductId, s => s.StockType == "in");
             if (item !=null)
             {
                await DeleteInventory(createDto.ProductId, createDto.AttributesProductId);
@@ -1593,10 +1572,10 @@ namespace BusinessLogic.ApiClasses
         }
         public async Task DeleteInventory(int productId, int? attr)
         {
-            var attrp = await _repositoryManager.Inventory.GetOptionsByProductIdInStock(productId);
+            var attrp = await _repositoryManager.Inventory.GetPredicateStockProduct(productId, s=>s.StockType == "in");
             if (attr != null)
             {
-                attrp = await _repositoryManager.Inventory.GetProductIdOptoinIdInStock(productId, attr.Value);
+                attrp = await _repositoryManager.Inventory.GetProductIdAttributeId(productId, attr.Value, r => r.StockType == "in");
             }
             foreach (var t in attrp)
             {
@@ -1606,25 +1585,14 @@ namespace BusinessLogic.ApiClasses
         }
         public int AvailabilityProducts(int productId)
         {
-            var total = 0;
-            var instock = 0;
-            var outstock = 0;
-
             var inventories = _repositoryManager.Inventory.GetAllInventoryByPrductId(productId);
-            if (inventories != null)
-            {
-                foreach (var inventory in inventories)
-                {
-                    if (inventory.StockType == "in")
-                    {
-                        instock += inventory.Stock;
-                    }
-                    if (inventory.StockType == "out")
-                    {
-                        outstock += inventory.Stock;
-                    }
-                }
-            }
+            int instock = inventories.Aggregate<Inventory, int>(0,
+                               (Total, inventory) => inventory.StockType == "in" ?  Total += inventory.Stock : 0);
+
+            int outstock = inventories.Aggregate<Inventory, int>(0,
+                           (Total, inventory) => inventory.StockType == "out" ? Total += inventory.Stock : 0);
+
+            var total = 0;
             if ((instock - outstock) > 0)
             {
                 return total = instock - outstock;
@@ -1634,5 +1602,6 @@ namespace BusinessLogic.ApiClasses
                 return total;
             }
         }
+       
     }
 }

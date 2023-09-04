@@ -43,14 +43,14 @@ namespace EtayfeAdminPanel.Controllers
         [HttpGet("GetCustomerTotal")]
         public async Task<IActionResult> GetCustomerTotal(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _userBL.GetCustomerTotal(search, postsParameters);
+            var result = await _userBL.GetCustomerTotal(GetCurrentUserId(), search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }
         [HttpGet("GetVendorTotal")]
         public async Task<IActionResult> GetVendorTotal(string search, [FromQuery] PostsParameters postsParameters)
         {
-            var result = await _userBL.GetVendorTotal(search, postsParameters);
+            var result = await _userBL.GetVendorTotal(GetCurrentUserId(), search, postsParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.MetaData));
             return Ok(result);
         }

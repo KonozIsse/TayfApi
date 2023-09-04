@@ -166,7 +166,7 @@
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
         create = new UpdateNewsDto();
         create = await _newBL.GetBlogId(Id);
-        image = _imageBL.GetImageOriginal(create.ImgId);
+        image = _imageBL.GetTypeImage(create.ImgId, ImageType.ACTUAL);
     }
 
     async Task EditNews()

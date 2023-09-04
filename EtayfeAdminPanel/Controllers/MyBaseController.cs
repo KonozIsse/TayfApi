@@ -75,8 +75,8 @@ namespace EtayfeAdminPanel.Controllers
         [NonAction]
         public int GetCurrentUserId()
         {
-            //var user = GetCurrentUser();
-            var user = _repositoryManager.User.GetUserId(3,false).Result;
+            var user = GetCurrentUser();
+           // var user = _repositoryManager.User.GetUserId(3,false).Result;
             return user.Id;
         }
      

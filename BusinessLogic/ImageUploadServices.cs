@@ -36,7 +36,7 @@ namespace BusinessLogic
                     {
                         Directory.CreateDirectory(_webHostEnvironment.WebRootPath + path);
                     }
-                    using (var stream = System.IO.File.Create(_webHostEnvironment.WebRootPath + path + fileName))
+                    using (var stream = File.Create(_webHostEnvironment.WebRootPath + path + fileName))
                     {
                         obj.CopyTo(stream);
                         stream.Flush();
@@ -70,7 +70,7 @@ namespace BusinessLogic
 
                // fileName = Guid.NewGuid() + Path.GetExtension(fileName);
 
-                System.IO.File.WriteAllBytes(_webHostEnvironment.WebRootPath + path + fileName, binData);
+                File.WriteAllBytes(_webHostEnvironment.WebRootPath + path + fileName, binData);
                 return fileName;
             }
             catch

@@ -103,7 +103,8 @@
 @code {
     [Parameter]
     public int ProductId { get; set; }
-    string lang = "ar";
+    public string lang { get; set; }
+    public AdminDto user { get; set; }
 
     public List<InventoryDto> Model { get; set; }
 
@@ -111,7 +112,8 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
-        Model = await _productBL.GetAllViewInventory(3, lang, ProductId);
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
+        Model = await _productBL.GetAllViewInventory(user.Id, lang, ProductId);
     }
 
 }

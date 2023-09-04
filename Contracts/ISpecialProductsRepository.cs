@@ -12,9 +12,7 @@ namespace Contracts
     {
         Task<SpecialProducts> GetSpecialProductId(int productId);
         Task<SpecialProducts> CheckSpecialExists(int productId, bool trackChanges);
-        Task<PagedList<SpecialProducts>> SpecialsPage(PostsParameters postsParameters, bool trackChanges);
         void AddSpecialProduct(SpecialProducts special);
         void DeleteSpecialProduct(SpecialProducts special);
-        Task<SpecialProducts> GetSpecialId(int id, bool trackChanges);
     }
 }

@@ -161,7 +161,7 @@
     {
         create = new UpdateServiceDto();
         create = await _homeBL.GetMapService(Id);
-        image = _imageBL.GetImageOriginal(Convert.ToInt32(create.ImgId)) ?? " ";
+        image = _imageBL.GetTypeImage(Convert.ToInt32(create.ImgId),ImageType.ACTUAL) ?? " ";
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
     }

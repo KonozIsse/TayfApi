@@ -17,7 +17,7 @@ namespace EtayfeAdminPanel.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetMediaSetting()
         {
-            var result = await _imageBL.GetMediaSetting();
+            var result = await _homeBL.GetSettingVM(new SettingImageVM());
             return Ok(result);
         }
        

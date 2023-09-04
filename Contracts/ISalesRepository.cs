@@ -10,7 +10,6 @@ namespace Contracts
     public interface ISalesRepository
     {
         Task<ProductSales> CheckFlashExists(int productId, bool trackChanges);
-        Task<ProductSales> GetItemId(int id, bool trackChanges);
         Task<ProductSales> GetFlashProductId(int productId);
         void AddFlashSale(ProductSales sale);
         void DeleteFlashSale(ProductSales sale);

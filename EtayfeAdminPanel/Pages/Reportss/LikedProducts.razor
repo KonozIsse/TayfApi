@@ -116,6 +116,7 @@
     public string search { get; set; }
     [Parameter]
     public string lang { get; set; }
+    public AdminDto user { get; set; }
 
     private PostsParameters _PostsParameters = new PostsParameters();
      public List<ProductDto> Model { get; set; }
@@ -130,6 +131,7 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GetLikedProducts();
     }
     private async Task SelectedPage(int page)
@@ -139,7 +141,7 @@
     }
     async Task GetLikedProducts()
     {
-        var pagingResponse = await _productBL.GetProductsCP(3, search, null, lang, _PostsParameters);
+        var pagingResponse = await _productBL.GetProductsCP(user.Id, search, null, lang, _PostsParameters);
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }

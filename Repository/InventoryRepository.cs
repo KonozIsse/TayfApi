@@ -17,19 +17,20 @@ namespace Repository
         {
             
         }
-        public async Task<List<Inventory>> GetProductIdOptoinIdInStock(int productId, int option)
-         => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == option && r.StockType == "in",false).ToListAsync();
-        public async Task<List<Inventory>> GetProductIdOptoinIdOutStock(int productId, int option)
-         => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == option && r.StockType == "out", false).ToListAsync();
-        public async Task<IEnumerable<Inventory>> GetAllInventoryByProductIdOption (int productId, int attributeId)
-         => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == attributeId, false).ToListAsync();
-        public List<Inventory> GetAllInventoryByPrductId(int productId)
+        public async Task<List<Inventory>> GetProductIdAttributeId(int productId, int attributeId, Predicate<Inventory>? predicateStock)
+        {
+            var result = FindByCondition(r => r.ProductId == productId && r.AttributesProductId == attributeId, false);
+            if (predicateStock != null)
+            {
+                result = result.Where(r => predicateStock(r));
+            }
+            return await result.ToListAsync();
+        }
+           public List<Inventory> GetAllInventoryByPrductId(int productId)
          => FindByCondition(r => r.ProductId == productId, false).Include(c => c.Product).ToList();
         public async Task<IEnumerable<Inventory>> GetAllInventory() 
             => await FindAll(false).Include(c=>c.Product).ThenInclude(c=>c.Images).OrderByDescending(c=>c.CreatedAt)
             .ToListAsync();
-        public async Task<List<Inventory>> GetOptionsByProductIdInStock(int productId)
-        => await FindByCondition(r => r.ProductId == productId && r.StockType == "in", false).ToListAsync();
         public async Task<List<Inventory>> GetAllOutStock()
         => await FindByCondition(r =>  r.StockType == "out", false).ToListAsync();
         public async Task<Inventory> GetStockProduct(int productId)
@@ -38,10 +39,9 @@ namespace Repository
          => await FindByCondition(r => r.ProductId == productId && r.AttributesProductId == attributeId && r.Stock > 0 && r.StockType == "in", false).FirstOrDefaultAsync();
         public void AddInventory(Inventory inventory) => Create(inventory);
         public void DeleteInventory(Inventory inventory) => Delete(inventory);// delete inventory if was exsit in stock
-        public async Task<List<Inventory>> GetOutStockProduct(int productId)
-         => await FindByCondition(r => r.ProductId == productId && r.StockType == "out", false).ToListAsync();
-        public async Task<List<Inventory>> GetInStockProduct(int productId)
-        => await FindByCondition(r => r.ProductId == productId && r.StockType == "in", false).ToListAsync();
+
+        public async Task<List<Inventory>> GetPredicateStockProduct(int productId, Predicate<Inventory> predicateStock)
+         => await FindByCondition(r => r.ProductId == productId && predicateStock(r), false).ToListAsync();
     }
 }
 

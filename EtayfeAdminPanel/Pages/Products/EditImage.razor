@@ -132,7 +132,7 @@
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         images = await http.GetFromJsonAsync<List<ImageSettingDto>>("api/Home/GetAllImagesOriginal");
-        image = _imageBL.GetImageOriginal(imageId);
+        image = _imageBL.GetTypeImage(imageId, ImageType.ACTUAL);
     }
     public async Task EditImageProduct()
     {

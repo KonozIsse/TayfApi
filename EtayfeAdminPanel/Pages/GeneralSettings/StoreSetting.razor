@@ -121,7 +121,7 @@
     protected override async Task OnInitializedAsync()
     {
         create = new SettingStoreVM();
-        create = await _homeBL.GetSettingStore();
+        create = (SettingStoreVM)await _homeBL.GetSettingVM(create);
 
     }
 

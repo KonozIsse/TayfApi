@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Entities;
 using Entities.DataTransferObjects;
+using Entities.Models;
+using Entities.ViewModel;
 using EtayfeAdminPanel.Model;
 using EtayfeAdminPanel.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -38,7 +40,8 @@ namespace EtayfeAdminPanel.Controllers
         {
             var result = await _homeBL.GetCurrentUser(GetCurrentUserId());
              return Ok(result);
-        }
+        }  
+        
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest tokenDto)
         {
@@ -98,7 +101,8 @@ namespace EtayfeAdminPanel.Controllers
             }
             return Ok();
         }
-
+        
+       
     }
 
 }

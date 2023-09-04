@@ -4,7 +4,7 @@ namespace Entities.Models
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using Entities.Models.Enums;
-    public class Image : BaseEntity
+    public class Image : BaseEntity 
     {
         [Required]
         [StringLength(191)]

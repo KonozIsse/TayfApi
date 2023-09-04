@@ -20,15 +20,7 @@ namespace Repository
          => await FindByCondition(c => c.ProductId == productId && c.EndDate > DateTime.Now && c.IsStatus == Status.Active, false).FirstOrDefaultAsync();
         public async Task<SpecialProducts> CheckSpecialExists(int productId , bool trackChanges)
         => await FindByCondition(c => c.ProductId == productId , trackChanges).FirstOrDefaultAsync();
-        public async Task<PagedList<SpecialProducts>> SpecialsPage(PostsParameters postsParameters, bool trackChanges)
-        {
-            var special = await FindByCondition(c => c.IsStatus == Status.Active && c.EndDate > DateTime.Now, trackChanges)
-                .Include(i => i.Product).ThenInclude(r => r.Reviews).OrderByDescending(p => p.ProductId).ToListAsync();
-            return PagedList<SpecialProducts>.ToPagedList(special, postsParameters.PageNumber, postsParameters.PageSize);
-        }
         public void AddSpecialProduct(SpecialProducts special) => Create(special);
         public void DeleteSpecialProduct(SpecialProducts special) => Delete(special);
-        public async Task<SpecialProducts> GetSpecialId(int id, bool trackChanges)
-      => await FindByCondition(c => c.Id == id, trackChanges).FirstOrDefaultAsync();
     }
 }

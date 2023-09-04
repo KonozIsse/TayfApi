@@ -505,7 +505,7 @@
     {
         create = new UpdateProductDto();
         create = await  _productBL.GetMapProduct(Id);
-        image =  _imageBL.GetImageOriginal(create.Images.First().ImageId);
+        image =  _imageBL.GetTypeImage(create.Images.First().ImageId,ImageType.ACTUAL);
         selectedSale = create.IsSale == 1 ? true : false;
         selectedSpeical = create.IsSpecial == 1 ? true : false;
         //--------------------------------------

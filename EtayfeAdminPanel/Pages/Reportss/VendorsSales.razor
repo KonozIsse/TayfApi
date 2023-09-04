@@ -42,7 +42,7 @@
 
                     </div>
                     <div class="col-lg-6 form-inline" id="contact-form12">
-                        <button onclick="exportTableToExcelVendors()" class="btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
+                        <button onclick="exportTableToExcele('Vendors Sales' + new Date(),'#html_table')" class="btn btn-success  @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-file-excel"></i> @SharedLocalize.GetLocalizedStringValue("excel")</button>
                         <button onclick="printJS('html_table', 'html')" class="btn btn-primary @(lang=="en"?"pull-right":"pull-left")" style="@(lang =="en" ? "margin-right: 2%;" : "margin-left: 2%;")"><i class="fa fa-print"></i> @SharedLocalize.GetLocalizedStringValue("Print")</button>
                     </div>
 
@@ -117,6 +117,7 @@
     [Parameter]
     public string search { get; set; }
     public string lang { get; set; }
+    public AdminDto user { get; set; }
     public List<StoreDto> Model { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
@@ -125,6 +126,7 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         await GetCustomerTotal();
     }
     private async Task SelectedPage(int page)
@@ -134,7 +136,7 @@
     }
     async Task GetCustomerTotal()
     {
-        var pagingResponse = await _userBL.GetVendorTotal(search, _PostsParameters);
+        var pagingResponse = await _userBL.GetVendorTotal(user.Id,search, _PostsParameters);
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }

@@ -7,7 +7,6 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.RequestFeatures;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 
@@ -51,7 +50,7 @@ namespace BusinessLogic.ApiClasses
                 var time = await _repositoryManager.DeliveryTime.GetDeliveryTimeById(order.DeliveryTimeId, false);
                 var currency = await _repositoryManager.Currency.GetCurrency(currencyId, false);
                 var states = await _repositoryManager.OrderStatus.GetOrderStatusById(order.OrderStatusId, false);
-                var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+                var customer = await _repositoryManager.User.GetTypeUserId(order.CustomerId,UserType.Customer, false);
                 var address = await _repositoryManager.Address.GetDefaultAddressCustomer(order.CustomerId);
 
                 var orderProducts = new List<OrderProductDto>();
@@ -72,7 +71,7 @@ namespace BusinessLogic.ApiClasses
                         ProductName = c.Product.ProductName,
                         ProductModel = c.Product.ProductModel,
                         ProductPrice = c.Product.Price,
-                        ProductImage = _imageBL.GetImageOriginal(image.First().ImageId),
+                        ProductImage = _imageBL.GetTypeImage(image.First().ImageId, ImageType.ACTUAL),
                         OrderAttributesProducts = attributesOrder ?? null
                     });
                     subTotal = subTotal + c.Qty * c.Product.Price;
@@ -285,7 +284,7 @@ namespace BusinessLogic.ApiClasses
 
                         orderProductDto.ProductName = lang == "en" ? product.ProductName : product.ProductNameAr;
                         orderProductDto.ProductModel = product.ProductModel;
-                        orderProductDto.ProductImage = _imageBL.GetImageMedium(product.Images.First().ImageId);
+                        orderProductDto.ProductImage = _imageBL.GetTypeImage(product.Images.First().ImageId, ImageType.MEDIUM);
                         orderProductDto.ProductPrice = product.Price;
                         return orderProductDto;
                     }).ToList();
@@ -390,7 +389,7 @@ namespace BusinessLogic.ApiClasses
             }
 
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CompleteOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            var store = await _repositoryManager.User.GetTypeUserId(order.StoreId, UserType.Store, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
             action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
@@ -409,7 +408,7 @@ namespace BusinessLogic.ApiClasses
             string msgEm1 = await InvoiceOrder(id);
             var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderCompleted); 
             var msgem = msgEm1 + temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
-            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            var customer = await _repositoryManager.User.GetTypeUserId(order.CustomerId, UserType.Customer, false);
             try
             {
                 var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
@@ -428,7 +427,7 @@ namespace BusinessLogic.ApiClasses
             var status = await _repositoryManager.OrderStatus.GetOrderStatusEnum(OrderStatusEnum.OrderCanceled, false);
             order.OrderStatusId = status.Id;
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.CancelOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            var store = await _repositoryManager.User.GetTypeUserId(order.StoreId, UserType.Store, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
             action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
@@ -446,7 +445,7 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
 
         }
-        public async Task<BussnessResultModel> OrderReject(int id)
+        public async Task<BussnessResultModel> OrderReject(int id )
         {
             var order = await _repositoryManager.Order.GetOrderId(id, true, false);
             if (order == null)
@@ -460,7 +459,7 @@ namespace BusinessLogic.ApiClasses
                 order.OrderStatusId = status1.Id;
             }
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.RejectOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            var store = await _repositoryManager.User.GetTypeUserId(order.StoreId, UserType.Store, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
             action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
@@ -543,7 +542,7 @@ namespace BusinessLogic.ApiClasses
             }
 
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ReceiveOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            var store = await _repositoryManager.User.GetTypeUserId(order.StoreId, UserType.Store, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName); 
             action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
@@ -564,7 +563,7 @@ namespace BusinessLogic.ApiClasses
             string msgEm1 = await InvoiceOrder(id);
             var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderRecieved); //recived email
             var msgem = msgEm1 + temp.Message + "<br><br> The E-Tayf account team <br> Thank You";
-            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            var customer = await _repositoryManager.User.GetTypeUserId(order.CustomerId, UserType.Customer, false);
             var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
             _emailSender.SendEmail(message);
         }
@@ -586,7 +585,7 @@ namespace BusinessLogic.ApiClasses
             }
            
             var action = await _repositoryManager.NotificationAction.GetNotificationActionByKey(NotificationKey.ShippedOrder);
-            var store = await _repositoryManager.User.GetStore(order.StoreId, false);
+            var store = await _repositoryManager.User.GetTypeUserId(order.StoreId, UserType.Store, false);
             action.Template = action.Template.Replace("{userName}", store.FirstName);
             action.TemplateAr = action.Template.Replace("{userName}", store.FirstName);
             Notification notification = new()
@@ -606,7 +605,7 @@ namespace BusinessLogic.ApiClasses
             //send email
             var temp = await _repositoryManager.MessageTemplate.GetNameTemplate(NameTemplate.OrderShipped);
             var msgem = msgEm1 + "<br><br> The E-Tayf account team <br> Thank You";
-            var customer = await _repositoryManager.User.GetCustomerId(order.CustomerId, false);
+            var customer = await _repositoryManager.User.GetTypeUserId(order.CustomerId, UserType.Customer, false);
             try
             {
                 var message = new Message(new string[] { customer.Email }, "Order Details", msgem);
@@ -663,7 +662,6 @@ namespace BusinessLogic.ApiClasses
             await _repositoryManager.SaveAsync();
             return new BussnessResultModel(order, "successDelete");
         }
-       
         public async Task<List<OrderDto>> GetAllSalesOrders(int userId , string search, int customerId, int storeId, int statusId, DateTime? dateFrom, DateTime? dateTo)
         {
             var orders = await _repositoryManager.Order.GetAllOrders(search, customerId, storeId, statusId, dateFrom, dateTo);
@@ -750,7 +748,7 @@ namespace BusinessLogic.ApiClasses
                 }
             }
             var setting = await _repositoryManager.Setting.GetSettingByValue("website_logo",false);
-            var logo = _imageBL.GetImageOriginal(Convert.ToInt32(setting.Value));
+            var logo = _imageBL.GetTypeImage(Convert.ToInt32(setting.Value), ImageType.ACTUAL);
             var all = "";
             var bb3 = "";
             var m3 = "";

@@ -17,8 +17,6 @@ using Entities.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Entities.Exception;
 using Microsoft.AspNetCore.Hosting;
-using System.Xml.Linq;
-using Org.BouncyCastle.Crypto;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -246,32 +244,32 @@ namespace BusinessLogic.ApiClasses
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
                     var products = await _repositoryManager.ImageProduct.GetAllProductsImageId(id, false);
-                    if (products != null)
+                    if (products.Count() >0)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
                     var stores = await _repositoryManager.User.GetStoresImage(id, false);
-                    if (stores != null)
+                    if (stores.Count() > 0)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
                     var categories = await _repositoryManager.Categories.GetAllCategoriesImageId(id, false);
-                    if (categories != null)
+                    if (categories.Count() > 0)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
                     var languages = await _repositoryManager.Language.GetListLanguageImage(id, false);
-                    if (languages != null)
+                    if (languages.Count() > 0)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
                     var countries = await _repositoryManager.Country.GetCountriesImage(id);
-                    if (countries != null)
+                    if (countries.Count() > 0)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
                     var blogs = await _repositoryManager.News.GetBlogsImage(id);
-                    if (blogs != null)
+                    if (blogs.Count() > 0)
                     {
                         return new BussnessResultModel(null, _locService.GetLocalizedStringValue("CannotDeleteImage"), false);
                     }
@@ -292,13 +290,6 @@ namespace BusinessLogic.ApiClasses
             var imageSetting = _mapper.Map<ImageSetting>(settingDto);
             _repositoryManager.ImageSetting.AddImageSetting(imageSetting);
             await _repositoryManager.SaveAsync();
-        }
-        public async Task<ImageSettingDto> GetMapImageSetting(int id)
-        {
-
-            var itemFromDB =  await _repositoryManager.ImageSetting.GetImageSettingId(id, false);
-            var itemFromDto = _mapper.Map<ImageSettingDto>(itemFromDB);
-            return itemFromDto;
         }
         public async Task<BussnessResultModel> EditImageSetting(UpdateImageSettingDto update)
         {
@@ -394,51 +385,15 @@ namespace BusinessLogic.ApiClasses
             }).ToList();
             return itemFromDto;
         }
-        public string GetImageMedium(int imageId)
+        public string GetTypeImage(int imageId , ImageType type)
         {
             var image = _repositoryManager.Image.GetImage(imageId, false,true);
             if (image != null)
             {
-                var imageMedium = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.MEDIUM);
+                var imageMedium = _repositoryManager.ImageSetting.GetByType(image.Id, type);
                 if (imageMedium != null)
                 {
                     var dto = _mapper.Map<ImageSettingDto>(imageMedium);
-                    image.Name = dto.Path;
-                }
-                return image.Name;
-            }
-            else
-            {
-                return " ";
-            }
-        }
-        public string GetImageThumbnail(int imageId)
-        {
-            var image = _repositoryManager.Image.GetImage(imageId, false,true);
-            if (image != null)
-            {
-                var imageThumbnail = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.THUMBNAIL);
-                if (imageThumbnail != null)
-                {
-                    var dto = _mapper.Map<ImageSettingDto>(imageThumbnail);
-                    image.Name = dto.Path;
-                }
-                return image.Name;
-            }
-            else
-            {
-                return " ";
-            }
-        }
-        public string GetImageOriginal(int imageId)
-        {
-            var image = _repositoryManager.Image.GetImage(imageId, false, true);
-            if (image != null)
-            {
-                var imageOriginal = _repositoryManager.ImageSetting.GetByType(image.Id, ImageType.ACTUAL);
-                if (imageOriginal != null)
-                {
-                    var dto = _mapper.Map<ImageSettingDto>(imageOriginal);
                     image.Name = dto.Path;
                 }
                 return image.Name;
@@ -461,16 +416,8 @@ namespace BusinessLogic.ApiClasses
         }
         public List<ImageCategory> GetImageCategories()
         {
-            List<ImageCategory> days = Enum.GetValues(typeof(ImageCategory))
-                             .Cast<ImageCategory>()
-                             .ToList();
+            List<ImageCategory> days = Enum.GetValues(typeof(ImageCategory)).Cast<ImageCategory>().ToList();
             return days;
-        }
-        public async Task<List<ImageDto>> GetAllImages()
-        {
-            var images = await _repositoryManager.Image.GetAllImages();
-            var imagesDto = _mapper.Map<List<ImageDto>>(images);
-            return imagesDto ;
         }
         public async Task<List<ImageSettingDto>> GetImageSettingImg(int imgId)
         {
@@ -501,20 +448,7 @@ namespace BusinessLogic.ApiClasses
             return new BussnessResultModel(update, _locService.GetLocalizedStringValue("successSave"))??
                  new BussnessResultModel(null, _locService.GetLocalizedStringValue("Error"));
         } 
-        public async Task<SettingImageVM> GetMediaSetting()
-        {
-            var settings = await _repositoryManager.Setting.GetAllSettings(false);
-            var settingsDto = new SettingImageVM
-            {
-                Large_height = settings.Where(c=>c.Key == "Large_height").First().Value,
-                Large_width = settings.Where(c => c.Key == "Large_width").First().Value,
-                Medium_height = settings.Where(c => c.Key == "Medium_height").First().Value,
-                Medium_width = settings.Where(c => c.Key == "Medium_width").First().Value,
-                Thumbnail_height = settings.Where(c => c.Key == "Thumbnail_height").First().Value,
-                Thumbnail_width = settings.Where(c => c.Key == "Thumbnail_width").First().Value,
-            };
-            return settingsDto;
-        } 
+        
         public async Task<List<SettingDto>> GetAllSettings()
         {
             var settings=  await _repositoryManager.Setting.GetAllSettings(false);
@@ -529,7 +463,7 @@ namespace BusinessLogic.ApiClasses
             var listImages = images.Select(image => new ProductImagesDto
             {
                 Id = image.Id,
-                Image = GetImageOriginal(image.ImageId),
+                Image = GetTypeImage(image.ImageId,ImageType.ACTUAL),
             }).ToList();
             return listImages;
         }

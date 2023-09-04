@@ -187,14 +187,14 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("correctLink"), false);
             }
-            //var zones = await _repositoryManager.Zone.GetZonesByCountryId(id);
-            //if (zones != null)
-            //{
-            //    foreach (var zone in zones)
-            //    {
-            //        _repositoryManager.Zone.DeleteZone(zone);
-            //    }
-            //}
+            var zones = await _repositoryManager.Zone.GetZonesByCountryId(id);
+            if (zones != null)
+            {
+                foreach (var zone in zones)
+                {
+                    _repositoryManager.Zone.DeleteZone(zone);
+                }
+            }
             _repositoryManager.Country.DeleteCountry(country);
 
             await _repositoryManager.SaveAsync();
@@ -218,7 +218,7 @@ namespace BusinessLogic.ApiClasses
             {
                 var countryDto = _mapper.Map<CountryDto>(c);
                 countryDto.CountryName = lang == "en" ? c.CountryName : c.CountryNameAr;
-                countryDto.Image = _imageBL.GetImageOriginal(Convert.ToInt32(c.ImageId));
+                countryDto.Image = _imageBL.GetTypeImage(Convert.ToInt32(c.ImageId), ImageType.ACTUAL);
                 return countryDto;
             }).ToList();
             return PagedList<CountryDto>.ToPagedList(countriesDto, postsParameters.PageNumber, postsParameters.PageSize);
@@ -299,7 +299,7 @@ namespace BusinessLogic.ApiClasses
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("sureLink"), false);
             }
-            if (String.IsNullOrEmpty(updateDto.ZoneName) || updateDto.ZoneName.Contains("    "))
+            if (string.IsNullOrEmpty(updateDto.ZoneName) || updateDto.ZoneName.Contains(" "))
             {
                 return new BussnessResultModel(null, _locService.GetLocalizedStringValue("enterallfiled"), false);
             }
@@ -461,7 +461,7 @@ namespace BusinessLogic.ApiClasses
         public async Task<decimal> GetTax(int customerId)
         {
             decimal tax = 0;
-            var customer = await _repositoryManager.User.GetCustomerId(customerId, false);
+            var customer = await _repositoryManager.User.GetTypeUserId(customerId,UserType.Customer, false);
             if (customer != null && customer.DefaultAddressId != null)
             {
                 var defaultAddress = await _repositoryManager.Address.GetAddressIdByCustomerId(customer.DefaultAddressId.Value, customerId, false);

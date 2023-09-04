@@ -165,7 +165,7 @@
         if(id != 0)
         {
             create = await _homeBL.GetLanugage(id);
-            image = _imageBL.GetImageOriginal(create.ImgId);
+            image = _imageBL.GetTypeImage(create.ImgId,ImageType.ACTUAL);
         }
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");

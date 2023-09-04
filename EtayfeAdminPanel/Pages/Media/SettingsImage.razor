@@ -129,7 +129,7 @@
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
         create = new SettingImageVM();
-        create = await _imageBL.GetMediaSetting();
+        create = (SettingImageVM)await _homeBL.GetSettingVM(create);
     }
 
     async Task EditImgSetting()

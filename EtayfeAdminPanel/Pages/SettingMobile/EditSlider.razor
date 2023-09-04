@@ -167,7 +167,7 @@
     {
         create = new UpdateSliderDto();
         create = await _homeBL.GetSliderId(Id);
-        image = _imageBL.GetImageOriginal(create.ImageId) ?? " ";
+        image = _imageBL.GetTypeImage(create.ImageId, ImageType.ACTUAL) ?? " ";
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         Languages = await http.GetFromJsonAsync<List<LanguageDto>>("api/Language/GetLanguages");

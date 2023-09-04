@@ -12,6 +12,7 @@ namespace Entities.Models
         public string Type { get; set; }
         [Required]
         [StringLength(191)]
+        [Url]
         public string Url { get; set; }
         [ForeignKey(nameof(Language))]
         public int? LangId { get; set; }

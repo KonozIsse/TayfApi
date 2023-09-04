@@ -37,7 +37,6 @@ namespace Repository
             }
             return await result.OrderByDescending(x => x.CreatedAt).ToListAsync();
         }
-        public int GetCountContacts() => FindAll(false).Count();
         public void CreateContact(Contact contact) => Create(contact);
         public void DeleteContact(Contact contact) => Delete(contact);
     }

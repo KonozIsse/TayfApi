@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,7 @@ namespace Contracts
         Task<Order> GetCustomerNewOlderByStore(int vendorId, int customerId);
         void CreateOrder(Order order);
         void DeleteOrder(Order order) ;
-        Task<List<Order>> GetAllCansalOrders(bool trackChanges);
-        Task<List<Order>> GetAllPandingOrders(bool trackChanges);
-        Task<List<Order>> GetAllCompleteOrders(bool trackChanges);
+        Task<List<Order>> GetTypeAllOrders(OrderStatusEnum status, bool trackChanges);
     }
    
 }

@@ -6,8 +6,6 @@ using Entities.Exception;
 using Entities.Models;
 using Entities.Models.Enums;
 using Entities.ViewModel;
-using Org.BouncyCastle.Asn1.Cms;
-using System.Web.Helpers;
 
 namespace BusinessLogic.ApiClasses
 {
@@ -92,7 +90,7 @@ namespace BusinessLogic.ApiClasses
                 {
                     Id = x.Key.Id,
                     FirstName = x.Key.FirstName,
-                    Image = _imageBL.GetImageMedium(Convert.ToInt32(x.Key.ImageId)),
+                    Image = _imageBL.GetTypeImage(Convert.ToInt32(x.Key.ImageId), ImageType.MEDIUM),
                     AdressInfo = x.Key.AdressInfo,
                     CountCart = x.CountCartStore,
                     TotalPrice = x.TotalPriceStore,
@@ -450,7 +448,7 @@ namespace BusinessLogic.ApiClasses
                 var attribute = await _repositoryManager.Attribute.GetAttributeIdProductId(productAttribut ,cart.ProdId);
                 if (attribute != null)
                 {
-                    var inventories = await _repositoryManager.Inventory.GetAllInventoryByProductIdOption(cart.ProdId, attribute.Id);
+                    var inventories = await _repositoryManager.Inventory.GetProductIdAttributeId(cart.ProdId, attribute.Id,null);
                     foreach (var inventory in inventories)
                     {
                         if (inventory.StockType == "in")
@@ -579,7 +577,7 @@ namespace BusinessLogic.ApiClasses
                 carDto.Attributes = null ?? _productBL.GetAttributsProducts(cart.ProdId).Result;
                 carDto.ShareLink = "http://demotay.com/admin" + "/share.html?id=" + cart.ProdId;
                 carDto.ProductName = cart.Product.ProductName;
-                carDto.ProductImage = _imageBL.GetImageOriginal(cart.Product.Images.First().ImageId);
+                carDto.ProductImage = _imageBL.GetTypeImage(cart.Product.Images.First().ImageId, ImageType.ACTUAL);
                 carDto.IsFeature = cart.Product.IsFeature;
                 carDto.SpecialPrice = special == null ? 0 : special.SpecialPrice;
                 carDto.StoreName = cart.Store.FirstName;

@@ -1,10 +1,11 @@
 ﻿using Entities.Models;
-using Entities.Models.Configuration;
+using Entities.Models.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -138,8 +139,9 @@ namespace Entities
             modelBuilder.Entity<User>().HasMany(customer => customer.CustomerOrders)
                          .WithOne(order => order.Customer).HasForeignKey(con => con.CustomerId);
 
+            modelBuilder.Entity<User>().Property(c => c.UserType)
+                .HasConversion(x => x.ToString(), x => (UserType)Enum.Parse(typeof(UserType), x));
         }
-
         private static void ConfigureDeleteBehavior(ModelBuilder modelBuilder)
         {
             var cascadeFKs = modelBuilder.Model.GetEntityTypes()
@@ -149,12 +151,11 @@ namespace Entities
             foreach (var fk in cascadeFKs)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
         }
-
         private static void ConfigureConfiguration(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(RepositoryContext).Assembly);
+            //modelBuilder.ApplyConfiguration(new RoleConfiguration());
         }
-
         private static void ConfigureSoftDelete(ModelBuilder modelBuilder)
         {
             Expression<Func<BaseEntity, bool>> filterExpr = bm => !bm.IsDeleted ;
@@ -191,8 +192,6 @@ namespace Entities
                 }
             }
         }
-       
-
         private static void ConfigureAutoMapToTables(ModelBuilder modelBuilder)
         {
             var allDbSets = typeof(RepositoryContext).GetProperties()

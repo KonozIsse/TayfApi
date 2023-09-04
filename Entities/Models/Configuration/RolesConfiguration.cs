@@ -14,12 +14,18 @@ namespace Entities.Models.Configuration
     {
         public void Configure(EntityTypeBuilder<Role> builder)
         {
+            builder.OwnsOne(x => x.TimeSlot, ts =>
+            {
+                ts.Property(p => p.CreatedAt).HasColumnType("time").HasColumnName("CreatedAt");
+                ts.Property(p => p.UpdatedAt).HasColumnType("time").HasColumnName("UpdatedAt");
+            });
             builder.HasData(
             new Role
             {
                 Id = 1,
                 Name = "Admin",
                 NormalizedName = "ADMIN",
+                IsVendorLink = false,
                 IsStatus = Status.Active
             },
              new Role
@@ -27,6 +33,7 @@ namespace Entities.Models.Configuration
                  Id = 2,
                  Name = "Customer",
                  NormalizedName = "CUSTOMER",
+                 IsVendorLink = false,
                  IsStatus = Status.Active
              },
             new Role
@@ -34,6 +41,7 @@ namespace Entities.Models.Configuration
                 Id = 3,
                 Name = "Store",
                 NormalizedName = "STORE",
+                IsVendorLink = true,
                 IsStatus = Status.Active
             }
             );

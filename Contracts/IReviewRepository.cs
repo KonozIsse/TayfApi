@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.DataTransferObjects;
+using Entities.Models;
 using Entities.RequestFeatures;
 using System;
 using System.Collections.Generic;

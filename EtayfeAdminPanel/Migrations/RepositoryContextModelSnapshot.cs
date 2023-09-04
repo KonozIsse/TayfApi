@@ -1748,15 +1748,6 @@ namespace EtayfeAdminPanel.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("IsStatus")
                         .HasColumnType("int");
 
@@ -1771,9 +1762,6 @@ namespace EtayfeAdminPanel.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
@@ -1787,30 +1775,27 @@ namespace EtayfeAdminPanel.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "39a843c7-4f8e-433b-b5ab-c5a4293ebd53",
-                            CreatedAt = new DateTime(2023, 4, 29, 2, 3, 57, 569, DateTimeKind.Local).AddTicks(4012),
-                            IsDeleted = false,
+                            ConcurrencyStamp = "5f40a0f3-e247-4f9e-afdf-c33aaaa91573",
                             IsStatus = 1,
+                            IsVendorLink = false,
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "fcd59888-ceac-4e5c-9f20-12c572841b83",
-                            CreatedAt = new DateTime(2023, 4, 29, 2, 3, 57, 569, DateTimeKind.Local).AddTicks(4102),
-                            IsDeleted = false,
+                            ConcurrencyStamp = "1d0ad41e-eb63-4881-868b-f17e35e19d2d",
                             IsStatus = 1,
+                            IsVendorLink = false,
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "60b78f82-174e-4bdf-89e5-11608cf617bd",
-                            CreatedAt = new DateTime(2023, 4, 29, 2, 3, 57, 569, DateTimeKind.Local).AddTicks(4108),
-                            IsDeleted = false,
+                            ConcurrencyStamp = "4b1a360c-3ac0-421f-a43d-66eb9261866b",
                             IsStatus = 1,
+                            IsVendorLink = true,
                             Name = "Store",
                             NormalizedName = "STORE"
                         });
@@ -2334,8 +2319,9 @@ namespace EtayfeAdminPanel.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("UserType")
-                        .HasColumnType("int");
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("VerifiedCode")
                         .HasColumnType("int");
@@ -3037,6 +3023,32 @@ namespace EtayfeAdminPanel.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Entities.Models.Role", b =>
+                {
+                    b.OwnsOne("Entities.Models.TimeSlot", "TimeSlot", b1 =>
+                        {
+                            b1.Property<int>("RoleId")
+                                .HasColumnType("int");
+
+                            b1.Property<TimeSpan>("CreatedAt")
+                                .HasColumnType("time")
+                                .HasColumnName("CreatedAt");
+
+                            b1.Property<TimeSpan?>("UpdatedAt")
+                                .HasColumnType("time")
+                                .HasColumnName("UpdatedAt");
+
+                            b1.HasKey("RoleId");
+
+                            b1.ToTable("AspNetRoles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RoleId");
+                        });
+
+                    b.Navigation("TimeSlot");
                 });
 
             modelBuilder.Entity("Entities.Models.Service", b =>

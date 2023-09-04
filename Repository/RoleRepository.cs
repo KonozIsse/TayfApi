@@ -17,7 +17,7 @@ namespace Repository
 
         }
         public async Task<List<Role>> GetRolesAdminStore()
-            => await FindByCondition(c =>  c.Name != "Customer", false).OrderByDescending(c=>c.CreatedAt).ToListAsync();  
+            => await FindByCondition(c =>  c.Name != "Customer", false).OrderByDescending(c=>c.TimeSlot.CreatedAt).ToListAsync();  
         public async Task<Role> GetActiveRole (int id ,bool trackChanges)
             => await FindByCondition(c => c.Id == id &&  c.IsStatus== Status.Active, trackChanges).FirstOrDefaultAsync();
         public async Task<Role> GetRoleId(int id, bool trackChanges)

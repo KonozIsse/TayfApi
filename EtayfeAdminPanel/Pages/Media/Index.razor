@@ -220,7 +220,7 @@ else
                     <div class="modal-body">
                         <p>@SharedLocalize.GetLocalizedStringValue("ChooseImages")</p>
                         <select class="form-control" @bind="create.Category">
-                            <option value="@ImageCategory.Products" selected>@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
+                            <option value="@ImageCategory.Products" selected="">@SharedLocalize.GetLocalizedStringValue("products") (1000 * 600)</option>
                             <option value="@ImageCategory.Banners">@SharedLocalize.GetLocalizedStringValue("banners") (1140 * 240)</option>
                             <option value="@ImageCategory.Categories">@SharedLocalize.GetLocalizedStringValue("categories") (250 * 200)</option>
                             <option value="@ImageCategory.Sliders">@SharedLocalize.GetLocalizedStringValue("slider") (1400 * 600)</option>
@@ -255,7 +255,6 @@ else
     public List<ImageDto> Model { get; set; }
     public List<ImageCategory> categories { get; set; } 
     public AdminDto user { get; set; }
-    private List<IFormFile> files = new();
     public ImageCategory? category { get; set; }
     public MetaData MetaData { get; set; } = new MetaData();
     private PostsParameters _PostsParameters = new PostsParameters();
@@ -290,9 +289,7 @@ else
     {
         using var content = new MultipartFormDataContent();
         content.Add(content: fileContent, name: "\"file\"", fileName: fileName );
-        var response =
-                await http.PostAsync("api/Media/addImages",
-                content);
+        var response = await http.PostAsync($"api/Media/addImages", content);
         if (response.IsSuccessStatusCode)
         {
             message = SharedLocalize.GetLocalizedStringValue("successSave");

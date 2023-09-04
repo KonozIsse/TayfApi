@@ -210,6 +210,7 @@
     public int statusId { get; set; }
     [Parameter]
     public string lang { get; set; }
+    public AdminDto user { get; set; }
     public List<CustomerDto> customers { get; set; }
     public List<StoreDto> stores { get; set; } 
     public List<OrderStatusDto> states { get; set; }
@@ -222,6 +223,7 @@
     {
         http.DefaultRequestHeaders.Add("Accept", "application/json");
         lang = await http.GetFromJsonAsync<string>("api/Language/GetDefaultLanugage");
+        user = await http.GetFromJsonAsync<AdminDto>("api/Account/currentUser");
         customers = await _userBL.GetAllCustomer();
         stores = await _userBL.GetStores();
         states = await _orderBL.GetAllOrderStatus(lang);
@@ -234,7 +236,7 @@
     }
     async Task GetAllOrders()
     {
-        var pagingResponse = await _orderBL.GetAllOrders(3,customerId,storeId,statusId, search, _PostsParameters);
+        var pagingResponse = await _orderBL.GetAllOrders(user.Id,customerId,storeId,statusId, search, _PostsParameters);
         Model = pagingResponse.ToList();
         MetaData = pagingResponse.MetaData;
     }

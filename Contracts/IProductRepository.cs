@@ -17,12 +17,6 @@ namespace Contracts
         Task<Product> GetAcceptAdminActiveProduct(int id);
         Task<List<Product>> GetProductsTOStoreId(int storeId);
         Task<Product> CheckApproveProduct(int id); 
-        Task<List<Product>> TopRatedPage();
-        Task<List<Product>> GetBestProducts();
-        Task<List<Product>> GetPopularProducts();
-        Task<List<Product>> GetLatestPage();
-        Task<List<Product>> SpecialsPage();
-        Task<List<Product>> DailyDeals();
         Task<List<Product>> GetProductsCP( string search, int? filter);
         void AddProduct(Product product);
         void DeleteProduct(Product product);
